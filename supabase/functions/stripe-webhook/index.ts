@@ -105,11 +105,30 @@ Deno.serve(async (req: Request) => {
           status: string;
           current_period_end: number;
           pause_collection: { behavior: string } | null;
+          items: { data: { price: { id: string } }[] };
         };
         const status = subscription.pause_collection ? "paused" : subscription.status;
+
+        // Resync plan_id from the subscription's current price so that plan
+        // upgrades/downgrades made via the Stripe billing portal keep the
+        // member's feature entitlements (plan_features) in sync.
+        const currentPriceId = subscription.items?.data?.[0]?.price?.id;
+        const updatePayload: Record<string, unknown> = { subscription_status: status };
+
+        if (currentPriceId) {
+          const { data: matchedPlan } = await supabase
+            .from("membership_plans")
+            .select("id")
+            .eq("stripe_price_id", currentPriceId)
+            .maybeSingle();
+          if (matchedPlan) {
+            updatePayload.plan_id = matchedPlan.id;
+          }
+        }
+
         await supabase
           .from("member_profiles")
-          .update({ subscription_status: status })
+          .update(updatePayload)
           .eq("stripe_customer_id", subscription.customer);
         break;
       }
@@ -123,16 +142,7 @@ Deno.serve(async (req: Request) => {
         break;
       }
 
-      case "invoice.paid": {
-        const invoice = event.data.object as {
-          customer: string;
-          id: string;
-          total: number;
-          created: number;
-        };
-        // Could store invoice records for billing history
-        break;
-      }
+
     }
 
     return new Response(JSON.stringify({ received: true }), {

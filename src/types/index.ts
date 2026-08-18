@@ -1,25 +1,3 @@
-export interface UserSubscription {
-  customer_id: string
-  subscription_id: string
-  price_id: string | null
-  subscription_status: string
-  current_period_start: string | null
-  current_period_end: string | null
-  cancel_at_period_end: boolean
-  payment_method_brand: string | null
-  payment_method_last4: string | null
-}
-
-export interface UserOrder {
-  customer_id: string
-  order_id: string
-  payment_status: string
-  order_date: string
-  amount_total: number | null
-  currency: string | null
-  payment_intent_id: string | null
-}
-
 export interface MembershipPlan {
   id: string
   slug: string
