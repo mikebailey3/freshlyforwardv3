@@ -1,5 +1,87 @@
 @import "tailwindcss";
 
+@theme {
+  --font-serif: 'Manrope', 'DM Sans', sans-serif;
+
+  /* Brand green (matches --green in the marketing site) */
+  --color-primary-50: #ecfdf5;
+  --color-primary-100: #d1fae5;
+  --color-primary-200: #a7f3d0;
+  --color-primary-300: #6ee7b7;
+  --color-primary-400: #34d399;
+  --color-primary-500: #10b981;
+  --color-primary-600: #078a58;
+  --color-primary-700: #046b45;
+  --color-primary-800: #035939;
+  --color-primary-900: #023d27;
+  --color-primary-950: #01180f;
+
+  /* Complementary blue-teal, used alongside primary in gradients/highlights */
+  --color-secondary-50: #eff6ff;
+  --color-secondary-100: #dbeafe;
+  --color-secondary-200: #bfdbfe;
+  --color-secondary-300: #93c5fd;
+  --color-secondary-400: #60a5fa;
+  --color-secondary-500: #3b82f6;
+  --color-secondary-600: #2563eb;
+  --color-secondary-700: #1d4ed8;
+  --color-secondary-800: #1e40af;
+  --color-secondary-900: #1e3a8a;
+  --color-secondary-950: #172554;
+
+  /* Warm gold accent — badges, "coming soon" tags, concierge highlights */
+  --color-accent-50: #fefce8;
+  --color-accent-100: #fdf6d8;
+  --color-accent-200: #fbecad;
+  --color-accent-300: #f8dd75;
+  --color-accent-400: #f0c94a;
+  --color-accent-500: #e0af2e;
+  --color-accent-600: #d4af37;
+  --color-accent-700: #a9821f;
+  --color-accent-800: #85631c;
+  --color-accent-900: #6f521c;
+  --color-accent-950: #402b0d;
+
+  /* Positive / success states */
+  --color-success-50: #f0fdf4;
+  --color-success-100: #dcfce7;
+  --color-success-200: #bbf7d0;
+  --color-success-300: #86efac;
+  --color-success-400: #4ade80;
+  --color-success-500: #22c55e;
+  --color-success-600: #16a34a;
+  --color-success-700: #15803d;
+  --color-success-800: #166534;
+  --color-success-900: #14532d;
+  --color-success-950: #052e16;
+
+  /* Caution / needs-attention states */
+  --color-warning-50: #fffbeb;
+  --color-warning-100: #fef3c7;
+  --color-warning-200: #fde68a;
+  --color-warning-300: #fcd34d;
+  --color-warning-400: #fbbf24;
+  --color-warning-500: #f59e0b;
+  --color-warning-600: #d97706;
+  --color-warning-700: #b45309;
+  --color-warning-800: #92400e;
+  --color-warning-900: #78350f;
+  --color-warning-950: #451a03;
+
+  /* Negative / error states */
+  --color-error-50: #fef2f2;
+  --color-error-100: #fee2e2;
+  --color-error-200: #fecaca;
+  --color-error-300: #fca5a5;
+  --color-error-400: #f87171;
+  --color-error-500: #ef4444;
+  --color-error-600: #dc2626;
+  --color-error-700: #b91c1c;
+  --color-error-800: #991b1b;
+  --color-error-900: #7f1d1d;
+  --color-error-950: #450a0a;
+}
+
 :root {
   --navy: #071a31;
   --navy-soft: #102a46;

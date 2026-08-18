@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { calculateSearchReadiness } from '@/lib/profile'
+import { CircularProgress } from '@/components/CircularProgress'
 import { TrendingUp, AlertCircle, Check } from 'lucide-react'
 import type { MemberProfile } from '@/types'
 
@@ -8,9 +9,6 @@ export function SearchReadinessWidget({ profile }: { profile: MemberProfile | nu
     if (!profile) return { score: 0, missing: [] }
     return calculateSearchReadiness(profile)
   }, [profile])
-
-  const scoreColor = score >= 80 ? 'text-success-600' : score >= 50 ? 'text-warning-600' : 'text-error-600'
-  const barColor = score >= 80 ? 'bg-success-500' : score >= 50 ? 'bg-warning-500' : 'bg-error-500'
 
   return (
     <div className="rounded-2xl border border-neutral-200 bg-white p-6">
@@ -26,30 +24,7 @@ export function SearchReadinessWidget({ profile }: { profile: MemberProfile | nu
 
       {/* Score */}
       <div className="mt-6 flex items-center justify-center">
-        <div className="relative h-32 w-32">
-          <svg className="h-full w-full -rotate-90" viewBox="0 0 100 100">
-            <circle
-              cx="50" cy="50" r="42"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="8"
-              className="text-neutral-100"
-            />
-            <circle
-              cx="50" cy="50" r="42"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="8"
-              strokeDasharray={`${(score / 100) * 264} 264`}
-              strokeLinecap="round"
-              className={`${score >= 80 ? 'text-success-500' : score >= 50 ? 'text-warning-500' : 'text-error-500'} transition-all duration-700`}
-            />
-          </svg>
-          <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className={`font-serif text-3xl font-bold ${scoreColor}`}>{score}%</span>
-            <span className="text-xs text-neutral-500">Complete</span>
-          </div>
-        </div>
+        <CircularProgress value={score} size={128} strokeWidth={8} />
       </div>
 
       {/* Missing items */}

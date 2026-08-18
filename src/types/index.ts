@@ -34,6 +34,30 @@ export interface Feature {
   updated_at: string
 }
 
+export type BadgeType = 'membership' | 'achievement'
+export type BadgeColorScheme = 'green' | 'gold' | 'navy' | 'silver' | 'blue' | 'purple'
+
+export interface Badge {
+  id: string
+  slug: string
+  badge_type: BadgeType
+  name: string
+  description: string
+  icon: string
+  color_scheme: BadgeColorScheme
+  sort_order: number
+  is_active: boolean
+  created_at: string
+}
+
+export interface MemberBadge {
+  id: string
+  user_id: string
+  badge_id: string
+  awarded_at: string
+  badge?: Badge
+}
+
 export interface PlanFeature {
   id: string
   plan_id: string

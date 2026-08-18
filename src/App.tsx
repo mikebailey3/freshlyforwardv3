@@ -32,6 +32,10 @@ import { CalendarPage } from '@/pages/CalendarPage'
 import { NotificationsPage } from '@/pages/NotificationsPage'
 import { CommunicationPreferencesPage } from '@/pages/CommunicationPreferencesPage'
 import { ActivityFeedPage } from '@/pages/ActivityFeedPage'
+import { InterviewsPage } from '@/pages/InterviewsPage'
+import { ToolsPage } from '@/pages/ToolsPage'
+import { AchievementVaultPage } from '@/pages/AchievementVaultPage'
+import { RoadmapPage } from '@/pages/RoadmapPage'
 import { FeatureEntitlementsPage } from '@/pages/strategist/FeatureEntitlementsPage'
 import { StrategistDashboardPage } from '@/pages/strategist/StrategistDashboardPage'
 import { StrategistMembersPage } from '@/pages/strategist/StrategistMembersPage'
@@ -223,6 +227,39 @@ function App() {
           element={
             <ProtectedRoute>
               <MemberLayout><ActivityFeedPage /></MemberLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/interviews"
+          element={
+            <ProtectedRoute>
+              <MemberLayout><InterviewsPage /></MemberLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/tools"
+          element={
+            <ProtectedRoute>
+              <MemberLayout><ToolsPage /></MemberLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/achievement-vault"
+          element={
+            <ProtectedRoute feature="achievement_vault" requiredPlan="career-concierge">
+              <MemberLayout><AchievementVaultPage /></MemberLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/roadmap"
+          element={
+            <ProtectedRoute feature="career_roadmap" requiredPlan="career-concierge">
+              <MemberLayout><RoadmapPage /></MemberLayout>
             </ProtectedRoute>
           }
         />
