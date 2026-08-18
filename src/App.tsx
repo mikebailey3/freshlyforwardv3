@@ -43,6 +43,8 @@ import { StrategistMemberWorkspacePage } from '@/pages/strategist/StrategistMemb
 import { StrategistOpportunitiesPage } from '@/pages/strategist/StrategistOpportunitiesPage'
 import { StrategistApplicationsPage } from '@/pages/strategist/StrategistApplicationsPage'
 import { AdminDashboardPage } from '@/pages/strategist/AdminDashboardPage'
+import { AdminMembersPage } from '@/pages/strategist/AdminMembersPage'
+import { AdminMemberDetailPage } from '@/pages/strategist/AdminMemberDetailPage'
 import { ProtectedRoute } from '@/components/ProtectedRoute'
 import { LoadingScreen } from '@/components/LoadingScreen'
 import { MemberLayout } from '@/components/MemberLayout'
@@ -312,6 +314,22 @@ function App() {
           element={
             <ProtectedRoute roles={['admin']}>
               <AdminDashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/members"
+          element={
+            <ProtectedRoute roles={['admin']}>
+              <AdminMembersPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/members/:memberId"
+          element={
+            <ProtectedRoute roles={['admin']}>
+              <AdminMemberDetailPage />
             </ProtectedRoute>
           }
         />

@@ -1,7 +1,8 @@
 import { useMemo } from 'react'
-import { calculateSearchReadiness } from '@/lib/profile'
+import { Link } from 'react-router-dom'
+import { calculateSearchReadiness, getReadinessFixLink } from '@/lib/profile'
 import { CircularProgress } from '@/components/CircularProgress'
-import { TrendingUp, AlertCircle, Check } from 'lucide-react'
+import { TrendingUp, AlertCircle, Check, ArrowRight } from 'lucide-react'
 import type { MemberProfile } from '@/types'
 
 export function SearchReadinessWidget({ profile }: { profile: MemberProfile | null }) {
@@ -9,6 +10,8 @@ export function SearchReadinessWidget({ profile }: { profile: MemberProfile | nu
     if (!profile) return { score: 0, missing: [] }
     return calculateSearchReadiness(profile)
   }, [profile])
+
+  const fixLink = useMemo(() => getReadinessFixLink(missing), [missing])
 
   return (
     <div className="rounded-2xl border border-neutral-200 bg-white p-6">
@@ -42,6 +45,13 @@ export function SearchReadinessWidget({ profile }: { profile: MemberProfile | nu
               <li className="text-xs text-neutral-400">+ {missing.length - 5} more</li>
             )}
           </ul>
+          <Link
+            to={fixLink}
+            className="mt-4 flex w-full items-center justify-center gap-1.5 rounded-lg bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-700"
+          >
+            Let&rsquo;s fix it
+            <ArrowRight className="h-4 w-4" />
+          </Link>
         </div>
       ) : (
         <div className="mt-6 flex items-center gap-2 rounded-lg bg-success-50 p-3">

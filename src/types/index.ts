@@ -18,6 +18,21 @@ export interface MembershipPlan {
   updated_at: string
 }
 
+export interface AdminMemberSummary {
+  user_id: string
+  email: string
+  full_name: string | null
+  headline: string | null
+  plan_id: string | null
+  plan_name: string | null
+  subscription_status: string
+  account_status: 'active' | 'suspended' | 'banned'
+  account_status_reason: string | null
+  onboarding_completed: boolean
+  search_readiness_score: number
+  created_at: string
+}
+
 export interface Feature {
   id: string
   feature_key: string
@@ -135,6 +150,9 @@ export interface MemberProfile {
   stripe_customer_id: string | null
   stripe_subscription_id: string | null
   subscription_status: string
+  account_status: 'active' | 'suspended' | 'banned'
+  account_status_reason: string | null
+  account_status_changed_at: string | null
   created_at: string
   updated_at: string
 }

@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { MemberLayout } from '@/components/MemberLayout'
 import { SearchReadinessWidget } from '@/components/SearchReadinessWidget'
+import { ProfileEditForm } from '@/components/ProfileEditForm'
 import { useAuth } from '@/context/AuthContext'
 import { supabase } from '@/lib/supabase'
-import { ensureProfile } from '@/lib/profile'
+import { ensureProfile, calculateSearchReadiness } from '@/lib/profile'
 import {
   User, Briefcase, GraduationCap, Award, Wrench, Target, DollarSign,
-  Clock, MapPin, TrendingUp, FileCheck, FileText, Upload, Loader2,
+  Clock, MapPin, TrendingUp, FileCheck, FileText, Upload, Loader2, Pencil,
 } from 'lucide-react'
 import type { MemberProfile, MemberDocument } from '@/types'
 
@@ -15,6 +17,10 @@ export function CareerProfilePage() {
   const [documents, setDocuments] = useState<MemberDocument[]>([])
   const [loading, setLoading] = useState(true)
   const [uploading, setUploading] = useState(false)
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  const editing = searchParams.get('edit') === '1'
+  const focusSection = searchParams.get('focus')
 
   useEffect(() => {
     if (!user) return
@@ -64,11 +70,55 @@ export function CareerProfilePage() {
 
   const p = profile as MemberProfile | null
 
+  const startEditing = () => setSearchParams({ edit: '1' })
+  const stopEditing = () => setSearchParams({})
+
+  const handleSaveProfile = async (updates: Record<string, unknown>) => {
+    if (!user || !p) return
+    const merged = { ...p, ...updates } as MemberProfile
+    const { score } = calculateSearchReadiness(merged)
+    const { error } = await supabase
+      .from('member_profiles')
+      .update({ ...updates, search_readiness_score: score })
+      .eq('user_id', user.id)
+    if (error) throw new Error(error.message)
+    await refreshProfile()
+    stopEditing()
+  }
+
+  if (editing && p) {
+    return (
+      <MemberLayout>
+        <div className="mb-6 flex items-center justify-between">
+          <div>
+            <h1 className="font-serif text-2xl font-semibold text-neutral-900 sm:text-3xl">Edit Career Profile</h1>
+            <p className="mt-1 text-sm text-neutral-600">Update any section below, then save your changes.</p>
+          </div>
+        </div>
+        <ProfileEditForm
+          profile={p}
+          focusSection={focusSection}
+          onSave={handleSaveProfile}
+          onCancel={stopEditing}
+        />
+      </MemberLayout>
+    )
+  }
+
   return (
     <MemberLayout>
-      <div className="mb-6">
-        <h1 className="font-serif text-2xl font-semibold text-neutral-900 sm:text-3xl">Career Profile</h1>
-        <p className="mt-1 text-sm text-neutral-600">Your complete career profile, built from your questionnaire.</p>
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <h1 className="font-serif text-2xl font-semibold text-neutral-900 sm:text-3xl">Career Profile</h1>
+          <p className="mt-1 text-sm text-neutral-600">Your complete career profile, built from your questionnaire.</p>
+        </div>
+        <button
+          onClick={startEditing}
+          className="flex items-center gap-1.5 rounded-lg bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-700"
+        >
+          <Pencil className="h-4 w-4" />
+          Edit Profile
+        </button>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">

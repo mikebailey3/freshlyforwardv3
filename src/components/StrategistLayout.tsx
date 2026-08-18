@@ -2,7 +2,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
 import {
   Compass, LayoutDashboard, Users, Search, FileText, BarChart3,
-  Menu, X, LogOut, User,
+  Menu, X, LogOut, User, ShieldCheck,
 } from 'lucide-react'
 import { useState } from 'react'
 import type { ReactNode } from 'react'
@@ -16,6 +16,7 @@ const navItems = [
 
 const adminNavItems = [
   { to: '/admin', label: 'Analytics', icon: BarChart3 },
+  { to: '/admin/members', label: 'All Members', icon: ShieldCheck },
 ]
 
 export function StrategistLayout({ children, isAdmin = false }: { children: ReactNode; isAdmin?: boolean }) {

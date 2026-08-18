@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase'
+import { questionnaireSections } from '@/data/questionnaire'
 import type { MemberProfile, CareerTimelineEvent } from '@/types'
 
 export async function ensureProfile(userId: string): Promise<MemberProfile | null> {
@@ -123,4 +124,29 @@ export function calculateSearchReadiness(profile: MemberProfile): {
     score: Math.round((earned / total) * 100),
     missing,
   }
+}
+
+/**
+ * Finds which questionnaire/profile-edit section a given member_profiles
+ * column belongs to, so the "Let's fix it" flow can deep-link straight
+ * into the right part of the editable profile.
+ */
+export function getSectionKeyForField(field: string): string | null {
+  for (const section of questionnaireSections) {
+    if (section.fields.some((f) => f.key === field)) {
+      return section.key
+    }
+  }
+  return null
+}
+
+/**
+ * Builds the URL for the "Let's fix it" call-to-action on the Search
+ * Readiness widget — jumps into edit mode on the Career Profile page,
+ * focused on the section containing the first incomplete field.
+ */
+export function getReadinessFixLink(missing: { field: string; label: string }[]): string {
+  const firstMissing = missing[0]
+  const section = firstMissing ? getSectionKeyForField(firstMissing.field) : null
+  return section ? `/profile?edit=1&focus=${section}` : '/profile?edit=1'
 }

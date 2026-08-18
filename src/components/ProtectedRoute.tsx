@@ -3,6 +3,7 @@ import { useAuth } from '@/context/AuthContext'
 import { useEntitlements } from '@/hooks/useEntitlements'
 import { MemberLayout } from '@/components/MemberLayout'
 import { UpgradeRequiredPage } from '@/components/FeatureEntitlements'
+import { AccountRestrictedPage } from '@/components/AccountRestrictedPage'
 import type { ReactNode } from 'react'
 import type { UserRole, FeatureKey } from '@/types'
 
@@ -14,7 +15,7 @@ interface ProtectedRouteProps {
 }
 
 export function ProtectedRoute({ children, roles, feature, requiredPlan }: ProtectedRouteProps) {
-  const { user, role, loading } = useAuth()
+  const { user, profile, role, loading } = useAuth()
   const { canAccess, loading: entitlementsLoading } = useEntitlements()
 
   if (loading || entitlementsLoading) {
@@ -27,6 +28,12 @@ export function ProtectedRoute({ children, roles, feature, requiredPlan }: Prote
 
   if (!user) {
     return <Navigate to="/signin" replace />
+  }
+
+  // Suspended/banned members are blocked from the app entirely (admins and
+  // strategists are staff accounts and are not subject to this check).
+  if (role === 'member' && profile?.account_status && profile.account_status !== 'active') {
+    return <AccountRestrictedPage status={profile.account_status} reason={profile.account_status_reason} />
   }
 
   if (roles && !roles.includes(role)) {

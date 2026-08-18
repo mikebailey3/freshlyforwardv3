@@ -34,7 +34,10 @@ export function SignUpPage() {
       setError(signUpError)
       setLoading(false)
     } else {
-      navigate(planSlug ? `/checkout/${planSlug}` : '/pricing')
+      // If a plan was already selected (from the Pricing page), continue to
+      // checkout for that plan. Otherwise, get the member straight into the
+      // career wizard so they can start building their profile immediately.
+      navigate(planSlug ? `/checkout/${planSlug}` : '/onboarding')
     }
   }
 

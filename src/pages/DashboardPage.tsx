@@ -5,7 +5,7 @@ import { CircularProgress } from '@/components/CircularProgress'
 import { useAuth } from '@/context/AuthContext'
 import { useEntitlements } from '@/hooks/useEntitlements'
 import { supabase } from '@/lib/supabase'
-import { ensureProfile, calculateSearchReadiness } from '@/lib/profile'
+import { ensureProfile, calculateSearchReadiness, getReadinessFixLink } from '@/lib/profile'
 import { TOOL_TILES } from '@/data/tools'
 import {
   FileText, MessageSquare, Briefcase, Calendar, Mail,
@@ -154,8 +154,8 @@ export function DashboardPage() {
               {readiness.score >= 80 ? "You're doing great! Keep going." : 'Keep going, you\u2019re getting closer.'}
             </p>
           </div>
-          <Link to="/profile" className="mt-3 inline-block text-xs font-medium text-primary-600 hover:text-primary-700">
-            View My Progress
+          <Link to={readiness.missing.length > 0 ? getReadinessFixLink(readiness.missing) : '/profile'} className="mt-3 inline-block text-xs font-medium text-primary-600 hover:text-primary-700">
+            {readiness.missing.length > 0 ? "Let's fix it" : 'View My Progress'}
           </Link>
         </div>
 
