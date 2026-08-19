@@ -6,6 +6,7 @@ import { useAuth } from '@/context/AuthContext'
 import { useEntitlements } from '@/hooks/useEntitlements'
 import { supabase } from '@/lib/supabase'
 import { ensureProfile, calculateSearchReadiness, getReadinessFixLink } from '@/lib/profile'
+import { getRecentPublishedPosts } from '@/lib/blog'
 import { TOOL_TILES } from '@/data/tools'
 import {
   FileText, MessageSquare, Briefcase, Calendar, Mail,
@@ -30,12 +31,6 @@ const MOTIVATIONS = [
   'The right opportunity is worth the wait \u2014 keep going.',
 ]
 
-const FORWARD_FEED = [
-  { category: 'JOB SEARCH', title: '7 Ways to Make Your Resume Stand Out to Employers', readTime: '5 min read' },
-  { category: 'INTERVIEW PREP', title: 'How to Ace Your Next Interview with Confidence', readTime: '6 min read' },
-  { category: 'CAREER GROWTH', title: '5 Steps to Take Control of Your Career Growth', readTime: '4 min read' },
-]
-
 function dayIndex(len: number) {
   const dayOfYear = Math.floor(
     (Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000
@@ -58,6 +53,7 @@ export function DashboardPage() {
   const [allMessages, setAllMessages] = useState<Message[]>([])
   const [mockInterviews, setMockInterviews] = useState<MockInterview[]>([])
   const [upcomingEvents, setUpcomingEvents] = useState<CalendarEvent[]>([])
+  const [recentPosts, setRecentPosts] = useState<Awaited<ReturnType<typeof getRecentPublishedPosts>>>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -67,7 +63,7 @@ export function DashboardPage() {
       await ensureProfile(user.id)
       await refreshProfile()
 
-      const [appsRes, unreadRes, allMsgRes, mockRes, eventsRes] = await Promise.all([
+      const [appsRes, unreadRes, allMsgRes, mockRes, eventsRes, postsRes] = await Promise.all([
         supabase.from('applications').select('*').eq('member_id', user.id),
         supabase
           .from('messages')
@@ -84,6 +80,7 @@ export function DashboardPage() {
           .gte('start_at', new Date().toISOString())
           .order('start_at', { ascending: true })
           .limit(3),
+        getRecentPublishedPosts(3),
       ])
 
       setApplications((appsRes.data as Application[]) || [])
@@ -91,6 +88,7 @@ export function DashboardPage() {
       setAllMessages((allMsgRes.data as Message[]) || [])
       setMockInterviews((mockRes.data as MockInterview[]) || [])
       setUpcomingEvents((eventsRes.data as CalendarEvent[]) || [])
+      setRecentPosts(postsRes)
 
       setLoading(false)
     }
@@ -329,17 +327,27 @@ export function DashboardPage() {
       <div className="mt-6 rounded-2xl border border-neutral-200 bg-white p-6">
         <div className="flex items-center justify-between">
           <h2 className="font-serif text-base font-semibold text-neutral-900">The Forward Feed</h2>
-          <span className="text-xs font-medium text-primary-600">Visit The Forward Feed &rarr;</span>
+          <Link to="/forward-feed" className="text-xs font-medium text-primary-600 hover:text-primary-700">
+            Visit The Forward Feed &rarr;
+          </Link>
         </div>
-        <div className="mt-4 grid gap-4 sm:grid-cols-3">
-          {FORWARD_FEED.map((article) => (
-            <div key={article.title} className="rounded-xl border border-neutral-200 p-4">
-              <p className="text-[11px] font-semibold uppercase tracking-wide text-primary-600">{article.category}</p>
-              <p className="mt-1 text-sm font-medium text-neutral-900">{article.title}</p>
-              <p className="mt-2 text-xs text-neutral-400">{article.readTime}</p>
-            </div>
-          ))}
-        </div>
+        {recentPosts.length === 0 ? (
+          <p className="mt-4 text-sm text-neutral-500">New articles are on the way &mdash; check back soon.</p>
+        ) : (
+          <div className="mt-4 grid gap-4 sm:grid-cols-3">
+            {recentPosts.map((post) => (
+              <Link
+                key={post.id}
+                to={`/forward-feed/${post.slug}`}
+                className="rounded-xl border border-neutral-200 p-4 transition-colors hover:border-primary-200 hover:bg-neutral-50"
+              >
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-primary-600">{post.category}</p>
+                <p className="mt-1 text-sm font-medium text-neutral-900">{post.title}</p>
+                <p className="mt-2 text-xs text-neutral-400">{post.read_time_minutes} min read</p>
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Quick Access Tools */}

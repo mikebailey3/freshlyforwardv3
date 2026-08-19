@@ -33,6 +33,26 @@ export interface AdminMemberSummary {
   created_at: string
 }
 
+export type BlogCategory = 'Job Search Tips' | 'Interview Prep' | 'Career Growth' | 'FreshlyForward Updates'
+export type BlogPostStatus = 'draft' | 'scheduled' | 'published'
+
+export interface BlogPost {
+  id: string
+  slug: string
+  title: string
+  excerpt: string
+  content: string
+  category: BlogCategory
+  cover_image_url: string | null
+  read_time_minutes: number
+  status: BlogPostStatus
+  author_id: string | null
+  author_name: string
+  published_at: string | null
+  created_at: string
+  updated_at: string
+}
+
 export interface Feature {
   id: string
   feature_key: string

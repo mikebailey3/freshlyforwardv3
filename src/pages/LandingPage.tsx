@@ -1,5 +1,6 @@
 import { ArrowRight, CalendarCheck, Check, ClipboardCheck, FilePenLine, Handshake, MessageCircleMore, PauseCircle, Search, ShieldCheck, Sparkles, Target, UserRoundCheck, X } from 'lucide-react'
 import { LinkButton, SectionHeading } from '@/components/ui'
+import { ForwardFeedWidget } from '@/components/ForwardFeedWidget'
 
 const promises = [
   { icon: ShieldCheck, title: '100% Human-Led Service', copy: 'No bots, no shortcuts. Every decision is made by a real career professional.' },
@@ -104,6 +105,8 @@ export function LandingPage() {
           <div><Handshake /><span><strong>Ongoing coaching</strong>Navigate decisions, offers, and next moves.</span></div>
         </div>
       </section>
+
+      <ForwardFeedWidget />
 
       <section className="closing-cta">
         <div className="shell closing-inner">

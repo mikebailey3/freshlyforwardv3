@@ -8,6 +8,7 @@ const navigation = [
   ['/services', 'Services'],
   ['/why-freshlyforward', 'Why FreshlyForward'],
   ['/pricing', 'Pricing'],
+  ['/forward-feed', 'The Forward Feed'],
   ['/about', 'About'],
 ] as const
 
@@ -58,7 +59,7 @@ export function SiteFooter() {
     <footer className="site-footer">
       <div className="shell footer-grid">
         <div className="footer-brand"><Logo /><p>Human-led career search support for people ready to move forward with intention.</p></div>
-        <div><strong>Explore</strong><Link to="/how-it-works">How It Works</Link><Link to="/services">Services</Link><Link to="/pricing">Pricing</Link><Link to="/faq">FAQ</Link></div>
+        <div><strong>Explore</strong><Link to="/how-it-works">How It Works</Link><Link to="/services">Services</Link><Link to="/pricing">Pricing</Link><Link to="/forward-feed">The Forward Feed</Link><Link to="/faq">FAQ</Link></div>
         <div><strong>Company</strong><Link to="/about">About</Link><Link to="/contact">Contact</Link><Link to="/why-freshlyforward">Why FreshlyForward</Link><Link to="/authorization">Authorization</Link></div>
         <div><strong>Legal</strong><Link to="/privacy">Privacy</Link><Link to="/terms">Terms</Link><Link to="/signin">Client login</Link><Link to="/signup">Get started</Link></div>
       </div>

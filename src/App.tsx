@@ -9,6 +9,8 @@ import { WhyFreshlyForwardPage } from '@/pages/WhyFreshlyForwardPage'
 import { AboutPage } from '@/pages/AboutPage'
 import { ContactPage } from '@/pages/ContactPage'
 import { FaqPage } from '@/pages/FaqPage'
+import { ForwardFeedPage } from '@/pages/ForwardFeedPage'
+import { ForwardFeedPostPage } from '@/pages/ForwardFeedPostPage'
 import { AuthorizationPage } from '@/pages/AuthorizationPage'
 import { PrivacyPage } from '@/pages/PrivacyPage'
 import { TermsPage } from '@/pages/TermsPage'
@@ -45,6 +47,8 @@ import { StrategistApplicationsPage } from '@/pages/strategist/StrategistApplica
 import { AdminDashboardPage } from '@/pages/strategist/AdminDashboardPage'
 import { AdminMembersPage } from '@/pages/strategist/AdminMembersPage'
 import { AdminMemberDetailPage } from '@/pages/strategist/AdminMemberDetailPage'
+import { BlogManagementPage } from '@/pages/strategist/BlogManagementPage'
+import { BlogPostEditorPage } from '@/pages/strategist/BlogPostEditorPage'
 import { ProtectedRoute } from '@/components/ProtectedRoute'
 import { LoadingScreen } from '@/components/LoadingScreen'
 import { MemberLayout } from '@/components/MemberLayout'
@@ -53,7 +57,7 @@ import { StrategistLayout } from '@/components/StrategistLayout'
 const publicRoutes = [
   '/', '/pricing', '/how-it-works', '/services', '/why-freshlyforward',
   '/about', '/contact', '/faq', '/authorization', '/privacy', '/terms',
-  '/signin', '/signup',
+  '/signin', '/signup', '/forward-feed',
 ]
 
 function App() {
@@ -79,6 +83,8 @@ function App() {
         <Route path="/about" element={<AboutPage />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/faq" element={<FaqPage />} />
+        <Route path="/forward-feed" element={<ForwardFeedPage />} />
+        <Route path="/forward-feed/:slug" element={<ForwardFeedPostPage />} />
         <Route path="/authorization" element={<AuthorizationPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="/terms" element={<TermsPage />} />
@@ -304,6 +310,22 @@ function App() {
           element={
             <ProtectedRoute roles={['strategist', 'admin']}>
               <StrategistLayout><StrategistApplicationsPage /></StrategistLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/strategist/blog-posts"
+          element={
+            <ProtectedRoute roles={['strategist', 'admin']}>
+              <BlogManagementPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/strategist/blog-posts/:postId"
+          element={
+            <ProtectedRoute roles={['strategist', 'admin']}>
+              <BlogPostEditorPage />
             </ProtectedRoute>
           }
         />
