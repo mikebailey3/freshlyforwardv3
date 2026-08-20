@@ -30,6 +30,7 @@ export interface AdminMemberSummary {
   account_status_reason: string | null
   onboarding_completed: boolean
   search_readiness_score: number
+  is_strategist: boolean
   created_at: string
 }
 
@@ -173,6 +174,7 @@ export interface MemberProfile {
   account_status: 'active' | 'suspended' | 'banned'
   account_status_reason: string | null
   account_status_changed_at: string | null
+  is_strategist: boolean
   created_at: string
   updated_at: string
 }
@@ -694,6 +696,7 @@ export const NOTIFICATION_TYPES = [
   'membership_renewal',
   'payment_failure',
   'system_announcement',
+  'strategist_assigned',
 ] as const
 
 export const NOTIFICATION_TYPE_LABELS: Record<string, string> = {
@@ -709,6 +712,7 @@ export const NOTIFICATION_TYPE_LABELS: Record<string, string> = {
   membership_renewal: 'Membership Renewal',
   payment_failure: 'Payment Failure',
   system_announcement: 'System Announcement',
+  strategist_assigned: 'Strategist Matched',
 }
 
 export const NOTIFICATION_TYPE_ICONS: Record<string, string> = {
@@ -724,4 +728,5 @@ export const NOTIFICATION_TYPE_ICONS: Record<string, string> = {
   membership_renewal: 'CreditCard',
   payment_failure: 'AlertCircle',
   system_announcement: 'Bell',
+  strategist_assigned: 'User',
 }

@@ -1,4 +1,6 @@
+import { useEffect, useState } from 'react'
 import { User, Mail, Calendar, MessageSquare } from 'lucide-react'
+import { supabase } from '@/lib/supabase'
 
 interface OnboardingStepProps {
   onNext: () => void
@@ -6,6 +8,15 @@ interface OnboardingStepProps {
 }
 
 export function OnboardingMeetStrategist({ onNext }: OnboardingStepProps) {
+  const [strategistName, setStrategistName] = useState<string | null>(null)
+
+  useEffect(() => {
+    supabase.rpc('get_my_strategist').then(({ data }) => {
+      const row = Array.isArray(data) ? data[0] : null
+      if (row?.strategist_name) setStrategistName(row.strategist_name)
+    })
+  }, [])
+
   return (
     <div>
       <h1 className="font-serif text-3xl font-semibold text-neutral-900 sm:text-4xl">
@@ -21,7 +32,9 @@ export function OnboardingMeetStrategist({ onNext }: OnboardingStepProps) {
             <User className="h-12 w-12 text-primary-600" />
           </div>
           <div className="text-center sm:text-left">
-            <h2 className="font-serif text-xl font-semibold text-neutral-900">Your Dedicated Strategist</h2>
+            <h2 className="font-serif text-xl font-semibold text-neutral-900">
+              {strategistName ? strategistName : 'Your Dedicated Strategist'}
+            </h2>
             <p className="mt-2 text-sm text-neutral-600">
               You will be matched with a Career Strategist who understands your industry and career goals.
               They will be your single point of contact throughout your membership.
@@ -48,7 +61,9 @@ export function OnboardingMeetStrategist({ onNext }: OnboardingStepProps) {
       </div>
 
       <p className="mt-6 text-center text-sm text-neutral-500">
-        Your Strategist will be assigned after you complete your questionnaire so we can match you with the best fit.
+        {strategistName
+          ? `${strategistName} has already been notified and sent you a welcome message — check Messages after onboarding.`
+          : "Your Strategist will be assigned as soon as your account is set up."}
       </p>
     </div>
   )

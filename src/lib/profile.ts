@@ -23,8 +23,26 @@ export async function ensureProfile(userId: string): Promise<MemberProfile | nul
   }
 
   await addTimelineEvent(userId, 'joined', 'Joined FreshlyForward', 'Welcome to FreshlyForward! Your career journey begins here.')
+  await enrollWithRandomStrategist(userId, (data as MemberProfile | null)?.full_name ?? null)
 
   return data as MemberProfile | null
+}
+
+/**
+ * Enrolls a brand-new member with a randomly assigned strategist (admins
+ * count as strategists). Idempotent on the database side, and safe to
+ * no-op silently if no strategists exist yet (fresh install). Also
+ * drops a welcome conversation message + notification naming the
+ * assigned strategist.
+ */
+export async function enrollWithRandomStrategist(userId: string, fullName: string | null): Promise<void> {
+  const { error } = await supabase.rpc('enroll_member_with_random_strategist', {
+    p_member_id: userId,
+    p_member_name: fullName,
+  })
+  if (error) {
+    console.error('Error enrolling member with a strategist:', error)
+  }
 }
 
 export async function addTimelineEvent(

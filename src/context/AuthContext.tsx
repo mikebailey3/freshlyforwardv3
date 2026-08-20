@@ -61,7 +61,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .limit(1)
 
     let determinedRole: UserRole = 'member'
-    if (strategistData && strategistData.length > 0) {
+    if ((data as MemberProfile | null)?.is_strategist || (strategistData && strategistData.length > 0)) {
       determinedRole = 'strategist'
     }
     setRole(determinedRole)

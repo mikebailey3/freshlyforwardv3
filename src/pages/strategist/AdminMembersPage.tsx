@@ -5,7 +5,7 @@ import { supabase } from '@/lib/supabase'
 import { cn, formatDate } from '@/lib/utils'
 import {
   Users, Search, Filter, ShieldAlert, ShieldCheck, ShieldX, ArrowRight,
-  AlertCircle, Loader2,
+  AlertCircle, Loader2, UserCog,
 } from 'lucide-react'
 import type { AdminMemberSummary } from '@/types'
 
@@ -70,6 +70,22 @@ export function AdminMembersPage() {
     if (!error) {
       setMembers((prev) =>
         prev.map((m) => (m.user_id === userId ? { ...m, account_status: status, account_status_reason: reason } : m)),
+      )
+    } else {
+      setError(error.message)
+    }
+    setActioningId(null)
+  }
+
+  const toggleStrategistStatus = async (userId: string, current: boolean) => {
+    setActioningId(userId)
+    const { error } = await supabase
+      .from('member_profiles')
+      .update({ is_strategist: !current })
+      .eq('user_id', userId)
+    if (!error) {
+      setMembers((prev) =>
+        prev.map((m) => (m.user_id === userId ? { ...m, is_strategist: !current } : m)),
       )
     } else {
       setError(error.message)
@@ -163,6 +179,12 @@ export function AdminMembersPage() {
                         Onboarded
                       </span>
                     )}
+                    {m.is_strategist && (
+                      <span className="flex items-center gap-1 rounded-full bg-secondary-100 px-2 py-0.5 text-xs font-medium text-secondary-700">
+                        <UserCog className="h-3 w-3" />
+                        Strategist
+                      </span>
+                    )}
                   </div>
                   <p className="mt-0.5 text-sm text-neutral-500 truncate">{m.email}</p>
                   <p className="mt-0.5 text-xs text-neutral-400">
@@ -171,6 +193,19 @@ export function AdminMembersPage() {
                 </div>
 
                 <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => toggleStrategistStatus(m.user_id, m.is_strategist)}
+                    disabled={actioningId === m.user_id}
+                    className={cn(
+                      'flex items-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-medium transition-colors disabled:opacity-60',
+                      m.is_strategist
+                        ? 'border-secondary-200 bg-secondary-50 text-secondary-700 hover:bg-secondary-100'
+                        : 'border-neutral-200 bg-neutral-50 text-neutral-600 hover:bg-neutral-100',
+                    )}
+                  >
+                    <UserCog className="h-3.5 w-3.5" />
+                    {m.is_strategist ? 'Revoke Strategist' : 'Make Strategist'}
+                  </button>
                   {m.account_status !== 'active' && (
                     <button
                       onClick={() => setAccountStatus(m.user_id, 'active')}
