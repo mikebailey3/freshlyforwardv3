@@ -25,6 +25,7 @@ import { CareerSuccessPage } from '@/pages/CareerSuccessPage'
 import { TimelinePage } from '@/pages/TimelinePage'
 import { MessagesPage } from '@/pages/MessagesPage'
 import { MemberOpportunitiesPage } from '@/pages/MemberOpportunitiesPage'
+import { OpportunityEnginePage } from '@/pages/OpportunityEnginePage'
 import { MemberApplicationsPage } from '@/pages/MemberApplicationsPage'
 import { WhyWeAppliedPage } from '@/pages/WhyWeAppliedPage'
 import { FoundingMemberPage } from '@/pages/FoundingMemberPage'
@@ -43,6 +44,7 @@ import { StrategistDashboardPage } from '@/pages/strategist/StrategistDashboardP
 import { StrategistMembersPage } from '@/pages/strategist/StrategistMembersPage'
 import { StrategistMemberWorkspacePage } from '@/pages/strategist/StrategistMemberWorkspacePage'
 import { StrategistOpportunitiesPage } from '@/pages/strategist/StrategistOpportunitiesPage'
+import { StrategistOpportunityEnginePage } from '@/pages/strategist/StrategistOpportunityEnginePage'
 import { StrategistApplicationsPage } from '@/pages/strategist/StrategistApplicationsPage'
 import { AdminDashboardPage } from '@/pages/strategist/AdminDashboardPage'
 import { AdminMembersPage } from '@/pages/strategist/AdminMembersPage'
@@ -163,6 +165,14 @@ function App() {
           element={
             <ProtectedRoute>
               <MemberLayout><MemberOpportunitiesPage /></MemberLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/opportunity-engine"
+          element={
+            <ProtectedRoute>
+              <MemberLayout><OpportunityEnginePage /></MemberLayout>
             </ProtectedRoute>
           }
         />
@@ -302,6 +312,14 @@ function App() {
           element={
             <ProtectedRoute roles={['strategist', 'admin']}>
               <StrategistLayout><StrategistOpportunitiesPage /></StrategistLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/strategist/opportunity-engine"
+          element={
+            <ProtectedRoute roles={['strategist', 'admin']}>
+              <StrategistLayout><StrategistOpportunityEnginePage /></StrategistLayout>
             </ProtectedRoute>
           }
         />

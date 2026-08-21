@@ -352,6 +352,48 @@ export interface Opportunity {
   updated_at: string
 }
 
+export interface ScrapedJob {
+  id: string
+  source: string
+  external_id: string
+  title: string
+  company: string
+  location: string | null
+  description: string
+  salary_text: string | null
+  employment_type: string | null
+  posting_url: string
+  posted_at: string | null
+  search_query: string | null
+  is_active: boolean
+  scraped_at: string
+  created_at: string
+}
+
+export interface JobMatchScoreBreakdown {
+  skillsCoverage: number
+  roleRelevance: number
+  locationFit: number
+  keywordDensity: number
+}
+
+export interface JobMatch {
+  id: string
+  member_id: string
+  scraped_job_id: string
+  fresh_fit_score: number
+  matched_skills: string[]
+  missing_skills: string[]
+  score_breakdown: JobMatchScoreBreakdown | Record<string, never>
+  dismissed_at: string | null
+  promoted_opportunity_id: string | null
+  computed_at: string
+}
+
+export interface JobMatchWithJob extends JobMatch {
+  scraped_job: ScrapedJob
+}
+
 export interface Application {
   id: string
   opportunity_id: string

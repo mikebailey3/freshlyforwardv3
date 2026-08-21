@@ -35,6 +35,7 @@ const navGroups: NavGroup[] = [
     items: [
       { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
       { to: '/opportunities', label: 'Opportunities', icon: Search, feature: 'hand_selected_opportunities' },
+      { to: '/opportunity-engine', label: 'Opportunity Engine', icon: Sparkles, isNew: true },
       { to: '/applications', label: 'Applications', icon: FileText, feature: 'applications' },
       { to: '/interviews', label: 'Interviews', icon: Briefcase },
       { to: '/profile', label: 'Career Profile', icon: User, feature: 'career_profile' },
