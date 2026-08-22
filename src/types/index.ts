@@ -31,7 +31,17 @@ export interface AdminMemberSummary {
   onboarding_completed: boolean
   search_readiness_score: number
   is_strategist: boolean
+  strategist_id: string | null
+  strategist_name: string | null
   created_at: string
+}
+
+export interface EligibleStrategist {
+  user_id: string
+  full_name: string | null
+  email: string
+  is_admin: boolean
+  active_member_count: number
 }
 
 export type BlogCategory = 'Job Search Tips' | 'Interview Prep' | 'Career Growth' | 'FreshlyForward Updates'

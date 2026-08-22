@@ -2,12 +2,13 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { StrategistLayout } from '@/components/StrategistLayout'
 import { supabase } from '@/lib/supabase'
+import { adminAssignStrategist, getEligibleStrategists } from '@/lib/operations'
 import { cn, formatDate } from '@/lib/utils'
 import {
   Users, Search, Filter, ShieldAlert, ShieldCheck, ShieldX, ArrowRight,
   AlertCircle, Loader2, UserCog,
 } from 'lucide-react'
-import type { AdminMemberSummary } from '@/types'
+import type { AdminMemberSummary, EligibleStrategist } from '@/types'
 
 type StatusFilter = 'all' | 'active' | 'suspended' | 'banned'
 
@@ -19,6 +20,7 @@ const STATUS_BADGE: Record<string, string> = {
 
 export function AdminMembersPage() {
   const [members, setMembers] = useState<AdminMemberSummary[]>([])
+  const [strategists, setStrategists] = useState<EligibleStrategist[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
@@ -27,7 +29,12 @@ export function AdminMembersPage() {
 
   useEffect(() => {
     loadMembers()
+    loadStrategists()
   }, [])
+
+  const loadStrategists = async () => {
+    setStrategists(await getEligibleStrategists())
+  }
 
   const loadMembers = async () => {
     setLoading(true)
@@ -89,6 +96,25 @@ export function AdminMembersPage() {
       )
     } else {
       setError(error.message)
+    }
+    setActioningId(null)
+  }
+
+  const handleAssignStrategist = async (memberId: string, strategistId: string) => {
+    if (!strategistId) return
+    setActioningId(memberId)
+    const assignError = await adminAssignStrategist(memberId, strategistId)
+    if (assignError) {
+      setError(assignError)
+    } else {
+      const strategist = strategists.find((s) => s.user_id === strategistId)
+      setMembers((prev) =>
+        prev.map((m) =>
+          m.user_id === memberId
+            ? { ...m, strategist_id: strategistId, strategist_name: strategist?.full_name || strategist?.email || 'Strategist' }
+            : m,
+        ),
+      )
     }
     setActioningId(null)
   }
@@ -190,6 +216,32 @@ export function AdminMembersPage() {
                   <p className="mt-0.5 text-xs text-neutral-400">
                     {m.plan_name || 'No plan'} &middot; {m.subscription_status} &middot; joined {formatDate(m.created_at)}
                   </p>
+                  <div className="mt-2 flex items-center gap-2">
+                    <UserCog className="h-3.5 w-3.5 text-neutral-400" />
+                    <span className="text-xs text-neutral-500">
+                      {m.strategist_name ? (
+                        <>Strategist: <span className="font-medium text-neutral-700">{m.strategist_name}</span></>
+                      ) : (
+                        <span className="text-warning-600">No strategist assigned</span>
+                      )}
+                    </span>
+                    <select
+                      value=""
+                      onChange={(e) => handleAssignStrategist(m.user_id, e.target.value)}
+                      disabled={actioningId === m.user_id || strategists.length === 0}
+                      aria-label={`Assign strategist to ${m.full_name || 'member'}`}
+                      className="rounded-lg border border-neutral-300 bg-white py-1 pl-2 pr-6 text-xs text-neutral-600 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 disabled:opacity-60"
+                    >
+                      <option value="" disabled>
+                        {m.strategist_name ? 'Reassign to...' : 'Assign to...'}
+                      </option>
+                      {strategists.map((s) => (
+                        <option key={s.user_id} value={s.user_id} disabled={s.user_id === m.strategist_id}>
+                          {s.full_name || s.email} ({s.active_member_count}){s.is_admin ? ' — admin' : ''}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
 
                 <div className="flex items-center gap-2">

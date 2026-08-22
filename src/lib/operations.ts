@@ -2,7 +2,7 @@ import { supabase } from '@/lib/supabase'
 import { addTimelineEvent } from '@/lib/profile'
 import type {
   Opportunity, Application, ResumeVersion, CoverLetter,
-  CareerNote, FollowUp, MemberFeedback, WhyWeApplied,
+  CareerNote, FollowUp, MemberFeedback, WhyWeApplied, EligibleStrategist,
 } from '@/types'
 
 // ============================================================
@@ -468,4 +468,29 @@ export async function assignStrategist(strategistId: string, memberId: string): 
     .insert({ strategist_id: strategistId, member_id: memberId })
 
   if (error) console.error('Error assigning strategist:', error)
+}
+
+// Admin-only: assign (or reassign) any member to any eligible strategist.
+// Unlike assignStrategist() above (which only lets a strategist claim a
+// member for themselves), this goes through a SECURITY DEFINER RPC since
+// admins have no direct RLS path to write another strategist's rows.
+export async function adminAssignStrategist(memberId: string, strategistId: string): Promise<string | null> {
+  const { error } = await supabase.rpc('admin_assign_strategist', {
+    p_member_id: memberId,
+    p_strategist_id: strategistId,
+  })
+  if (error) {
+    console.error('Error assigning strategist:', error)
+    return error.message
+  }
+  return null
+}
+
+export async function getEligibleStrategists(): Promise<EligibleStrategist[]> {
+  const { data, error } = await supabase.rpc('admin_list_strategists')
+  if (error) {
+    console.error('Error fetching eligible strategists:', error)
+    return []
+  }
+  return (data ?? []) as EligibleStrategist[]
 }
