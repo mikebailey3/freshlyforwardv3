@@ -105,6 +105,10 @@ export function MockInterviewPage() {
         scheduled_at: new Date(scheduledAt).toISOString(),
         focus_area: focusArea,
         status: 'scheduled',
+        company: company || null,
+        position: position || null,
+        interview_type: interviewType,
+        meeting_platform: 'Microsoft Teams',
       })
       .select('*')
       .maybeSingle()
@@ -183,7 +187,7 @@ export function MockInterviewPage() {
             Mock Interviews
           </h1>
           <p className="mt-1 text-sm text-neutral-600">
-            Practice with your Career Strategist before the real thing. Build confidence, refine your answers, and get expert feedback.
+            Practice with your Career Strategist before the real thing. Build confidence, refine your answers, and get expert feedback. All mock interviews take place over Microsoft Teams — your strategist will send the meeting link before your scheduled time.
           </p>
         </div>
         <button
@@ -398,6 +402,25 @@ function InterviewCard({
               <Clock className="h-3.5 w-3.5" />
               {formatDateTime(interview.scheduled_at)}
             </p>
+            {interview.status === 'scheduled' && (
+              <p className="mt-1 flex items-center gap-1.5 text-xs text-neutral-500">
+                <Video className="h-3.5 w-3.5 text-primary-500" />
+                {interview.meeting_link ? (
+                  <a
+                    href={interview.meeting_link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-medium text-primary-600 hover:underline"
+                  >
+                    Join via {interview.meeting_platform || 'Microsoft Teams'}
+                  </a>
+                ) : (
+                  <span>
+                    Meeting via {interview.meeting_platform || 'Microsoft Teams'} — your strategist will send the link soon
+                  </span>
+                )}
+              </p>
+            )}
             {interview.feedback && (
               <div className="mt-3 rounded-lg bg-neutral-50 p-3 text-sm text-neutral-600">
                 <p className="flex items-center gap-1.5 font-medium text-neutral-700">

@@ -1,14 +1,15 @@
 import { useEffect, useState, useMemo } from 'react'
 import { MemberLayout } from '@/components/MemberLayout'
+import { AddCalendarEventModal } from '@/components/AddCalendarEventModal'
 import { useAuth } from '@/context/AuthContext'
 import { supabase } from '@/lib/supabase'
 import { getCalendarEvents } from '@/lib/communication'
 import { formatDate, formatDateTime, cn } from '@/lib/utils'
 import {
   Calendar, ChevronLeft, ChevronRight, Loader2, Briefcase,
-  Video, FileText, CreditCard, Clock, Users, Bell, MapPin,
+  Video, FileText, CreditCard, Clock, Users, Bell, MapPin, Plus,
 } from 'lucide-react'
-import type { CalendarEvent, MockInterview, FridayReport } from '@/types'
+import type { CalendarEvent, MockInterview, FridayReport, Application } from '@/types'
 
 interface UnifiedEvent {
   id: string
@@ -48,6 +49,7 @@ export function CalendarPage() {
   const [events, setEvents] = useState<UnifiedEvent[]>([])
   const [loading, setLoading] = useState(true)
   const [currentMonth, setCurrentMonth] = useState(() => new Date())
+  const [showAddModal, setShowAddModal] = useState(false)
 
   useEffect(() => {
     if (!profile) return
@@ -56,7 +58,7 @@ export function CalendarPage() {
 
   const loadEvents = async () => {
     if (!profile) return
-    const [calEvents, mockData, reportData] = await Promise.all([
+    const [calEvents, mockData, reportData, interviewApps] = await Promise.all([
       getCalendarEvents(profile.id),
       supabase
         .from('mock_interviews')
@@ -68,9 +70,16 @@ export function CalendarPage() {
         .from('friday_reports')
         .select('*')
         .eq('user_id', profile.id)
-        .in('status', ['approved', 'sent'])
+        .in('approval_status', ['approved', 'sent'])
         .order('report_date', { ascending: true })
         .then(({ data }) => (data as FridayReport[]) || []),
+      supabase
+        .from('applications')
+        .select('*')
+        .eq('member_id', profile.id)
+        .not('interview_date', 'is', null)
+        .order('interview_date', { ascending: true })
+        .then(({ data }) => (data as Application[]) || []),
     ])
 
     const unified: UnifiedEvent[] = [
@@ -108,6 +117,17 @@ export function CalendarPage() {
         location: null,
         meeting_link: null,
         source: 'friday_report' as const,
+      })),
+      ...interviewApps.map((a) => ({
+        id: `int-${a.id}`,
+        event_type: 'real_interview',
+        title: `Interview — ${a.job_title} @ ${a.employer}`,
+        description: null,
+        start_at: a.interview_date as string,
+        end_at: null,
+        location: null,
+        meeting_link: null,
+        source: 'calendar' as const,
       })),
     ]
 
@@ -182,14 +202,34 @@ export function CalendarPage() {
 
   return (
     <MemberLayout>
-      <div className="mb-6">
-        <h1 className="font-serif text-2xl font-semibold text-neutral-900 sm:text-3xl">
-          Calendar
-        </h1>
-        <p className="mt-1 text-sm text-neutral-600">
-          All your career events in one place — mock interviews, real interviews, Friday reports, and more.
-        </p>
+      <div className="mb-6 flex items-start justify-between gap-4">
+        <div>
+          <h1 className="font-serif text-2xl font-semibold text-neutral-900 sm:text-3xl">
+            Calendar
+          </h1>
+          <p className="mt-1 text-sm text-neutral-600">
+            All your career events in one place — mock interviews, real interviews, Friday reports, and more.
+          </p>
+        </div>
+        <button
+          onClick={() => setShowAddModal(true)}
+          className="flex flex-shrink-0 items-center gap-2 rounded-xl bg-primary-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-primary-700"
+        >
+          <Plus className="h-4 w-4" />
+          Add Event
+        </button>
       </div>
+
+      {showAddModal && profile && (
+        <AddCalendarEventModal
+          profileId={profile.id}
+          onClose={() => setShowAddModal(false)}
+          onCreated={() => {
+            setShowAddModal(false)
+            loadEvents()
+          }}
+        />
+      )}
 
       {/* Calendar */}
       <div className="mb-8 rounded-2xl border border-neutral-200 bg-white p-4 sm:p-6">

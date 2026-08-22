@@ -46,6 +46,8 @@ import { StrategistMemberWorkspacePage } from '@/pages/strategist/StrategistMemb
 import { StrategistOpportunitiesPage } from '@/pages/strategist/StrategistOpportunitiesPage'
 import { StrategistOpportunityEnginePage } from '@/pages/strategist/StrategistOpportunityEnginePage'
 import { StrategistApplicationsPage } from '@/pages/strategist/StrategistApplicationsPage'
+import { StrategistFridayReportsPage } from '@/pages/strategist/StrategistFridayReportsPage'
+import { AdminReportReviewPage } from '@/pages/strategist/AdminReportReviewPage'
 import { AdminDashboardPage } from '@/pages/strategist/AdminDashboardPage'
 import { AdminMembersPage } from '@/pages/strategist/AdminMembersPage'
 import { AdminMemberDetailPage } from '@/pages/strategist/AdminMemberDetailPage'
@@ -328,6 +330,22 @@ function App() {
           element={
             <ProtectedRoute roles={['strategist', 'admin']}>
               <StrategistLayout><StrategistApplicationsPage /></StrategistLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/strategist/friday-reports"
+          element={
+            <ProtectedRoute roles={['strategist', 'admin']}>
+              <StrategistFridayReportsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/report-review"
+          element={
+            <ProtectedRoute roles={['admin']}>
+              <AdminReportReviewPage />
             </ProtectedRoute>
           }
         />

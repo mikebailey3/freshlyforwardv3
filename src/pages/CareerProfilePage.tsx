@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 import { MemberLayout } from '@/components/MemberLayout'
 import { SearchReadinessWidget } from '@/components/SearchReadinessWidget'
 import { ProfileEditForm } from '@/components/ProfileEditForm'
+import { ProfileCard as MemberProfileCard } from '@/components/ProfileCard'
 import { useAuth } from '@/context/AuthContext'
 import { supabase } from '@/lib/supabase'
 import { ensureProfile, calculateSearchReadiness } from '@/lib/profile'
@@ -298,6 +299,7 @@ export function CareerProfilePage() {
 
         {/* Sidebar */}
         <div className="space-y-6">
+          {p && <MemberProfileCard userId={user!.id} profile={p} onUpdated={refreshProfile} />}
           <SearchReadinessWidget profile={p} />
         </div>
       </div>

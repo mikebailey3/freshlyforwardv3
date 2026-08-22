@@ -201,8 +201,12 @@ export function MemberLayout({ children }: { children: ReactNode }) {
 
           <div className="border-t border-neutral-200 p-3">
             <div className="mb-2 flex items-center gap-2 px-3">
-              <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-primary-100 text-xs font-semibold text-primary-700">
-                {(profile?.full_name || 'M').charAt(0).toUpperCase()}
+              <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-primary-100 text-xs font-semibold text-primary-700">
+                {profile?.avatar_url ? (
+                  <img src={profile.avatar_url} alt="" className="h-full w-full object-cover" />
+                ) : (
+                  (profile?.full_name || 'M').charAt(0).toUpperCase()
+                )}
               </div>
               <div className="min-w-0 flex-1">
                 <p className="truncate text-xs font-semibold text-neutral-800">

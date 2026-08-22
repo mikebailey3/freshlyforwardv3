@@ -1,57 +1,40 @@
 import { useEffect, useState } from 'react'
 import { MemberLayout } from '@/components/MemberLayout'
 import { useAuth } from '@/context/AuthContext'
-import { supabase } from '@/lib/supabase'
 import { getFridayReports } from '@/lib/communication'
 import { formatDate, cn } from '@/lib/utils'
 import {
   FileText, Loader2, Calendar, TrendingUp, Mail, Briefcase,
   ArrowLeft, CheckCircle2, Clock, AlertCircle,
 } from 'lucide-react'
-
-interface FridayReportRow {
-  id: string
-  user_id: string
-  report_date: string
-  title: string
-  summary: string
-  opportunities_reviewed: number
-  applications_submitted: number
-  interviews_scheduled: number
-  next_steps: string | null
-  reporting_period_start: string | null
-  reporting_period_end: string | null
-  strategist_summary: string | null
-  opportunities_researched: string | null
-  applications_submitted_detail: string | null
-  interviews_detail: string | null
-  status: string
-  created_at: string
-}
+import type { FridayReport } from '@/types'
 
 const approvalStatusLabels: Record<string, string> = {
   draft: 'Draft',
+  pending_review: 'In Review',
   approved: 'Approved',
   sent: 'Sent',
 }
 
 const approvalStatusColors: Record<string, string> = {
   draft: 'bg-neutral-100 text-neutral-600',
+  pending_review: 'bg-warning-100 text-warning-700',
   approved: 'bg-accent-100 text-accent-700',
   sent: 'bg-success-100 text-success-700',
 }
 
 const approvalStatusIcons: Record<string, typeof Clock> = {
   draft: Clock,
+  pending_review: Clock,
   approved: AlertCircle,
   sent: CheckCircle2,
 }
 
 export function FridayReportsPage() {
   const { profile } = useAuth()
-  const [reports, setReports] = useState<FridayReportRow[]>([])
+  const [reports, setReports] = useState<FridayReport[]>([])
   const [loading, setLoading] = useState(true)
-  const [selected, setSelected] = useState<FridayReportRow | null>(null)
+  const [selected, setSelected] = useState<FridayReport | null>(null)
 
   useEffect(() => {
     if (!profile) return
@@ -61,9 +44,10 @@ export function FridayReportsPage() {
   const loadReports = async () => {
     if (!profile) return
     const data = await getFridayReports(profile.id)
-    // Only show approved or sent reports to members
-    const visible = (data as unknown as FridayReportRow[]).filter(
-      (r) => r.status === 'approved' || r.status === 'sent'
+    // Only show approved or sent reports to members -- drafts and
+    // pending-review reports are still being written/reviewed internally.
+    const visible = (data as unknown as FridayReport[]).filter(
+      (r) => r.approval_status === 'approved' || r.approval_status === 'sent'
     )
     setReports(visible)
     setLoading(false)
@@ -104,7 +88,7 @@ export function FridayReportsPage() {
         <div className="space-y-4">
           <h2 className="font-serif text-lg font-semibold text-neutral-900">Recent Reports</h2>
           {reports.map((report) => {
-            const StatusIcon = approvalStatusIcons[report.status] || Clock
+            const StatusIcon = approvalStatusIcons[report.approval_status] || Clock
             return (
               <button
                 key={report.id}
@@ -117,11 +101,11 @@ export function FridayReportsPage() {
                       <span
                         className={cn(
                           'flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium',
-                          approvalStatusColors[report.status] || 'bg-neutral-100 text-neutral-600'
+                          approvalStatusColors[report.approval_status] || 'bg-neutral-100 text-neutral-600'
                         )}
                       >
                         <StatusIcon className="h-3 w-3" />
-                        {approvalStatusLabels[report.status] || report.status}
+                        {approvalStatusLabels[report.approval_status] || report.approval_status}
                       </span>
                       <span className="flex items-center gap-1 text-xs text-neutral-500">
                         <Calendar className="h-3.5 w-3.5" />
@@ -158,8 +142,8 @@ export function FridayReportsPage() {
   )
 }
 
-function ReportDetail({ report, onBack }: { report: FridayReportRow; onBack: () => void }) {
-  const StatusIcon = approvalStatusIcons[report.status] || Clock
+function ReportDetail({ report, onBack }: { report: FridayReport; onBack: () => void }) {
+  const StatusIcon = approvalStatusIcons[report.approval_status] || Clock
 
   const sections: { label: string; icon: typeof Calendar; content: string | null }[] = [
     {
@@ -192,11 +176,11 @@ function ReportDetail({ report, onBack }: { report: FridayReportRow; onBack: () 
           <span
             className={cn(
               'flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium',
-              approvalStatusColors[report.status] || 'bg-neutral-100 text-neutral-600'
+              approvalStatusColors[report.approval_status] || 'bg-neutral-100 text-neutral-600'
             )}
           >
             <StatusIcon className="h-3 w-3" />
-            {approvalStatusLabels[report.status] || report.status}
+            {approvalStatusLabels[report.approval_status] || report.approval_status}
           </span>
           <span className="flex items-center gap-1 text-xs text-neutral-500">
             <Calendar className="h-3.5 w-3.5" />

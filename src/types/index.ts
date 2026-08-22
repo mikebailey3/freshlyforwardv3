@@ -131,6 +131,8 @@ export interface MemberProfile {
   user_id: string
   plan_id: string | null
   status: string
+  username: string | null
+  avatar_url: string | null
   headline: string | null
   summary: string | null
   full_name: string | null
@@ -238,6 +240,7 @@ export interface MemberDocument {
 export interface FridayReport {
   id: string
   user_id: string
+  strategist_id: string | null
   report_date: string
   title: string
   summary: string
@@ -245,6 +248,17 @@ export interface FridayReport {
   applications_submitted: number
   interviews_scheduled: number
   next_steps: string | null
+  reporting_period_start: string | null
+  reporting_period_end: string | null
+  strategist_summary: string | null
+  opportunities_researched: string | null
+  applications_submitted_detail: string | null
+  interviews_detail: string | null
+  approval_status: string
+  approved_by: string | null
+  approved_at: string | null
+  sent_at: string | null
+  report_data: Record<string, unknown>
   created_at: string
 }
 
@@ -269,6 +283,12 @@ export interface MockInterview {
   focus_area: string | null
   status: string
   feedback: string | null
+  company: string | null
+  position: string | null
+  interview_type: string | null
+  duration_minutes: number | null
+  meeting_platform: string | null
+  meeting_link: string | null
   created_at: string
 }
 
