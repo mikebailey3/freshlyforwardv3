@@ -26,6 +26,7 @@ import { TimelinePage } from '@/pages/TimelinePage'
 import { MessagesPage } from '@/pages/MessagesPage'
 import { MemberOpportunitiesPage } from '@/pages/MemberOpportunitiesPage'
 import { OpportunityEnginePage } from '@/pages/OpportunityEnginePage'
+import { LinkedInOptimizerPage } from '@/pages/LinkedInOptimizerPage'
 import { MemberApplicationsPage } from '@/pages/MemberApplicationsPage'
 import { WhyWeAppliedPage } from '@/pages/WhyWeAppliedPage'
 import { FoundingMemberPage } from '@/pages/FoundingMemberPage'
@@ -175,6 +176,14 @@ function App() {
           element={
             <ProtectedRoute>
               <MemberLayout><OpportunityEnginePage /></MemberLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/linkedin-optimizer"
+          element={
+            <ProtectedRoute>
+              <MemberLayout><LinkedInOptimizerPage /></MemberLayout>
             </ProtectedRoute>
           }
         />

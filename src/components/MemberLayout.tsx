@@ -8,7 +8,7 @@ import {
   Compass, LayoutDashboard, User, CreditCard, Calendar, MessageSquare,
   Sparkles, Menu, X, LogOut, Search, FileText, Briefcase,
   Bell, Settings, Activity, Award, FileText as FileTextIcon,
-  Lock, Video, Map, ChevronDown,
+  Lock, Video, Map, ChevronDown, Linkedin,
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
@@ -39,6 +39,7 @@ const navGroups: NavGroup[] = [
       { to: '/applications', label: 'Applications', icon: FileText, feature: 'applications' },
       { to: '/interviews', label: 'Interviews', icon: Briefcase },
       { to: '/profile', label: 'Career Profile', icon: User, feature: 'career_profile' },
+      { to: '/linkedin-optimizer', label: 'LinkedIn Optimizer', icon: Linkedin, isNew: true },
     ],
   },
   {

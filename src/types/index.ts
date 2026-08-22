@@ -44,6 +44,20 @@ export interface EligibleStrategist {
   active_member_count: number
 }
 
+export interface LinkedInProfileData {
+  id: string
+  member_id: string
+  linkedin_url: string | null
+  target_role: string | null
+  headline: string
+  about: string
+  experience_bullets: string
+  skills: string[]
+  last_synced_at: string | null
+  created_at: string
+  updated_at: string
+}
+
 export type BlogCategory = 'Job Search Tips' | 'Interview Prep' | 'Career Growth' | 'FreshlyForward Updates'
 export type BlogPostStatus = 'draft' | 'scheduled' | 'published'
 
