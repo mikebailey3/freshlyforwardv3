@@ -144,26 +144,26 @@ export function MemberLayout({ children }: { children: ReactNode }) {
         key={item.to}
         to={item.to}
         onClick={onNavigate}
-        className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+        className={`flex items-center gap-3 border-l-2 px-3 py-2.5 text-sm font-medium transition-colors ${
           isActive
-            ? 'bg-primary-50 text-primary-700'
-            : 'text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900'
+            ? 'border-primary-600 bg-primary-50/60 text-primary-700'
+            : 'border-transparent text-neutral-600 hover:border-neutral-300 hover:bg-neutral-50 hover:text-neutral-900'
         } ${isLocked ? 'opacity-70' : ''}`}
       >
         {renderNavIcon(item)}
         {item.label}
         {item.isNew && (
-          <span className="ml-auto rounded-full bg-primary-100 px-2 py-0.5 text-[10px] font-semibold uppercase text-primary-700">
+          <span className="ml-auto rounded border border-primary-200 px-1.5 py-0.5 font-mono text-[10px] font-semibold uppercase text-primary-700">
             New
           </span>
         )}
         {!item.isNew && count > 0 && (
-          <span className="ml-auto rounded-full bg-primary-600 px-2 py-0.5 text-xs font-semibold text-white">
+          <span className="ml-auto rounded bg-primary-600 px-2 py-0.5 font-mono text-xs font-semibold text-white">
             {count}
           </span>
         )}
         {isLocked && item.requiredPlan && (
-          <span className="ml-auto rounded-full bg-neutral-100 px-2 py-0.5 text-xs font-medium text-neutral-500">
+          <span className="ml-auto rounded border border-neutral-200 px-1.5 py-0.5 font-mono text-[10px] font-medium uppercase text-neutral-500">
             {item.requiredPlan === 'career-growth' ? 'Growth' : item.requiredPlan === 'career-concierge' ? 'Concierge' : ''}
           </span>
         )}
@@ -195,6 +195,9 @@ export function MemberLayout({ children }: { children: ReactNode }) {
             <Compass className="h-7 w-7 text-primary-600" />
             <span className="font-serif text-lg font-semibold text-neutral-900">FreshlyForward</span>
           </Link>
+          <p className="border-b border-dashed border-neutral-200 px-6 py-2 font-mono text-[10px] font-semibold uppercase tracking-wide text-neutral-400">
+            Member Console
+          </p>
 
           <nav className="flex-1 overflow-y-auto px-3 py-4">
             {renderNavGroups()}
@@ -202,7 +205,7 @@ export function MemberLayout({ children }: { children: ReactNode }) {
 
           <div className="border-t border-neutral-200 p-3">
             <div className="mb-2 flex items-center gap-2 px-3">
-              <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-primary-100 text-xs font-semibold text-primary-700">
+              <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center overflow-hidden rounded border border-neutral-200 bg-primary-50 font-mono text-xs font-semibold text-primary-700">
                 {profile?.avatar_url ? (
                   <img src={profile.avatar_url} alt="" className="h-full w-full object-cover" />
                 ) : (
@@ -218,7 +221,7 @@ export function MemberLayout({ children }: { children: ReactNode }) {
             </div>
             <button
               onClick={handleSignOut}
-              className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-50"
+              className="flex w-full items-center gap-3 border-l-2 border-transparent px-3 py-2.5 text-sm font-medium text-neutral-600 transition-colors hover:border-neutral-300 hover:bg-neutral-50"
             >
               <LogOut className="h-5 w-5" />
               Sign Out
@@ -228,28 +231,28 @@ export function MemberLayout({ children }: { children: ReactNode }) {
       </aside>
 
       {/* Desktop top header */}
-      <header className="sticky top-0 z-20 hidden border-b border-neutral-200 bg-white/90 backdrop-blur lg:block lg:pl-64">
+      <header className="sticky top-0 z-20 hidden border-b border-neutral-200 bg-white lg:block lg:pl-64">
         <div className="flex items-center justify-end gap-4 px-6 py-3">
           <div className="relative flex-1 max-w-md">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
             <input
               type="search"
               placeholder="Search opportunities, tools, and more..."
-              className="w-full rounded-lg border border-neutral-200 bg-neutral-50 py-2 pl-9 pr-3 text-sm text-neutral-700 placeholder:text-neutral-400 focus:border-primary-300 focus:outline-none"
+              className="w-full rounded border border-neutral-200 bg-neutral-50 py-2 pl-9 pr-3 text-sm text-neutral-700 placeholder:text-neutral-400 focus:border-primary-300 focus:outline-none"
             />
           </div>
-          <Link to="/notifications" className="relative rounded-lg p-2 text-neutral-500 hover:bg-neutral-50">
+          <Link to="/notifications" className="relative rounded p-2 text-neutral-500 hover:bg-neutral-50">
             <Bell className="h-5 w-5" />
             {unreadNotifications > 0 && (
               <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-primary-600" />
             )}
           </Link>
           {plan && membershipBadges[0] && (
-            <div className="flex items-center gap-2 rounded-xl border border-neutral-200 bg-white px-3 py-1.5">
+            <div className="flex items-center gap-2 border border-neutral-200 bg-white px-3 py-1.5">
               <MembershipBadgeShield badge={membershipBadges[0]} size="sm" />
               <div className="leading-tight">
                 <p className="text-xs font-semibold text-neutral-900">{plan.name}</p>
-                <p className="text-[10px] text-neutral-500">
+                <p className="font-mono text-[10px] text-neutral-500">
                   Member since {new Date(profile?.created_at || Date.now()).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
                 </p>
               </div>
@@ -292,7 +295,7 @@ export function MemberLayout({ children }: { children: ReactNode }) {
             {renderNavGroups(() => setMobileNavOpen(false))}
             <button
               onClick={handleSignOut}
-              className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-50"
+              className="flex w-full items-center gap-3 border-l-2 border-transparent px-3 py-3 text-sm font-medium text-neutral-600 transition-colors hover:border-neutral-300 hover:bg-neutral-50"
             >
               <LogOut className="h-5 w-5" />
               Sign Out

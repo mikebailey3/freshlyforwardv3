@@ -143,61 +143,64 @@ export function DashboardPage() {
       </div>
 
       {/* Stat cards */}
-      <div className="grid gap-4 lg:grid-cols-5">
-        <div className="rounded-2xl border border-neutral-200 bg-white p-5">
-          <p className="text-sm font-semibold text-neutral-700">Search Readiness</p>
-          <div className="mt-3 flex items-center gap-3">
-            <CircularProgress value={readiness.score} size={56} strokeWidth={6} label="" />
-            <p className="text-xs text-neutral-500">
-              {readiness.score >= 80 ? "You're doing great! Keep going." : 'Keep going, you\u2019re getting closer.'}
-            </p>
+      <div className="border border-neutral-200">
+        <div className="grid gap-0 lg:grid-cols-4">
+          <div className="border-b border-neutral-200 p-5 lg:border-b-0 lg:border-r">
+            <p className="text-sm font-semibold text-neutral-700">Search Readiness</p>
+            <div className="mt-3 flex items-center gap-3">
+              <CircularProgress value={readiness.score} size={56} strokeWidth={6} label="" />
+              <p className="text-xs text-neutral-500">
+                {readiness.score >= 80 ? "You're doing great! Keep going." : 'Keep going, you\u2019re getting closer.'}
+              </p>
+            </div>
+            <Link to={readiness.missing.length > 0 ? getReadinessFixLink(readiness.missing) : '/profile'} className="mt-3 inline-block font-mono text-xs font-medium text-primary-600 hover:text-primary-700">
+              {readiness.missing.length > 0 ? "Let's fix it" : 'View My Progress'}
+            </Link>
           </div>
-          <Link to={readiness.missing.length > 0 ? getReadinessFixLink(readiness.missing) : '/profile'} className="mt-3 inline-block text-xs font-medium text-primary-600 hover:text-primary-700">
-            {readiness.missing.length > 0 ? "Let's fix it" : 'View My Progress'}
-          </Link>
+
+          <div className="border-b border-neutral-200 p-5 lg:border-b-0 lg:border-r">
+            <p className="text-sm font-semibold text-neutral-700">Applications</p>
+            <p className="mt-2 font-mono text-3xl font-bold text-neutral-900">{activeApplications.length}</p>
+            <p className="text-xs text-neutral-500">
+              Active applications{newThisWeek > 0 && <span className="text-primary-600"> \u2022 {newThisWeek} new this week</span>}
+            </p>
+            <Link to="/applications" className="mt-3 inline-block font-mono text-xs font-medium text-primary-600 hover:text-primary-700">
+              View Applications
+            </Link>
+          </div>
+
+          <div className="border-b border-neutral-200 p-5 lg:border-b-0 lg:border-r">
+            <p className="text-sm font-semibold text-neutral-700">Interviews</p>
+            <p className="mt-2 font-mono text-3xl font-bold text-neutral-900">{upcomingInterviewApps.length}</p>
+            <p className="text-xs text-neutral-500">
+              {nextInterview
+                ? `Next: ${new Date(nextInterview.interview_date!).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
+                : 'Upcoming interviews'}
+            </p>
+            <Link to="/interviews" className="mt-3 inline-block font-mono text-xs font-medium text-primary-600 hover:text-primary-700">
+              View Interviews
+            </Link>
+          </div>
+
+          <div className="p-5">
+            <p className="text-sm font-semibold text-neutral-700">Messages</p>
+            <p className="mt-2 font-mono text-3xl font-bold text-neutral-900">{unreadMessages.length}</p>
+            <p className="text-xs text-neutral-500">Unread messages</p>
+            <Link to="/messages" className="mt-3 inline-block font-mono text-xs font-medium text-primary-600 hover:text-primary-700">
+              Open Messages
+            </Link>
+          </div>
         </div>
 
-        <div className="rounded-2xl border border-neutral-200 bg-white p-5">
-          <p className="text-sm font-semibold text-neutral-700">Applications</p>
-          <p className="mt-2 font-serif text-3xl font-bold text-neutral-900">{activeApplications.length}</p>
-          <p className="text-xs text-neutral-500">
-            Active applications{newThisWeek > 0 && <span className="text-primary-600"> \u2022 {newThisWeek} new this week</span>}
-          </p>
-          <Link to="/applications" className="mt-3 inline-block text-xs font-medium text-primary-600 hover:text-primary-700">
-            View Applications
-          </Link>
-        </div>
-
-        <div className="rounded-2xl border border-neutral-200 bg-white p-5">
-          <p className="text-sm font-semibold text-neutral-700">Interviews</p>
-          <p className="mt-2 font-serif text-3xl font-bold text-neutral-900">{upcomingInterviewApps.length}</p>
-          <p className="text-xs text-neutral-500">
-            {nextInterview
-              ? `Next: ${new Date(nextInterview.interview_date!).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
-              : 'Upcoming interviews'}
-          </p>
-          <Link to="/interviews" className="mt-3 inline-block text-xs font-medium text-primary-600 hover:text-primary-700">
-            View Interviews
-          </Link>
-        </div>
-
-        <div className="rounded-2xl border border-neutral-200 bg-white p-5">
-          <p className="text-sm font-semibold text-neutral-700">Messages</p>
-          <p className="mt-2 font-serif text-3xl font-bold text-neutral-900">{unreadMessages.length}</p>
-          <p className="text-xs text-neutral-500">Unread messages</p>
-          <Link to="/messages" className="mt-3 inline-block text-xs font-medium text-primary-600 hover:text-primary-700">
-            Open Messages
-          </Link>
-        </div>
-
-        <div className="rounded-2xl bg-gradient-to-br from-primary-700 to-primary-900 p-5 text-white">
-          <p className="text-sm font-semibold">Your Career Strategist</p>
-          <p className="mt-3 text-xs text-primary-100">
-            Your dedicated Career Strategist will reach out via message. Typically replies within 24 hrs.
-          </p>
+        <div className="flex flex-col items-start justify-between gap-4 border-t-2 border-neutral-900 bg-neutral-50 p-5 sm:flex-row sm:items-center">
+          <div>
+            <p className="font-mono text-[10px] font-semibold uppercase tracking-wide text-neutral-500">On Call</p>
+            <p className="mt-1 text-sm font-semibold text-neutral-900">Your Career Strategist</p>
+            <p className="mt-1 text-xs text-neutral-600">Typically replies within 24 hrs.</p>
+          </div>
           <Link
             to="/messages"
-            className="mt-4 inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-white px-4 py-2 text-sm font-semibold text-primary-700 hover:bg-primary-50"
+            className="inline-flex items-center justify-center gap-1.5 border-2 border-neutral-900 px-4 py-2 text-sm font-semibold text-neutral-900 hover:bg-neutral-900 hover:text-white"
           >
             <Mail className="h-4 w-4" />
             Send a Message
@@ -207,7 +210,7 @@ export function DashboardPage() {
 
       {/* Tip / Motivation / Upcoming */}
       <div className="mt-6 grid gap-4 lg:grid-cols-3">
-        <div className="rounded-2xl bg-primary-50 border border-primary-100 p-5 lg:col-span-2">
+        <div className="border border-dashed border-neutral-300 bg-[var(--cream)] p-5 lg:col-span-2">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="flex items-start gap-3">
               <Lightbulb className="mt-0.5 h-5 w-5 flex-shrink-0 text-primary-600" />
@@ -226,10 +229,10 @@ export function DashboardPage() {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-neutral-200 bg-white p-5">
+        <div className="border border-neutral-200 bg-white p-5">
           <div className="flex items-center justify-between">
             <p className="text-sm font-semibold text-neutral-900">Upcoming</p>
-            <Link to="/calendar" className="text-xs font-medium text-primary-600 hover:text-primary-700">
+            <Link to="/calendar" className="font-mono text-xs font-medium text-primary-600 hover:text-primary-700">
               View Calendar
             </Link>
           </div>
@@ -251,7 +254,7 @@ export function DashboardPage() {
           ) : (
             <p className="mt-3 text-xs text-neutral-500">Nothing scheduled yet.</p>
           )}
-          <Link to="/calendar" className="mt-3 inline-block text-xs font-medium text-primary-600 hover:text-primary-700">
+          <Link to="/calendar" className="mt-3 inline-block font-mono text-xs font-medium text-primary-600 hover:text-primary-700">
             See all upcoming &rarr;
           </Link>
         </div>
@@ -259,10 +262,10 @@ export function DashboardPage() {
 
       {/* Recommended + Progress */}
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
-        <div className="rounded-2xl border border-neutral-200 bg-white p-6">
+        <div className="border border-neutral-200 bg-white p-6">
           <div className="flex items-center justify-between">
             <h2 className="font-serif text-base font-semibold text-neutral-900">Recommended for You</h2>
-            <Link to="/tools" className="text-xs font-medium text-primary-600 hover:text-primary-700">
+            <Link to="/tools" className="font-mono text-xs font-medium text-primary-600 hover:text-primary-700">
               View All
             </Link>
           </div>
@@ -301,10 +304,10 @@ export function DashboardPage() {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-neutral-200 bg-white p-6">
+        <div className="border border-neutral-200 bg-white p-6">
           <div className="flex items-center justify-between">
             <h2 className="font-serif text-base font-semibold text-neutral-900">Your Progress This Week</h2>
-            <Link to="/timeline" className="text-xs font-medium text-primary-600 hover:text-primary-700">
+            <Link to="/timeline" className="font-mono text-xs font-medium text-primary-600 hover:text-primary-700">
               View Full Report
             </Link>
           </div>
@@ -314,9 +317,9 @@ export function DashboardPage() {
             <ProgressBar label="Interview Prep" value={interviewPrepPct} max={100} display={`${interviewPrepPct}%`} />
             <ProgressBar label="Messages Responded" value={messagesRespondedPct} max={100} display={`${messagesRespondedPct}%`} />
           </div>
-          <div className="mt-4 rounded-xl bg-accent-50 p-4">
-            <p className="text-sm font-semibold text-accent-800">Keep the momentum!</p>
-            <p className="mt-1 text-xs text-accent-700">
+          <div className="mt-4 border border-dashed border-neutral-300 p-4">
+            <p className="text-sm font-semibold text-neutral-900">Keep the momentum!</p>
+            <p className="mt-1 text-xs text-neutral-600">
               You've taken {activeApplications.length + submittedThisWeek} steps forward this week. You're building something great.
             </p>
           </div>
@@ -324,10 +327,10 @@ export function DashboardPage() {
       </div>
 
       {/* Forward Feed */}
-      <div className="mt-6 rounded-2xl border border-neutral-200 bg-white p-6">
+      <div className="mt-6 border border-neutral-200 bg-white p-6">
         <div className="flex items-center justify-between">
           <h2 className="font-serif text-base font-semibold text-neutral-900">The Forward Feed</h2>
-          <Link to="/forward-feed" className="text-xs font-medium text-primary-600 hover:text-primary-700">
+          <Link to="/forward-feed" className="font-mono text-xs font-medium text-primary-600 hover:text-primary-700">
             Visit The Forward Feed &rarr;
           </Link>
         </div>
@@ -339,11 +342,11 @@ export function DashboardPage() {
               <Link
                 key={post.id}
                 to={`/forward-feed/${post.slug}`}
-                className="rounded-xl border border-neutral-200 p-4 transition-colors hover:border-primary-200 hover:bg-neutral-50"
+                className="border border-neutral-200 border-l-4 border-l-primary-600 p-4 transition-colors hover:border-l-primary-800"
               >
-                <p className="text-[11px] font-semibold uppercase tracking-wide text-primary-600">{post.category}</p>
+                <p className="font-mono text-[11px] font-semibold uppercase tracking-wide text-primary-700">{post.category}</p>
                 <p className="mt-1 text-sm font-medium text-neutral-900">{post.title}</p>
-                <p className="mt-2 text-xs text-neutral-400">{post.read_time_minutes} min read</p>
+                <p className="mt-2 font-mono text-xs text-neutral-400">{post.read_time_minutes} min read</p>
               </Link>
             ))}
           </div>
@@ -351,17 +354,17 @@ export function DashboardPage() {
       </div>
 
       {/* Quick Access Tools */}
-      <div className="mt-6 rounded-2xl border border-neutral-200 bg-white p-6">
+      <div className="mt-6 border border-neutral-200 bg-white p-6">
         <div className="flex items-center justify-between">
           <h2 className="font-serif text-base font-semibold text-neutral-900">Quick Access Tools</h2>
-          <Link to="/tools" className="text-xs font-medium text-primary-600 hover:text-primary-700">
+          <Link to="/tools" className="font-mono text-xs font-medium text-primary-600 hover:text-primary-700">
             View All Tools &rarr;
           </Link>
         </div>
         <div className="mt-4 grid grid-cols-3 gap-4 sm:grid-cols-4 lg:grid-cols-7">
           {TOOL_TILES.map((tool) => (
-            <Link key={tool.label} to={tool.to} className="flex flex-col items-center gap-2 rounded-xl p-3 text-center hover:bg-neutral-50">
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-neutral-100">
+            <Link key={tool.label} to={tool.to} className="flex flex-col items-center gap-2 border border-transparent p-3 text-center hover:border-neutral-200 hover:bg-neutral-50">
+              <div className="flex h-11 w-11 items-center justify-center border border-neutral-200 bg-neutral-50">
                 <tool.icon className="h-5 w-5 text-neutral-600" />
               </div>
               <span className="text-[11px] font-medium text-neutral-700">{tool.label}</span>
@@ -385,16 +388,14 @@ function RecommendationRow({
   locked?: boolean
 }) {
   return (
-    <div className="flex items-center justify-between gap-3">
+    <div className="flex items-center justify-between gap-3 border-l-2 border-neutral-200 pl-3">
       <div className="flex items-center gap-3">
-        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-primary-100">
-          <Icon className="h-4 w-4 text-primary-600" />
-        </div>
+        <Icon className="h-5 w-5 flex-shrink-0 text-primary-600" />
         <div>
           <div className="flex items-center gap-1.5">
             <p className="text-sm font-medium text-neutral-900">{title}</p>
             {tag && (
-              <span className="rounded-full bg-accent-100 px-2 py-0.5 text-[10px] font-semibold text-accent-700">
+              <span className="border border-accent-300 px-1.5 py-0.5 font-mono text-[10px] font-semibold text-accent-700">
                 {tag}
               </span>
             )}
@@ -405,7 +406,7 @@ function RecommendationRow({
       </div>
       <Link
         to={to}
-        className="flex-shrink-0 rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-semibold text-neutral-700 hover:bg-neutral-50"
+        className="flex-shrink-0 border border-neutral-300 px-3 py-1.5 text-xs font-semibold text-neutral-700 hover:bg-neutral-50"
       >
         {cta}
       </Link>
@@ -419,10 +420,10 @@ function ProgressBar({ label, value, max, display }: { label: string; value: num
     <div>
       <div className="flex items-center justify-between">
         <p className="text-xs font-medium text-neutral-700">{label}</p>
-        <p className="text-xs font-semibold text-neutral-900">{display}</p>
+        <p className="font-mono text-xs font-semibold text-neutral-900">{display}</p>
       </div>
-      <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-neutral-100">
-        <div className="h-full rounded-full bg-primary-600 transition-all duration-700" style={{ width: `${pct}%` }} />
+      <div className="mt-1.5 h-1.5 w-full overflow-hidden border border-neutral-200 bg-neutral-100">
+        <div className="h-full bg-primary-600 transition-all duration-700" style={{ width: `${pct}%` }} />
       </div>
     </div>
   )
