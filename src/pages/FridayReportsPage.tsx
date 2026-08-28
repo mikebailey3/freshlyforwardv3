@@ -17,10 +17,10 @@ const approvalStatusLabels: Record<string, string> = {
 }
 
 const approvalStatusColors: Record<string, string> = {
-  draft: 'bg-neutral-100 text-neutral-600',
-  pending_review: 'bg-warning-100 text-warning-700',
-  approved: 'bg-accent-100 text-accent-700',
-  sent: 'bg-success-100 text-success-700',
+  draft: 'border-neutral-300 text-neutral-600',
+  pending_review: 'border-warning-300 text-warning-700',
+  approved: 'border-accent-300 text-accent-700',
+  sent: 'border-success-300 text-success-700',
 }
 
 const approvalStatusIcons: Record<string, typeof Clock> = {
@@ -77,7 +77,7 @@ export function FridayReportsPage() {
       {selected ? (
         <ReportDetail report={selected} onBack={() => setSelected(null)} />
       ) : reports.length === 0 ? (
-        <div className="rounded-2xl border border-neutral-200 bg-white p-12 text-center">
+        <div className="border border-neutral-200 bg-white p-12 text-center">
           <FileText className="mx-auto h-12 w-12 text-neutral-300" />
           <p className="mt-4 text-sm text-neutral-500">
             No Friday Progress Reports are available yet. Your first report will appear here after your
@@ -93,15 +93,15 @@ export function FridayReportsPage() {
               <button
                 key={report.id}
                 onClick={() => setSelected(report)}
-                className="w-full rounded-2xl border border-neutral-200 bg-white p-6 text-left transition-all hover:shadow-md"
+                className="w-full border border-neutral-200 border-l-4 border-l-primary-600 bg-white p-6 text-left transition-colors hover:bg-neutral-50"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
                       <span
                         className={cn(
-                          'flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium',
-                          approvalStatusColors[report.approval_status] || 'bg-neutral-100 text-neutral-600'
+                          'flex items-center gap-1 border px-2.5 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide',
+                          approvalStatusColors[report.approval_status] || 'border-neutral-300 text-neutral-600'
                         )}
                       >
                         <StatusIcon className="h-3 w-3" />
@@ -170,13 +170,13 @@ function ReportDetail({ report, onBack }: { report: FridayReport; onBack: () => 
         Back to all reports
       </button>
 
-      <div className="rounded-2xl border border-neutral-200 bg-white p-6 sm:p-8">
+      <div className="border border-neutral-200 bg-white p-6 sm:p-8">
         {/* Header */}
         <div className="flex flex-wrap items-center gap-3 border-b border-neutral-200 pb-5">
           <span
             className={cn(
-              'flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium',
-              approvalStatusColors[report.approval_status] || 'bg-neutral-100 text-neutral-600'
+              'flex items-center gap-1 border px-2.5 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide',
+              approvalStatusColors[report.approval_status] || 'border-neutral-300 text-neutral-600'
             )}
           >
             <StatusIcon className="h-3 w-3" />
@@ -194,22 +194,22 @@ function ReportDetail({ report, onBack }: { report: FridayReport; onBack: () => 
         <p className="mt-2 text-sm text-neutral-600">{report.summary}</p>
 
         {/* Stats */}
-        <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <div className="rounded-xl bg-primary-50 p-4">
+        <div className="mt-6 grid grid-cols-1 border border-neutral-200 sm:grid-cols-3">
+          <div className="border-b border-neutral-200 p-4 sm:border-b-0 sm:border-r">
             <TrendingUp className="h-5 w-5 text-primary-600" />
             <p className="mt-2 text-2xl font-semibold text-neutral-900">
               {report.opportunities_reviewed}
             </p>
             <p className="text-xs text-neutral-500">Opportunities Reviewed</p>
           </div>
-          <div className="rounded-xl bg-primary-50 p-4">
+          <div className="border-b border-neutral-200 p-4 sm:border-b-0 sm:border-r">
             <Mail className="h-5 w-5 text-primary-600" />
             <p className="mt-2 text-2xl font-semibold text-neutral-900">
               {report.applications_submitted}
             </p>
             <p className="text-xs text-neutral-500">Applications Submitted</p>
           </div>
-          <div className="rounded-xl bg-primary-50 p-4">
+          <div className="p-4">
             <Briefcase className="h-5 w-5 text-primary-600" />
             <p className="mt-2 text-2xl font-semibold text-neutral-900">
               {report.interviews_scheduled}
@@ -237,7 +237,7 @@ function ReportDetail({ report, onBack }: { report: FridayReport; onBack: () => 
 
         {/* Next Steps */}
         {report.next_steps && (
-          <div className="mt-6 rounded-xl border border-primary-200 bg-primary-50 p-5">
+          <div className="mt-6 border border-l-4 border-primary-200 border-l-primary-600 bg-primary-50 p-5">
             <h3 className="flex items-center gap-2 font-serif text-base font-semibold text-primary-800">
               <CheckCircle2 className="h-4 w-4" />
               Next Steps
