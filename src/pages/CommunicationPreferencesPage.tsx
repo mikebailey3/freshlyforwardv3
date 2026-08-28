@@ -66,16 +66,14 @@ export function CommunicationPreferencesPage() {
         {prefRows.map((row) => {
           const value = prefs ? (prefs[row.key] as boolean) : false
           return (
-            <div key={row.key} className={`flex items-center justify-between rounded-xl border border-neutral-200 bg-white p-5 ${row.future ? 'opacity-60' : ''}`}>
+            <div key={row.key} className={`flex items-center justify-between border border-neutral-200 border-l-4 border-l-primary-600 bg-white p-5 ${row.future ? 'opacity-60' : ''}`}>
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-50">
-                  <row.icon className="h-5 w-5 text-primary-600" />
-                </div>
+                <row.icon className="h-5 w-5 flex-shrink-0 text-primary-600" />
                 <div>
                   <div className="flex items-center gap-2">
                     <p className="text-sm font-semibold text-neutral-900">{row.label}</p>
                     {row.future && (
-                      <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-xs font-medium text-neutral-500">Coming Soon</span>
+                      <span className="border border-neutral-300 px-2 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide text-neutral-500">Coming Soon</span>
                     )}
                   </div>
                   <p className="text-xs text-neutral-500">{row.desc}</p>
