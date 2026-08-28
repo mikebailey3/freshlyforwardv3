@@ -112,7 +112,7 @@ export function BlogPostEditorPage() {
   }
 
   const inputClass =
-    'mt-1 block w-full rounded-lg border border-neutral-300 px-3 py-2.5 text-sm text-neutral-900 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500'
+    'mt-1 block w-full border border-neutral-300 px-3 py-2.5 text-sm text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500'
 
   return (
     <StrategistLayout>
@@ -134,13 +134,13 @@ export function BlogPostEditorPage() {
       </div>
 
       {error && (
-        <div className="mb-6 flex items-start gap-2 rounded-lg bg-error-50 border border-error-100 px-4 py-3 text-sm text-error-600">
+        <div className="mb-6 flex items-start gap-2 border border-error-300 border-l-4 border-l-error-500 bg-error-50 px-4 py-3 text-sm text-error-600">
           <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
-      <div className="space-y-5 rounded-2xl border border-neutral-200 bg-white p-6">
+      <div className="space-y-5 border border-neutral-200 bg-white p-6">
         <div>
           <label className="block text-sm font-medium text-neutral-700">Title</label>
           <input
@@ -267,7 +267,7 @@ export function BlogPostEditorPage() {
           <button
             onClick={handleDelete}
             disabled={deleting}
-            className="flex items-center gap-1.5 rounded-lg border border-error-200 px-4 py-2.5 text-sm font-medium text-error-600 transition-colors hover:bg-error-50 disabled:opacity-60"
+            className="flex items-center gap-1.5 border border-error-200 px-4 py-2.5 text-sm font-medium text-error-600 transition-colors hover:bg-error-50 disabled:opacity-60"
           >
             {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
             Delete Post
@@ -277,7 +277,7 @@ export function BlogPostEditorPage() {
         <button
           onClick={handleSave}
           disabled={saving}
-          className="flex items-center gap-1.5 rounded-lg bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-700 disabled:opacity-60"
+          className="flex items-center gap-1.5 border-2 border-neutral-900 bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-700 disabled:opacity-60"
         >
           {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
           {saving ? 'Saving...' : isNew ? 'Create Post' : 'Save Changes'}
