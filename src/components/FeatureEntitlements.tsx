@@ -55,7 +55,7 @@ export function UpgradeModal({
       aria-labelledby="upgrade-modal-title"
     >
       <div
-        className="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-xl animate-slide-up"
+        className="relative w-full max-w-md border-2 border-neutral-900 bg-white p-6 animate-slide-up"
         onClick={(e) => e.stopPropagation()}
       >
         <button
@@ -66,9 +66,7 @@ export function UpgradeModal({
           <X className="h-5 w-5" />
         </button>
 
-        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary-100">
-          <Lock className="h-6 w-6 text-primary-600" />
-        </div>
+        <Lock className="h-8 w-8 text-primary-600" />
 
         <h2 id="upgrade-modal-title" className="mt-4 font-serif text-xl font-semibold text-neutral-900">
           {title}
@@ -76,7 +74,7 @@ export function UpgradeModal({
         <p className="mt-2 text-sm text-neutral-600">{body}</p>
 
         {requiredPlan && (
-          <div className="mt-4 rounded-xl bg-neutral-50 border border-neutral-200 p-4">
+          <div className="mt-4 border border-neutral-200 bg-neutral-50 p-4">
             <p className="text-xs font-semibold text-neutral-500 uppercase tracking-wide">
               Included with
             </p>
@@ -89,14 +87,14 @@ export function UpgradeModal({
         <div className="mt-6 flex flex-col gap-2 sm:flex-row">
           <Link
             to={upgradeLink}
-            className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-700"
+            className="flex flex-1 items-center justify-center gap-2 border-2 border-neutral-900 bg-primary-600 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-700"
           >
             {cta}
             <ArrowRight className="h-4 w-4" />
           </Link>
           <Link
             to="/pricing"
-            className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-neutral-300 px-5 py-3 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50"
+            className="flex flex-1 items-center justify-center gap-2 border border-neutral-300 px-5 py-3 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50"
           >
             View Plans
           </Link>
@@ -209,13 +207,11 @@ export function LockedFeatureCard({
 
   return (
     <div
-      className="relative overflow-hidden rounded-2xl border border-neutral-200 bg-white p-6 transition-all hover:shadow-md cursor-pointer"
+      className="relative border border-dashed border-neutral-300 bg-white p-6 transition-colors hover:border-primary-400 cursor-pointer"
       onClick={onUpgrade}
     >
       <div className="flex items-start gap-4">
-        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-neutral-100">
-          {icon || <Lock className="h-6 w-6 text-neutral-400" />}
-        </div>
+        {icon || <Lock className="h-8 w-8 flex-shrink-0 text-neutral-400" />}
         <div className="flex-1">
           <div className="flex items-center gap-2">
             <h3 className="font-serif text-lg font-semibold text-neutral-900">{displayName}</h3>
@@ -224,7 +220,7 @@ export function LockedFeatureCard({
           {desc && <p className="mt-1 text-sm text-neutral-600">{desc}</p>}
           {planLabel && (
             <div className="mt-3">
-              <span className="inline-block rounded-full bg-primary-100 px-3 py-1 text-xs font-medium text-primary-700">
+              <span className="inline-block border border-primary-300 px-3 py-1 font-mono text-[11px] font-semibold uppercase tracking-wide text-primary-700">
                 Available with {planLabel}
               </span>
             </div>
@@ -253,9 +249,7 @@ export function UpgradeRequiredPage({ featureKey, requiredPlan }: UpgradeRequire
   return (
     <div className="flex min-h-[60vh] items-center justify-center">
       <div className="max-w-md text-center">
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-neutral-100">
-          <Lock className="h-8 w-8 text-neutral-400" />
-        </div>
+        <Lock className="mx-auto h-10 w-10 text-neutral-400" />
         <h1 className="mt-6 font-serif text-2xl font-semibold text-neutral-900">
           {displayName} requires an upgrade
         </h1>
@@ -264,7 +258,7 @@ export function UpgradeRequiredPage({ featureKey, requiredPlan }: UpgradeRequire
             `This feature is not included in your current plan. Upgrade to access ${displayName}.`}
         </p>
         {requiredPlan && (
-          <div className="mt-4 inline-block rounded-xl bg-neutral-50 border border-neutral-200 px-6 py-3">
+          <div className="mt-4 inline-block border border-neutral-200 bg-neutral-50 px-6 py-3">
             <p className="text-xs font-semibold text-neutral-500 uppercase tracking-wide">
               Included with
             </p>
@@ -276,14 +270,14 @@ export function UpgradeRequiredPage({ featureKey, requiredPlan }: UpgradeRequire
         <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-center">
           <Link
             to={requiredPlan ? `/checkout/${requiredPlan}` : '/pricing'}
-            className="flex items-center justify-center gap-2 rounded-xl bg-primary-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-700"
+            className="flex items-center justify-center gap-2 border-2 border-neutral-900 bg-primary-600 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-700"
           >
             {feature?.upgrade_cta || 'Upgrade Now'}
             <ArrowRight className="h-4 w-4" />
           </Link>
           <Link
             to="/pricing"
-            className="flex items-center justify-center gap-2 rounded-xl border border-neutral-300 px-6 py-3 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50"
+            className="flex items-center justify-center gap-2 border border-neutral-300 px-6 py-3 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50"
           >
             View Plans
           </Link>

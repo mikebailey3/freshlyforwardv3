@@ -97,23 +97,23 @@ export function CareerSuccessPage() {
             return (
               <div
                 key={item.id}
-                className="relative overflow-hidden rounded-2xl border border-neutral-200 bg-white p-6 transition-all hover:shadow-lg"
+                className="relative border border-neutral-200 bg-white p-6 transition-colors hover:border-primary-300"
               >
                 {item.is_coming_soon && (
                   <div className="absolute right-3 top-3">
-                    <span className="rounded-full bg-accent-100 px-3 py-1 text-xs font-medium text-accent-700">
+                    <span className="border border-accent-300 px-2.5 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide text-accent-700">
                       Coming Soon
                     </span>
                   </div>
                 )}
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-primary-100 to-secondary-100 text-2xl">
-                  {iconMap[item.icon] || '✨'}
+                <div className="mb-4 text-2xl">
+                  {iconMap[item.icon] || <Sparkles className="h-6 w-6 text-primary-600" />}
                 </div>
                 <h3 className="font-serif text-lg font-semibold text-neutral-900">{item.title}</h3>
                 <p className="mt-2 text-sm text-neutral-600">{item.description}</p>
 
                 {item.is_coming_soon && (
-                  <div className="mt-4 rounded-lg bg-neutral-50 p-3">
+                  <div className="mt-4 border border-neutral-200 bg-neutral-50 p-3">
                     <p className="text-xs text-neutral-500">
                       This feature is in development. You will be the first to know when it launches.
                     </p>
@@ -125,7 +125,7 @@ export function CareerSuccessPage() {
         </div>
       )}
 
-      <div className="mt-12 rounded-2xl bg-gradient-to-br from-primary-50 to-secondary-50 border border-primary-100 p-8 text-center">
+      <div className="mt-12 border border-dashed border-primary-400 bg-[var(--cream)] p-8 text-center">
         <h2 className="font-serif text-xl font-semibold text-neutral-900">
           Your career does not stop at your next job.
         </h2>
