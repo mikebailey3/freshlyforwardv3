@@ -78,7 +78,7 @@ export function StrategistMemberWorkspacePage() {
           ← Back to Members
         </Link>
         <div className="flex items-center gap-4">
-          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-primary-100 to-secondary-100">
+          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary-100">
             <User className="h-7 w-7 text-primary-600" />
           </div>
           <div>
@@ -88,7 +88,7 @@ export function StrategistMemberWorkspacePage() {
             <p className="text-sm text-neutral-600">{profile?.headline || 'No headline set'}</p>
           </div>
           <div className="ml-auto">
-            <div className="flex items-center gap-2 rounded-lg bg-neutral-100 px-3 py-2">
+            <div className="flex items-center gap-2 border border-neutral-300 px-3 py-2">
               <TrendingUp className="h-4 w-4 text-primary-600" />
               <span className="text-sm font-semibold text-neutral-900">{readiness.score}%</span>
               <span className="text-xs text-neutral-500">Search Readiness</span>
@@ -137,7 +137,7 @@ function SnapshotTab({ profile, memberId }: { profile: MemberProfile | null; mem
 
   return (
     <div className="grid gap-6 lg:grid-cols-2">
-      <div className="rounded-2xl border border-neutral-200 bg-white p-6">
+      <div className="border border-neutral-200 bg-white p-6">
         <h3 className="mb-4 font-serif text-base font-semibold text-neutral-900">Career Snapshot</h3>
         <div className="space-y-3 text-sm">
           <Field label="Full Name" value={profile?.full_name} />
@@ -149,15 +149,15 @@ function SnapshotTab({ profile, memberId }: { profile: MemberProfile | null; mem
         </div>
       </div>
 
-      <div className="rounded-2xl border border-neutral-200 bg-white p-6">
+      <div className="border border-neutral-200 bg-white p-6">
         <h3 className="mb-4 font-serif text-base font-semibold text-neutral-900">Search Readiness</h3>
         <div className="mb-4">
           <div className="flex items-center justify-between">
             <span className="text-sm text-neutral-600">Profile Completeness</span>
             <span className="font-serif text-2xl font-bold text-neutral-900">{readiness.score}%</span>
           </div>
-          <div className="mt-2 h-2 w-full rounded-full bg-neutral-100">
-            <div className="h-full rounded-full bg-primary-600 transition-all" style={{ width: `${readiness.score}%` }} />
+          <div className="mt-2 h-2 w-full border border-neutral-300 bg-neutral-100">
+            <div className="h-full bg-primary-600 transition-all" style={{ width: `${readiness.score}%` }} />
           </div>
         </div>
         {readiness.missing.length > 0 && (
@@ -175,7 +175,7 @@ function SnapshotTab({ profile, memberId }: { profile: MemberProfile | null; mem
         )}
       </div>
 
-      <div className="rounded-2xl border border-neutral-200 bg-white p-6">
+      <div className="border border-neutral-200 bg-white p-6">
         <h3 className="mb-4 flex items-center gap-2 font-serif text-base font-semibold text-neutral-900">
           <Briefcase className="h-4 w-4 text-primary-600" />
           Work History
@@ -195,7 +195,7 @@ function SnapshotTab({ profile, memberId }: { profile: MemberProfile | null; mem
         )}
       </div>
 
-      <div className="rounded-2xl border border-neutral-200 bg-white p-6">
+      <div className="border border-neutral-200 bg-white p-6">
         <h3 className="mb-4 flex items-center gap-2 font-serif text-base font-semibold text-neutral-900">
           <Target className="h-4 w-4 text-primary-600" />
           Preferences
@@ -210,7 +210,7 @@ function SnapshotTab({ profile, memberId }: { profile: MemberProfile | null; mem
         </div>
       </div>
 
-      <div className="rounded-2xl border border-neutral-200 bg-white p-6">
+      <div className="border border-neutral-200 bg-white p-6">
         <h3 className="mb-4 flex items-center gap-2 font-serif text-base font-semibold text-neutral-900">
           <Wrench className="h-4 w-4 text-primary-600" />
           Skills
@@ -218,7 +218,7 @@ function SnapshotTab({ profile, memberId }: { profile: MemberProfile | null; mem
         {profile?.skills && profile.skills.length > 0 ? (
           <div className="flex flex-wrap gap-2">
             {profile.skills.map((s, i) => (
-              <span key={i} className="rounded-full bg-primary-100 px-3 py-1 text-xs font-medium text-primary-700">{s}</span>
+              <span key={i} className="border border-primary-300 px-2.5 py-1 font-mono text-[11px] font-semibold uppercase tracking-wide text-primary-700">{s}</span>
             ))}
           </div>
         ) : (
@@ -226,7 +226,7 @@ function SnapshotTab({ profile, memberId }: { profile: MemberProfile | null; mem
         )}
       </div>
 
-      <div className="rounded-2xl border border-neutral-200 bg-white p-6">
+      <div className="border border-neutral-200 bg-white p-6">
         <h3 className="mb-4 flex items-center gap-2 font-serif text-base font-semibold text-neutral-900">
           <FileCheck className="h-4 w-4 text-primary-600" />
           Authorization
@@ -266,7 +266,7 @@ function OpportunitiesTab({ memberId, strategistId }: { memberId: string; strate
         <h3 className="font-serif text-base font-semibold text-neutral-900">Opportunity Pipeline</h3>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="flex items-center gap-1.5 rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-700"
+          className="flex items-center gap-1.5 border-2 border-neutral-900 bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-700"
         >
           <Plus className="h-4 w-4" />
           Add Opportunity
@@ -291,10 +291,10 @@ function OpportunitiesTab({ memberId, strategistId }: { memberId: string; strate
       ) : (
         <div className="space-y-3">
           {opportunities.map((opp) => (
-            <div key={opp.id} className="rounded-xl border border-neutral-200 bg-white p-4">
+            <div key={opp.id} className="border border-neutral-200 bg-white p-4">
               <div className="flex items-start justify-between">
                 <div>
-                  <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-xs font-medium text-neutral-700">{opp.status.replace(/_/g, ' ')}</span>
+                  <span className="border px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide border-neutral-300 text-neutral-700">{opp.status.replace(/_/g, ' ')}</span>
                   <p className="mt-2 text-sm font-semibold text-neutral-900">{opp.job_title} at {opp.employer}</p>
                   <p className="text-xs text-neutral-500">{opp.location} — {opp.salary_text || 'Salary TBD'}</p>
                   {opp.why_it_matches && <p className="mt-2 text-xs text-neutral-600">{opp.why_it_matches}</p>}
@@ -305,7 +305,7 @@ function OpportunitiesTab({ memberId, strategistId }: { memberId: string; strate
                     await updateOpportunity(opp.id, { status: e.target.value })
                     load()
                   }}
-                  className="rounded-lg border border-neutral-300 px-2 py-1 text-xs"
+                  className="border border-neutral-300 px-2 py-1 text-xs"
                 >
                   {['researching', 'needs_review', 'recommended', 'awaiting_member_approval', 'approved', 'declined', 'preparing_application', 'submitted', 'expired', 'archived'].map((s) => (
                     <option key={s} value={s}>{s.replace(/_/g, ' ')}</option>
@@ -357,7 +357,7 @@ function OpportunityForm({ memberId, strategistId, onSave, onCancel }: {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mb-4 rounded-2xl border border-primary-200 bg-primary-50 p-6">
+    <form onSubmit={handleSubmit} className="mb-4 border border-primary-300 border-l-4 border-l-primary-600 bg-primary-50 p-6">
       <h4 className="mb-4 font-serif text-base font-semibold text-neutral-900">New Opportunity</h4>
       <div className="grid gap-3 sm:grid-cols-2">
         <Input label="Employer" value={form.employer} onChange={(v) => setForm({ ...form, employer: v })} required />
@@ -377,10 +377,10 @@ function OpportunityForm({ memberId, strategistId, onSave, onCancel }: {
       <TextArea label="Why It Matches" value={form.why_it_matches} onChange={(v) => setForm({ ...form, why_it_matches: v })} />
       <TextArea label="Potential Concerns" value={form.potential_concerns} onChange={(v) => setForm({ ...form, potential_concerns: v })} />
       <div className="mt-4 flex gap-2">
-        <button type="submit" className="flex items-center gap-1.5 rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">
+        <button type="submit" className="flex items-center gap-1.5 border-2 border-neutral-900 bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">
           <Check className="h-4 w-4" /> Create
         </button>
-        <button type="button" onClick={onCancel} className="flex items-center gap-1.5 rounded-lg border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50">
+        <button type="button" onClick={onCancel} className="flex items-center gap-1.5 border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50">
           <X className="h-4 w-4" /> Cancel
         </button>
       </div>
@@ -416,7 +416,7 @@ function ApplicationsTab({ memberId, strategistId }: { memberId: string; strateg
         <h3 className="font-serif text-base font-semibold text-neutral-900">Applications</h3>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="flex items-center gap-1.5 rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700"
+          className="flex items-center gap-1.5 border-2 border-neutral-900 bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700"
         >
           <Plus className="h-4 w-4" /> Create Application
         </button>
@@ -441,10 +441,10 @@ function ApplicationsTab({ memberId, strategistId }: { memberId: string; strateg
       ) : (
         <div className="space-y-3">
           {applications.map((app) => (
-            <div key={app.id} className="rounded-xl border border-neutral-200 bg-white p-4">
+            <div key={app.id} className="border border-neutral-200 bg-white p-4">
               <div className="flex items-start justify-between">
                 <div>
-                  <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-xs font-medium text-neutral-700">{app.status.replace(/_/g, ' ')}</span>
+                  <span className="border px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide border-neutral-300 text-neutral-700">{app.status.replace(/_/g, ' ')}</span>
                   <p className="mt-2 text-sm font-semibold text-neutral-900">{app.job_title} at {app.employer}</p>
                   {app.date_submitted && <p className="text-xs text-neutral-500">Submitted: {formatDate(app.date_submitted)}</p>}
                   {app.interview_date && <p className="text-xs text-neutral-500">Interview: {formatDate(app.interview_date)}</p>}
@@ -455,7 +455,7 @@ function ApplicationsTab({ memberId, strategistId }: { memberId: string; strateg
                     await updateApplication(app.id, { status: e.target.value })
                     load()
                   }}
-                  className="rounded-lg border border-neutral-300 px-2 py-1 text-xs"
+                  className="border border-neutral-300 px-2 py-1 text-xs"
                 >
                   {['preparing_resume', 'preparing_cover_letter', 'waiting_on_member', 'ready_to_submit', 'submitted', 'employer_viewed', 'follow_up_needed', 'interview_requested', 'interview_scheduled', 'rejected', 'offer_received', 'offer_accepted', 'closed'].map((s) => (
                     <option key={s} value={s}>{s.replace(/_/g, ' ')}</option>
@@ -498,7 +498,7 @@ function ApplicationForm({ memberId, strategistId, opportunities, onSave, onCanc
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mb-4 rounded-2xl border border-primary-200 bg-primary-50 p-6">
+    <form onSubmit={handleSubmit} className="mb-4 border border-primary-300 border-l-4 border-l-primary-600 bg-primary-50 p-6">
       <h4 className="mb-4 font-serif text-base font-semibold text-neutral-900">New Application</h4>
       <div className="space-y-3">
         <div>
@@ -507,7 +507,7 @@ function ApplicationForm({ memberId, strategistId, opportunities, onSave, onCanc
             value={oppId}
             onChange={(e) => setOppId(e.target.value)}
             required
-            className="mt-1 block w-full rounded-lg border border-neutral-300 px-3 py-2.5 text-sm"
+            className="mt-1 block w-full border border-neutral-300 px-3 py-2.5 text-sm"
           >
             <option value="">Select an approved opportunity…</option>
             {opportunities.map((o) => (
@@ -519,10 +519,10 @@ function ApplicationForm({ memberId, strategistId, opportunities, onSave, onCanc
         <TextArea label="Internal Notes" value={form.internal_notes} onChange={(v) => setForm({ ...form, internal_notes: v })} />
       </div>
       <div className="mt-4 flex gap-2">
-        <button type="submit" className="flex items-center gap-1.5 rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">
+        <button type="submit" className="flex items-center gap-1.5 border-2 border-neutral-900 bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">
           <Check className="h-4 w-4" /> Create
         </button>
-        <button type="button" onClick={onCancel} className="flex items-center gap-1.5 rounded-lg border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50">
+        <button type="button" onClick={onCancel} className="flex items-center gap-1.5 border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50">
           <X className="h-4 w-4" /> Cancel
         </button>
       </div>
@@ -547,7 +547,7 @@ function ResumesTab({ memberId }: { memberId: string }) {
     <div>
       <div className="mb-4 flex items-center justify-between">
         <h3 className="font-serif text-base font-semibold text-neutral-900">Resume Versions</h3>
-        <button onClick={() => setShowForm(!showForm)} className="flex items-center gap-1.5 rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">
+        <button onClick={() => setShowForm(!showForm)} className="flex items-center gap-1.5 border-2 border-neutral-900 bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">
           <Plus className="h-4 w-4" /> Add Version
         </button>
       </div>
@@ -561,13 +561,13 @@ function ResumesTab({ memberId }: { memberId: string }) {
       ) : (
         <div className="space-y-3">
           {resumes.map((r) => (
-            <div key={r.id} className="rounded-xl border border-neutral-200 bg-white p-4">
+            <div key={r.id} className="border border-neutral-200 bg-white p-4">
               <div className="flex items-start justify-between">
                 <div>
                   <div className="flex items-center gap-2">
                     <p className="text-sm font-semibold text-neutral-900">{r.title}</p>
-                    {r.is_master && <span className="rounded-full bg-primary-100 px-2 py-0.5 text-xs font-medium text-primary-700">Master</span>}
-                    {r.is_archived && <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-xs font-medium text-neutral-500">Archived</span>}
+                    {r.is_master && <span className="border border-primary-300 px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide text-primary-700">Master</span>}
+                    {r.is_archived && <span className="border px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide border-neutral-300 text-neutral-500">Archived</span>}
                   </div>
                   <p className="text-xs text-neutral-500">Version {r.version_number} — {formatDate(r.created_at)}</p>
                   {r.notes && <p className="mt-1 text-xs text-neutral-600">{r.notes}</p>}
@@ -593,19 +593,19 @@ function ResumeForm({ memberId, onSave, onCancel }: { memberId: string; onSave: 
   const [isMaster, setIsMaster] = useState(false)
 
   return (
-    <form onSubmit={(e) => { e.preventDefault(); onSave({ member_id: memberId, title, notes: notes || null, is_master: isMaster, version_number: 1 }) }} className="mb-4 rounded-2xl border border-primary-200 bg-primary-50 p-6">
+    <form onSubmit={(e) => { e.preventDefault(); onSave({ member_id: memberId, title, notes: notes || null, is_master: isMaster, version_number: 1 }) }} className="mb-4 border border-primary-300 border-l-4 border-l-primary-600 bg-primary-50 p-6">
       <h4 className="mb-4 font-serif text-base font-semibold text-neutral-900">New Resume Version</h4>
       <Input label="Title" value={title} onChange={setTitle} required />
       <TextArea label="Notes" value={notes} onChange={setNotes} />
       <label className="mt-3 flex items-center gap-2 text-sm text-neutral-700">
-        <input type="checkbox" checked={isMaster} onChange={(e) => setIsMaster(e.target.checked)} className="h-4 w-4 rounded border-neutral-300 text-primary-600" />
+        <input type="checkbox" checked={isMaster} onChange={(e) => setIsMaster(e.target.checked)} className="h-4 w-4 border-neutral-300 text-primary-600" />
         Set as Master Resume
       </label>
       <div className="mt-4 flex gap-2">
-        <button type="submit" className="flex items-center gap-1.5 rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">
+        <button type="submit" className="flex items-center gap-1.5 border-2 border-neutral-900 bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">
           <Check className="h-4 w-4" /> Create
         </button>
-        <button type="button" onClick={onCancel} className="flex items-center gap-1.5 rounded-lg border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50">
+        <button type="button" onClick={onCancel} className="flex items-center gap-1.5 border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50">
           <X className="h-4 w-4" /> Cancel
         </button>
       </div>
@@ -630,7 +630,7 @@ function CoverLettersTab({ memberId }: { memberId: string }) {
     <div>
       <div className="mb-4 flex items-center justify-between">
         <h3 className="font-serif text-base font-semibold text-neutral-900">Cover Letters</h3>
-        <button onClick={() => setShowForm(!showForm)} className="flex items-center gap-1.5 rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">
+        <button onClick={() => setShowForm(!showForm)} className="flex items-center gap-1.5 border-2 border-neutral-900 bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">
           <Plus className="h-4 w-4" /> Add Letter
         </button>
       </div>
@@ -644,11 +644,11 @@ function CoverLettersTab({ memberId }: { memberId: string }) {
       ) : (
         <div className="space-y-3">
           {letters.map((l) => (
-            <div key={l.id} className="rounded-xl border border-neutral-200 bg-white p-4">
+            <div key={l.id} className="border border-neutral-200 bg-white p-4">
               <div className="flex items-center gap-2">
                 <p className="text-sm font-semibold text-neutral-900">{l.title}</p>
-                {l.is_template && <span className="rounded-full bg-accent-100 px-2 py-0.5 text-xs font-medium text-accent-700">Template</span>}
-                {l.is_archived && <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-xs font-medium text-neutral-500">Archived</span>}
+                {l.is_template && <span className="border border-accent-300 px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide text-accent-700">Template</span>}
+                {l.is_archived && <span className="border px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide border-neutral-300 text-neutral-500">Archived</span>}
               </div>
               <p className="mt-1 text-xs text-neutral-500">{formatDate(l.created_at)}</p>
               <p className="mt-2 line-clamp-3 text-sm text-neutral-600">{l.body}</p>
@@ -666,22 +666,22 @@ function CoverLetterForm({ memberId, onSave, onCancel }: { memberId: string; onS
   const [isTemplate, setIsTemplate] = useState(false)
 
   return (
-    <form onSubmit={(e) => { e.preventDefault(); onSave({ member_id: memberId, title, body, is_template: isTemplate }) }} className="mb-4 rounded-2xl border border-primary-200 bg-primary-50 p-6">
+    <form onSubmit={(e) => { e.preventDefault(); onSave({ member_id: memberId, title, body, is_template: isTemplate }) }} className="mb-4 border border-primary-300 border-l-4 border-l-primary-600 bg-primary-50 p-6">
       <h4 className="mb-4 font-serif text-base font-semibold text-neutral-900">New Cover Letter</h4>
       <Input label="Title" value={title} onChange={setTitle} required />
       <div>
         <label className="block text-sm font-medium text-neutral-700">Body</label>
-        <textarea value={body} onChange={(e) => setBody(e.target.value)} required rows={8} className="mt-1 block w-full rounded-lg border border-neutral-300 px-3 py-2.5 text-sm" />
+        <textarea value={body} onChange={(e) => setBody(e.target.value)} required rows={8} className="mt-1 block w-full border border-neutral-300 px-3 py-2.5 text-sm" />
       </div>
       <label className="mt-3 flex items-center gap-2 text-sm text-neutral-700">
-        <input type="checkbox" checked={isTemplate} onChange={(e) => setIsTemplate(e.target.checked)} className="h-4 w-4 rounded border-neutral-300 text-primary-600" />
+        <input type="checkbox" checked={isTemplate} onChange={(e) => setIsTemplate(e.target.checked)} className="h-4 w-4 border-neutral-300 text-primary-600" />
         Save as Template
       </label>
       <div className="mt-4 flex gap-2">
-        <button type="submit" className="flex items-center gap-1.5 rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">
+        <button type="submit" className="flex items-center gap-1.5 border-2 border-neutral-900 bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">
           <Check className="h-4 w-4" /> Create
         </button>
-        <button type="button" onClick={onCancel} className="flex items-center gap-1.5 rounded-lg border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50">
+        <button type="button" onClick={onCancel} className="flex items-center gap-1.5 border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50">
           <X className="h-4 w-4" /> Cancel
         </button>
       </div>
@@ -719,13 +719,13 @@ function NotesTab({ memberId, strategistId }: { memberId: string; strategistId: 
         <p className="text-xs text-neutral-500">Career notes are private — visible only to Career Strategists and Admins.</p>
       </div>
 
-      <form onSubmit={handleAdd} className="mb-4 rounded-2xl border border-neutral-200 bg-white p-4">
+      <form onSubmit={handleAdd} className="mb-4 border border-neutral-200 bg-white p-4">
         <textarea
           value={newNote}
           onChange={(e) => setNewNote(e.target.value)}
           placeholder="Add a private note about this member…"
           rows={3}
-          className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm"
+          className="w-full border border-neutral-300 px-3 py-2 text-sm"
         />
         <div className="mt-2 flex gap-2">
           <input
@@ -733,9 +733,9 @@ function NotesTab({ memberId, strategistId }: { memberId: string; strategistId: 
             value={category}
             onChange={(e) => setCategory(e.target.value)}
             placeholder="Category (optional)"
-            className="flex-1 rounded-lg border border-neutral-300 px-3 py-2 text-sm"
+            className="flex-1 border border-neutral-300 px-3 py-2 text-sm"
           />
-          <button type="submit" className="flex items-center gap-1.5 rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">
+          <button type="submit" className="flex items-center gap-1.5 border-2 border-neutral-900 bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">
             <Plus className="h-4 w-4" /> Add Note
           </button>
         </div>
@@ -746,10 +746,10 @@ function NotesTab({ memberId, strategistId }: { memberId: string; strategistId: 
       ) : (
         <div className="space-y-3">
           {notes.map((note) => (
-            <div key={note.id} className={`rounded-xl border p-4 ${note.is_pinned ? 'border-accent-200 bg-accent-50' : 'border-neutral-200 bg-white'}`}>
+            <div key={note.id} className={`border p-4 ${note.is_pinned ? 'border-accent-300 border-l-4 border-l-accent-500 bg-accent-50' : 'border-neutral-200 bg-white'}`}>
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  {note.category && <span className="mb-1 inline-block rounded-full bg-neutral-100 px-2 py-0.5 text-xs font-medium text-neutral-600">{note.category}</span>}
+                  {note.category && <span className="mb-1 inline-block border border-neutral-300 px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide text-neutral-600">{note.category}</span>}
                   <p className="text-sm text-neutral-700">{note.note}</p>
                   <p className="mt-1 text-xs text-neutral-400">{timeAgo(note.created_at)}</p>
                 </div>
@@ -814,19 +814,19 @@ function FollowUpsTab({ memberId, strategistId }: { memberId: string; strategist
     <div>
       <div className="mb-4 flex items-center justify-between">
         <h3 className="font-serif text-base font-semibold text-neutral-900">Follow-Ups</h3>
-        <button onClick={() => setShowForm(!showForm)} className="flex items-center gap-1.5 rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">
+        <button onClick={() => setShowForm(!showForm)} className="flex items-center gap-1.5 border-2 border-neutral-900 bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">
           <Plus className="h-4 w-4" /> Schedule
         </button>
       </div>
 
       {showForm && (
-        <form onSubmit={handleAdd} className="mb-4 rounded-2xl border border-primary-200 bg-primary-50 p-4">
+        <form onSubmit={handleAdd} className="mb-4 border border-primary-300 border-l-4 border-l-primary-600 bg-primary-50 p-4">
           <Input label="Title" value={form.title} onChange={(v) => setForm({ ...form, title: v })} required />
           <Input label="Description" value={form.description} onChange={(v) => setForm({ ...form, description: v })} />
           <Input label="Due Date" type="date" value={form.due_date} onChange={(v) => setForm({ ...form, due_date: v })} required />
           <div className="mt-3 flex gap-2">
-            <button type="submit" className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">Create</button>
-            <button type="button" onClick={() => setShowForm(false)} className="rounded-lg border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50">Cancel</button>
+            <button type="submit" className="border-2 border-neutral-900 bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">Create</button>
+            <button type="button" onClick={() => setShowForm(false)} className="border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50">Cancel</button>
           </div>
         </form>
       )}
@@ -861,7 +861,7 @@ function FollowUpsTab({ memberId, strategistId }: { memberId: string; strategist
 
 function FollowUpItem({ f, onComplete }: { f: FollowUp; onComplete: () => void }) {
   return (
-    <div className={`flex items-center justify-between rounded-xl border p-3 ${
+    <div className={`flex items-center justify-between border border-l-4 p-3 ${
       f.status === 'completed' ? 'border-success-200 bg-success-50' :
       new Date(f.due_date) < new Date() ? 'border-error-200 bg-error-50' : 'border-neutral-200 bg-white'
     }`}>
@@ -873,7 +873,7 @@ function FollowUpItem({ f, onComplete }: { f: FollowUp; onComplete: () => void }
       {f.status === 'pending' && (
         <button
           onClick={async () => { await updateFollowUp(f.id, { status: 'completed', completed_at: new Date().toISOString() }); onComplete() }}
-          className="flex items-center gap-1 rounded-lg bg-success-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-success-700"
+          className="flex items-center gap-1 border-2 border-neutral-900 bg-success-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-success-700"
         >
           <Check className="h-3 w-3" /> Complete
         </button>
@@ -912,7 +912,7 @@ function MessagesTab({ memberId }: { memberId: string }) {
   if (loading) return <LoadingSpinner />
 
   return (
-    <div className="flex h-[calc(100vh-20rem)] flex-col rounded-2xl border border-neutral-200 bg-white">
+    <div className="flex h-[calc(100vh-20rem)] flex-col border border-neutral-200 bg-white">
       <div className="flex-1 overflow-y-auto p-4">
         {messages.length === 0 ? (
           <div className="flex h-full items-center justify-center text-center">
@@ -940,9 +940,9 @@ function MessagesTab({ memberId }: { memberId: string }) {
             value={body}
             onChange={(e) => setBody(e.target.value)}
             placeholder="Type a message…"
-            className="flex-1 rounded-full border border-neutral-300 px-4 py-2.5 text-sm"
+            className="flex-1 border border-neutral-300 px-4 py-2.5 text-sm"
           />
-          <button type="submit" disabled={sending || !body.trim()} className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-600 text-white hover:bg-primary-700 disabled:opacity-60">
+          <button type="submit" disabled={sending || !body.trim()} className="flex h-10 w-10 items-center justify-center border-2 border-neutral-900 bg-primary-600 text-white hover:bg-primary-700 disabled:opacity-60">
             <Send className="h-4 w-4" />
           </button>
         </form>
@@ -985,7 +985,7 @@ function TimelineTab({ memberId }: { memberId: string }) {
                 <div className="z-10 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-primary-600 ring-4 ring-primary-100">
                   <Check className="h-3.5 w-3.5 text-white" />
                 </div>
-                <div className="flex-1 rounded-xl border border-neutral-200 bg-white p-4">
+                <div className="flex-1 border border-neutral-200 bg-white p-4">
                   <p className="text-xs text-neutral-400">{formatDate(event.event_date)}</p>
                   <p className="text-sm font-medium text-neutral-900">{event.event_title}</p>
                   {event.event_description && <p className="text-xs text-neutral-600">{event.event_description}</p>}
@@ -1021,7 +1021,7 @@ function Input({ label, value, onChange, type = 'text', required }: { label: str
   return (
     <div>
       <label className="block text-sm font-medium text-neutral-700">{label}{required && <span className="ml-1 text-error-500">*</span>}</label>
-      <input type={type} value={value} onChange={(e) => onChange(e.target.value)} required={required} className="mt-1 block w-full rounded-lg border border-neutral-300 px-3 py-2.5 text-sm" />
+      <input type={type} value={value} onChange={(e) => onChange(e.target.value)} required={required} className="mt-1 block w-full border border-neutral-300 px-3 py-2.5 text-sm" />
     </div>
   )
 }
@@ -1030,7 +1030,7 @@ function TextArea({ label, value, onChange }: { label: string; value: string; on
   return (
     <div>
       <label className="block text-sm font-medium text-neutral-700">{label}</label>
-      <textarea value={value} onChange={(e) => onChange(e.target.value)} rows={3} className="mt-1 block w-full rounded-lg border border-neutral-300 px-3 py-2.5 text-sm" />
+      <textarea value={value} onChange={(e) => onChange(e.target.value)} rows={3} className="mt-1 block w-full border border-neutral-300 px-3 py-2.5 text-sm" />
     </div>
   )
 }
@@ -1039,7 +1039,7 @@ function Select({ label, value, onChange, options }: { label: string; value: str
   return (
     <div>
       <label className="block text-sm font-medium text-neutral-700">{label}</label>
-      <select value={value} onChange={(e) => onChange(e.target.value)} className="mt-1 block w-full rounded-lg border border-neutral-300 px-3 py-2.5 text-sm">
+      <select value={value} onChange={(e) => onChange(e.target.value)} className="mt-1 block w-full border border-neutral-300 px-3 py-2.5 text-sm">
         {options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
       </select>
     </div>
@@ -1056,7 +1056,7 @@ function LoadingSpinner() {
 
 function EmptyState({ text }: { text: string }) {
   return (
-    <div className="rounded-xl border border-neutral-200 bg-white p-8 text-center">
+    <div className="border border-neutral-200 bg-white p-8 text-center">
       <p className="text-sm text-neutral-500">{text}</p>
     </div>
   )
