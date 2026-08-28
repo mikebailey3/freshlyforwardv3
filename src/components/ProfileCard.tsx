@@ -140,10 +140,10 @@ export function ProfileCard({ userId, profile, onUpdated }: ProfileCardProps) {
                 autoFocus
                 className="w-32 border border-neutral-300 px-2 py-1 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
               />
-              <button onClick={handleSaveUsername} disabled={savingUsername} className="rounded p-1 text-primary-600 hover:bg-primary-50">
+              <button onClick={handleSaveUsername} disabled={savingUsername} className="p-1 text-primary-600 hover:bg-primary-50">
                 {savingUsername ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />}
               </button>
-              <button onClick={() => { setEditingUsername(false); setUsernameDraft(profile.username || '') }} className="rounded p-1 text-neutral-400 hover:bg-neutral-50">
+              <button onClick={() => { setEditingUsername(false); setUsernameDraft(profile.username || '') }} className="p-1 text-neutral-400 hover:bg-neutral-50">
                 <X className="h-3.5 w-3.5" />
               </button>
             </div>

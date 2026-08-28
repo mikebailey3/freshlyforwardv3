@@ -26,9 +26,9 @@ export function OnboardingMeetStrategist({ onNext }: OnboardingStepProps) {
         Your Career Strategist is a dedicated human professional who will personally guide your job search.
       </p>
 
-      <div className="mt-10 rounded-2xl border border-neutral-200 bg-white p-6 sm:p-8">
+      <div className="mt-10 border border-neutral-200 bg-white p-6 sm:p-8">
         <div className="flex flex-col items-center gap-6 sm:flex-row">
-          <div className="flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-primary-100 to-secondary-100">
+          <div className="flex h-24 w-24 items-center justify-center rounded-full bg-primary-100">
             <User className="h-12 w-12 text-primary-600" />
           </div>
           <div className="text-center sm:text-left">
@@ -49,7 +49,7 @@ export function OnboardingMeetStrategist({ onNext }: OnboardingStepProps) {
             { icon: MessageSquare, title: 'Personalized Guidance', desc: 'Real advice from a real person who knows your story.' },
             { icon: User, title: 'One Point of Contact', desc: 'No rotating reps or call centers. Just your Strategist.' },
           ].map((item) => (
-            <div key={item.title} className="flex items-start gap-3 rounded-xl bg-neutral-50 p-4">
+            <div key={item.title} className="flex items-start gap-3 border border-neutral-200 bg-neutral-50 p-4">
               <item.icon className="h-5 w-5 flex-shrink-0 text-primary-600" />
               <div>
                 <h3 className="text-sm font-semibold text-neutral-900">{item.title}</h3>

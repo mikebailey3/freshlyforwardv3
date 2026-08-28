@@ -24,10 +24,8 @@ export function OnboardingWelcome({ onNext }: OnboardingStepProps) {
           { icon: Sparkles, title: 'Personalized from day one', desc: 'Your Career Strategist will get to know you, your goals, and your preferences.' },
           { icon: Compass, title: 'Human-led, not automated', desc: 'Every step is guided by a real person who cares about your career success.' },
         ].map((item) => (
-          <div key={item.title} className="flex items-start gap-4 rounded-xl border border-neutral-200 bg-white p-5">
-            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-primary-50">
-              <item.icon className="h-5 w-5 text-primary-600" />
-            </div>
+          <div key={item.title} className="flex items-start gap-4 border border-neutral-200 border-l-4 border-l-primary-600 bg-white p-5">
+            <item.icon className="h-6 w-6 flex-shrink-0 text-primary-600" />
             <div>
               <h3 className="font-serif text-base font-semibold text-neutral-900">{item.title}</h3>
               <p className="mt-1 text-sm text-neutral-600">{item.desc}</p>

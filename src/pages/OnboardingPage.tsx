@@ -246,14 +246,14 @@ export function OnboardingPage() {
           <button
             onClick={handleBack}
             disabled={currentStep === 0}
-            className="flex items-center gap-1.5 rounded-lg px-4 py-2.5 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-100 disabled:opacity-40"
+            className="flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-100 disabled:opacity-40"
           >
             <ChevronLeft className="h-4 w-4" />
             Back
           </button>
           <button
             onClick={handleNext}
-            className="flex items-center gap-1.5 rounded-lg bg-primary-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-700"
+            className="flex items-center gap-1.5 border-2 border-neutral-900 bg-primary-600 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-700"
           >
             {isLastStep ? 'Go to Dashboard' : 'Continue'}
             <ChevronRight className="h-4 w-4" />
