@@ -84,7 +84,7 @@ export function RoadmapPage() {
       )}
 
       {hasBadge('goal-achieved') && (
-        <div className="mt-6 flex items-center gap-2 rounded-xl bg-success-50 p-4 text-success-700">
+        <div className="mt-6 flex items-center gap-2 border border-success-300 bg-success-50 p-4 text-success-700">
           <CheckCircle2 className="h-5 w-5" />
           <p className="text-sm font-medium">You've achieved a major career goal on your roadmap. Nicely done.</p>
         </div>

@@ -64,7 +64,7 @@ export function ActivityFeedPage() {
           <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
         </div>
       ) : activities.length === 0 ? (
-        <div className="rounded-2xl border border-neutral-200 bg-white p-12 text-center">
+        <div className="border border-neutral-200 bg-white p-12 text-center">
           <Compass className="mx-auto h-12 w-12 text-neutral-300" />
           <p className="mt-4 text-sm text-neutral-500">No activity yet. Your feed will populate as your career journey progresses.</p>
         </div>
@@ -80,10 +80,10 @@ export function ActivityFeedPage() {
                   <div className={`relative z-10 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full ${colorClass} ring-4 ring-neutral-50`}>
                     <Icon className="h-5 w-5" aria-hidden="true" />
                   </div>
-                  <div className="flex-1 rounded-xl border border-neutral-200 bg-white p-4 shadow-sm">
+                  <div className="flex-1 border border-neutral-200 border-l-4 border-l-primary-600 bg-white p-4">
                     <p className="text-sm font-semibold text-neutral-900">{item.title}</p>
                     {item.description && <p className="mt-0.5 text-sm text-neutral-600">{item.description}</p>}
-                    <time className="mt-1 block text-xs text-neutral-400" dateTime={item.created_at}>{timeAgo(item.created_at)}</time>
+                    <time className="mt-1 block font-mono text-xs text-neutral-400" dateTime={item.created_at}>{timeAgo(item.created_at)}</time>
                   </div>
                 </li>
               )
