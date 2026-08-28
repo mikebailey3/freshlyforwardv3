@@ -99,22 +99,22 @@ export function AddCalendarEventModal({ profileId, onClose, onCreated }: AddCale
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl">
+      <div className="w-full max-w-lg border border-neutral-200 bg-white p-6 shadow-xl">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="font-serif text-lg font-semibold text-neutral-900">Add to Calendar</h2>
-          <button onClick={onClose} aria-label="Close" className="rounded-lg p-1.5 text-neutral-400 hover:bg-neutral-50 hover:text-neutral-600">
+          <button onClick={onClose} aria-label="Close" className="p-1.5 text-neutral-400 hover:bg-neutral-50 hover:text-neutral-600">
             <X className="h-5 w-5" />
           </button>
         </div>
 
         {/* Mode tabs */}
-        <div className="mb-5 flex gap-2 rounded-xl bg-neutral-100 p-1">
+        <div className="mb-5 flex gap-4 border-b border-neutral-200">
           <button
             type="button"
             onClick={() => setMode('custom')}
             className={cn(
-              'flex flex-1 items-center justify-center gap-1.5 rounded-lg py-2 text-sm font-medium transition-colors',
-              mode === 'custom' ? 'bg-white text-primary-700 shadow-sm' : 'text-neutral-500 hover:text-neutral-700'
+              'flex items-center gap-1.5 border-b-2 py-2 text-sm font-medium transition-colors',
+              mode === 'custom' ? 'border-primary-600 text-primary-700' : 'border-transparent text-neutral-500 hover:text-neutral-700'
             )}
           >
             <Calendar className="h-4 w-4" />
@@ -124,8 +124,8 @@ export function AddCalendarEventModal({ profileId, onClose, onCreated }: AddCale
             type="button"
             onClick={() => setMode('interview')}
             className={cn(
-              'flex flex-1 items-center justify-center gap-1.5 rounded-lg py-2 text-sm font-medium transition-colors',
-              mode === 'interview' ? 'bg-white text-primary-700 shadow-sm' : 'text-neutral-500 hover:text-neutral-700'
+              'flex items-center gap-1.5 border-b-2 py-2 text-sm font-medium transition-colors',
+              mode === 'interview' ? 'border-primary-600 text-primary-700' : 'border-transparent text-neutral-500 hover:text-neutral-700'
             )}
           >
             <Briefcase className="h-4 w-4" />
@@ -134,7 +134,7 @@ export function AddCalendarEventModal({ profileId, onClose, onCreated }: AddCale
         </div>
 
         {error && (
-          <div className="mb-4 rounded-lg border border-error-200 bg-error-50 px-4 py-2.5 text-sm text-error-700">
+          <div className="mb-4 border border-error-200 bg-error-50 px-4 py-2.5 text-sm text-error-700">
             {error}
           </div>
         )}
@@ -150,7 +150,7 @@ export function AddCalendarEventModal({ profileId, onClose, onCreated }: AddCale
                 onChange={(e) => setTitle(e.target.value)}
                 required
                 placeholder="e.g. Call with strategist about resume"
-                className="mt-1.5 w-full rounded-xl border border-neutral-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="mt-1.5 w-full border border-neutral-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
               />
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
@@ -160,7 +160,7 @@ export function AddCalendarEventModal({ profileId, onClose, onCreated }: AddCale
                   id="ev-type"
                   value={eventType}
                   onChange={(e) => setEventType(e.target.value)}
-                  className="mt-1.5 w-full rounded-xl border border-neutral-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  className="mt-1.5 w-full border border-neutral-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                 >
                   {CUSTOM_EVENT_TYPES.map((t) => (
                     <option key={t.value} value={t.value}>{t.label}</option>
@@ -175,7 +175,7 @@ export function AddCalendarEventModal({ profileId, onClose, onCreated }: AddCale
                   value={startAt}
                   onChange={(e) => setStartAt(e.target.value)}
                   required
-                  className="mt-1.5 w-full rounded-xl border border-neutral-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  className="mt-1.5 w-full border border-neutral-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                 />
               </div>
             </div>
@@ -188,7 +188,7 @@ export function AddCalendarEventModal({ profileId, onClose, onCreated }: AddCale
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={2}
-                className="mt-1.5 w-full rounded-xl border border-neutral-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="mt-1.5 w-full border border-neutral-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
               />
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
@@ -201,7 +201,7 @@ export function AddCalendarEventModal({ profileId, onClose, onCreated }: AddCale
                   type="text"
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
-                  className="mt-1.5 w-full rounded-xl border border-neutral-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  className="mt-1.5 w-full border border-neutral-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                 />
               </div>
               <div>
@@ -214,7 +214,7 @@ export function AddCalendarEventModal({ profileId, onClose, onCreated }: AddCale
                   value={meetingLink}
                   onChange={(e) => setMeetingLink(e.target.value)}
                   placeholder="https://teams.microsoft.com/..."
-                  className="mt-1.5 w-full rounded-xl border border-neutral-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  className="mt-1.5 w-full border border-neutral-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                 />
               </div>
             </div>
@@ -227,7 +227,7 @@ export function AddCalendarEventModal({ profileId, onClose, onCreated }: AddCale
                 <Loader2 className="h-5 w-5 animate-spin text-primary-600" />
               </div>
             ) : applications.length === 0 ? (
-              <p className="rounded-lg bg-neutral-50 p-4 text-sm text-neutral-500">
+              <p className="border border-dashed border-neutral-300 bg-neutral-50 p-4 text-sm text-neutral-500">
                 No applications are currently missing an interview date. Once your strategist submits one for you
                 (or if you already have a date), you can add it from the Interviews page.
               </p>
@@ -240,7 +240,7 @@ export function AddCalendarEventModal({ profileId, onClose, onCreated }: AddCale
                     value={selectedAppId}
                     onChange={(e) => setSelectedAppId(e.target.value)}
                     required
-                    className="mt-1.5 w-full rounded-xl border border-neutral-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                    className="mt-1.5 w-full border border-neutral-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                   >
                     <option value="">Select an application…</option>
                     {applications.map((a) => (
@@ -256,7 +256,7 @@ export function AddCalendarEventModal({ profileId, onClose, onCreated }: AddCale
                     value={interviewAt}
                     onChange={(e) => setInterviewAt(e.target.value)}
                     required
-                    className="mt-1.5 w-full rounded-xl border border-neutral-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                    className="mt-1.5 w-full border border-neutral-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                   />
                 </div>
                 <p className="text-xs text-neutral-500">
@@ -278,7 +278,7 @@ function ModalActions({ saving, disabled, onClose }: { saving: boolean; disabled
       <button
         type="submit"
         disabled={saving || disabled}
-        className="flex items-center gap-2 rounded-xl bg-primary-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-primary-700 disabled:opacity-60"
+        className="flex items-center gap-2 border-2 border-neutral-900 bg-primary-600 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-700 disabled:opacity-60"
       >
         {saving && <Loader2 className="h-4 w-4 animate-spin" />}
         {saving ? 'Saving…' : 'Save'}
@@ -287,7 +287,7 @@ function ModalActions({ saving, disabled, onClose }: { saving: boolean; disabled
         type="button"
         onClick={onClose}
         disabled={saving}
-        className="rounded-xl border border-neutral-300 px-5 py-2.5 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-50"
+        className="border border-neutral-300 px-5 py-2.5 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-50"
       >
         Cancel
       </button>

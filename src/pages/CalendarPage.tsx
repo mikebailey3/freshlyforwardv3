@@ -213,7 +213,7 @@ export function CalendarPage() {
         </div>
         <button
           onClick={() => setShowAddModal(true)}
-          className="flex flex-shrink-0 items-center gap-2 rounded-xl bg-primary-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-primary-700"
+          className="flex flex-shrink-0 items-center gap-2 border-2 border-neutral-900 bg-primary-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-700"
         >
           <Plus className="h-4 w-4" />
           Add Event
@@ -232,7 +232,7 @@ export function CalendarPage() {
       )}
 
       {/* Calendar */}
-      <div className="mb-8 rounded-2xl border border-neutral-200 bg-white p-4 sm:p-6">
+      <div className="mb-8 border border-neutral-200 bg-white p-4 sm:p-6">
         {/* Month navigation */}
         <div className="mb-4 flex items-center justify-between">
           <h2 className="font-serif text-lg font-semibold text-neutral-900">
@@ -241,20 +241,20 @@ export function CalendarPage() {
           <div className="flex items-center gap-2">
             <button
               onClick={prevMonth}
-              className="flex h-9 w-9 items-center justify-center rounded-lg border border-neutral-200 text-neutral-600 transition-colors hover:bg-neutral-50"
+              className="flex h-9 w-9 items-center justify-center border border-neutral-200 text-neutral-600 transition-colors hover:bg-neutral-50"
               aria-label="Previous month"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
             <button
               onClick={() => setCurrentMonth(new Date())}
-              className="rounded-lg border border-neutral-200 px-3 py-1.5 text-xs font-medium text-neutral-600 transition-colors hover:bg-neutral-50"
+              className="border border-neutral-200 px-3 py-1.5 font-mono text-xs font-medium text-neutral-600 transition-colors hover:bg-neutral-50"
             >
               Today
             </button>
             <button
               onClick={nextMonth}
-              className="flex h-9 w-9 items-center justify-center rounded-lg border border-neutral-200 text-neutral-600 transition-colors hover:bg-neutral-50"
+              className="flex h-9 w-9 items-center justify-center border border-neutral-200 text-neutral-600 transition-colors hover:bg-neutral-50"
               aria-label="Next month"
             >
               <ChevronRight className="h-4 w-4" />
@@ -281,9 +281,9 @@ export function CalendarPage() {
               <div
                 key={i}
                 className={cn(
-                  'min-h-[80px] rounded-lg border p-1.5 sm:min-h-[100px]',
+                  'min-h-[80px] border p-1.5 sm:min-h-[100px]',
                   day.isCurrentMonth ? 'border-neutral-200 bg-white' : 'border-neutral-100 bg-neutral-50',
-                  todayHighlight && 'border-primary-300 bg-primary-50'
+                  todayHighlight && 'border-primary-600'
                 )}
               >
                 <div
@@ -304,7 +304,7 @@ export function CalendarPage() {
                     return (
                       <div
                         key={ev.id}
-                        className={cn('flex items-center gap-1 rounded px-1 py-0.5 text-[10px] font-medium sm:text-xs', meta.color)}
+                        className={cn('flex items-center gap-1 px-1 py-0.5 font-mono text-[10px] font-medium sm:text-xs', meta.color)}
                         title={ev.title}
                       >
                         <span className={cn('h-1.5 w-1.5 flex-shrink-0 rounded-full', meta.dot)} />
@@ -338,7 +338,7 @@ export function CalendarPage() {
           Upcoming Events
         </h2>
         {upcomingEvents.length === 0 ? (
-          <div className="rounded-2xl border border-neutral-200 bg-white p-8 text-center">
+          <div className="border border-neutral-200 bg-white p-8 text-center">
             <Calendar className="mx-auto h-10 w-10 text-neutral-300" />
             <p className="mt-3 text-sm text-neutral-500">
               No upcoming events. Your calendar will fill up as your career search progresses.
@@ -351,22 +351,20 @@ export function CalendarPage() {
               return (
                 <div
                   key={ev.id}
-                  className="rounded-2xl border border-neutral-200 bg-white p-5 transition-all hover:shadow-md"
+                  className="border border-neutral-200 border-l-4 border-l-primary-600 bg-white p-5 transition-colors hover:border-l-primary-800"
                 >
                   <div className="flex items-start gap-3">
-                    <div className={cn('flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl', meta.color)}>
-                      <meta.icon className="h-5 w-5" />
-                    </div>
+                    <meta.icon className="mt-0.5 h-5 w-5 flex-shrink-0 text-neutral-500" />
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
-                        <span className={cn('rounded-full px-2.5 py-0.5 text-xs font-medium', meta.color)}>
+                        <span className={cn('border-2 px-2.5 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide', meta.color)}>
                           {meta.label}
                         </span>
                       </div>
                       <h3 className="mt-2 font-serif text-base font-semibold text-neutral-900">
                         {ev.title}
                       </h3>
-                      <p className="mt-0.5 flex items-center gap-1.5 text-sm text-neutral-600">
+                      <p className="mt-0.5 flex items-center gap-1.5 font-mono text-sm text-neutral-600">
                         <Clock className="h-3.5 w-3.5" />
                         {formatDateTime(ev.start_at)}
                       </p>
