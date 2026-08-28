@@ -323,7 +323,7 @@ export function MessagesPage() {
                             >
                               {msg.body}
                               {msg.attachment_url && (
-                                <div className={`mt-2 flex items-center gap-2 rounded-lg p-2 text-xs ${
+                                <div className={`mt-2 flex items-center gap-2 p-2 text-xs ${
                                   msg.sender_type === 'member' ? 'bg-primary-700' : 'bg-neutral-200'
                                 }`}>
                                   {msg.attachment_type?.startsWith('image/') ? (

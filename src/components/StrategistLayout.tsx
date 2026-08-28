@@ -56,10 +56,10 @@ export function StrategistLayout({ children, isAdmin = false }: { children: Reac
                 <Link
                   key={item.to}
                   to={item.to}
-                  className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+                  className={`flex items-center gap-3 border-l-2 px-3 py-2.5 text-sm font-medium transition-colors ${
                     isActive
-                      ? 'bg-primary-50 text-primary-700'
-                      : 'text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900'
+                      ? 'border-primary-600 bg-primary-50/60 text-primary-700'
+                      : 'border-transparent text-neutral-600 hover:border-neutral-300 hover:bg-neutral-50 hover:text-neutral-900'
                   }`}
                 >
                   <item.icon className="h-5 w-5" />
@@ -72,14 +72,14 @@ export function StrategistLayout({ children, isAdmin = false }: { children: Reac
           <div className="border-t border-neutral-200 p-3">
             <Link
               to="/dashboard"
-              className="mb-1 flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-50"
+              className="mb-1 flex items-center gap-3 border-l-2 border-transparent px-3 py-2.5 text-sm font-medium text-neutral-600 transition-colors hover:border-neutral-300 hover:bg-neutral-50"
             >
               <User className="h-5 w-5" />
               Member View
             </Link>
             <button
               onClick={handleSignOut}
-              className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-50"
+              className="flex w-full items-center gap-3 border-l-2 border-transparent px-3 py-2.5 text-sm font-medium text-neutral-600 transition-colors hover:border-neutral-300 hover:bg-neutral-50"
             >
               <LogOut className="h-5 w-5" />
               Sign Out
@@ -124,10 +124,10 @@ export function StrategistLayout({ children, isAdmin = false }: { children: Reac
                 key={item.to}
                 to={item.to}
                 onClick={() => setMobileNavOpen(false)}
-                className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium transition-colors ${
+                className={`flex items-center gap-3 border-l-2 px-3 py-3 text-sm font-medium transition-colors ${
                   location.pathname === item.to
-                    ? 'bg-primary-50 text-primary-700'
-                    : 'text-neutral-600 hover:bg-neutral-50'
+                    ? 'border-primary-600 bg-primary-50/60 text-primary-700'
+                    : 'border-transparent text-neutral-600 hover:border-neutral-300 hover:bg-neutral-50'
                 }`}
               >
                 <item.icon className="h-5 w-5" />
@@ -137,14 +137,14 @@ export function StrategistLayout({ children, isAdmin = false }: { children: Reac
             <Link
               to="/dashboard"
               onClick={() => setMobileNavOpen(false)}
-              className="flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-50"
+              className="flex items-center gap-3 border-l-2 border-transparent px-3 py-3 text-sm font-medium text-neutral-600 transition-colors hover:border-neutral-300 hover:bg-neutral-50"
             >
               <User className="h-5 w-5" />
               Member View
             </Link>
             <button
               onClick={handleSignOut}
-              className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-50"
+              className="flex w-full items-center gap-3 border-l-2 border-transparent px-3 py-3 text-sm font-medium text-neutral-600 transition-colors hover:border-neutral-300 hover:bg-neutral-50"
             >
               <LogOut className="h-5 w-5" />
               Sign Out

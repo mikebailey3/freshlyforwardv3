@@ -181,7 +181,7 @@ export function BadgePillCompact({ badge }: { badge: Badge }) {
 
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide ${style.pillBg} ${style.pillText} ${style.pillBorder}`}
+      className={`inline-flex items-center gap-1 border-2 px-2 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide ${style.pillBg} ${style.pillText} ${style.pillBorder}`}
     >
       <Icon className="h-3 w-3" strokeWidth={2.5} />
       {badge.name}

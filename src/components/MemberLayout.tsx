@@ -153,17 +153,17 @@ export function MemberLayout({ children }: { children: ReactNode }) {
         {renderNavIcon(item)}
         {item.label}
         {item.isNew && (
-          <span className="ml-auto rounded border border-primary-200 px-1.5 py-0.5 font-mono text-[10px] font-semibold uppercase text-primary-700">
+          <span className="ml-auto border border-primary-200 px-1.5 py-0.5 font-mono text-[10px] font-semibold uppercase text-primary-700">
             New
           </span>
         )}
         {!item.isNew && count > 0 && (
-          <span className="ml-auto rounded bg-primary-600 px-2 py-0.5 font-mono text-xs font-semibold text-white">
+          <span className="ml-auto bg-primary-600 px-2 py-0.5 font-mono text-xs font-semibold text-white">
             {count}
           </span>
         )}
         {isLocked && item.requiredPlan && (
-          <span className="ml-auto rounded border border-neutral-200 px-1.5 py-0.5 font-mono text-[10px] font-medium uppercase text-neutral-500">
+          <span className="ml-auto border border-neutral-200 px-1.5 py-0.5 font-mono text-[10px] font-medium uppercase text-neutral-500">
             {item.requiredPlan === 'career-growth' ? 'Growth' : item.requiredPlan === 'career-concierge' ? 'Concierge' : ''}
           </span>
         )}
@@ -205,7 +205,7 @@ export function MemberLayout({ children }: { children: ReactNode }) {
 
           <div className="border-t border-neutral-200 p-3">
             <div className="mb-2 flex items-center gap-2 px-3">
-              <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center overflow-hidden rounded border border-neutral-200 bg-primary-50 font-mono text-xs font-semibold text-primary-700">
+              <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center overflow-hidden border border-neutral-200 bg-primary-50 font-mono text-xs font-semibold text-primary-700">
                 {profile?.avatar_url ? (
                   <img src={profile.avatar_url} alt="" className="h-full w-full object-cover" />
                 ) : (
@@ -238,10 +238,10 @@ export function MemberLayout({ children }: { children: ReactNode }) {
             <input
               type="search"
               placeholder="Search opportunities, tools, and more..."
-              className="w-full rounded border border-neutral-200 bg-neutral-50 py-2 pl-9 pr-3 text-sm text-neutral-700 placeholder:text-neutral-400 focus:border-primary-300 focus:outline-none"
+              className="w-full border border-neutral-200 bg-neutral-50 py-2 pl-9 pr-3 text-sm text-neutral-700 placeholder:text-neutral-400 focus:border-primary-300 focus:outline-none"
             />
           </div>
-          <Link to="/notifications" className="relative rounded p-2 text-neutral-500 hover:bg-neutral-50">
+          <Link to="/notifications" className="relative p-2 text-neutral-500 hover:bg-neutral-50">
             <Bell className="h-5 w-5" />
             {unreadNotifications > 0 && (
               <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-primary-600" />
