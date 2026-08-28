@@ -23,7 +23,7 @@ export function InteriorPage({ eyebrow, title, intro, features, sectionEyebrow =
   return (
     <main>
       <section className="page-hero shell">
-        <div><p className="eyebrow">{eyebrow}</p><h1>{title}</h1><p>{intro}</p><div className="hero-actions"><LinkButton to="/signup">Get started <ArrowRight size={18} /></LinkButton><LinkButton to="/contact" variant="secondary">Talk with us</LinkButton></div></div>
+        <div data-doc-tag="FRESHLYFORWARD · DOCUMENT"><p className="eyebrow">{eyebrow}</p><h1>{title}</h1><p>{intro}</p><div className="hero-actions"><LinkButton to="/signup">Get started <ArrowRight size={18} /></LinkButton><LinkButton to="/contact" variant="secondary">Talk with us</LinkButton></div></div>
         <div className="page-hero-mark" aria-hidden="true"><span>FF</span><ArrowRight /></div>
       </section>
       <section className="interior-section shell">
@@ -37,7 +37,7 @@ export function InteriorPage({ eyebrow, title, intro, features, sectionEyebrow =
           ))}
         </div>
       </section>
-      {aside && <section className="editorial-aside shell"><p className="eyebrow eyebrow-light">The human difference</p><h2>{aside.title}</h2><p>{aside.copy}</p><LinkButton to="/why-freshlyforward" variant="light">Why FreshlyForward <ArrowRight size={18} /></LinkButton></section>}
+      {aside && <section className="editorial-aside shell"><p className="eyebrow eyebrow-light">The human difference</p><h2>{aside.title}</h2><p>{aside.copy}</p><LinkButton to="/why-freshlyforward" variant="secondary">Why FreshlyForward <ArrowRight size={18} /></LinkButton></section>}
     </main>
   )
 }

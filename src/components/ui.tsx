@@ -12,7 +12,7 @@ export function LinkButton({ to, children, variant = 'primary' }: LinkButtonProp
 }
 
 type SectionHeadingProps = {
-  eyebrow: string
+  eyebrow?: string
   title: string
   copy?: string
   id?: string
@@ -22,7 +22,7 @@ type SectionHeadingProps = {
 export function SectionHeading({ eyebrow, title, copy, id, centered = false }: SectionHeadingProps) {
   return (
     <div className={`section-heading${centered ? ' section-heading-centered' : ''}`}>
-      <p className="eyebrow">{eyebrow}</p>
+      {eyebrow && <p className="eyebrow">{eyebrow}</p>}
       <h2 id={id}>{title}</h2>
       {copy && <p>{copy}</p>}
     </div>

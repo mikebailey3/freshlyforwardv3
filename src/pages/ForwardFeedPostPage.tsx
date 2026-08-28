@@ -62,6 +62,9 @@ export function ForwardFeedPostPage() {
           <span>{formatPostDate(post.published_at)}</span>
           <span>{post.read_time_minutes} min read</span>
         </div>
+        {post.cover_image_url && (
+          <img className="blog-detail-cover" src={post.cover_image_url} alt="" />
+        )}
         <div className="blog-detail-body">
           {paragraphs.map((paragraph, i) => (
             <p key={i}>{paragraph}</p>
