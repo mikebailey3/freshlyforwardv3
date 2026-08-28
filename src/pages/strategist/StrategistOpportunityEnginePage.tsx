@@ -8,9 +8,9 @@ import { Loader2, MapPin, DollarSign, ExternalLink, ArrowUpRight, Sparkles } fro
 import type { JobMatchWithJob, MemberProfile } from '@/types'
 
 function scoreColor(score: number): string {
-  if (score >= 75) return 'bg-success-100 text-success-700'
-  if (score >= 50) return 'bg-primary-100 text-primary-700'
-  return 'bg-neutral-100 text-neutral-600'
+  if (score >= 75) return 'border-success-300 text-success-700'
+  if (score >= 50) return 'border-primary-300 text-primary-700'
+  return 'border-neutral-300 text-neutral-600'
 }
 
 export function StrategistOpportunityEnginePage() {
@@ -83,7 +83,7 @@ export function StrategistOpportunityEnginePage() {
       </div>
 
       {matches.length === 0 ? (
-        <div className="rounded-2xl border border-neutral-200 bg-white p-12 text-center">
+        <div className="border border-neutral-200 bg-white p-12 text-center">
           <Sparkles className="mx-auto h-10 w-10 text-neutral-300" />
           <p className="mt-4 text-sm text-neutral-500">
             No pending matches. Run the scraper + FreshFit sync scripts to populate this queue.
@@ -92,9 +92,9 @@ export function StrategistOpportunityEnginePage() {
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {matches.map((match) => (
-            <div key={match.id} className="rounded-2xl border border-neutral-200 bg-white p-4 transition-all hover:border-primary-300">
+            <div key={match.id} className="border border-neutral-200 border-l-4 border-l-primary-600 bg-white p-4 transition-colors hover:border-l-primary-700">
               <div className="mb-2 flex items-center justify-between gap-2">
-                <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${scoreColor(match.fresh_fit_score)}`}>
+                <span className={`border px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wide ${scoreColor(match.fresh_fit_score)}`}>
                   FreshFit {match.fresh_fit_score}
                 </span>
                 <span className="truncate text-xs text-neutral-500">{memberNames[match.member_id] || 'Member'}</span>
@@ -121,7 +121,7 @@ export function StrategistOpportunityEnginePage() {
               {match.matched_skills.length > 0 && (
                 <div className="mt-2 flex flex-wrap gap-1">
                   {match.matched_skills.slice(0, 4).map((skill) => (
-                    <span key={skill} className="rounded-full bg-success-50 px-2 py-0.5 text-[10px] font-medium text-success-700">
+                    <span key={skill} className="border border-success-300 px-1.5 py-0.5 font-mono text-[10px] font-medium text-success-700">
                       {skill}
                     </span>
                   ))}
@@ -141,7 +141,7 @@ export function StrategistOpportunityEnginePage() {
                 <button
                   onClick={() => handlePromote(match)}
                   disabled={promotingId === match.id}
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-primary-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-primary-700 disabled:opacity-60"
+                  className="inline-flex items-center gap-1.5 border-2 border-neutral-900 bg-primary-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-primary-700 disabled:opacity-60"
                 >
                   <ArrowUpRight className="h-3.5 w-3.5" />
                   {promotingId === match.id ? 'Promoting...' : 'Promote'}
