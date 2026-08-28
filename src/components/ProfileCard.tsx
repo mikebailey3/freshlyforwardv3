@@ -7,10 +7,10 @@ import type { MemberProfile } from '@/types'
 const USERNAME_PATTERN = /^[a-z0-9_]{3,20}$/i
 
 const SUBSCRIPTION_STYLES: Record<string, string> = {
-  active: 'bg-success-100 text-success-700',
-  paused: 'bg-warning-100 text-warning-700',
-  canceled: 'bg-neutral-100 text-neutral-500',
-  none: 'bg-neutral-100 text-neutral-500',
+  active: 'border-success-500 text-success-700',
+  paused: 'border-warning-500 text-warning-700',
+  canceled: 'border-neutral-300 text-neutral-500',
+  none: 'border-neutral-300 text-neutral-500',
 }
 
 const SUBSCRIPTION_LABELS: Record<string, string> = {
@@ -98,7 +98,7 @@ export function ProfileCard({ userId, profile, onUpdated }: ProfileCardProps) {
   }
 
   return (
-    <div className="rounded-2xl border border-neutral-200 bg-white p-6">
+    <div className="border border-neutral-200 bg-white p-6">
       <div className="flex items-center gap-4">
         <div className="relative">
           <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-primary-100 text-xl font-semibold text-primary-700">
@@ -138,7 +138,7 @@ export function ProfileCard({ userId, profile, onUpdated }: ProfileCardProps) {
                 value={usernameDraft}
                 onChange={(e) => setUsernameDraft(e.target.value)}
                 autoFocus
-                className="w-32 rounded-lg border border-neutral-300 px-2 py-1 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="w-32 border border-neutral-300 px-2 py-1 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
               />
               <button onClick={handleSaveUsername} disabled={savingUsername} className="rounded p-1 text-primary-600 hover:bg-primary-50">
                 {savingUsername ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />}
@@ -157,7 +157,7 @@ export function ProfileCard({ userId, profile, onUpdated }: ProfileCardProps) {
             </button>
           )}
 
-          <span className={cn('mt-2 inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium', SUBSCRIPTION_STYLES[status] || SUBSCRIPTION_STYLES.none)}>
+          <span className={cn('mt-2 inline-flex items-center gap-1 border-2 px-2.5 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide', SUBSCRIPTION_STYLES[status] || SUBSCRIPTION_STYLES.none)}>
             <BadgeCheck className="h-3 w-3" />
             {SUBSCRIPTION_LABELS[status] || status}
           </span>
@@ -165,7 +165,7 @@ export function ProfileCard({ userId, profile, onUpdated }: ProfileCardProps) {
       </div>
 
       {error && (
-        <p className="mt-3 rounded-lg bg-error-50 px-3 py-2 text-xs text-error-700">{error}</p>
+        <p className="mt-3 border border-error-200 bg-error-50 px-3 py-2 text-xs text-error-700">{error}</p>
       )}
     </div>
   )

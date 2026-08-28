@@ -64,7 +64,7 @@ export function ProfileEditForm({ profile, onSave, onCancel, focusSection }: Pro
   return (
     <div className="space-y-6">
       {error && (
-        <div className="rounded-lg border border-error-200 bg-error-50 px-4 py-3 text-sm text-error-600">
+        <div className="border border-error-200 bg-error-50 px-4 py-3 text-sm text-error-600">
           {error}
         </div>
       )}
@@ -76,14 +76,12 @@ export function ProfileEditForm({ profile, onSave, onCancel, focusSection }: Pro
           <div
             key={section.key}
             ref={(el) => { sectionRefs.current[section.key] = el }}
-            className={`rounded-2xl border bg-white p-6 transition-colors ${
-              isFocused ? 'border-primary-400 ring-2 ring-primary-100' : 'border-neutral-200'
+            className={`border bg-white p-6 transition-colors border-l-4 ${
+              isFocused ? 'border-l-primary-600 border-primary-200' : 'border-l-neutral-300 border-neutral-200'
             }`}
           >
-            <div className="mb-4 flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-100">
-                <Icon className="h-5 w-5 text-primary-600" />
-              </div>
+            <div className="mb-4 flex items-center gap-3 border-b border-neutral-100 pb-3">
+              <Icon className="h-5 w-5 text-primary-600" />
               <div>
                 <h3 className="font-serif text-base font-semibold text-neutral-900">{section.title}</h3>
                 <p className="text-xs text-neutral-500">{section.description}</p>
@@ -104,12 +102,12 @@ export function ProfileEditForm({ profile, onSave, onCancel, focusSection }: Pro
       })}
 
       {/* Sticky save bar */}
-      <div className="sticky bottom-0 z-10 flex items-center justify-end gap-3 rounded-2xl border border-neutral-200 bg-white/95 p-4 shadow-lg backdrop-blur-md">
+      <div className="sticky bottom-0 z-10 flex items-center justify-end gap-3 border border-neutral-200 bg-white/95 p-4 shadow-lg backdrop-blur-md">
         <button
           type="button"
           onClick={onCancel}
           disabled={saving}
-          className="flex items-center gap-1.5 rounded-lg border border-neutral-300 px-4 py-2.5 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50 disabled:opacity-60"
+          className="flex items-center gap-1.5 border border-neutral-300 px-4 py-2.5 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50 disabled:opacity-60"
         >
           <X className="h-4 w-4" />
           Cancel
@@ -118,7 +116,7 @@ export function ProfileEditForm({ profile, onSave, onCancel, focusSection }: Pro
           type="button"
           onClick={handleSave}
           disabled={saving}
-          className="flex items-center gap-1.5 rounded-lg bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-700 disabled:opacity-60"
+          className="flex items-center gap-1.5 border-2 border-neutral-900 bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-700 disabled:opacity-60"
         >
           {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
           {saving ? 'Saving…' : 'Save Changes'}
