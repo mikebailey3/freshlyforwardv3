@@ -143,7 +143,7 @@ export function AdminMemberDetailPage() {
   if (!profile) {
     return (
       <StrategistLayout isAdmin>
-        <div className="rounded-2xl border border-neutral-200 bg-white p-12 text-center">
+        <div className="border border-neutral-200 bg-white p-12 text-center">
           <AlertCircle className="mx-auto h-10 w-10 text-neutral-300" />
           <p className="mt-4 text-sm text-neutral-500">{error || 'Member not found.'}</p>
           <button onClick={() => navigate('/admin/members')} className="mt-4 text-sm font-medium text-primary-600 hover:underline">
@@ -170,13 +170,13 @@ export function AdminMemberDetailPage() {
       </div>
 
       {error && (
-        <div className="mb-6 flex items-start gap-2 rounded-lg bg-error-50 border border-error-100 px-4 py-3 text-sm text-error-600">
+        <div className="mb-6 flex items-start gap-2 border border-error-300 border-l-4 border-l-error-500 bg-error-50 px-4 py-3 text-sm text-error-600">
           <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
           <span>{error}</span>
         </div>
       )}
       {successMsg && (
-        <div className="mb-6 flex items-center gap-2 rounded-lg bg-success-50 border border-success-100 px-4 py-3 text-sm text-success-700">
+        <div className="mb-6 flex items-center gap-2 border border-success-300 border-l-4 border-l-success-500 bg-success-50 px-4 py-3 text-sm text-success-700">
           <Check className="h-4 w-4 flex-shrink-0" />
           <span>{successMsg}</span>
         </div>
@@ -184,11 +184,9 @@ export function AdminMemberDetailPage() {
 
       <div className="mb-6 grid gap-6 lg:grid-cols-2">
         {/* Account Status */}
-        <div className="rounded-2xl border border-neutral-200 bg-white p-6">
+        <div className="border border-neutral-200 border-l-4 border-l-warning-500 bg-white p-6">
           <div className="mb-4 flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-warning-100">
-              <ShieldAlert className="h-5 w-5 text-warning-600" />
-            </div>
+            <ShieldAlert className="h-6 w-6 text-warning-600" />
             <div>
               <h2 className="font-serif text-base font-semibold text-neutral-900">Account Status</h2>
               <p className="text-xs text-neutral-500">Suspend or ban to restrict platform access</p>
@@ -199,7 +197,7 @@ export function AdminMemberDetailPage() {
           <select
             value={statusForm.status}
             onChange={(e) => setStatusForm((prev) => ({ ...prev, status: e.target.value as typeof prev.status }))}
-            className="mt-1 block w-full rounded-lg border border-neutral-300 px-3 py-2.5 text-sm capitalize shadow-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+            className="mt-1 block w-full border border-neutral-300 px-3 py-2.5 text-sm capitalize focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
           >
             {ACCOUNT_STATUSES.map((s) => (
               <option key={s} value={s}>{s}</option>
@@ -214,7 +212,7 @@ export function AdminMemberDetailPage() {
                 onChange={(e) => setStatusForm((prev) => ({ ...prev, reason: e.target.value }))}
                 rows={3}
                 placeholder="Why is this account being restricted?"
-                className="mt-1 block w-full rounded-lg border border-neutral-300 px-3 py-2.5 text-sm shadow-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="mt-1 block w-full border border-neutral-300 px-3 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
               />
             </div>
           )}
@@ -222,7 +220,7 @@ export function AdminMemberDetailPage() {
           <button
             onClick={handleSaveStatus}
             disabled={savingStatus}
-            className="mt-4 flex items-center gap-1.5 rounded-lg bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-700 disabled:opacity-60"
+            className="mt-4 flex items-center gap-1.5 border-2 border-neutral-900 bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-700 disabled:opacity-60"
           >
             {savingStatus ? <Loader2 className="h-4 w-4 animate-spin" /> : statusForm.status === 'active' ? <ShieldCheck className="h-4 w-4" /> : <ShieldX className="h-4 w-4" />}
             Update Status
@@ -230,11 +228,9 @@ export function AdminMemberDetailPage() {
         </div>
 
         {/* Subscription */}
-        <div className="rounded-2xl border border-neutral-200 bg-white p-6">
+        <div className="border border-neutral-200 border-l-4 border-l-primary-600 bg-white p-6">
           <div className="mb-4 flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-100">
-              <CreditCard className="h-5 w-5 text-primary-600" />
-            </div>
+            <CreditCard className="h-6 w-6 text-primary-600" />
             <div>
               <h2 className="font-serif text-base font-semibold text-neutral-900">Subscription</h2>
               <p className="text-xs text-neutral-500">Change plan or billing status manually</p>
@@ -245,7 +241,7 @@ export function AdminMemberDetailPage() {
           <select
             value={subForm.plan_id}
             onChange={(e) => setSubForm((prev) => ({ ...prev, plan_id: e.target.value }))}
-            className="mt-1 block w-full rounded-lg border border-neutral-300 px-3 py-2.5 text-sm shadow-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+            className="mt-1 block w-full border border-neutral-300 px-3 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
           >
             <option value="">No plan</option>
             {plans.map((plan) => (
@@ -259,7 +255,7 @@ export function AdminMemberDetailPage() {
           <select
             value={subForm.subscription_status}
             onChange={(e) => setSubForm((prev) => ({ ...prev, subscription_status: e.target.value }))}
-            className="mt-1 block w-full rounded-lg border border-neutral-300 px-3 py-2.5 text-sm capitalize shadow-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+            className="mt-1 block w-full border border-neutral-300 px-3 py-2.5 text-sm capitalize focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
           >
             {SUBSCRIPTION_STATUSES.map((s) => (
               <option key={s} value={s}>{s}</option>
@@ -269,7 +265,7 @@ export function AdminMemberDetailPage() {
           <button
             onClick={handleSaveSubscription}
             disabled={savingSub}
-            className="mt-4 flex items-center gap-1.5 rounded-lg bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-700 disabled:opacity-60"
+            className="mt-4 flex items-center gap-1.5 border-2 border-neutral-900 bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-700 disabled:opacity-60"
           >
             {savingSub ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
             Update Subscription
