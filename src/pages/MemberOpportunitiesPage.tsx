@@ -25,16 +25,16 @@ const statusLabels: Record<string, string> = {
 }
 
 const statusColors: Record<string, string> = {
-  researching: 'bg-neutral-100 text-neutral-700',
-  needs_review: 'bg-neutral-100 text-neutral-700',
-  recommended: 'bg-primary-100 text-primary-700',
-  awaiting_member_approval: 'bg-warning-100 text-warning-700',
-  approved: 'bg-success-100 text-success-700',
-  declined: 'bg-error-100 text-error-700',
-  preparing_application: 'bg-accent-100 text-accent-700',
-  submitted: 'bg-primary-600 text-white',
-  expired: 'bg-neutral-100 text-neutral-500',
-  archived: 'bg-neutral-100 text-neutral-500',
+  researching: 'border-neutral-300 text-neutral-700',
+  needs_review: 'border-neutral-300 text-neutral-700',
+  recommended: 'border-primary-300 text-primary-700',
+  awaiting_member_approval: 'border-warning-300 text-warning-700',
+  approved: 'border-success-300 text-success-700',
+  declined: 'border-error-300 text-error-700',
+  preparing_application: 'border-accent-300 text-accent-700',
+  submitted: 'border-neutral-900 bg-primary-600 text-white',
+  expired: 'border-neutral-300 text-neutral-500',
+  archived: 'border-neutral-300 text-neutral-500',
 }
 
 export function MemberOpportunitiesPage() {
@@ -112,7 +112,7 @@ export function MemberOpportunitiesPage() {
       </div>
 
       {pendingApproval.length > 0 && (
-        <div className="mb-6 rounded-xl bg-warning-50 border border-warning-200 p-4">
+        <div className="mb-6 border border-warning-300 border-l-4 border-l-warning-500 bg-warning-50 p-4">
           <div className="flex items-center gap-2">
             <AlertCircle className="h-5 w-5 text-warning-600" />
             <p className="text-sm font-medium text-warning-700">
@@ -123,7 +123,7 @@ export function MemberOpportunitiesPage() {
       )}
 
       {active.length === 0 ? (
-        <div className="rounded-2xl border border-neutral-200 bg-white p-12 text-center">
+        <div className="border border-neutral-200 bg-white p-12 text-center">
           <Search className="mx-auto h-12 w-12 text-neutral-300" />
           <p className="mt-4 text-sm text-neutral-500">
             Your Career Strategist is researching opportunities for you. Check back soon!
@@ -132,11 +132,11 @@ export function MemberOpportunitiesPage() {
       ) : (
         <div className="space-y-4">
           {active.map((opp) => (
-            <div key={opp.id} className="rounded-2xl border border-neutral-200 bg-white p-6 transition-all hover:shadow-md">
+            <div key={opp.id} className="border border-neutral-200 border-l-4 border-l-primary-600 bg-white p-6">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
-                    <span className={`rounded-full px-3 py-1 text-xs font-medium ${statusColors[opp.status] || 'bg-neutral-100 text-neutral-700'}`}>
+                    <span className={`border px-2.5 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide ${statusColors[opp.status] || 'border-neutral-300 text-neutral-700'}`}>
                       {statusLabels[opp.status] || opp.status}
                     </span>
                   </div>
@@ -171,7 +171,7 @@ export function MemberOpportunitiesPage() {
                   </div>
 
                   {opp.member_visible_notes && (
-                    <p className="mt-3 rounded-lg bg-neutral-50 p-3 text-sm text-neutral-600">
+                    <p className="mt-3 border-l-2 border-neutral-300 bg-neutral-50 p-3 text-sm text-neutral-600">
                       {opp.member_visible_notes}
                     </p>
                   )}
@@ -203,7 +203,7 @@ export function MemberOpportunitiesPage() {
                   <button
                     onClick={() => handleApprove(opp)}
                     disabled={feedbackLoading}
-                    className="flex items-center gap-1.5 rounded-lg bg-success-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-success-700 disabled:opacity-60"
+                    className="flex items-center gap-1.5 border-2 border-neutral-900 bg-success-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-success-700 disabled:opacity-60"
                   >
                     <Check className="h-4 w-4" />
                     Approve
@@ -211,14 +211,14 @@ export function MemberOpportunitiesPage() {
                   <button
                     onClick={() => handleDecline(opp)}
                     disabled={feedbackLoading}
-                    className="flex items-center gap-1.5 rounded-lg bg-error-50 border border-error-200 px-4 py-2 text-sm font-semibold text-error-600 transition-colors hover:bg-error-100 disabled:opacity-60"
+                    className="flex items-center gap-1.5 border border-error-300 bg-error-50 px-4 py-2 text-sm font-semibold text-error-600 transition-colors hover:bg-error-100 disabled:opacity-60"
                   >
                     <X className="h-4 w-4" />
                     Decline
                   </button>
                   <Link
                     to="/messages"
-                    className="flex items-center gap-1.5 rounded-lg border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50"
+                    className="flex items-center gap-1.5 border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50"
                   >
                     <MessageSquare className="h-4 w-4" />
                     Ask Questions
@@ -232,35 +232,35 @@ export function MemberOpportunitiesPage() {
                   <span className="text-xs text-neutral-500">Your feedback:</span>
                   <button
                     onClick={() => handleFeedback(opp, 'great_fit')}
-                    className="flex items-center gap-1 rounded-full bg-success-50 px-3 py-1 text-xs font-medium text-success-700 hover:bg-success-100"
+                    className="flex items-center gap-1 border border-success-300 px-2.5 py-1 text-xs font-medium text-success-700 hover:bg-success-50"
                   >
                     <ThumbsUp className="h-3 w-3" />
                     Great Fit
                   </button>
                   <button
                     onClick={() => handleFeedback(opp, 'good_fit')}
-                    className="flex items-center gap-1 rounded-full bg-primary-50 px-3 py-1 text-xs font-medium text-primary-700 hover:bg-primary-100"
+                    className="flex items-center gap-1 border border-primary-300 px-2.5 py-1 text-xs font-medium text-primary-700 hover:bg-primary-50"
                   >
                     <ThumbsUp className="h-3 w-3" />
                     Good Fit
                   </button>
                   <button
                     onClick={() => handleFeedback(opp, 'not_interested')}
-                    className="flex items-center gap-1 rounded-full bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-700 hover:bg-neutral-200"
+                    className="flex items-center gap-1 border border-neutral-300 px-2.5 py-1 text-xs font-medium text-neutral-700 hover:bg-neutral-100"
                   >
                     <Frown className="h-3 w-3" />
                     Not Interested
                   </button>
                   <button
                     onClick={() => handleFeedback(opp, 'avoid_similar')}
-                    className="flex items-center gap-1 rounded-full bg-error-50 px-3 py-1 text-xs font-medium text-error-700 hover:bg-error-100"
+                    className="flex items-center gap-1 border border-error-300 px-2.5 py-1 text-xs font-medium text-error-700 hover:bg-error-50"
                   >
                     <Ban className="h-3 w-3" />
                     Avoid Similar
                   </button>
                   <Link
                     to="/messages"
-                    className="flex items-center gap-1 rounded-full bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-700 hover:bg-neutral-200"
+                    className="flex items-center gap-1 border border-neutral-300 px-2.5 py-1 text-xs font-medium text-neutral-700 hover:bg-neutral-100"
                   >
                     <MessageSquare className="h-3 w-3" />
                     Message Strategist
