@@ -168,49 +168,47 @@ export function MembershipPage() {
       </div>
 
       {error && (
-        <div className="mb-6 flex items-start gap-2 rounded-lg bg-error-50 border border-error-100 px-4 py-3 text-sm text-error-600">
+        <div className="mb-6 flex items-start gap-2 border border-error-200 bg-error-50 px-4 py-3 text-sm text-error-600">
           <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
       {/* Current Plan */}
-      <div className="rounded-2xl border border-neutral-200 bg-white p-6">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-100">
-            <CreditCard className="h-5 w-5 text-primary-600" />
-          </div>
+      <div className="border border-neutral-200 bg-white p-6">
+        <div className="flex items-center gap-3 border-b border-neutral-100 pb-3">
+          <CreditCard className="h-5 w-5 text-primary-600" />
           <div>
             <h3 className="font-serif text-base font-semibold text-neutral-900">Current Plan</h3>
             <p className="text-xs text-neutral-500">Your active membership</p>
           </div>
         </div>
 
-        <div className="mt-4 grid gap-4 sm:grid-cols-2">
-          <div className="rounded-xl bg-neutral-50 p-4">
+        <div className="mt-4 grid gap-0 border border-neutral-200 sm:grid-cols-2">
+          <div className="border-b border-r-0 border-neutral-200 p-4 sm:border-r">
             <p className="text-xs text-neutral-500">Plan</p>
             <p className="mt-1 font-serif text-lg font-semibold text-neutral-900">{plan?.name || 'No plan'}</p>
           </div>
-          <div className="rounded-xl bg-neutral-50 p-4">
+          <div className="border-b border-neutral-200 p-4">
             <p className="text-xs text-neutral-500">Price</p>
             <p className="mt-1 font-serif text-lg font-semibold text-neutral-900">
-              {plan ? `${formatCurrency(plan.price_cents)}/${plan.interval}` : '—'}
+              {plan ? `${formatCurrency(plan.price_cents)}/${plan.interval}` : '\u2014'}
             </p>
           </div>
-          <div className="rounded-xl bg-neutral-50 p-4">
+          <div className="border-r-0 p-4 sm:border-r sm:border-neutral-200">
             <p className="text-xs text-neutral-500">Status</p>
-            <p className={`mt-1 text-sm font-semibold capitalize ${
+            <p className={`mt-1 font-mono text-sm font-semibold uppercase tracking-wide ${
               status === 'active' ? 'text-success-600' : status === 'paused' ? 'text-warning-600' : status === 'canceled' ? 'text-error-600' : 'text-neutral-900'
             }`}>
               {status}
             </p>
           </div>
-          <div className="rounded-xl bg-neutral-50 p-4">
+          <div className="p-4">
             <p className="text-xs text-neutral-500">Next Billing Date</p>
-            <p className="mt-1 text-sm font-semibold text-neutral-900">
+            <p className="mt-1 font-mono text-sm font-semibold text-neutral-900">
               {status === 'active'
                 ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
-                : '—'}
+                : '\u2014'}
             </p>
           </div>
         </div>
@@ -236,7 +234,7 @@ export function MembershipPage() {
           <button
             onClick={handlePause}
             disabled={actionLoading}
-            className="flex items-center justify-center gap-2 rounded-xl border border-neutral-300 bg-white px-4 py-3 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50 disabled:opacity-60"
+            className="flex items-center justify-center gap-2 border border-neutral-300 bg-white px-4 py-3 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50 disabled:opacity-60"
           >
             {actionLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Pause className="h-4 w-4" />}
             Pause Membership
@@ -247,7 +245,7 @@ export function MembershipPage() {
           <button
             onClick={handleResume}
             disabled={actionLoading}
-            className="flex items-center justify-center gap-2 rounded-xl bg-primary-600 px-4 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-700 disabled:opacity-60"
+            className="flex items-center justify-center gap-2 border-2 border-neutral-900 bg-primary-600 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-700 disabled:opacity-60"
           >
             {actionLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
             Resume Membership
@@ -258,7 +256,7 @@ export function MembershipPage() {
           <button
             onClick={handleCancel}
             disabled={actionLoading}
-            className="flex items-center justify-center gap-2 rounded-xl border border-error-200 bg-error-50 px-4 py-3 text-sm font-medium text-error-600 transition-colors hover:bg-error-100 disabled:opacity-60"
+            className="flex items-center justify-center gap-2 border border-error-300 bg-error-50 px-4 py-3 text-sm font-medium text-error-600 transition-colors hover:bg-error-100 disabled:opacity-60"
           >
             {actionLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <X className="h-4 w-4" />}
             Cancel Membership
@@ -268,7 +266,7 @@ export function MembershipPage() {
         <button
           onClick={handlePortal}
           disabled={portalLoading}
-          className="flex items-center justify-center gap-2 rounded-xl border border-neutral-300 bg-white px-4 py-3 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50 disabled:opacity-60 sm:col-span-3"
+          className="flex items-center justify-center gap-2 border border-neutral-300 bg-white px-4 py-3 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50 disabled:opacity-60 sm:col-span-3"
         >
           {portalLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ExternalLink className="h-4 w-4" />}
           Manage Billing in Stripe Portal
@@ -276,11 +274,9 @@ export function MembershipPage() {
       </div>
 
       {/* Billing Info */}
-      <div className="mt-6 rounded-2xl border border-neutral-200 bg-white p-6">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-100">
-            <Calendar className="h-5 w-5 text-primary-600" />
-          </div>
+      <div className="mt-6 border border-neutral-200 bg-white p-6">
+        <div className="flex items-center gap-3 border-b border-neutral-100 pb-3">
+          <Calendar className="h-5 w-5 text-primary-600" />
           <h3 className="font-serif text-base font-semibold text-neutral-900">Billing Information</h3>
         </div>
         <div className="mt-4 space-y-3 text-sm text-neutral-600">
@@ -296,7 +292,7 @@ export function MembershipPage() {
       </div>
 
       {/* Disclaimer */}
-      <div className="mt-6 rounded-xl bg-neutral-50 border border-neutral-200 p-4">
+      <div className="mt-6 border border-dashed border-neutral-300 bg-neutral-50 p-4">
         <div className="space-y-1 text-xs text-neutral-500">
           <p>Employment is never guaranteed.</p>
           <p>Applications are personally researched and submitted by a Career Strategist.</p>
