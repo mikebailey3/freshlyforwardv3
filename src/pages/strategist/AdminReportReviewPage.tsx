@@ -100,7 +100,7 @@ export function AdminReportReviewPage() {
       </div>
 
       {error && (
-        <div className="mb-4 rounded-lg border border-error-200 bg-error-50 px-4 py-2.5 text-sm text-error-700">
+        <div className="mb-4 border border-error-300 border-l-4 border-l-error-500 bg-error-50 px-4 py-2.5 text-sm text-error-700">
           {error}
         </div>
       )}
@@ -112,20 +112,20 @@ export function AdminReportReviewPage() {
         ) : (
           <div className="space-y-4">
             {reports.map((r) => (
-              <div key={r.id} className="rounded-2xl border border-neutral-200 bg-white p-6">
+              <div key={r.id} className="border border-neutral-200 border-l-4 border-l-primary-600 bg-white p-6">
                 <ReportSummary report={r} memberName={memberMap[r.user_id]} />
                 <textarea
                   value={notesDraft[r.id] ?? ''}
                   onChange={(e) => setNotesDraft((prev) => ({ ...prev, [r.id]: e.target.value }))}
                   placeholder="Optional: notes for the strategist if you're sending this back for changes..."
                   rows={2}
-                  className="mt-4 w-full rounded-xl border border-neutral-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  className="mt-4 w-full border border-neutral-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                 />
                 <div className="mt-3 flex gap-3">
                   <button
                     onClick={() => handleApprove(r.id)}
                     disabled={actingId === r.id}
-                    className="flex items-center gap-1.5 rounded-lg bg-primary-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-primary-700 disabled:opacity-60"
+                    className="flex items-center gap-1.5 border-2 border-neutral-900 bg-primary-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-primary-700 disabled:opacity-60"
                   >
                     {actingId === r.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
                     Approve
@@ -133,7 +133,7 @@ export function AdminReportReviewPage() {
                   <button
                     onClick={() => handleRequestChanges(r.id)}
                     disabled={actingId === r.id}
-                    className="flex items-center gap-1.5 rounded-lg border border-neutral-300 px-4 py-2.5 text-sm font-medium text-neutral-700 hover:bg-neutral-50 disabled:opacity-60"
+                    className="flex items-center gap-1.5 border border-neutral-300 px-4 py-2.5 text-sm font-medium text-neutral-700 hover:bg-neutral-50 disabled:opacity-60"
                   >
                     <XCircle className="h-4 w-4" />
                     Send Back for Changes
@@ -152,12 +152,12 @@ export function AdminReportReviewPage() {
         ) : (
           <div className="space-y-4">
             {approved.map((r) => (
-              <div key={r.id} className="rounded-2xl border border-accent-200 bg-accent-50/40 p-6">
+              <div key={r.id} className="border border-accent-300 border-l-4 border-l-accent-500 bg-accent-50/40 p-6">
                 <ReportSummary report={r} memberName={memberMap[r.user_id]} />
                 <button
                   onClick={() => handleSend(r.id)}
                   disabled={actingId === r.id}
-                  className="mt-4 flex items-center gap-1.5 rounded-lg bg-success-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-success-700 disabled:opacity-60"
+                  className="mt-4 flex items-center gap-1.5 border-2 border-neutral-900 bg-success-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-success-700 disabled:opacity-60"
                 >
                   {actingId === r.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                   Send to Member
@@ -181,7 +181,7 @@ function ReportSummary({ report, memberName }: { report: FridayReport; memberNam
       <h3 className="mt-2 font-serif text-lg font-semibold text-neutral-900">{report.title}</h3>
       <p className="mt-1 text-sm text-neutral-600">{report.summary}</p>
       {report.strategist_summary && (
-        <p className="mt-2 rounded-lg bg-neutral-50 p-3 text-sm text-neutral-600">{report.strategist_summary}</p>
+        <p className="mt-2 border-l-2 border-neutral-300 bg-neutral-50 p-3 text-sm text-neutral-600">{report.strategist_summary}</p>
       )}
       <div className="mt-3 flex flex-wrap gap-4 text-sm text-neutral-600">
         <span>{report.opportunities_reviewed} opportunities reviewed</span>
@@ -194,7 +194,7 @@ function ReportSummary({ report, memberName }: { report: FridayReport; memberNam
 
 function EmptyState({ text }: { text: string }) {
   return (
-    <div className="rounded-2xl border border-neutral-200 bg-white p-8 text-center">
+    <div className="border border-neutral-200 bg-white p-8 text-center">
       <FileText className="mx-auto h-10 w-10 text-neutral-300" />
       <p className="mt-3 text-sm text-neutral-500">{text}</p>
     </div>
