@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { Check, Minus, Loader2, AlertCircle } from 'lucide-react'
+import { useCallback, useEffect, useState } from 'react'
+import { Check, Minus, Loader2, AlertCircle, RefreshCw } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { LinkButton, SectionHeading } from '@/components/ui'
 import { supabase } from '@/lib/supabase'
@@ -11,7 +11,9 @@ export function PricingPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
+  const fetchPlans = useCallback(() => {
+    setLoading(true)
+    setError(null)
     supabase
       .from('membership_plans')
       .select('*')
@@ -20,13 +22,17 @@ export function PricingPage() {
       .order('sort_order', { ascending: true })
       .then(({ data, error }) => {
         if (error || !data) {
-          setError('Could not load plans. Please try again later.')
+          setError('Could not load plans. Please try again.')
         } else {
           setPlans(data as MembershipPlan[])
         }
         setLoading(false)
       })
   }, [])
+
+  useEffect(() => {
+    fetchPlans()
+  }, [fetchPlans])
 
   return (
     <main>
@@ -44,9 +50,20 @@ export function PricingPage() {
             <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
           </div>
         ) : error ? (
-          <div className="flex flex-col items-center justify-center py-20">
+          <div className="flex flex-col items-center justify-center gap-4 py-20">
             <AlertCircle className="h-12 w-12 text-neutral-400" />
-            <p className="mt-4 text-neutral-600">{error}</p>
+            <p className="text-neutral-600">{error}</p>
+            <button type="button" className="button button-secondary button-small" onClick={fetchPlans}>
+              <RefreshCw size={16} /> Try again
+            </button>
+          </div>
+        ) : plans.length === 0 ? (
+          <div className="flex flex-col items-center justify-center gap-2 py-20 text-center">
+            <AlertCircle className="h-12 w-12 text-neutral-400" />
+            <p className="text-neutral-600">Plans aren't available to show right now.</p>
+            <p className="text-sm text-neutral-500">
+              Reach out on the <Link to="/contact">contact page</Link> and we'll walk you through pricing directly.
+            </p>
           </div>
         ) : (
           <div className="pricing-grid">

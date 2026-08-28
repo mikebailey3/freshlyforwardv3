@@ -28,7 +28,7 @@ export function LandingPage() {
           <h1>We search. We apply. <span>You move forward.</span></h1>
           <p className="hero-lede">A real person manages the details of your job search—from strategy and tailored applications to interview preparation and ongoing support.</p>
           <div className="hero-actions">
-            <LinkButton to="/signup">Start your journey <ArrowRight size={18} /></LinkButton>
+            <LinkButton to="/signup">Get started <ArrowRight size={18} /></LinkButton>
             <LinkButton to="/how-it-works" variant="secondary">See how it works</LinkButton>
           </div>
           <div className="hero-assurances" aria-label="Service assurances">
@@ -108,10 +108,16 @@ export function LandingPage() {
 
       <ForwardFeedWidget />
 
+      {/* TODO(social-proof): homepage currently has zero third-party validation --
+          the only testimonial above is from the founder about his own service.
+          Before the next marketing push, add 2-3 real client quotes/outcomes here
+          (name + result, with permission) or a placement/client-count stat.
+          Do not fill this with placeholder/fabricated quotes. */}
+
       <section className="closing-cta">
         <div className="shell closing-inner">
           <div><p className="eyebrow eyebrow-light">Your next chapter starts here</p><h2>Let's make your job search feel lighter—and work harder.</h2></div>
-          <LinkButton to="/signup" variant="light">Meet your strategist <ArrowRight size={18} /></LinkButton>
+          <LinkButton to="/signup" variant="light">Get started <ArrowRight size={18} /></LinkButton>
         </div>
       </section>
     </main>
