@@ -28,26 +28,34 @@ export function useEntitlements(): EntitlementInfo {
       return
     }
 
-    const [featuresRes, planFeaturesRes] = await Promise.all([
-      supabase.from('features').select('*').order('sort_order', { ascending: true }),
-      profile?.plan_id
-        ? supabase
-            .from('plan_features')
-            .select('feature_id, is_enabled')
-            .eq('plan_id', profile.plan_id)
-            .eq('is_enabled', true)
-        : Promise.resolve({ data: [], error: null }),
-    ])
+    try {
+      const [featuresRes, planFeaturesRes] = await Promise.all([
+        supabase.from('features').select('*').order('sort_order', { ascending: true }),
+        profile?.plan_id
+          ? supabase
+              .from('plan_features')
+              .select('feature_id, is_enabled')
+              .eq('plan_id', profile.plan_id)
+              .eq('is_enabled', true)
+          : Promise.resolve({ data: [], error: null }),
+      ])
 
-    const featureList = (featuresRes.data as Feature[]) || []
-    setFeatures(featureList)
+      const featureList = (featuresRes.data as Feature[]) || []
+      setFeatures(featureList)
 
-    const planFeatureRows = (planFeaturesRes.data as { feature_id: string; is_enabled: boolean }[]) || []
-    const allowedFeatureIds = new Set(planFeatureRows.map((r) => r.feature_id))
-    const allowed = new Set<string>(
-      featureList.filter((f) => allowedFeatureIds.has(f.id)).map((f) => f.feature_key)
-    )
-    setAllowedKeys(allowed)
+      const planFeatureRows = (planFeaturesRes.data as { feature_id: string; is_enabled: boolean }[]) || []
+      const allowedFeatureIds = new Set(planFeatureRows.map((r) => r.feature_id))
+      const allowed = new Set<string>(
+        featureList.filter((f) => allowedFeatureIds.has(f.id)).map((f) => f.feature_key)
+      )
+      setAllowedKeys(allowed)
+    } catch (err) {
+      // Network/parse failure (e.g. Supabase unreachable) shouldn't leave the
+      // app stuck loading forever -- fail closed to "no entitlements" instead.
+      console.error('Error loading entitlements:', err)
+      setFeatures([])
+      setAllowedKeys(new Set())
+    }
     setLoading(false)
   }, [user, profile?.plan_id])
 

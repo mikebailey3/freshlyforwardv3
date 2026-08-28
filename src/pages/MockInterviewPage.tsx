@@ -42,10 +42,10 @@ const statusLabels: Record<string, string> = {
 }
 
 const statusColors: Record<string, string> = {
-  scheduled: 'bg-primary-100 text-primary-700',
-  completed: 'bg-success-100 text-success-700',
-  cancelled: 'bg-neutral-100 text-neutral-500',
-  no_show: 'bg-error-100 text-error-700',
+  scheduled: 'border-primary-300 text-primary-700',
+  completed: 'border-success-300 text-success-700',
+  cancelled: 'border-neutral-300 text-neutral-500',
+  no_show: 'border-error-300 text-error-700',
 }
 
 export function MockInterviewPage() {
@@ -192,7 +192,7 @@ export function MockInterviewPage() {
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="flex flex-shrink-0 items-center gap-2 rounded-xl bg-primary-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-primary-700"
+          className="flex flex-shrink-0 items-center gap-2 border-2 border-neutral-900 bg-primary-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-700"
         >
           {showForm ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
           {showForm ? 'Cancel' : 'Book Interview'}
@@ -201,7 +201,7 @@ export function MockInterviewPage() {
 
       {/* Booking form */}
       {showForm && (
-        <div className="mb-6 rounded-2xl border border-neutral-200 bg-white p-6 animate-fade-in">
+        <div className="mb-6 border border-neutral-200 bg-white p-6 animate-fade-in">
           <h2 className="font-serif text-lg font-semibold text-neutral-900">Book a Mock Interview</h2>
           <form onSubmit={handleBook} className="mt-4 space-y-4">
             <div className="grid gap-4 sm:grid-cols-2">
@@ -215,7 +215,7 @@ export function MockInterviewPage() {
                   value={company}
                   onChange={(e) => setCompany(e.target.value)}
                   placeholder="e.g. Acme Corp"
-                  className="mt-1.5 w-full rounded-xl border border-neutral-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  className="mt-1.5 w-full border border-neutral-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                 />
               </div>
               <div>
@@ -228,7 +228,7 @@ export function MockInterviewPage() {
                   value={position}
                   onChange={(e) => setPosition(e.target.value)}
                   placeholder="e.g. Senior Product Manager"
-                  className="mt-1.5 w-full rounded-xl border border-neutral-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  className="mt-1.5 w-full border border-neutral-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                 />
               </div>
             </div>
@@ -242,7 +242,7 @@ export function MockInterviewPage() {
                   id="mi-type"
                   value={interviewType}
                   onChange={(e) => setInterviewType(e.target.value)}
-                  className="mt-1.5 w-full rounded-xl border border-neutral-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  className="mt-1.5 w-full border border-neutral-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                 >
                   {interviewTypes.map((t) => (
                     <option key={t} value={t}>{t}</option>
@@ -259,7 +259,7 @@ export function MockInterviewPage() {
                   value={scheduledAt}
                   onChange={(e) => setScheduledAt(e.target.value)}
                   required
-                  className="mt-1.5 w-full rounded-xl border border-neutral-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  className="mt-1.5 w-full border border-neutral-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                 />
               </div>
             </div>
@@ -272,7 +272,7 @@ export function MockInterviewPage() {
                 id="mi-focus"
                 value={focusArea}
                 onChange={(e) => setFocusArea(e.target.value)}
-                className="mt-1.5 w-full rounded-xl border border-neutral-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="mt-1.5 w-full border border-neutral-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
               >
                 {focusAreas.map((a) => (
                   <option key={a} value={a}>{a}</option>
@@ -281,14 +281,14 @@ export function MockInterviewPage() {
             </div>
 
             {error && (
-              <p className="rounded-lg bg-error-50 px-4 py-2.5 text-sm text-error-700">{error}</p>
+              <p className="border border-error-200 bg-error-50 px-4 py-2.5 text-sm text-error-700">{error}</p>
             )}
 
             <div className="flex items-center gap-3">
               <button
                 type="submit"
                 disabled={submitting || !scheduledAt}
-                className="flex items-center gap-2 rounded-xl bg-primary-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-primary-700 disabled:opacity-60"
+                className="flex items-center gap-2 border-2 border-neutral-900 bg-primary-600 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-700 disabled:opacity-60"
               >
                 {submitting ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -300,7 +300,7 @@ export function MockInterviewPage() {
               <button
                 type="button"
                 onClick={() => setShowForm(false)}
-                className="rounded-xl border border-neutral-300 px-5 py-2.5 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-50"
+                className="border border-neutral-300 px-5 py-2.5 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-50"
               >
                 Cancel
               </button>
@@ -315,7 +315,7 @@ export function MockInterviewPage() {
           Upcoming Interviews
         </h2>
         {upcoming.length === 0 ? (
-          <div className="rounded-2xl border border-neutral-200 bg-white p-8 text-center">
+          <div className="border border-neutral-200 bg-white p-8 text-center">
             <Calendar className="mx-auto h-10 w-10 text-neutral-300" />
             <p className="mt-3 text-sm text-neutral-500">
               No upcoming mock interviews. Click "Book Interview" to schedule one.
@@ -370,24 +370,22 @@ function InterviewCard({
 }) {
   const hasFeedback = !!interview.feedback
   return (
-    <div className="rounded-2xl border border-neutral-200 bg-white p-5 transition-all hover:shadow-md">
+    <div className="border border-neutral-200 border-l-4 border-l-primary-600 bg-white p-5 transition-colors">
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-start gap-3">
-          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-primary-50">
-            <Briefcase className="h-5 w-5 text-primary-600" />
-          </div>
+          <Briefcase className="mt-0.5 h-5 w-5 flex-shrink-0 text-primary-600" />
           <div>
             <div className="flex items-center gap-2">
               <span
                 className={cn(
-                  'rounded-full px-3 py-1 text-xs font-medium',
-                  statusColors[interview.status] || 'bg-neutral-100 text-neutral-600'
+                  'border px-2.5 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide',
+                  statusColors[interview.status] || 'border-neutral-300 text-neutral-600'
                 )}
               >
                 {statusLabels[interview.status] || interview.status}
               </span>
               {hasFeedback && (
-                <span className="flex items-center gap-1 rounded-full bg-success-100 px-3 py-1 text-xs font-medium text-success-700">
+                <span className="flex items-center gap-1 border border-success-300 px-2.5 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide text-success-700">
                   <CheckCircle2 className="h-3 w-3" />
                   Feedback Ready
                 </span>
@@ -422,7 +420,7 @@ function InterviewCard({
               </p>
             )}
             {interview.feedback && (
-              <div className="mt-3 rounded-lg bg-neutral-50 p-3 text-sm text-neutral-600">
+              <div className="mt-3 border border-neutral-200 bg-neutral-50 p-3 text-sm text-neutral-600">
                 <p className="flex items-center gap-1.5 font-medium text-neutral-700">
                   <MessageSquare className="h-3.5 w-3.5" />
                   Strategist Feedback
@@ -435,7 +433,7 @@ function InterviewCard({
         {interview.status === 'scheduled' && (
           <button
             onClick={() => onCancel(interview.id)}
-            className="flex-shrink-0 rounded-lg border border-neutral-200 px-3 py-2 text-xs font-medium text-neutral-500 transition-colors hover:bg-neutral-50 hover:text-error-600"
+            className="flex-shrink-0 border border-neutral-300 px-3 py-2 text-xs font-medium text-neutral-500 transition-colors hover:bg-neutral-50 hover:text-error-600"
           >
             Cancel
           </button>
