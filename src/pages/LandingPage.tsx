@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from 'react'
 import { ArrowRight, CalendarCheck, Check, ClipboardCheck, FilePenLine, Handshake, MessageCircleMore, PauseCircle, Search, ShieldCheck, Target, UserRoundCheck, X } from 'lucide-react'
 import { LinkButton, SectionHeading } from '@/components/ui'
 import { ForwardFeedWidget } from '@/components/ForwardFeedWidget'
 import { FridayReportCard, type FridayReportCardData } from '@/components/FridayReportCard'
+import { useScrollReveal } from '@/hooks/useScrollReveal'
 
 const manifest = [
   { icon: ShieldCheck, title: '100% Human-Led Service', copy: 'No bots, no shortcuts. Every decision is made by a real career professional.' },
@@ -36,26 +36,7 @@ const sampleReport: FridayReportCardData = {
 }
 
 export function LandingPage() {
-  const verdictRef = useRef<HTMLElement>(null)
-  const [verdictVisible, setVerdictVisible] = useState(false)
-
-  useEffect(() => {
-    const node = verdictRef.current
-    if (!node) return
-    // One authored moment, not a scroll-fade applied everywhere: the verdict
-    // (redline strike + approval stamp) plays once, the first time it's seen.
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setVerdictVisible(true)
-          observer.disconnect()
-        }
-      },
-      { threshold: 0.4 }
-    )
-    observer.observe(node)
-    return () => observer.disconnect()
-  }, [])
+  const [verdictRef, verdictVisible] = useScrollReveal<HTMLElement>(0.4)
 
   return (
     <main className="callsheet">
