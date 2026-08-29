@@ -14,9 +14,14 @@ const baseReport: FridayReportCardData = {
 }
 
 describe('FridayReportCard', () => {
-  it('renders the report title and stat counts', () => {
+  it('renders the report title, date, and stat counts', () => {
     render(<FridayReportCard report={baseReport} />)
     expect(screen.getByText('Week 5 Progress Report')).toBeInTheDocument()
+    // Regression test: report_date is a date-only string ('2026-05-09').
+    // A naive `new Date(dateOnly)` parses as UTC midnight, which renders
+    // one day earlier in any US timezone once formatted locally -- this
+    // assertion pins the correct, timezone-safe local date.
+    expect(screen.getByText('May 9, 2026')).toBeInTheDocument()
     expect(screen.getByText('18')).toBeInTheDocument()
     expect(screen.getByText('3')).toBeInTheDocument()
     expect(screen.getByText('1')).toBeInTheDocument()

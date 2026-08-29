@@ -29,6 +29,20 @@ const STATUS_LABEL: Record<string, string> = {
   sent: 'Delivered',
 }
 
+// report_date is a date-only string ('2026-05-08'), not a full timestamp.
+// new Date('2026-05-08') parses as UTC midnight, and toLocaleDateString()
+// then renders in the browser's *local* timezone -- for any US timezone
+// that rolls the displayed date back a day (a Friday report would show as
+// Thursday). Parsing the parts into a local-time Date sidesteps that.
+function formatReportDate(dateOnly: string): string {
+  const [year, month, day] = dateOnly.split('-').map(Number)
+  return new Date(year, month - 1, day).toLocaleDateString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  })
+}
+
 export function FridayReportCard({ report, isSample = false }: FridayReportCardProps) {
   const steps = report.next_steps
     ? report.next_steps.split('\n').map((s) => s.trim()).filter(Boolean)
@@ -49,13 +63,7 @@ export function FridayReportCard({ report, isSample = false }: FridayReportCardP
             </span>
           )}
         </div>
-        <p className="mt-1 font-mono text-xs text-neutral-500">
-          {new Date(report.report_date).toLocaleDateString('en-US', {
-            month: 'long',
-            day: 'numeric',
-            year: 'numeric',
-          })}
-        </p>
+        <p className="mt-1 font-mono text-xs text-neutral-500">{formatReportDate(report.report_date)}</p>
 
         <h3 className="mt-4 font-display text-xl font-semibold leading-snug text-neutral-900">
           {report.title}
@@ -78,8 +86,8 @@ export function FridayReportCard({ report, isSample = false }: FridayReportCardP
           </div>
           {steps.length > 0 ? (
             <ul className="mt-3 space-y-2">
-              {steps.map((step) => (
-                <li key={step} className="flex items-start gap-2.5 text-sm text-neutral-700">
+              {steps.map((step, index) => (
+                <li key={`${index}-${step}`} className="flex items-start gap-2.5 text-sm text-neutral-700">
                   <ArrowRight className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-primary-500" aria-hidden="true" />
                   {step}
                 </li>

@@ -135,6 +135,13 @@ export function DashboardPage() {
   return (
     <MemberLayout>
       {/* Greeting */}
+      {/* font-display carries through at a small size on card section titles
+          below too (not just this h1) -- the whole point of "Concierge
+          Editorial" is a single visual identity across Persuade and Operate
+          modes, just quieter here. Dropping it entirely on card headers
+          would make this page's typography an unexplained one-off relative
+          to both this page's own h1 and every other (not-yet-migrated) page
+          in the app, which still uses a heading font throughout. */}
       <div className="mb-6">
         <h1 className="font-display text-2xl font-semibold text-neutral-900 sm:text-3xl">
           {greeting()}{profile?.full_name ? `, ${profile.full_name.split(' ')[0]}` : ''}! \u2615
@@ -264,7 +271,7 @@ export function DashboardPage() {
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
         <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
           <div className="flex items-center justify-between">
-            <h2 className="text-base font-semibold text-neutral-900">Recommended for You</h2>
+            <h2 className="font-display text-base font-semibold text-neutral-900">Recommended for You</h2>
             <Link to="/tools" className="font-mono text-xs font-medium text-primary-600 hover:text-primary-700">
               View All
             </Link>
@@ -306,7 +313,7 @@ export function DashboardPage() {
 
         <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
           <div className="flex items-center justify-between">
-            <h2 className="text-base font-semibold text-neutral-900">Your Progress This Week</h2>
+            <h2 className="font-display text-base font-semibold text-neutral-900">Your Progress This Week</h2>
             <Link to="/timeline" className="font-mono text-xs font-medium text-primary-600 hover:text-primary-700">
               View Full Report
             </Link>
@@ -329,7 +336,7 @@ export function DashboardPage() {
       {/* Forward Feed */}
       <div className="mt-6 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
         <div className="flex items-center justify-between">
-          <h2 className="text-base font-semibold text-neutral-900">The Forward Feed</h2>
+          <h2 className="font-display text-base font-semibold text-neutral-900">The Forward Feed</h2>
           <Link to="/forward-feed" className="font-mono text-xs font-medium text-primary-600 hover:text-primary-700">
             Visit The Forward Feed &rarr;
           </Link>
@@ -342,7 +349,7 @@ export function DashboardPage() {
               <Link
                 key={post.id}
                 to={`/forward-feed/${post.slug}`}
-                className="rounded-lg border border-neutral-200 border-l-4 border-l-primary-600 p-4 shadow-sm transition-all hover:border-l-primary-800 hover:shadow-md"
+                className="rounded-lg border border-neutral-200 border-l-4 border-l-primary-600 p-4 shadow-sm transition-[border-color,box-shadow] hover:border-l-primary-800 hover:shadow-md"
               >
                 <p className="font-mono text-[11px] font-semibold uppercase tracking-wide text-primary-700">{post.category}</p>
                 <p className="mt-1 text-sm font-medium text-neutral-900">{post.title}</p>
@@ -356,7 +363,7 @@ export function DashboardPage() {
       {/* Quick Access Tools */}
       <div className="mt-6 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
         <div className="flex items-center justify-between">
-          <h2 className="text-base font-semibold text-neutral-900">Quick Access Tools</h2>
+          <h2 className="font-display text-base font-semibold text-neutral-900">Quick Access Tools</h2>
           <Link to="/tools" className="font-mono text-xs font-medium text-primary-600 hover:text-primary-700">
             View All Tools &rarr;
           </Link>

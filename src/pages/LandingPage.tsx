@@ -159,8 +159,11 @@ export function LandingPage() {
 
       <ForwardFeedWidget />
 
-      {/* TODO(social-proof): homepage currently has zero third-party validation --
-          the only testimonial above is from the founder about his own service.
+      {/* TODO(social-proof): homepage currently has zero third-party validation.
+          The hero used to carry a founder testimonial/photo as its only human
+          trust signal; the Concierge Editorial hero rebuild (2026-08-28) replaced
+          it with a sample Friday Report artifact instead, so as of that change
+          this page has no human-face or third-party proof at all above the fold.
           Before the next marketing push, add 2-3 real client quotes/outcomes here
           (name + result, with permission) or a placement/client-count stat.
           Do not fill this with placeholder/fabricated quotes. */}
