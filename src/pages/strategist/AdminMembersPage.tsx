@@ -290,7 +290,7 @@ export function AdminMembersPage() {
                   )}
                   <Link
                     to={`/admin/members/${m.user_id}`}
-                    className="flex items-center gap-1.5 border-2 border-neutral-900 bg-primary-600 px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-primary-700"
+                    className="flex items-center gap-1.5 rounded-full bg-primary-600 px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-primary-700"
                   >
                     Manage
                     <ArrowRight className="h-3.5 w-3.5" />

@@ -73,7 +73,7 @@ export function RoadmapPage() {
           </p>
           <Link
             to="/messages"
-            className="mt-4 inline-flex items-center gap-1.5 border-2 border-neutral-900 bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-primary-700"
+            className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-primary-700"
           >
             <MessageSquare className="h-4 w-4" />
             Ask your Strategist to build one

@@ -125,7 +125,7 @@ export function AdminReportReviewPage() {
                   <button
                     onClick={() => handleApprove(r.id)}
                     disabled={actingId === r.id}
-                    className="flex items-center gap-1.5 border-2 border-neutral-900 bg-primary-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-primary-700 disabled:opacity-60"
+                    className="flex items-center gap-1.5 rounded-full bg-primary-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-primary-700 disabled:opacity-60"
                   >
                     {actingId === r.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
                     Approve
@@ -157,7 +157,7 @@ export function AdminReportReviewPage() {
                 <button
                   onClick={() => handleSend(r.id)}
                   disabled={actingId === r.id}
-                  className="mt-4 flex items-center gap-1.5 border-2 border-neutral-900 bg-success-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-success-700 disabled:opacity-60"
+                  className="mt-4 flex items-center gap-1.5 rounded-full bg-success-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-success-700 disabled:opacity-60"
                 >
                   {actingId === r.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                   Send to Member

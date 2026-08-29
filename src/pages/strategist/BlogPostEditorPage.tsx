@@ -277,7 +277,7 @@ export function BlogPostEditorPage() {
         <button
           onClick={handleSave}
           disabled={saving}
-          className="flex items-center gap-1.5 border-2 border-neutral-900 bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-700 disabled:opacity-60"
+          className="flex items-center gap-1.5 rounded-full bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-700 disabled:opacity-60"
         >
           {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
           {saving ? 'Saving...' : isNew ? 'Create Post' : 'Save Changes'}

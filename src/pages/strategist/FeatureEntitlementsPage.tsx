@@ -291,7 +291,7 @@ export function FeatureEntitlementsPage() {
         {/* Edit modal */}
         {editingFeature && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setEditingFeature(null)}>
-            <div className="w-full max-w-lg border border-neutral-900 bg-white p-6" onClick={(e) => e.stopPropagation()}>
+            <div className="w-full max-w-lg rounded-2xl border border-neutral-200 bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
               <h2 className="font-serif text-lg font-semibold text-neutral-900">Edit Feature</h2>
               <div className="mt-4 space-y-4">
                 <div>
@@ -360,7 +360,7 @@ export function FeatureEntitlementsPage() {
                 <button
                   onClick={saveEdit}
                   disabled={saving}
-                  className="flex items-center gap-2 border-2 border-neutral-900 bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700 disabled:opacity-60"
+                  className="flex items-center gap-2 rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700 disabled:opacity-60"
                 >
                   {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                   Save

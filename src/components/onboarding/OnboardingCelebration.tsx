@@ -48,7 +48,7 @@ export function OnboardingCelebration({ onNext }: OnboardingStepProps) {
 
       <button
         onClick={onNext}
-        className="mt-10 inline-flex items-center gap-2 border-2 border-neutral-900 bg-primary-600 px-8 py-3.5 text-base font-semibold text-white transition-all hover:bg-primary-700"
+        className="mt-10 inline-flex items-center gap-2 rounded-full bg-primary-600 px-8 py-3.5 text-base font-semibold text-white transition-all hover:bg-primary-700"
       >
         Go to Your Dashboard
         <ArrowRight className="h-5 w-5" />

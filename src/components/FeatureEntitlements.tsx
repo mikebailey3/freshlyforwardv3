@@ -55,7 +55,7 @@ export function UpgradeModal({
       aria-labelledby="upgrade-modal-title"
     >
       <div
-        className="relative w-full max-w-md border-2 border-neutral-900 bg-white p-6 animate-slide-up"
+        className="relative w-full max-w-md rounded-2xl border border-neutral-200 bg-white p-6 shadow-xl animate-slide-up"
         onClick={(e) => e.stopPropagation()}
       >
         <button
@@ -87,7 +87,7 @@ export function UpgradeModal({
         <div className="mt-6 flex flex-col gap-2 sm:flex-row">
           <Link
             to={upgradeLink}
-            className="flex flex-1 items-center justify-center gap-2 border-2 border-neutral-900 bg-primary-600 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-700"
+            className="flex flex-1 items-center justify-center gap-2 rounded-full bg-primary-600 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-700"
           >
             {cta}
             <ArrowRight className="h-4 w-4" />
@@ -270,7 +270,7 @@ export function UpgradeRequiredPage({ featureKey, requiredPlan }: UpgradeRequire
         <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-center">
           <Link
             to={requiredPlan ? `/checkout/${requiredPlan}` : '/pricing'}
-            className="flex items-center justify-center gap-2 border-2 border-neutral-900 bg-primary-600 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-700"
+            className="flex items-center justify-center gap-2 rounded-full bg-primary-600 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-700"
           >
             {feature?.upgrade_cta || 'Upgrade Now'}
             <ArrowRight className="h-4 w-4" />

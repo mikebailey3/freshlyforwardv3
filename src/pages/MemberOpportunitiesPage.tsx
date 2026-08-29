@@ -32,7 +32,7 @@ const statusColors: Record<string, string> = {
   approved: 'border-success-300 text-success-700',
   declined: 'border-error-300 text-error-700',
   preparing_application: 'border-accent-300 text-accent-700',
-  submitted: 'border-neutral-900 bg-primary-600 text-white',
+  submitted: 'rounded-full bg-primary-600 text-white',
   expired: 'border-neutral-300 text-neutral-500',
   archived: 'border-neutral-300 text-neutral-500',
 }
@@ -203,7 +203,7 @@ export function MemberOpportunitiesPage() {
                   <button
                     onClick={() => handleApprove(opp)}
                     disabled={feedbackLoading}
-                    className="flex items-center gap-1.5 border-2 border-neutral-900 bg-success-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-success-700 disabled:opacity-60"
+                    className="flex items-center gap-1.5 rounded-full bg-success-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-success-700 disabled:opacity-60"
                   >
                     <Check className="h-4 w-4" />
                     Approve

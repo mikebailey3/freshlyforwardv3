@@ -220,7 +220,7 @@ export function AdminMemberDetailPage() {
           <button
             onClick={handleSaveStatus}
             disabled={savingStatus}
-            className="mt-4 flex items-center gap-1.5 border-2 border-neutral-900 bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-700 disabled:opacity-60"
+            className="mt-4 flex items-center gap-1.5 rounded-full bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-700 disabled:opacity-60"
           >
             {savingStatus ? <Loader2 className="h-4 w-4 animate-spin" /> : statusForm.status === 'active' ? <ShieldCheck className="h-4 w-4" /> : <ShieldX className="h-4 w-4" />}
             Update Status
@@ -265,7 +265,7 @@ export function AdminMemberDetailPage() {
           <button
             onClick={handleSaveSubscription}
             disabled={savingSub}
-            className="mt-4 flex items-center gap-1.5 border-2 border-neutral-900 bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-700 disabled:opacity-60"
+            className="mt-4 flex items-center gap-1.5 rounded-full bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-700 disabled:opacity-60"
           >
             {savingSub ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
             Update Subscription

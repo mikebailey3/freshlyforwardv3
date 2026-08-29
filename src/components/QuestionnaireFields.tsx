@@ -139,7 +139,7 @@ export function FieldRenderer({
                   }}
                   className={`border-2 px-4 py-2 text-sm font-medium transition-all ${
                     selected
-                      ? 'border-neutral-900 bg-primary-600 text-white'
+                      ? 'rounded-full bg-primary-600 text-white'
                       : 'border-neutral-300 bg-white text-neutral-700 hover:bg-neutral-100'
                   }`}
                   aria-pressed={selected}

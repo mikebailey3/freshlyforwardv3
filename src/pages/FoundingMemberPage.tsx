@@ -47,7 +47,7 @@ const feedbackStatusColors: Record<string, string> = {
   open: 'border-neutral-300 text-neutral-700',
   under_review: 'border-accent-300 text-accent-700',
   planned: 'border-primary-300 text-primary-700',
-  in_progress: 'border-neutral-900 bg-primary-600 text-white',
+  in_progress: 'rounded-full bg-primary-600 text-white',
   completed: 'border-success-300 text-success-700',
   declined: 'border-error-300 text-error-700',
 }
@@ -134,12 +134,12 @@ export function FoundingMemberPage() {
       </div>
 
       {/* Founding Member Badge */}
-      <section className="mb-6 border-2 border-neutral-900 bg-primary-50 p-6 sm:p-8">
+      <section className="mb-6 rounded-2xl border border-primary-200 bg-primary-50 p-6 shadow-sm sm:p-8">
         <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">
             <Crown className="h-10 w-10 flex-shrink-0 text-primary-600" />
             <div>
-              <span className="inline-block border border-neutral-900 bg-primary-600 px-3 py-1 font-mono text-xs font-semibold uppercase tracking-wide text-white">
+              <span className="inline-block rounded-full bg-primary-600 px-3 py-1 font-mono text-xs font-semibold uppercase tracking-wide text-white">
                 Founding Member
               </span>
               <p className="mt-2 font-serif text-xl font-semibold text-neutral-900">
@@ -253,7 +253,7 @@ export function FoundingMemberPage() {
               <button
                 type="submit"
                 disabled={submitting || !title.trim()}
-                className="flex w-full items-center justify-center gap-2 border-2 border-neutral-900 bg-primary-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-700 disabled:opacity-60"
+                className="flex w-full items-center justify-center gap-2 rounded-full bg-primary-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-700 disabled:opacity-60"
               >
                 {submitting ? (
                   <Loader2 className="h-4 w-4 animate-spin" />

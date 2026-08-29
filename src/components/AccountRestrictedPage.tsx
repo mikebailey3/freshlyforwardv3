@@ -40,7 +40,7 @@ export function AccountRestrictedPage({ status, reason }: AccountRestrictedPageP
           </a>
           <button
             onClick={() => signOut()}
-            className="flex items-center justify-center gap-1.5 border-2 border-neutral-900 bg-neutral-900 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-neutral-800"
+            className="flex items-center justify-center gap-1.5 rounded-full bg-neutral-900 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-neutral-800"
           >
             <LogOut className="h-4 w-4" />
             Sign Out

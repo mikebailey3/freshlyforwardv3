@@ -278,7 +278,7 @@ function ReportEditor({ editing, setEditing, memberName, saving, onGenerate, onS
           {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
           Save Draft
         </button>
-        <button onClick={onSubmit} disabled={saving} className="flex items-center gap-1.5 border-2 border-neutral-900 bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-primary-700 disabled:opacity-60">
+        <button onClick={onSubmit} disabled={saving} className="flex items-center gap-1.5 rounded-full bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-primary-700 disabled:opacity-60">
           {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
           Submit for Admin Review
         </button>

@@ -230,7 +230,7 @@ export function StrategistOpportunitiesPage() {
         </div>
         <button
           onClick={() => setShowCreateForm(true)}
-          className="inline-flex items-center justify-center gap-2 border-2 border-neutral-900 bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-700"
+          className="inline-flex items-center justify-center gap-2 rounded-full bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-700"
         >
           <Plus className="h-4 w-4" />
           Create Opportunity
@@ -310,7 +310,7 @@ export function StrategistOpportunitiesPage() {
       {/* Create Opportunity Modal */}
       {showCreateForm && (
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-neutral-900/50 p-4 py-8">
-          <div className="w-full max-w-2xl border border-neutral-900 bg-white">
+          <div className="w-full max-w-2xl rounded-2xl border border-neutral-200 bg-white shadow-xl">
             <div className="sticky top-0 flex items-center justify-between border-b border-neutral-200 bg-white px-6 py-4">
               <h2 className="font-serif text-lg font-semibold text-neutral-900">Create Opportunity</h2>
               <button
@@ -544,7 +544,7 @@ export function StrategistOpportunitiesPage() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="inline-flex items-center gap-2 border-2 border-neutral-900 bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="inline-flex items-center gap-2 rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {submitting ? (
                     <>

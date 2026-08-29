@@ -266,7 +266,7 @@ function OpportunitiesTab({ memberId, strategistId }: { memberId: string; strate
         <h3 className="font-serif text-base font-semibold text-neutral-900">Opportunity Pipeline</h3>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="flex items-center gap-1.5 border-2 border-neutral-900 bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-700"
+          className="flex items-center gap-1.5 rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-700"
         >
           <Plus className="h-4 w-4" />
           Add Opportunity
@@ -377,7 +377,7 @@ function OpportunityForm({ memberId, strategistId, onSave, onCancel }: {
       <TextArea label="Why It Matches" value={form.why_it_matches} onChange={(v) => setForm({ ...form, why_it_matches: v })} />
       <TextArea label="Potential Concerns" value={form.potential_concerns} onChange={(v) => setForm({ ...form, potential_concerns: v })} />
       <div className="mt-4 flex gap-2">
-        <button type="submit" className="flex items-center gap-1.5 border-2 border-neutral-900 bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">
+        <button type="submit" className="flex items-center gap-1.5 rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">
           <Check className="h-4 w-4" /> Create
         </button>
         <button type="button" onClick={onCancel} className="flex items-center gap-1.5 border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50">
@@ -416,7 +416,7 @@ function ApplicationsTab({ memberId, strategistId }: { memberId: string; strateg
         <h3 className="font-serif text-base font-semibold text-neutral-900">Applications</h3>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="flex items-center gap-1.5 border-2 border-neutral-900 bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700"
+          className="flex items-center gap-1.5 rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700"
         >
           <Plus className="h-4 w-4" /> Create Application
         </button>
@@ -519,7 +519,7 @@ function ApplicationForm({ memberId, strategistId, opportunities, onSave, onCanc
         <TextArea label="Internal Notes" value={form.internal_notes} onChange={(v) => setForm({ ...form, internal_notes: v })} />
       </div>
       <div className="mt-4 flex gap-2">
-        <button type="submit" className="flex items-center gap-1.5 border-2 border-neutral-900 bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">
+        <button type="submit" className="flex items-center gap-1.5 rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">
           <Check className="h-4 w-4" /> Create
         </button>
         <button type="button" onClick={onCancel} className="flex items-center gap-1.5 border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50">
@@ -547,7 +547,7 @@ function ResumesTab({ memberId }: { memberId: string }) {
     <div>
       <div className="mb-4 flex items-center justify-between">
         <h3 className="font-serif text-base font-semibold text-neutral-900">Resume Versions</h3>
-        <button onClick={() => setShowForm(!showForm)} className="flex items-center gap-1.5 border-2 border-neutral-900 bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">
+        <button onClick={() => setShowForm(!showForm)} className="flex items-center gap-1.5 rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">
           <Plus className="h-4 w-4" /> Add Version
         </button>
       </div>
@@ -602,7 +602,7 @@ function ResumeForm({ memberId, onSave, onCancel }: { memberId: string; onSave: 
         Set as Master Resume
       </label>
       <div className="mt-4 flex gap-2">
-        <button type="submit" className="flex items-center gap-1.5 border-2 border-neutral-900 bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">
+        <button type="submit" className="flex items-center gap-1.5 rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">
           <Check className="h-4 w-4" /> Create
         </button>
         <button type="button" onClick={onCancel} className="flex items-center gap-1.5 border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50">
@@ -630,7 +630,7 @@ function CoverLettersTab({ memberId }: { memberId: string }) {
     <div>
       <div className="mb-4 flex items-center justify-between">
         <h3 className="font-serif text-base font-semibold text-neutral-900">Cover Letters</h3>
-        <button onClick={() => setShowForm(!showForm)} className="flex items-center gap-1.5 border-2 border-neutral-900 bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">
+        <button onClick={() => setShowForm(!showForm)} className="flex items-center gap-1.5 rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">
           <Plus className="h-4 w-4" /> Add Letter
         </button>
       </div>
@@ -678,7 +678,7 @@ function CoverLetterForm({ memberId, onSave, onCancel }: { memberId: string; onS
         Save as Template
       </label>
       <div className="mt-4 flex gap-2">
-        <button type="submit" className="flex items-center gap-1.5 border-2 border-neutral-900 bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">
+        <button type="submit" className="flex items-center gap-1.5 rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">
           <Check className="h-4 w-4" /> Create
         </button>
         <button type="button" onClick={onCancel} className="flex items-center gap-1.5 border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50">
@@ -735,7 +735,7 @@ function NotesTab({ memberId, strategistId }: { memberId: string; strategistId: 
             placeholder="Category (optional)"
             className="flex-1 border border-neutral-300 px-3 py-2 text-sm"
           />
-          <button type="submit" className="flex items-center gap-1.5 border-2 border-neutral-900 bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">
+          <button type="submit" className="flex items-center gap-1.5 rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">
             <Plus className="h-4 w-4" /> Add Note
           </button>
         </div>
@@ -814,7 +814,7 @@ function FollowUpsTab({ memberId, strategistId }: { memberId: string; strategist
     <div>
       <div className="mb-4 flex items-center justify-between">
         <h3 className="font-serif text-base font-semibold text-neutral-900">Follow-Ups</h3>
-        <button onClick={() => setShowForm(!showForm)} className="flex items-center gap-1.5 border-2 border-neutral-900 bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">
+        <button onClick={() => setShowForm(!showForm)} className="flex items-center gap-1.5 rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">
           <Plus className="h-4 w-4" /> Schedule
         </button>
       </div>
@@ -825,7 +825,7 @@ function FollowUpsTab({ memberId, strategistId }: { memberId: string; strategist
           <Input label="Description" value={form.description} onChange={(v) => setForm({ ...form, description: v })} />
           <Input label="Due Date" type="date" value={form.due_date} onChange={(v) => setForm({ ...form, due_date: v })} required />
           <div className="mt-3 flex gap-2">
-            <button type="submit" className="border-2 border-neutral-900 bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">Create</button>
+            <button type="submit" className="rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">Create</button>
             <button type="button" onClick={() => setShowForm(false)} className="border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50">Cancel</button>
           </div>
         </form>
@@ -873,7 +873,7 @@ function FollowUpItem({ f, onComplete }: { f: FollowUp; onComplete: () => void }
       {f.status === 'pending' && (
         <button
           onClick={async () => { await updateFollowUp(f.id, { status: 'completed', completed_at: new Date().toISOString() }); onComplete() }}
-          className="flex items-center gap-1 border-2 border-neutral-900 bg-success-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-success-700"
+          className="flex items-center gap-1 rounded-full bg-success-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-success-700"
         >
           <Check className="h-3 w-3" /> Complete
         </button>
@@ -942,7 +942,7 @@ function MessagesTab({ memberId }: { memberId: string }) {
             placeholder="Type a message…"
             className="flex-1 border border-neutral-300 px-4 py-2.5 text-sm"
           />
-          <button type="submit" disabled={sending || !body.trim()} className="flex h-10 w-10 items-center justify-center border-2 border-neutral-900 bg-primary-600 text-white hover:bg-primary-700 disabled:opacity-60">
+          <button type="submit" disabled={sending || !body.trim()} className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-600 text-white hover:bg-primary-700 disabled:opacity-60">
             <Send className="h-4 w-4" />
           </button>
         </form>

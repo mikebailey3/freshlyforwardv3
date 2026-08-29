@@ -10,9 +10,9 @@ import {
 import type { WhyWeApplied } from '@/types'
 
 const statusColors: Record<string, string> = {
-  submitted: 'border-neutral-900 bg-primary-600 text-white',
+  submitted: 'rounded-full bg-primary-600 text-white',
   employer_viewed: 'border-primary-300 text-primary-700',
-  interview_scheduled: 'border-neutral-900 bg-primary-600 text-white',
+  interview_scheduled: 'rounded-full bg-primary-600 text-white',
   offer_received: 'border-success-300 text-success-700',
   rejected: 'border-error-300 text-error-700',
 }

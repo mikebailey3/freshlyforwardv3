@@ -245,7 +245,7 @@ export function MembershipPage() {
           <button
             onClick={handleResume}
             disabled={actionLoading}
-            className="flex items-center justify-center gap-2 border-2 border-neutral-900 bg-primary-600 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-700 disabled:opacity-60"
+            className="flex items-center justify-center gap-2 rounded-full bg-primary-600 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-700 disabled:opacity-60"
           >
             {actionLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
             Resume Membership

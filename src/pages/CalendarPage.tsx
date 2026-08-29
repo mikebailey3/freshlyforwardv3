@@ -213,7 +213,7 @@ export function CalendarPage() {
         </div>
         <button
           onClick={() => setShowAddModal(true)}
-          className="flex flex-shrink-0 items-center gap-2 border-2 border-neutral-900 bg-primary-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-700"
+          className="flex flex-shrink-0 items-center gap-2 rounded-full bg-primary-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-700"
         >
           <Plus className="h-4 w-4" />
           Add Event

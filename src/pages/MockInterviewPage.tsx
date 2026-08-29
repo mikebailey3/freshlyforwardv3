@@ -192,7 +192,7 @@ export function MockInterviewPage() {
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="flex flex-shrink-0 items-center gap-2 border-2 border-neutral-900 bg-primary-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-700"
+          className="flex flex-shrink-0 items-center gap-2 rounded-full bg-primary-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-700"
         >
           {showForm ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
           {showForm ? 'Cancel' : 'Book Interview'}
@@ -288,7 +288,7 @@ export function MockInterviewPage() {
               <button
                 type="submit"
                 disabled={submitting || !scheduledAt}
-                className="flex items-center gap-2 border-2 border-neutral-900 bg-primary-600 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-700 disabled:opacity-60"
+                className="flex items-center gap-2 rounded-full bg-primary-600 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-700 disabled:opacity-60"
               >
                 {submitting ? (
                   <Loader2 className="h-4 w-4 animate-spin" />

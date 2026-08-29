@@ -219,7 +219,7 @@ export function StrategistMembersPage() {
                     </span>
                   )}
                   {m.unread_count > 0 && (
-                    <span className="inline-flex items-center gap-1 border border-neutral-900 bg-primary-600 px-2 py-1 font-mono text-[11px] font-semibold uppercase tracking-wide text-white">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-primary-600 px-2 py-1 font-mono text-[11px] font-semibold uppercase tracking-wide text-white">
                       <MessageSquare className="h-3.5 w-3.5" />
                       {m.unread_count} unread
                     </span>

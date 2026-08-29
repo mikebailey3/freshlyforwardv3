@@ -255,7 +255,7 @@ export function LinkedInOptimizerPage() {
               <button
                 onClick={handleSync}
                 disabled={saving}
-                className="flex items-center gap-2 border-2 border-neutral-900 bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-700 disabled:opacity-60"
+                className="flex items-center gap-2 rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-700 disabled:opacity-60"
               >
                 {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
                 Analyze &amp; Sync

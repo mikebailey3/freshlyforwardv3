@@ -141,7 +141,7 @@ export function StrategistOpportunityEnginePage() {
                 <button
                   onClick={() => handlePromote(match)}
                   disabled={promotingId === match.id}
-                  className="inline-flex items-center gap-1.5 border-2 border-neutral-900 bg-primary-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-primary-700 disabled:opacity-60"
+                  className="inline-flex items-center gap-1.5 rounded-full bg-primary-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-primary-700 disabled:opacity-60"
                 >
                   <ArrowUpRight className="h-3.5 w-3.5" />
                   {promotingId === match.id ? 'Promoting...' : 'Promote'}

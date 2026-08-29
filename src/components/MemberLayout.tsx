@@ -153,17 +153,17 @@ export function MemberLayout({ children }: { children: ReactNode }) {
         {renderNavIcon(item)}
         {item.label}
         {item.isNew && (
-          <span className="ml-auto border border-primary-200 px-1.5 py-0.5 font-mono text-[10px] font-semibold uppercase text-primary-700">
+          <span className="ml-auto rounded-full border border-primary-200 px-1.5 py-0.5 font-mono text-[10px] font-semibold uppercase text-primary-700">
             New
           </span>
         )}
         {!item.isNew && count > 0 && (
-          <span className="ml-auto bg-primary-600 px-2 py-0.5 font-mono text-xs font-semibold text-white">
+          <span className="ml-auto rounded-full bg-primary-600 px-2 py-0.5 font-mono text-xs font-semibold text-white">
             {count}
           </span>
         )}
         {isLocked && item.requiredPlan && (
-          <span className="ml-auto border border-neutral-200 px-1.5 py-0.5 font-mono text-[10px] font-medium uppercase text-neutral-500">
+          <span className="ml-auto rounded-full border border-neutral-200 px-1.5 py-0.5 font-mono text-[10px] font-medium uppercase text-neutral-500">
             {item.requiredPlan === 'career-growth' ? 'Growth' : item.requiredPlan === 'career-concierge' ? 'Concierge' : ''}
           </span>
         )}
@@ -205,7 +205,7 @@ export function MemberLayout({ children }: { children: ReactNode }) {
 
           <div className="border-t border-neutral-200 p-3">
             <div className="mb-2 flex items-center gap-2 px-3">
-              <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center overflow-hidden border border-neutral-200 bg-primary-50 font-mono text-xs font-semibold text-primary-700">
+              <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center overflow-hidden rounded-full border border-neutral-200 bg-primary-50 font-mono text-xs font-semibold text-primary-700">
                 {profile?.avatar_url ? (
                   <img src={profile.avatar_url} alt="" className="h-full w-full object-cover" />
                 ) : (
@@ -248,7 +248,7 @@ export function MemberLayout({ children }: { children: ReactNode }) {
             )}
           </Link>
           {plan && membershipBadges[0] && (
-            <div className="flex items-center gap-2 border border-neutral-200 bg-white px-3 py-1.5">
+            <div className="flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-3 py-1.5">
               <MembershipBadgeShield badge={membershipBadges[0]} size="sm" />
               <div className="leading-tight">
                 <p className="text-xs font-semibold text-neutral-900">{plan.name}</p>

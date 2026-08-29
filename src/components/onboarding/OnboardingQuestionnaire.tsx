@@ -280,7 +280,7 @@ export function OnboardingQuestionnaire({ onNext, onBack, user }: OnboardingStep
         </button>
         <button
           onClick={handleNextSection}
-          className="flex items-center gap-1.5 border-2 border-neutral-900 bg-primary-600 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-700"
+          className="flex items-center gap-1.5 rounded-full bg-primary-600 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-700"
         >
           {sectionIndex === totalSections - 1 ? 'Complete Questionnaire' : 'Continue'}
           <ChevronRight className="h-4 w-4" />

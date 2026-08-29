@@ -216,7 +216,7 @@ export function StrategistDashboardPage() {
                         </span>
                       )}
                       {m.unread_count > 0 && (
-                        <span className="border border-neutral-900 bg-primary-600 px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide text-white">
+                        <span className="rounded-full bg-primary-600 px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide text-white">
                           {m.unread_count}
                         </span>
                       )}
