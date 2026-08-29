@@ -31,8 +31,9 @@ export function InteriorPage({ eyebrow, title, intro, features, sectionEyebrow =
         <div className="feature-grid">
           {features.map(({ icon: Icon, title: featureTitle, copy, bullets }) => (
             <article className="feature-card" key={featureTitle}>
-              <Icon aria-hidden="true" /><h2>{featureTitle}</h2><p>{copy}</p>
-              {bullets && <ul>{bullets.map((bullet) => <li key={bullet}><Check size={15} />{bullet}</li>)}</ul>}
+              <Icon aria-hidden="true" />
+              <div className="feature-card-body"><h2>{featureTitle}</h2><p>{copy}</p></div>
+              {bullets && <ul className="feature-card-checklist">{bullets.map((bullet) => <li key={bullet}><Check size={15} />{bullet}</li>)}</ul>}
             </article>
           ))}
         </div>
