@@ -300,39 +300,39 @@ pricing-section { padding-bottom: 100px; }
 .mini-faq h3 { padding-top: 0; border-top: 0; }
 .mini-faq p { font-size: .88rem; }
 
-.about-hero { min-height: 560px; display: grid; grid-template-columns: 1fr .68fr; align-items: center; gap: 60px; padding-block: 46px 60px; }
+.about-hero { min-height: 560px; display: grid; grid-template-columns: 1fr .68fr; align-items: center; gap: 60px; margin-block: 24px; padding: 46px 60px; border-radius: 28px; background: var(--cream); }
 .about-hero h1 { font-size: clamp(2.5rem, 5vw, 4.4rem); }
 .about-hero > div:first-child > p:not(.eyebrow) { max-width: 650px; font-size: 1.05rem; }
-.about-portrait { position: relative; height: 460px; padding: 12px 12px 0; border: 1px solid var(--line); border-radius: 6px; background: #fbfaf6; box-shadow: var(--shadow); }
-.about-portrait img { display: block; width: 100%; height: 360px; object-fit: cover; object-position: center 20%; border: 1px solid var(--line); filter: saturate(.92) contrast(1.02); }
+.about-portrait { position: relative; height: 460px; padding: 12px 12px 0; border: 1px solid var(--line); border-radius: 20px; background: white; box-shadow: var(--shadow); }
+.about-portrait img { display: block; width: 100%; height: 360px; object-fit: cover; object-position: center 20%; border-radius: 12px; filter: saturate(.92) contrast(1.02); }
 .about-portrait > div { padding: 14px 2px; display: flex; flex-direction: column; color: var(--navy); background: transparent; }
 .about-portrait span { font-family: 'Space Mono', monospace; font-size: .68rem; letter-spacing: .04em; text-transform: uppercase; color: var(--green-dark); }
-.founder-note { margin-block: 40px 100px; padding: 50px; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; border: 1px solid var(--line); border-top: 3px solid var(--green); border-radius: 6px; background: var(--cream); }
+.founder-note { margin-block: 40px 100px; padding: 50px; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; border-radius: 24px; background: var(--cream); box-shadow: 0 4px 24px rgba(7, 26, 49, .04); }
 .founder-note h2 { font-size: clamp(1.7rem, 3vw, 2.6rem); }
 .signature { color: var(--green-dark); font: 700 1.1rem 'Space Mono', monospace; }
 .values-section { padding-bottom: 90px; }
-.values-grid { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; background: white; }
-.values-grid article { display: flex; align-items: flex-start; gap: 22px; padding: 26px 30px; border-bottom: 1px dashed var(--line); }
+.values-grid { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 24px; overflow: hidden; background: white; box-shadow: 0 4px 24px rgba(7, 26, 49, .04); }
+.values-grid article { display: flex; align-items: flex-start; gap: 22px; padding: 26px 30px; border-bottom: 1px solid var(--line); }
 .values-grid article:last-child { border-bottom: 0; }
-.values-grid svg { flex-shrink: 0; margin-top: 2px; color: var(--green); stroke-width: 1.7; }
-.about-checklist { margin-bottom: 100px; padding: 44px 50px; border: 1px solid var(--line); border-top: 3px solid var(--navy); border-radius: 6px; color: var(--navy); background: white; }
+.values-grid svg { flex-shrink: 0; width: 44px; height: 44px; padding: 10px; box-sizing: border-box; border-radius: 9999px; margin-top: 2px; color: var(--green-dark); background: var(--mint); stroke-width: 1.7; }
+.about-checklist { margin-bottom: 100px; padding: 44px 50px; border-radius: 24px; color: var(--navy); background: white; box-shadow: 0 4px 24px rgba(7, 26, 49, .04); }
 .about-checklist h2 { font-size: 1.7rem; }
-.about-checklist p { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px dashed var(--line); color: #35445a; }
+.about-checklist p { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); color: #35445a; }
 .about-checklist p:last-child { border-bottom: 0; }
 .about-checklist svg { width: 18px; color: var(--green); }
 
 .contact-page { min-height: 700px; display: grid; grid-template-columns: .9fr 1.1fr; align-items: start; gap: 70px; padding-block: 46px 100px; }
-.contact-copy { position: sticky; top: 130px; padding-top: 22px; border-top: 1px dashed var(--line); }
+.contact-copy { position: sticky; top: 130px; }
 .contact-copy h1 { font-size: clamp(2.4rem, 5vw, 4.2rem); }
-.contact-detail { display: flex; gap: 15px; margin-top: 24px; padding-top: 18px; border-top: 1px dashed var(--line); }
+.contact-detail { display: flex; gap: 15px; margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--line); }
 .contact-detail svg { color: var(--green); }
 .contact-detail span { display: flex; flex-direction: column; color: #6b7789; font-size: .85rem; }
 .contact-detail strong { margin-bottom: 3px; color: var(--navy); }
-.contact-card { padding: 38px; border: 1px solid var(--line); border-top: 3px solid var(--green); border-radius: 6px; background: white; }
+.contact-card { padding: 38px; border-radius: 24px; background: white; box-shadow: 0 4px 24px rgba(7, 26, 49, .04); }
 .contact-card h2 { font-size: 1.8rem; }
 .contact-form { display: grid; gap: 19px; }
 .contact-form label, .auth-card label { display: grid; gap: 7px; color: var(--navy); font-size: .8rem; font-weight: 700; }
-.contact-form input, .contact-form select, .contact-form textarea, .auth-card input, .auth-card select { width: 100%; border: 1px solid #cad6d1; border-radius: 9px; padding: 13px 14px; color: var(--navy); background: white; }
+.contact-form input, .contact-form select, .contact-form textarea, .auth-card input, .auth-card select { width: 100%; border: 1px solid #cad6d1; border-radius: 12px; padding: 13px 14px; color: var(--navy); background: white; }
 .contact-form textarea { resize: vertical; }
 .contact-form input:focus, .contact-form select:focus, .contact-form textarea:focus, .auth-card input:focus, .auth-card select:focus { border-color: var(--green); outline: 3px solid rgba(7,138,88,.12); }
 .bot-field { display: none; }
@@ -354,7 +354,7 @@ pricing-section { padding-bottom: 100px; }
 .small-cta h2 { margin-bottom: 7px; font-size: 1.6rem; }
 .small-cta p { margin: 0; }
 
-.legal-hero { padding-block: 46px 40px; border-bottom: 1px dashed var(--line); }
+.legal-hero { padding-block: 46px 40px; border-bottom: 1px solid var(--line); }
 .legal-hero h1 { font-size: clamp(2.4rem, 5vw, 4rem); }
 .legal-content { max-width: 780px; padding-block: 50px 100px; }
 .legal-content h2 { margin-top: 38px; font-size: 1.3rem; letter-spacing: -.02em; }
@@ -371,11 +371,11 @@ pricing-section { padding-bottom: 100px; }
 .auth-page { min-height: 620px; display: grid; grid-template-columns: 1fr 460px; align-items: center; gap: 80px; padding-block: 46px 70px; }
 .auth-story h1 { font-size: clamp(2.5rem, 5vw, 4.4rem); }
 .auth-story > p:not(.eyebrow) { max-width: 600px; font-size: 1.02rem; }
-.auth-note { max-width: 520px; display: flex; gap: 15px; margin-top: 28px; padding: 18px 20px; border: 1px dashed var(--line); border-radius: 6px; background: var(--cream); }
+.auth-note { max-width: 520px; display: flex; gap: 15px; margin-top: 28px; padding: 18px 20px; border-radius: 16px; background: var(--cream); }
 .auth-note svg { color: var(--green); }
 .auth-note span { display: flex; flex-direction: column; color: #6c7784; font-size: .8rem; }
 .auth-note strong { margin-bottom: 4px; color: var(--navy); }
-.auth-card { padding: 36px; border: 1px solid var(--line); border-top: 3px solid var(--green); border-radius: 6px; background: white; }
+.auth-card { padding: 36px; border-radius: 24px; background: white; box-shadow: 0 4px 24px rgba(7, 26, 49, .04); }
 .auth-card h2 { margin-bottom: 8px; font-size: 1.9rem; }
 .auth-card > p { font-size: .87rem; }
 .auth-card form { display: grid; gap: 17px; margin-top: 25px; }
