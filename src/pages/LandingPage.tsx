@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { ArrowRight, CalendarCheck, Check, ClipboardCheck, FilePenLine, Handshake, MessageCircleMore, PauseCircle, Search, ShieldCheck, Target, UserRoundCheck, X } from 'lucide-react'
-import { LinkButton, PillLinkButton, SectionHeading } from '@/components/ui'
+import { LinkButton, SectionHeading } from '@/components/ui'
 import { ForwardFeedWidget } from '@/components/ForwardFeedWidget'
 import { FridayReportCard, type FridayReportCardData } from '@/components/FridayReportCard'
 
@@ -71,12 +71,12 @@ export function LandingPage() {
               guessing what's happening behind the scenes.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <PillLinkButton to="/signup">
+              <LinkButton to="/signup">
                 Get started <ArrowRight size={18} />
-              </PillLinkButton>
-              <PillLinkButton to="/how-it-works" variant="secondary">
+              </LinkButton>
+              <LinkButton to="/how-it-works" variant="secondary">
                 See how it works
-              </PillLinkButton>
+              </LinkButton>
             </div>
             <div className="mt-7 flex flex-wrap gap-x-5 gap-y-2" aria-label="Service assurances">
               <span className="flex items-center gap-1.5 text-sm font-medium text-neutral-600">

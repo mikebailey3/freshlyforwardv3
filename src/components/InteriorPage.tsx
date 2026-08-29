@@ -23,7 +23,7 @@ export function InteriorPage({ eyebrow, title, intro, features, sectionEyebrow =
   return (
     <main>
       <section className="page-hero shell">
-        <div data-doc-tag="FRESHLYFORWARD · DOCUMENT"><p className="eyebrow">{eyebrow}</p><h1>{title}</h1><p>{intro}</p><div className="hero-actions"><LinkButton to="/signup">Get started <ArrowRight size={18} /></LinkButton><LinkButton to="/contact" variant="secondary">Talk with us</LinkButton></div></div>
+        <div><p className="eyebrow">{eyebrow}</p><h1>{title}</h1><p>{intro}</p><div className="hero-actions"><LinkButton to="/signup">Get started <ArrowRight size={18} /></LinkButton><LinkButton to="/contact" variant="secondary">Talk with us</LinkButton></div></div>
         <div className="page-hero-mark" aria-hidden="true"><span>FF</span><ArrowRight /></div>
       </section>
       <section className="interior-section shell">
