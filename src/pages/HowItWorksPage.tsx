@@ -1,4 +1,4 @@
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, Mail } from 'lucide-react'
 import { LinkButton } from '@/components/ui'
 import { ProcessStep } from '@/components/ProcessStep'
 import { ChatPreviewCard } from '@/components/ChatPreviewCard'
@@ -145,6 +145,33 @@ export function HowItWorksPage() {
             />
           }
         />
+      </section>
+
+      <section className="bg-[var(--cream)] py-16">
+        <div className="shell grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+          <div>
+            <span className="font-mono text-xs font-bold uppercase tracking-wide text-primary-600">Always on</span>
+            <h2 className="mt-3 font-display text-3xl font-semibold leading-tight text-[var(--navy)] sm:text-4xl">Your dashboard, always on -- not just Friday.</h2>
+            <p className="mt-4 max-w-lg text-base leading-relaxed text-neutral-600">The Friday report is the headline, but the dashboard behind it never sleeps. Track every application and interview as it moves, message your strategist directly whenever something comes up, and see what's next on your calendar -- all in one place, updated in real time, not just once a week.</p>
+            <ul className="mt-6 space-y-2 text-sm text-neutral-700">
+              <li className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-primary-500" aria-hidden="true" /> Live application &amp; interview tracking</li>
+              <li className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-primary-500" aria-hidden="true" /> Direct messaging with your strategist, any time</li>
+              <li className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-primary-500" aria-hidden="true" /> A calendar of what's coming up next</li>
+            </ul>
+          </div>
+          <div className="overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm">
+            <div className="grid grid-cols-3 divide-x divide-neutral-200">
+              <div className="p-5"><p className="text-xs font-semibold text-neutral-500">Applications</p><p className="mt-2 font-mono text-2xl font-bold text-neutral-900">4</p><p className="mt-1 text-[11px] text-neutral-500">Active</p></div>
+              <div className="p-5"><p className="text-xs font-semibold text-neutral-500">Interviews</p><p className="mt-2 font-mono text-2xl font-bold text-neutral-900">1</p><p className="mt-1 text-[11px] text-neutral-500">Upcoming</p></div>
+              <div className="p-5"><p className="text-xs font-semibold text-neutral-500">Messages</p><p className="mt-2 font-mono text-2xl font-bold text-neutral-900">2</p><p className="mt-1 text-[11px] text-neutral-500">Unread</p></div>
+            </div>
+            <div className="flex items-center justify-between border-t border-neutral-200 bg-neutral-50 p-5">
+              <div><p className="font-mono text-[10px] font-semibold uppercase tracking-wide text-neutral-500">On Call</p><p className="mt-1 text-sm font-semibold text-neutral-900">Your Career Strategist</p></div>
+              <span className="inline-flex items-center justify-center gap-1.5 rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white"><Mail className="h-4 w-4" aria-hidden="true" /> Send a Message</span>
+            </div>
+            <p className="border-t border-neutral-100 px-5 py-2 text-center font-mono text-[10px] font-semibold uppercase tracking-wide text-neutral-400">Sample dashboard preview</p>
+          </div>
+        </div>
       </section>
 
       <section className="editorial-aside shell">
