@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { ArrowRight, CalendarCheck, Check, ClipboardCheck, FilePenLine, Handshake, MessageCircleMore, PauseCircle, Search, ShieldCheck, Target, UserRoundCheck, X } from 'lucide-react'
-import { LinkButton, SectionHeading } from '@/components/ui'
+import { LinkButton, PillLinkButton, SectionHeading } from '@/components/ui'
 import { ForwardFeedWidget } from '@/components/ForwardFeedWidget'
+import { FridayReportCard, type FridayReportCardData } from '@/components/FridayReportCard'
 
 const manifest = [
   { icon: ShieldCheck, title: '100% Human-Led Service', copy: 'No bots, no shortcuts. Every decision is made by a real career professional.' },
@@ -19,6 +20,20 @@ const scenes: [string, string, string][] = [
   ['SC. 04', 'Review Friday progress', 'You receive a clear weekly report with decisions, applications, and next steps.'],
   ['SC. 05', 'Prepare with confidence', 'We coach your interviews, run mock sessions, and help you evaluate offers.'],
 ]
+
+// Explicitly labeled sample data for the hero -- never implied as a real
+// member's report. See docs/superpowers/specs/2026-08-28-concierge-editorial-redesign-design.md
+// for why this reuses the real FridayReport shape instead of inventing one.
+const sampleReport: FridayReportCardData = {
+  title: 'Week 5 Progress Report',
+  report_date: '2026-05-08',
+  summary: 'Strong week. Three roles cleared review and went out with tailored materials, and one first-round interview is on the books.',
+  opportunities_reviewed: 18,
+  applications_submitted: 3,
+  interviews_scheduled: 1,
+  next_steps: 'Finalize tailored resume for the Product Ops role\nPrep talking points for Thursday\'s interview\nReview two new leads flagged this week',
+  approval_status: 'sent',
+}
 
 export function LandingPage() {
   const verdictRef = useRef<HTMLElement>(null)
@@ -44,36 +59,39 @@ export function LandingPage() {
 
   return (
     <main className="callsheet">
-      <section className="cs-hero shell">
-        <div className="cs-masthead">
-          <span>FRESHLYFORWARD</span>
-          <span>CALL SHEET</span>
-          <span>STRATEGIST: ASSIGNED</span>
-          <span>STATUS: IN PRODUCTION</span>
-        </div>
-        <div className="cs-hero-grid">
-          <div className="cs-hero-copy reveal">
-            <h1>We search. We apply. <span>You move forward.</span></h1>
-            <p className="hero-lede">A real person manages the details of your job search—from strategy and tailored applications to interview preparation and ongoing support.</p>
-            <div className="hero-actions">
-              <LinkButton to="/signup">Get started <ArrowRight size={18} /></LinkButton>
-              <LinkButton to="/how-it-works" variant="secondary">See how it works</LinkButton>
+      <section className="bg-[var(--cream)] py-14 lg:py-24">
+        <div className="shell grid items-center gap-12 lg:grid-cols-2">
+          <div>
+            <h1 className="font-display text-4xl font-semibold leading-[1.1] text-[var(--navy)] sm:text-5xl lg:text-6xl">
+              A better search needs better judgment.
+            </h1>
+            <p className="mt-6 max-w-lg text-lg leading-relaxed text-neutral-600">
+              FreshlyForward is a human-led career concierge. One real strategist searches,
+              applies, and reports back — so you're never doing this alone, and never
+              guessing what's happening behind the scenes.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <PillLinkButton to="/signup">
+                Get started <ArrowRight size={18} />
+              </PillLinkButton>
+              <PillLinkButton to="/how-it-works" variant="secondary">
+                See how it works
+              </PillLinkButton>
             </div>
-            <div className="cs-manifest-strip" aria-label="Service assurances">
-              <span><Check size={16} /> Human-led</span>
-              <span><Check size={16} /> No mass applying</span>
-              <span><Check size={16} /> Pause anytime</span>
+            <div className="mt-7 flex flex-wrap gap-x-5 gap-y-2" aria-label="Service assurances">
+              <span className="flex items-center gap-1.5 text-sm font-medium text-neutral-600">
+                <Check size={16} className="text-primary-600" /> Human-led
+              </span>
+              <span className="flex items-center gap-1.5 text-sm font-medium text-neutral-600">
+                <Check size={16} className="text-primary-600" /> No mass applying
+              </span>
+              <span className="flex items-center gap-1.5 text-sm font-medium text-neutral-600">
+                <Check size={16} className="text-primary-600" /> Pause anytime
+              </span>
             </div>
           </div>
-          <div className="cs-contact-sheet reveal reveal-delay">
-            <img src="/images/headshot.png?v=2" alt="FreshlyForward founder and career strategist" />
-            <div className="cs-caption">
-              <p>"Your search deserves focus, judgment, and a person who knows your story."</p>
-              <div className="cs-caption-meta">
-                <strong>Mike Bailey</strong>
-                <span>FOUNDER &amp; STRATEGIST · FRAME 01</span>
-              </div>
-            </div>
+          <div className="mx-auto w-full max-w-md lg:max-w-none">
+            <FridayReportCard report={sampleReport} isSample />
           </div>
         </div>
       </section>

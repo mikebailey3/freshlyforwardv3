@@ -143,23 +143,9 @@ svg { flex: 0 0 auto; }
 .button-light { color: var(--navy); background: white; }
 .button-small { min-height: 42px; padding: 10px 18px; }
 
-.cs-hero { padding-block: 18px 44px; }
 .cs-masthead { display: flex; flex-wrap: wrap; gap: 10px 22px; margin-bottom: 34px; padding-bottom: 14px; border-bottom: 1px dashed var(--line); font-family: 'Space Mono', monospace; font-size: .7rem; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: #6b7789; }
 .cs-masthead span:first-child { color: var(--navy); }
-.cs-hero-grid { display: grid; grid-template-columns: minmax(0, 1.02fr) minmax(380px, .98fr); align-items: center; gap: 56px; padding-block: 20px 24px; }
-.cs-hero-copy h1 { max-width: 720px; margin-bottom: 26px; }
-.cs-hero-copy h1 span { display: block; color: var(--green); }
-.hero-lede { max-width: 650px; margin-bottom: 30px; font-size: 1.12rem; }
 .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
-.cs-manifest-strip { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 24px; }
-.cs-manifest-strip span { display: inline-flex; align-items: center; gap: 6px; color: #35445a; font-size: .8rem; font-weight: 700; }
-.cs-manifest-strip svg { color: var(--green); }
-.cs-contact-sheet { position: relative; align-self: stretch; min-height: 480px; padding: 14px 14px 0; border: 1px solid var(--line); border-radius: 6px; background: #fbfaf6; box-shadow: var(--shadow); }
-.cs-contact-sheet img { display: block; width: 100%; height: 380px; object-fit: cover; object-position: 50% 22%; border: 1px solid var(--line); filter: saturate(.92) contrast(1.02); }
-.cs-caption { padding: 16px 4px 18px; }
-.cs-caption p { margin: 0 0 12px; color: var(--navy); font-size: .92rem; font-style: italic; }
-.cs-caption-meta { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px; font-family: 'Space Mono', monospace; font-size: .68rem; letter-spacing: .04em; text-transform: uppercase; color: var(--green-dark); }
-.cs-caption-meta strong { font-family: 'Manrope', sans-serif; font-size: .82rem; text-transform: none; letter-spacing: 0; color: var(--navy); }
 .reveal { animation: reveal .75s both ease-out; }
 .reveal-delay { animation-delay: .14s; }
 @keyframes reveal { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
@@ -402,7 +388,6 @@ pricing-section { padding-bottom: 100px; }
 @media (max-width: 1024px) {
   .site-header nav { gap: 14px; }
   .site-header nav > a { font-size: .75rem; }
-  .cs-hero-grid { grid-template-columns: 1fr .85fr; gap: 35px; }
   .contrast-section { grid-template-columns: 1fr 1fr; }
   .contrast-intro { grid-column: 1 / -1; }
   .cs-schedule { grid-template-columns: repeat(3, 1fr); row-gap: 34px; }
@@ -420,8 +405,6 @@ pricing-section { padding-bottom: 100px; }
   .site-header nav > a::after { display: none; }
   .nav-actions { margin: 14px 0 0; }
   .nav-actions a { flex: 1; text-align: center; }
-  .cs-hero-grid { grid-template-columns: 1fr; padding-top: 30px; }
-  .cs-contact-sheet { min-height: 460px; }
     .forward-feed-grid, .blog-listing-grid { grid-template-columns: 1fr; }
   .forward-feed-head { flex-direction: column; align-items: flex-start; gap: 10px; }
   .contrast-section { padding: 40px; }
@@ -451,13 +434,8 @@ pricing-section { padding-bottom: 100px; }
   .header-inner { min-height: 70px; }
   .site-header nav { top: 70px; }
   .logo img { width: 180px; }
-  .cs-hero-grid { min-height: auto; gap: 34px; padding-block: 20px 24px; }
-  .hero-lede { font-size: 1rem; }
   .hero-actions { display: grid; }
   .hero-actions .button { width: 100%; }
-  .cs-manifest-strip { gap: 9px 16px; }
-  .cs-contact-sheet { min-height: 0; }
-  .cs-contact-sheet img { height: 300px; object-position: center 25%; }
   .cs-manifest-section { padding: 70px 0; }
   .cs-manifest-row { grid-template-columns: 26px 1fr; padding: 20px; }
   .cs-manifest-check { display: none; }
@@ -503,8 +481,6 @@ pricing-section { padding-bottom: 100px; }
 @media (max-width: 360px) {
   .shell { width: calc(100% - 24px); }
   .logo img { width: 160px; }
-  .hero-assurances { display: grid; }
-  .cs-contact-sheet { min-height: 0; }
   .about-portrait { height: 420px; }
   .footer-grid { grid-template-columns: 1fr; }
   .footer-brand { grid-column: auto; }
