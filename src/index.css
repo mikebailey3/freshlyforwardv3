@@ -2,6 +2,7 @@
 
 @theme {
   --font-serif: 'Manrope', 'DM Sans', sans-serif;
+  --font-display: 'Fraunces', 'Georgia', serif;
   --font-mono: 'Space Mono', ui-monospace, monospace;
 
   /* Brand green (matches --green in the marketing site) */
