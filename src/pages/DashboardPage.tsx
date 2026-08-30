@@ -402,6 +402,51 @@ export function DashboardPage() {
         </div>
       </div>
 
+      {/* Career Compass */}
+      <div className="mt-6 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+        <div className="flex items-center justify-between">
+          <h2 className="font-display text-base font-semibold text-neutral-900">Career Compass</h2>
+          {!compassLoading && compassResult && (
+            <Link to="/career-compass" className="font-mono text-xs font-medium text-primary-600 hover:text-primary-700">
+              Retake
+            </Link>
+          )}
+        </div>
+        {compassLoading ? (
+          <div className="mt-4 flex items-center gap-3" role="status" aria-label="Loading Career Compass">
+            <Compass className="h-5 w-5 flex-shrink-0 animate-pulse text-neutral-300" />
+            <div className="h-4 w-48 animate-pulse rounded bg-neutral-100" />
+          </div>
+        ) : compassResult ? (
+          <div className="mt-4 flex items-center gap-3">
+            <Compass className="h-5 w-5 flex-shrink-0 text-primary-600" />
+            <div>
+              <p className="text-sm font-medium text-neutral-900">
+                You're a {ARCHETYPE_LABELS[compassResult.primary_archetype]}.
+              </p>
+              <p className="mt-1 text-xs text-neutral-500">
+                Curious how things have shifted? Retake the free assessment anytime.
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div className="mt-4 flex items-center justify-between gap-3">
+            <div>
+              <p className="text-sm font-medium text-neutral-900">Discover your Career Compass</p>
+              <p className="mt-1 text-xs text-neutral-500">
+                Take the free 5-minute assessment to find your career archetype and readiness score.
+              </p>
+            </div>
+            <Link
+              to="/career-compass"
+              className="flex-shrink-0 rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-700"
+            >
+              Start Now
+            </Link>
+          </div>
+        )}
+      </div>
+
       {/* Forward Feed */}
       <div className="mt-6 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
         <div className="flex items-center justify-between">
