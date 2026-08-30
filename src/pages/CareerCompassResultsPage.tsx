@@ -63,23 +63,6 @@ const PLAN_NAMES: Record<Exclude<PlanRecommendation['planSlug'], null>, string> 
   'career-concierge': 'Career Concierge',
 }
 
-/**
- * Fallback reasons used only for the slow-path (Supabase row) lookup.
- * `career_compass_results` stores the plan slug and fit score but not the
- * free-text `reasons` array -- that only ever existed on the in-memory
- * PlanRecommendation produced at assessment-completion time and isn't part
- * of the persisted schema. These mirror the first reason from each branch
- * of recommendPlan() so the copy stays consistent even when the exact
- * original reasons weren't persisted.
- */
-const FALLBACK_REASONS: Record<'none' | Exclude<PlanRecommendation['planSlug'], null>, string[]> = {
-  none: ['Your readiness is strong across the board.'],
-  'career-kickstart': ['Your biggest opportunity is how your experience is presented.'],
-  'career-concierge': ["You're navigating a complex career transition."],
-  'career-growth': ["You're ready for more active, hands-on help."],
-  'founding-member': ["You'd benefit from ongoing guidance and hand-selected opportunities."],
-}
-
 interface DbResultRow {
   dimension_scores: ArchetypeResult['dimensionScores']
   archetype_scores: ArchetypeResult['archetypeScores']
@@ -90,6 +73,7 @@ interface DbResultRow {
   secondary_barrier: ReadinessBarrierKey
   recommended_plan_slug: PlanRecommendation['planSlug']
   service_fit_pct: number
+  reasons: string[]
 }
 
 /**
@@ -131,7 +115,7 @@ function mapDbRowToNavState(assessmentId: string, row: DbResultRow): CareerCompa
     recommendation: {
       planSlug: row.recommended_plan_slug,
       serviceFitPct: row.service_fit_pct,
-      reasons: FALLBACK_REASONS[row.recommended_plan_slug ?? 'none'],
+      reasons: row.reasons,
     },
   }
 }
@@ -163,11 +147,23 @@ export function CareerCompassResultsPage() {
       .eq('assessment_id', assessmentIdParam)
       .eq('is_current', true)
       .maybeSingle()
-      .then(({ data, error }) => {
-        if (cancelled) return
-        setLookupResult(!error && data ? mapDbRowToNavState(assessmentIdParam, data as DbResultRow) : null)
-        setLoading(false)
-      })
+      .then(
+        ({ data, error }) => {
+          if (cancelled) return
+          setLookupResult(!error && data ? mapDbRowToNavState(assessmentIdParam, data as DbResultRow) : null)
+          setLoading(false)
+        },
+        () => {
+          // A rejected request (network failure, not just a resolved error
+          // field) must still land on the empty state instead of leaving
+          // the visitor stuck on "Loading your results…" forever. Supabase's
+          // query builder is only PromiseLike (no `.catch`), so the rejection
+          // handler is passed as `.then`'s second argument instead.
+          if (cancelled) return
+          setLookupResult(null)
+          setLoading(false)
+        },
+      )
 
     return () => {
       cancelled = true

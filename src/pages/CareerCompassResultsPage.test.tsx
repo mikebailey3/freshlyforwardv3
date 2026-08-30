@@ -95,6 +95,7 @@ describe('CareerCompassResultsPage', () => {
         secondary_barrier: 'searchStrategy',
         recommended_plan_slug: 'career-kickstart',
         service_fit_pct: 90,
+        reasons: ['Your resume is holding back an otherwise clear direction.'],
       },
       error: null,
     })
@@ -104,6 +105,7 @@ describe('CareerCompassResultsPage', () => {
     await waitFor(() => expect(screen.getByText(/You're a Builder/)).toBeInTheDocument())
     expect(screen.getByText(/strong Explorer traits/)).toBeInTheDocument()
     expect(screen.getByText('Recommended: Career Kickstart')).toBeInTheDocument()
+    expect(screen.getByText('Your resume is holding back an otherwise clear direction.')).toBeInTheDocument()
     expect(mockMaybeSingle).toHaveBeenCalledTimes(1)
   })
 
@@ -119,6 +121,14 @@ describe('CareerCompassResultsPage', () => {
     mockMaybeSingle.mockResolvedValue({ data: null, error: null })
 
     renderPage('/career-compass/results?assessmentId=missing')
+
+    await waitFor(() => expect(screen.getByText("We couldn't find those results.")).toBeInTheDocument())
+  })
+
+  it('renders the empty state instead of stalling forever when the Supabase request itself rejects', async () => {
+    mockMaybeSingle.mockRejectedValue(new Error('network down'))
+
+    renderPage('/career-compass/results?assessmentId=assess-3')
 
     await waitFor(() => expect(screen.getByText("We couldn't find those results.")).toBeInTheDocument())
   })
