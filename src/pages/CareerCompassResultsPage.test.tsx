@@ -155,7 +155,12 @@ describe('CareerCompassResultsPage', () => {
 
     expect(screen.getByRole('link', { name: 'Save My Career Compass' })).toHaveAttribute('href', '/signup?compass=1')
     const signInLink = screen.getByRole('link', { name: /Sign in instead/ })
-    expect(signInLink).toHaveAttribute('href', '/signin?redirect=%2Fdashboard%3Fcompass%3Dsaved')
+    expect(signInLink).toHaveAttribute('href', '/signin?redirect=%2Fdashboard')
+    // Regression guard: this href must never carry compass=saved -- doing so
+    // would trigger the dashboard's "results saved" banner even though
+    // signing in (as opposed to signing up) does NOT actually save this
+    // result, directly contradicting the disclosure text right below it.
+    expect(signInLink.getAttribute('href')).not.toContain('compass')
     expect(screen.getByText(/Signing in won't keep this specific result/)).toBeInTheDocument()
   })
 })

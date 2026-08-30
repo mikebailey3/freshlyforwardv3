@@ -81,7 +81,12 @@ export function CareerCompassAssessmentPage() {
         setError("We couldn't save your results just now. Your answers are safe — try again.")
         return
       }
-      navigate('/career-compass/results', { state: { assessmentId: assessId, archetype, readiness, recommendation } })
+      // assessmentId must also live in the URL, not just router state -- a
+      // hard refresh or opening the results link in a new tab loses router
+      // state entirely, and CareerCompassResultsPage's documented slow-path
+      // fallback (re-fetching by assessmentId query param) depends on it
+      // being there.
+      navigate(`/career-compass/results?assessmentId=${assessId}`, { state: { assessmentId: assessId, archetype, readiness, recommendation } })
     },
     [navigate],
   )

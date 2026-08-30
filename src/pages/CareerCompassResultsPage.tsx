@@ -263,7 +263,7 @@ export function CareerCompassResultsPage() {
         <div>
           <LinkButton to="/signup?compass=1">Save My Career Compass</LinkButton>
           <p className="auth-switch">
-            <Link to="/signin?redirect=%2Fdashboard%3Fcompass%3Dsaved">Already have an account? Sign in instead</Link>
+            <Link to="/signin?redirect=%2Fdashboard">Already have an account? Sign in instead</Link>
           </p>
           <p style={{ marginTop: '8px', fontSize: '.8rem', color: 'var(--muted, #6b7280)' }}>
             Signing in won't keep this specific result -- create a new account above to save it.

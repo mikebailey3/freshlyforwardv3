@@ -173,7 +173,10 @@ describe('CareerCompassAssessmentPage', () => {
     expect(completeAssessment).toHaveBeenCalledTimes(2)
 
     const [path, options] = mockNavigate.mock.calls[0]
-    expect(path).toBe('/career-compass/results')
+    // assessmentId must be in the URL itself, not just router state -- a
+    // hard refresh or new-tab open on the results page has no router state
+    // to fall back on, only the query string.
+    expect(path).toBe('/career-compass/results?assessmentId=assess-1')
 
     const expectedArchetype = runArchetypeAssessment(archetypeQuestions, finalArchetypeAnswers)
     const expectedReadiness = calculateReadiness(forwardReadinessQuestions, finalReadinessAnswers)
