@@ -150,6 +150,7 @@ describe('completeAssessment', () => {
       secondary_barrier: readiness.secondaryBarrier,
       recommended_plan_slug: recommendation.planSlug,
       service_fit_pct: recommendation.serviceFitPct,
+      reasons: recommendation.reasons,
     })
     expect(insertCall.builder.update).not.toHaveBeenCalled()
   })

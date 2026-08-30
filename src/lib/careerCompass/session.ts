@@ -142,6 +142,7 @@ export async function completeAssessment(
         secondary_barrier: result.readiness.secondaryBarrier,
         recommended_plan_slug: result.recommendation.planSlug,
         service_fit_pct: result.recommendation.serviceFitPct,
+        reasons: result.recommendation.reasons,
       })
 
     return { error: insertError?.message ?? null }
