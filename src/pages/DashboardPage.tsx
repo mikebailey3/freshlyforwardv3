@@ -1,5 +1,6 @@
+
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { MemberLayout } from '@/components/MemberLayout'
 import { CircularProgress } from '@/components/CircularProgress'
 import { useAuth } from '@/context/AuthContext'
@@ -10,11 +11,28 @@ import { getRecentPublishedPosts } from '@/lib/blog'
 import { TOOL_TILES } from '@/data/tools'
 import {
   FileText, MessageSquare, Briefcase, Calendar, Mail,
-  Lightbulb, Flag, Loader2, Sparkles, Lock,
+  Lightbulb, Flag, Loader2, Sparkles, Lock, Compass, X,
 } from 'lucide-react'
 import type {
   Application, Message, MockInterview, CalendarEvent,
 } from '@/types'
+import type { ArchetypeKey } from '@/types/careerCompass'
+
+// Display labels mirror ARCHETYPE_COPY in CareerCompassResultsPage.tsx --
+// keep wording identical if that file's labels ever change.
+const ARCHETYPE_LABELS: Record<ArchetypeKey, string> = {
+  driver: 'Driver',
+  connector: 'Connector',
+  strategist: 'Strategist',
+  builder: 'Builder',
+  explorer: 'Explorer',
+  creator: 'Creator',
+}
+
+interface CompassSummary {
+  primary_archetype: ArchetypeKey
+  recommended_plan_slug: string | null
+}
 
 const TIPS_OF_THE_DAY = [
   'Tailor your resume for each application by matching your experience to the job description. It makes a big difference!',
@@ -48,6 +66,7 @@ function greeting() {
 export function DashboardPage() {
   const { user, profile, refreshProfile } = useAuth()
   const { canAccess } = useEntitlements()
+  const [searchParams] = useSearchParams()
   const [applications, setApplications] = useState<Application[]>([])
   const [unreadMessages, setUnreadMessages] = useState<Message[]>([])
   const [allMessages, setAllMessages] = useState<Message[]>([])
@@ -55,6 +74,9 @@ export function DashboardPage() {
   const [upcomingEvents, setUpcomingEvents] = useState<CalendarEvent[]>([])
   const [recentPosts, setRecentPosts] = useState<Awaited<ReturnType<typeof getRecentPublishedPosts>>>([])
   const [loading, setLoading] = useState(true)
+  const [compassResult, setCompassResult] = useState<CompassSummary | null>(null)
+  const [compassLoading, setCompassLoading] = useState(true)
+  const [savedBannerDismissed, setSavedBannerDismissed] = useState(false)
 
   useEffect(() => {
     if (!user) return
@@ -96,6 +118,37 @@ export function DashboardPage() {
     loadData()
   }, [user, refreshProfile])
 
+  // Own effect, deliberately not part of the Promise.all above -- a slow or
+  // failed Career Compass lookup should never block the rest of the
+  // dashboard from rendering.
+  useEffect(() => {
+    if (!user) return
+
+    let cancelled = false
+    supabase
+      .from('career_compass_results')
+      .select('primary_archetype, recommended_plan_slug')
+      .eq('user_id', user.id)
+      .eq('is_current', true)
+      .maybeSingle()
+      .then(
+        ({ data, error }) => {
+          if (cancelled) return
+          setCompassResult(!error && data ? (data as CompassSummary) : null)
+          setCompassLoading(false)
+        },
+        () => {
+          if (cancelled) return
+          setCompassResult(null)
+          setCompassLoading(false)
+        },
+      )
+
+    return () => {
+      cancelled = true
+    }
+  }, [user])
+
   if (loading) {
     return (
       <MemberLayout>
@@ -131,9 +184,25 @@ export function DashboardPage() {
   const applicationsGoal = 5
   const tip = TIPS_OF_THE_DAY[dayIndex(TIPS_OF_THE_DAY.length)]
   const motivation = MOTIVATIONS[dayIndex(MOTIVATIONS.length)]
+  const showSavedBanner = searchParams.get('compass') === 'saved' && !savedBannerDismissed
 
   return (
     <MemberLayout>
+      {showSavedBanner && (
+        <div className="mb-6 flex items-center justify-between gap-3 rounded-xl border border-primary-200 bg-primary-50 px-4 py-3">
+          <p className="text-sm font-medium text-primary-800">
+            Your Career Compass results have been saved to your account.
+          </p>
+          <button
+            type="button"
+            aria-label="Dismiss"
+            onClick={() => setSavedBannerDismissed(true)}
+            className="flex-shrink-0 rounded-full p-1 text-primary-600 transition-colors hover:bg-primary-100"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      )}
       {/* Greeting */}
       {/* font-display carries through at a small size on card section titles
           below too (not just this h1) -- the whole point of "Concierge

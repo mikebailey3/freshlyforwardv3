@@ -5,6 +5,7 @@ import { useAuth } from '@/context/AuthContext'
 
 const navigation = [
   ['/how-it-works', 'How It Works'],
+  ['/career-compass', 'Free Career Assessment'],
   ['/services', 'Services'],
   ['/why-freshlyforward', 'Why FreshlyForward'],
   ['/pricing', 'Pricing'],
