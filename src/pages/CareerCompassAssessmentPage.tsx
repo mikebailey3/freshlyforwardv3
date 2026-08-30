@@ -86,7 +86,7 @@ export function CareerCompassAssessmentPage() {
       // state entirely, and CareerCompassResultsPage's documented slow-path
       // fallback (re-fetching by assessmentId query param) depends on it
       // being there.
-      navigate(`/career-compass/results?assessmentId=${assessId}`, { state: { assessmentId: assessId, archetype, readiness, recommendation } })
+      navigate(`/career-compass/results?assessmentId=${encodeURIComponent(assessId)}`, { state: { assessmentId: assessId, archetype, readiness, recommendation } })
     },
     [navigate],
   )
