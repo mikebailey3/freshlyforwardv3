@@ -30,13 +30,17 @@ export interface CareerCompassResultInsert {
 export async function ensureAuthenticatedSession(
   client: SupabaseClient = defaultClient
 ): Promise<{ userId: string } | { error: string }> {
-  const { data: { session } } = await client.auth.getSession()
-  if (session?.user) return { userId: session.user.id }
+  try {
+    const { data: { session } } = await client.auth.getSession()
+    if (session?.user) return { userId: session.user.id }
 
-  const { data, error } = await client.auth.signInAnonymously()
-  if (error) return { error: error.message }
-  if (!data.user) return { error: 'Anonymous sign-in returned no user.' }
-  return { userId: data.user.id }
+    const { data, error } = await client.auth.signInAnonymously()
+    if (error) return { error: error.message }
+    if (!data.user) return { error: 'Anonymous sign-in returned no user.' }
+    return { userId: data.user.id }
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : 'Unknown error' }
+  }
 }
 
 /**
@@ -47,31 +51,35 @@ export async function startOrResumeAssessment(
   userId: string,
   client: SupabaseClient = defaultClient
 ): Promise<AssessmentProgress | { error: string }> {
-  const { data: existing, error: selectError } = await client
-    .from('career_compass_assessments')
-    .select('id, archetype_answers, readiness_answers')
-    .eq('user_id', userId)
-    .eq('status', 'in_progress')
-    .maybeSingle()
+  try {
+    const { data: existing, error: selectError } = await client
+      .from('career_compass_assessments')
+      .select('id, archetype_answers, readiness_answers')
+      .eq('user_id', userId)
+      .eq('status', 'in_progress')
+      .maybeSingle()
 
-  if (selectError) return { error: selectError.message }
-  if (existing) {
-    const row = existing as { id: string; archetype_answers: ArchetypeAnswers | null; readiness_answers: ReadinessAnswers | null }
-    return {
-      assessmentId: row.id,
-      archetypeAnswers: row.archetype_answers ?? {},
-      readinessAnswers: row.readiness_answers ?? {},
+    if (selectError) return { error: selectError.message }
+    if (existing) {
+      const row = existing as { id: string; archetype_answers: ArchetypeAnswers | null; readiness_answers: ReadinessAnswers | null }
+      return {
+        assessmentId: row.id,
+        archetypeAnswers: row.archetype_answers ?? {},
+        readinessAnswers: row.readiness_answers ?? {},
+      }
     }
+
+    const { data: created, error: insertError } = await client
+      .from('career_compass_assessments')
+      .insert({ user_id: userId })
+      .select('id')
+      .single()
+
+    if (insertError) return { error: insertError.message }
+    return { assessmentId: (created as { id: string }).id, archetypeAnswers: {}, readinessAnswers: {} }
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : 'Unknown error' }
   }
-
-  const { data: created, error: insertError } = await client
-    .from('career_compass_assessments')
-    .insert({ user_id: userId })
-    .select('id')
-    .single()
-
-  if (insertError) return { error: insertError.message }
-  return { assessmentId: (created as { id: string }).id, archetypeAnswers: {}, readinessAnswers: {} }
 }
 
 /** Autosaves answers to the caller's open assessment. Safe to call after every answer. */
@@ -81,12 +89,16 @@ export async function saveAssessmentAnswers(
   readinessAnswers: ReadinessAnswers,
   client: SupabaseClient = defaultClient
 ): Promise<{ error: string | null }> {
-  const { error } = await client
-    .from('career_compass_assessments')
-    .update({ archetype_answers: archetypeAnswers, readiness_answers: readinessAnswers })
-    .eq('id', assessmentId)
+  try {
+    const { error } = await client
+      .from('career_compass_assessments')
+      .update({ archetype_answers: archetypeAnswers, readiness_answers: readinessAnswers })
+      .eq('id', assessmentId)
 
-  return { error: error?.message ?? null }
+    return { error: error?.message ?? null }
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : 'Unknown error' }
+  }
 }
 
 /**
@@ -99,37 +111,41 @@ export async function completeAssessment(
   result: CareerCompassResultInsert,
   client: SupabaseClient = defaultClient
 ): Promise<{ error: string | null }> {
-  const { error: statusError } = await client
-    .from('career_compass_assessments')
-    .update({ status: 'completed', completed_at: new Date().toISOString() })
-    .eq('id', result.assessmentId)
+  try {
+    const { error: statusError } = await client
+      .from('career_compass_assessments')
+      .update({ status: 'completed', completed_at: new Date().toISOString() })
+      .eq('id', result.assessmentId)
 
-  if (statusError) return { error: statusError.message }
+    if (statusError) return { error: statusError.message }
 
-  const { error: supersedeError } = await client
-    .from('career_compass_results')
-    .update({ is_current: false })
-    .eq('user_id', result.userId)
-    .eq('is_current', true)
+    const { error: supersedeError } = await client
+      .from('career_compass_results')
+      .update({ is_current: false })
+      .eq('user_id', result.userId)
+      .eq('is_current', true)
 
-  if (supersedeError) return { error: supersedeError.message }
+    if (supersedeError) return { error: supersedeError.message }
 
-  const { error: insertError } = await client
-    .from('career_compass_results')
-    .insert({
-      assessment_id: result.assessmentId,
-      user_id: result.userId,
-      is_current: true,
-      dimension_scores: result.archetype.dimensionScores,
-      archetype_scores: result.archetype.archetypeScores,
-      primary_archetype: result.archetype.primaryArchetype,
-      secondary_archetype: result.archetype.secondaryArchetype,
-      readiness_scores: result.readiness.dimensionScores,
-      primary_barrier: result.readiness.primaryBarrier,
-      secondary_barrier: result.readiness.secondaryBarrier,
-      recommended_plan_slug: result.recommendation.planSlug,
-      service_fit_pct: result.recommendation.serviceFitPct,
-    })
+    const { error: insertError } = await client
+      .from('career_compass_results')
+      .insert({
+        assessment_id: result.assessmentId,
+        user_id: result.userId,
+        is_current: true,
+        dimension_scores: result.archetype.dimensionScores,
+        archetype_scores: result.archetype.archetypeScores,
+        primary_archetype: result.archetype.primaryArchetype,
+        secondary_archetype: result.archetype.secondaryArchetype,
+        readiness_scores: result.readiness.dimensionScores,
+        primary_barrier: result.readiness.primaryBarrier,
+        secondary_barrier: result.readiness.secondaryBarrier,
+        recommended_plan_slug: result.recommendation.planSlug,
+        service_fit_pct: result.recommendation.serviceFitPct,
+      })
 
-  return { error: insertError?.message ?? null }
+    return { error: insertError?.message ?? null }
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : 'Unknown error' }
+  }
 }

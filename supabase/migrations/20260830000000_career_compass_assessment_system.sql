@@ -72,6 +72,13 @@ CREATE TABLE IF NOT EXISTS career_compass_assessments (
 
 CREATE INDEX IF NOT EXISTS idx_career_compass_assessments_user ON career_compass_assessments(user_id);
 
+-- Only one in-progress assessment at a time per user (prevents a
+-- check-then-act race between concurrent startOrResumeAssessment calls
+-- from creating two open assessments for the same user).
+CREATE UNIQUE INDEX IF NOT EXISTS idx_one_in_progress_assessment_per_user
+  ON career_compass_assessments(user_id)
+  WHERE status = 'in_progress';
+
 ALTER TABLE career_compass_assessments ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "manage_own_assessment" ON career_compass_assessments;

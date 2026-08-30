@@ -119,11 +119,57 @@ describe('completeAssessment', () => {
   }
   const recommendation: PlanRecommendation = { planSlug: 'founding-member', serviceFitPct: 80, reasons: ['because'] }
 
-  it('always supersedes the prior current result before inserting the new one (every user has a uid now)', async () => {
-    const fromCalls: string[] = []
-    const client = makeFakeClient({ fromImpl: (table) => { fromCalls.push(table); return makeBuilder({ data: null, error: null }) } })
+  it('supersedes the prior current result via an is_current update before inserting the new one, with correct field mappings', async () => {
+    const calls: { table: string; builder: Record<string, unknown> }[] = []
+    const client = makeFakeClient({
+      fromImpl: (table) => {
+        const builder = makeBuilder({ data: null, error: null })
+        calls.push({ table, builder })
+        return builder
+      },
+    })
     await completeAssessment({ assessmentId: 'assess-1', userId: 'user-1', archetype, readiness, recommendation }, client)
-    expect(fromCalls.filter((t) => t === 'career_compass_results').length).toBe(2)
+
+    const resultsCalls = calls.filter((c) => c.table === 'career_compass_results')
+    expect(resultsCalls).toHaveLength(2)
+
+    const [supersedeCall, insertCall] = resultsCalls
+    expect(supersedeCall.builder.update).toHaveBeenCalledWith({ is_current: false })
+    expect(supersedeCall.builder.insert).not.toHaveBeenCalled()
+
+    expect(insertCall.builder.insert).toHaveBeenCalledWith({
+      assessment_id: 'assess-1',
+      user_id: 'user-1',
+      is_current: true,
+      dimension_scores: archetype.dimensionScores,
+      archetype_scores: archetype.archetypeScores,
+      primary_archetype: archetype.primaryArchetype,
+      secondary_archetype: archetype.secondaryArchetype,
+      readiness_scores: readiness.dimensionScores,
+      primary_barrier: readiness.primaryBarrier,
+      secondary_barrier: readiness.secondaryBarrier,
+      recommended_plan_slug: recommendation.planSlug,
+      service_fit_pct: recommendation.serviceFitPct,
+    })
+    expect(insertCall.builder.update).not.toHaveBeenCalled()
+  })
+
+  it('stops and returns an error if superseding the prior current result fails, without ever inserting the new one', async () => {
+    let resultsCallCount = 0
+    const client = makeFakeClient({
+      fromImpl: (table) => {
+        if (table === 'career_compass_results') {
+          resultsCallCount += 1
+          if (resultsCallCount === 1) {
+            return makeBuilder({ data: null, error: { message: 'supersede failed' } })
+          }
+        }
+        return makeBuilder({ data: null, error: null })
+      },
+    })
+    const result = await completeAssessment({ assessmentId: 'assess-1', userId: 'user-1', archetype, readiness, recommendation }, client)
+    expect(result.error).toBe('supersede failed')
+    expect(resultsCallCount).toBe(1)
   })
 
   it('stops and returns an error if marking the assessment completed fails, without touching results at all', async () => {
