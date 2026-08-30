@@ -346,6 +346,15 @@ are.
    does not redesign `DashboardPage.tsx` or `MemberLayout.tsx` beyond
    one new card and one new nav item, per the explicit
    don't-redesign-the-dashboard requirement.
+6. **Sign-in (not sign-up) cannot preserve an anonymous assessment**
+   (added 2026-08-30, UI plan). The in-place anonymous-to-permanent
+   conversion only works when the visitor creates a NEW account
+   (`updateUser` keeps the same `auth.uid()`). A visitor who instead
+   signs into an EXISTING account gets that account's own session,
+   discarding the anonymous one -- there is no safe way to reconcile the
+   two without new server-side JWT-verification infrastructure (out of
+   scope for V1). The UI must say so plainly rather than imply seamless
+   continuity; this is an accepted, documented gap, not an oversight.
 
 ## 11. Acceptance Criteria
 
