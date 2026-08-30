@@ -828,7 +828,7 @@ export function runArchetypeAssessment(
 - [ ] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run src/lib/careerCompass/archetypeEngine.test.ts`
-Expected: PASS (7 tests)
+Expected: PASS (8 tests)
 
 - [ ] **Step 5: Commit**
 
