@@ -109,4 +109,52 @@ describe('WizardShell', () => {
     renderShell({ children: <div>Unique child content marker</div> })
     expect(screen.getByText('Unique child content marker')).toBeInTheDocument()
   })
+
+  it('leaves the Next button enabled when nextDisabled is omitted, preserving existing consumers like OnboardingPage', () => {
+    renderShell()
+    expect(screen.getByRole('button', { name: /Continue/ })).not.toBeDisabled()
+  })
+
+  it('disables the Next button when nextDisabled is true', () => {
+    renderShell({ nextDisabled: true })
+    expect(screen.getByRole('button', { name: /Continue/ })).toBeDisabled()
+  })
+
+  it('shows nextHint only while nextDisabled is true', () => {
+    const { rerender } = render(
+      <WizardShell
+        steps={steps}
+        currentStep={0}
+        completedSteps={[]}
+        onBack={vi.fn()}
+        onNext={vi.fn()}
+        backDisabled={false}
+        nextLabel="Continue"
+        nextDisabled
+        nextHint="Select an answer to continue"
+        progressLabel="Onboarding progress"
+      >
+        <div>Step content</div>
+      </WizardShell>,
+    )
+    expect(screen.getByText('Select an answer to continue')).toBeInTheDocument()
+
+    rerender(
+      <WizardShell
+        steps={steps}
+        currentStep={0}
+        completedSteps={[]}
+        onBack={vi.fn()}
+        onNext={vi.fn()}
+        backDisabled={false}
+        nextLabel="Continue"
+        nextDisabled={false}
+        nextHint="Select an answer to continue"
+        progressLabel="Onboarding progress"
+      >
+        <div>Step content</div>
+      </WizardShell>,
+    )
+    expect(screen.queryByText('Select an answer to continue')).not.toBeInTheDocument()
+  })
 })

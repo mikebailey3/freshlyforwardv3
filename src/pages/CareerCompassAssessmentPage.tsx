@@ -187,6 +187,7 @@ export function CareerCompassAssessmentPage() {
   const completedSteps = isArchetypePhase ? [] : ['archetype']
 
   const nextLabel = submitting ? 'Saving your results…' : currentQuestionIndex === TOTAL_COUNT - 1 ? 'See My Results' : 'Next'
+  const nextDisabled = busy || currentAnswerValue() === undefined
 
   return (
     <WizardShell
@@ -197,6 +198,8 @@ export function CareerCompassAssessmentPage() {
       onNext={handleRetry}
       backDisabled={currentQuestionIndex === 0}
       nextLabel={nextLabel}
+      nextDisabled={nextDisabled}
+      nextHint={nextDisabled && !busy ? 'Select an answer to continue' : undefined}
       progressLabel="Career Compass progress"
       saving={bootstrapping}
       brandLabel="Career Compass"

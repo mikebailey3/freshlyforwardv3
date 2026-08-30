@@ -16,6 +16,10 @@ export interface WizardShellProps {
   onNext: () => void
   backDisabled: boolean
   nextLabel: string
+  /** Defaults to false -- must not change any existing consumer's behavior (e.g. OnboardingPage never passes this and always has a valid next action). */
+  nextDisabled?: boolean
+  /** Shown next to the Next button only while nextDisabled is true, e.g. "Select an answer to continue". */
+  nextHint?: string
   /**
    * Required, not derived from brandLabel -- this is the exact
    * aria-label text on the progress bar. Kept explicit so no consumer
@@ -40,6 +44,8 @@ export function WizardShell({
   backDisabled,
   nextLabel,
   progressLabel,
+  nextDisabled = false,
+  nextHint,
   saving = false,
   savedIndicator = false,
   brandLabel = 'FreshlyForward',
@@ -144,13 +150,19 @@ export function WizardShell({
             <ChevronLeft className="h-4 w-4" />
             Back
           </button>
-          <button
-            onClick={onNext}
-            className="flex items-center gap-1.5 rounded-full bg-primary-600 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-700"
-          >
-            {nextLabel}
-            <ChevronRight className="h-4 w-4" />
-          </button>
+          <div className="flex items-center gap-3">
+            {nextDisabled && nextHint && (
+              <span className="text-xs font-medium text-neutral-500">{nextHint}</span>
+            )}
+            <button
+              onClick={onNext}
+              disabled={nextDisabled}
+              className="flex items-center gap-1.5 rounded-full bg-primary-600 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              {nextLabel}
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
         </div>
       </div>
     </div>

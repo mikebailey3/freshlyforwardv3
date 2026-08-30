@@ -1,9 +1,20 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { CareerCompassAssessmentPage } from './CareerCompassAssessmentPage'
 import { archetypeQuestions } from '@/data/careerCompassQuestions'
-import type { ArchetypeAnswers } from '@/types/careerCompass'
+import { forwardReadinessQuestions } from '@/data/forwardReadinessQuestions'
+import { runArchetypeAssessment } from '@/lib/careerCompass/archetypeEngine'
+import { calculateReadiness } from '@/lib/careerCompass/readinessEngine'
+import { recommendPlan } from '@/lib/careerCompass/recommendationEngine'
+import type { ArchetypeAnswer, ArchetypeAnswers, ReadinessAnswers } from '@/types/careerCompass'
+
+const { mockNavigate } = vi.hoisted(() => ({ mockNavigate: vi.fn() }))
+
+vi.mock('react-router-dom', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('react-router-dom')>()
+  return { ...actual, useNavigate: () => mockNavigate }
+})
 
 vi.mock('@/lib/careerCompass/session', () => ({
   ensureAuthenticatedSession: vi.fn(),
@@ -13,7 +24,7 @@ vi.mock('@/lib/careerCompass/session', () => ({
 }))
 
 import {
-  ensureAuthenticatedSession, startOrResumeAssessment, saveAssessmentAnswers,
+  ensureAuthenticatedSession, startOrResumeAssessment, saveAssessmentAnswers, completeAssessment,
 } from '@/lib/careerCompass/session'
 
 function renderPage() {
@@ -109,5 +120,73 @@ describe('CareerCompassAssessmentPage', () => {
       { [archetypeQuestions[0].id]: 2 },
       {},
     )
+  })
+
+  it('does not navigate on a failed completeAssessment, then navigates with the exact result shape after a successful retry', async () => {
+    const ARCHETYPE_COUNT = archetypeQuestions.length
+    const READINESS_COUNT = forwardReadinessQuestions.length
+
+    // Every question answered with a known, fixed value so the expected
+    // engine outputs can be computed independently below.
+    const finalArchetypeAnswers: ArchetypeAnswers = {}
+    for (let i = 0; i < ARCHETYPE_COUNT; i++) finalArchetypeAnswers[archetypeQuestions[i].id] = 3 as ArchetypeAnswer
+    const finalReadinessAnswers: ReadinessAnswers = {}
+    for (let i = 0; i < READINESS_COUNT; i++) finalReadinessAnswers[forwardReadinessQuestions[i].id] = 0
+
+    // Resumed data covers everything except the very first archetype
+    // question (about to be answered live) and the very last readiness
+    // question -- so one click lands the visitor directly on question 33.
+    const resumedArchetype: ArchetypeAnswers = { ...finalArchetypeAnswers }
+    delete resumedArchetype[archetypeQuestions[0].id]
+    const resumedReadiness: ReadinessAnswers = { ...finalReadinessAnswers }
+    const lastReadinessQuestion = forwardReadinessQuestions[READINESS_COUNT - 1]
+    delete resumedReadiness[lastReadinessQuestion.id]
+
+    vi.mocked(ensureAuthenticatedSession).mockResolvedValue({ userId: 'user-1' })
+    vi.mocked(startOrResumeAssessment).mockResolvedValue({
+      assessmentId: 'assess-1',
+      archetypeAnswers: resumedArchetype,
+      readinessAnswers: resumedReadiness,
+    })
+    vi.mocked(saveAssessmentAnswers).mockResolvedValue({ error: null })
+    vi.mocked(completeAssessment)
+      .mockResolvedValueOnce({ error: 'db unavailable' })
+      .mockResolvedValueOnce({ error: null })
+
+    renderPage()
+
+    // Answering question 1 merges in the resumed progress and lands
+    // directly on the last (33rd) question.
+    fireEvent.click(screen.getByRole('button', { name: '3' }))
+    await screen.findByText(lastReadinessQuestion.text)
+
+    // Answering the final question triggers completion, which fails.
+    fireEvent.click(screen.getByRole('button', { name: lastReadinessQuestion.options[0].label }))
+    await screen.findByText(/couldn't save your results/i)
+    expect(completeAssessment).toHaveBeenCalledTimes(1)
+    expect(mockNavigate).not.toHaveBeenCalled()
+
+    // Retrying re-runs the same (cheap, pure) computation and succeeds.
+    fireEvent.click(screen.getByRole('button', { name: 'Try again' }))
+
+    await waitFor(() => expect(mockNavigate).toHaveBeenCalledTimes(1))
+    expect(completeAssessment).toHaveBeenCalledTimes(2)
+
+    const [path, options] = mockNavigate.mock.calls[0]
+    expect(path).toBe('/career-compass/results')
+
+    const expectedArchetype = runArchetypeAssessment(archetypeQuestions, finalArchetypeAnswers)
+    const expectedReadiness = calculateReadiness(forwardReadinessQuestions, finalReadinessAnswers)
+    const expectedRecommendation = recommendPlan(expectedReadiness)
+
+    expect(Object.keys(options.state).sort()).toEqual(
+      ['archetype', 'assessmentId', 'readiness', 'recommendation'].sort(),
+    )
+    expect(options.state).toEqual({
+      assessmentId: 'assess-1',
+      archetype: expectedArchetype,
+      readiness: expectedReadiness,
+      recommendation: expectedRecommendation,
+    })
   })
 })
