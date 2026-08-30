@@ -112,6 +112,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const signUp = async (email: string, password: string) => {
+    const { data: { session: currentSession } } = await supabase.auth.getSession()
+
+    if (currentSession?.user?.is_anonymous) {
+      // This visitor already has a real (temporary) auth.uid() from an
+      // earlier Supabase Anonymous Sign-In (started by Career Compass or
+      // any future anonymous-first flow). Converting in place -- rather
+      // than creating a brand-new account -- keeps that exact uid, so
+      // every already-saved row scoped by `user_id = auth.uid()` is
+      // instantly and correctly owned by the new permanent account with
+      // zero data migration and no separate "claim" step.
+      const { error } = await supabase.auth.updateUser({ email, password })
+      return { error: error?.message ?? null }
+    }
+
     const { error } = await supabase.auth.signUp({ email, password })
     return { error: error?.message ?? null }
   }

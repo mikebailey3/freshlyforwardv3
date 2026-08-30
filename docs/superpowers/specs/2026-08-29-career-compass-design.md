@@ -81,17 +81,30 @@ never required for the feature to function.
 ```
 LandingPage "Take the Free Career Compass" CTA (new)
   -> /career-compass                (intro, PUBLIC)
-  -> /career-compass/assessment     (one question per screen, PUBLIC,
-                                      autosaves to localStorage + a
-                                      Supabase row keyed by an
-                                      anonymous session id)
+  -> /career-compass/assessment     (one question per screen, PUBLIC.
+                                      Silently establishes a real
+                                      Supabase Anonymous Sign-In session
+                                      (`auth.signInAnonymously()`) on
+                                      first answer if none exists yet,
+                                      then autosaves to a Supabase row
+                                      keyed by that session's genuine
+                                      `auth.uid()` — see section 8 for
+                                      why this replaced an earlier,
+                                      insecure client-generated-id design)
   -> /career-compass/results        (full report, PUBLIC — shown
                                       BEFORE any signup wall)
   -> "Save My Career Compass" CTA
-  -> /signup                        (existing page, unmodified)
-  -> AuthContext claims the anonymous assessment on successful auth:
-       attaches user_id, KEEPS the anonymous_session_id for audit
-       trail, never deletes answers
+  -> /signup                        (existing page; `AuthContext.signUp`
+                                      detects the active anonymous
+                                      session and converts it to a
+                                      permanent account in place via
+                                      `supabase.auth.updateUser()`
+                                      instead of creating a new one —
+                                      the `auth.uid()` never changes, so
+                                      every already-saved assessment row
+                                      is instantly and correctly owned
+                                      by the new permanent account with
+                                      zero data migration)
   -> /dashboard, new Career Compass card appears
   -> full report reachable anytime from a member nav item
 ```
@@ -237,14 +250,29 @@ Validated against the required test scenarios:
 
 ## 8. Data Model
 
-Two new tables, one migration, following the existing phase-numbered
+**Revision note (2026-08-30):** the original version of this section
+specified a client-generated `anonymous_session_id` string as the
+access-control boundary for anonymous visitors, with RLS "matching a
+value they hold client-side." That is not something a Postgres RLS
+policy can actually verify -- the shared `anon` Postgres role has no
+per-visitor identity, so any policy built on that idea can only ever
+check "is this row unclaimed," not "does this caller hold the right
+value." A task review caught this as a full read/write/claim exposure
+across every visitor's data before it was ever applied to a real
+database. This section now specifies the corrected design: every
+visitor, anonymous or not, gets a genuine (if temporary) `auth.uid()`
+via **Supabase Anonymous Sign-In**, and both tables use the exact same
+ordinary `user_id = auth.uid()` ownership policy already used
+everywhere else in this schema.
+
+Two tables, one migration, following the existing phase-numbered
 migration convention:
 
 **`career_compass_assessments`**
 - `id uuid pk`
-- `user_id uuid null` (nullable until claimed)
-- `anonymous_session_id text null` (unguessable client-generated id;
-  kept permanently even after claiming, for audit trail)
+- `user_id uuid not null references auth.users(id)` (never null -- even
+  an anonymous visitor has a real, if temporary, `auth.uid()` from the
+  moment they start the assessment)
 - `version text default '1.0'`
 - `archetype_answers jsonb`
 - `readiness_answers jsonb`
@@ -254,9 +282,11 @@ migration convention:
 **`career_compass_results`**
 - `id uuid pk`
 - `assessment_id uuid fk`
-- `user_id uuid null`
+- `user_id uuid not null references auth.users(id)`
 - `is_current boolean default true` (supports retakes without deleting
-  history — only one `is_current=true` row per user)
+  history -- only one `is_current=true` row per user, enforced for
+  every user including still-anonymous ones, since `user_id` is always
+  present now)
 - `dimension_scores jsonb`, `archetype_scores jsonb`
 - `primary_archetype text`, `secondary_archetype text`
 - `readiness_scores jsonb`
@@ -264,13 +294,17 @@ migration convention:
 - `recommended_plan_slug text null`, `service_fit_pct int`
 - `created_at`
 
-**RLS:** authenticated users may select/insert/update rows where
-`user_id = auth.uid()`. Anonymous (anon-key) clients may
-select/insert/update rows where `anonymous_session_id` matches a value
-they hold client-side. This is inherently weaker than
-auth.uid()-scoped RLS (anyone who obtains the id could read that one
-row), mitigated by: the id is a random UUID, never placed in a URL,
-and never logged. Documented as an accepted risk in section 10.
+**RLS:** a single policy per table, `FOR ALL TO authenticated USING
+(user_id = auth.uid()) WITH CHECK (user_id = auth.uid())`. No `anon`-role
+policy exists on either table at all -- Supabase Anonymous Sign-In issues
+a real JWT and puts the request under the `authenticated` role (flagged
+`is_anonymous: true` on the user row), so the ordinary owner-scoped
+policy already covers anonymous visitors correctly. There is no separate
+"claim" policy or claim data-operation: "claiming" is an identity-layer
+operation (`supabase.auth.updateUser()` converting the anonymous account
+to a permanent one in place, see section 4), and since `auth.uid()` never
+changes during that conversion, the existing ownership policy keeps
+working unmodified before and after signup.
 
 ## 9. AI Usage
 
@@ -286,22 +320,29 @@ are.
 
 ## 10. Risks / Accepted Trade-offs
 
-1. **Anonymous sessions are new to this codebase** — no prior
-   `localStorage` usage exists anywhere in `src/`. This adds a new
-   testing surface (refresh/interruption/resume, expired session).
+1. **Anonymous sessions are new to this codebase** -- no prior use of
+   Supabase Anonymous Sign-In exists anywhere in this app. This adds a
+   new testing surface (refresh/interruption/resume, anonymous-session
+   expiry per this Supabase project's auth settings, the in-place
+   anonymous-to-permanent conversion path in `AuthContext.signUp`).
 2. **Naming collision risk**: "Search Readiness" (profile completeness,
    existing) vs. "Forward Readiness" (career-search confidence, new)
    will appear near each other on the dashboard. Copy must keep them
    unmistakably distinct.
-3. **No dedicated analytics pipeline in V1** — lifecycle events reuse
+3. **No dedicated analytics pipeline in V1** -- lifecycle events reuse
    `career_timeline` for authenticated completion milestones only;
    granular anonymous funnel analytics (started/abandoned per-question)
    are out of scope for V1 per YAGNI. Revisit if funnel data becomes a
    real product need.
-4. **Anonymous RLS is weaker than authenticated RLS** by construction
-   (a session id substitutes for `auth.uid()`). Accepted given the id
-   is unguessable and never exposed in a URL or log.
-5. **Dashboard/nav integration is intentionally minimal** — this spec
+4. **Anonymous-to-permanent conversion depends on this Supabase
+   project's email-confirmation settings** -- if email confirmation is
+   required, `updateUser({ email, password })` may leave the account in
+   a pending-confirmation state rather than immediately fully permanent;
+   the `auth.uid()` (and therefore every already-saved assessment row's
+   ownership) is unaffected either way, but the UX copy after "Save My
+   Career Compass" should account for a possible confirmation step. Not
+   a data-safety risk, a UX-sequencing one, deferred to the UI plan.
+5. **Dashboard/nav integration is intentionally minimal** -- this spec
    does not redesign `DashboardPage.tsx` or `MemberLayout.tsx` beyond
    one new card and one new nav item, per the explicit
    don't-redesign-the-dashboard requirement.
