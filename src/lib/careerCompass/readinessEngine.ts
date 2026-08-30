@@ -1,5 +1,5 @@
 import type {
-  ReadinessQuestion, ReadinessAnswers, ReadinessResult, ReadinessBarrierKey,
+  ReadinessQuestion, ReadinessAnswers, ReadinessResult, ReadinessBarrierKey, TransitionType,
 } from '@/types/careerCompass'
 
 /**
@@ -44,7 +44,8 @@ export function calculateReadiness(
   const transitionType = transitionQuestion && transitionOptionIndex !== undefined
     ? transitionQuestion.options[transitionOptionIndex]?.transitionValue ?? null
     : null
-  const isComplexTransition = transitionType !== null && transitionType !== 'advancement'
+  const COMPLEX_TRANSITIONS: TransitionType[] = ['career_change', 'first_job', 'returning']
+  const isComplexTransition = transitionType !== null && COMPLEX_TRANSITIONS.includes(transitionType)
 
   const overallScore = Math.round(
     careerDirection * 0.25 +

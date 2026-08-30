@@ -1,6 +1,15 @@
 import { describe, it, expect } from 'vitest'
 import { recommendPlan } from './recommendationEngine'
+import { calculateReadiness } from './readinessEngine'
+import { forwardReadinessQuestions } from '@/data/forwardReadinessQuestions'
 import type { ReadinessResult } from '@/types/careerCompass'
+
+function optionIndex(questionId: string, label: string): number {
+  const q = forwardReadinessQuestions.find((q) => q.id === questionId)!
+  const idx = q.options.findIndex((o) => o.label === label)
+  if (idx === -1) throw new Error(`Option not found: ${questionId} / ${label}`)
+  return idx
+}
 
 function makeReadiness(overrides: Partial<ReadinessResult>): ReadinessResult {
   return {
@@ -116,5 +125,16 @@ describe('recommendPlan', () => {
   it('is fully deterministic across repeated calls with identical input', () => {
     const readiness = makeReadiness({ supportNeed: 50 })
     expect(recommendPlan(readiness)).toEqual(recommendPlan(readiness))
+  })
+
+  it('integration: industry_change + high support need never routes to Career Concierge (regression for allowlist bug)', () => {
+    const answers = {
+      rf_transition_type: optionIndex('rf_transition_type', 'Changing industries'),
+      rf_support_need: optionIndex('rf_support_need', "I'd like someone actively managing my search for me."),
+    }
+    const readiness = calculateReadiness(forwardReadinessQuestions, answers)
+    expect(readiness.isComplexTransition).toBe(false)
+    const result = recommendPlan(readiness)
+    expect(result.planSlug).not.toBe('career-concierge')
   })
 })

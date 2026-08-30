@@ -78,6 +78,18 @@ describe('calculateReadiness', () => {
     })
     expect(advancement.transitionType).toBe('advancement')
     expect(advancement.isComplexTransition).toBe(false)
+
+    const industryChange = calculateReadiness(forwardReadinessQuestions, {
+      rf_transition_type: optionIndex('rf_transition_type', 'Changing industries'),
+    })
+    expect(industryChange.transitionType).toBe('industry_change')
+    expect(industryChange.isComplexTransition).toBe(false)
+
+    const returning = calculateReadiness(forwardReadinessQuestions, {
+      rf_transition_type: optionIndex('rf_transition_type', 'Returning to work after time away'),
+    })
+    expect(returning.transitionType).toBe('returning')
+    expect(returning.isComplexTransition).toBe(true)
   })
 
   it('identifies the lowest-scoring dimension as the primary barrier', () => {
