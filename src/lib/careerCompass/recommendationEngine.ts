@@ -27,7 +27,7 @@ export function recommendPlan(readiness: ReadinessResult): PlanRecommendation {
   } else if (supportNeed >= 80 && isComplexTransition) {
     planSlug = 'career-concierge'
     reasons.push("You're navigating a complex career transition.", 'You want fully managed, hands-on support.')
-  } else if (interviewIsBarrier || (supportNeed >= 67 && !isComplexTransition) || urgency >= 100) {
+  } else if (interviewIsBarrier || supportNeed >= 67 || urgency >= 100) {
     planSlug = 'career-growth'
     reasons.push(
       interviewIsBarrier

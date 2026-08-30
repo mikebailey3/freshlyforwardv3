@@ -91,6 +91,16 @@ describe('recommendPlan', () => {
     expect(result.planSlug).toBe('career-growth')
   })
 
+  it('routes mid-support complex transitions (supportNeed 34-79) to Career Growth, not Founding Member', () => {
+    const readiness = makeReadiness({
+      supportNeed: 70,
+      isComplexTransition: true,
+      transitionType: 'industry_change',
+    })
+    const result = recommendPlan(readiness)
+    expect(result.planSlug).toBe('career-growth')
+  })
+
   it('never returns a service fit above 97 or below 0', () => {
     const strong = recommendPlan(makeReadiness({ supportNeed: 100, isComplexTransition: true, transitionType: 'career_change' }))
     expect(strong.serviceFitPct).toBeLessThanOrEqual(97)
