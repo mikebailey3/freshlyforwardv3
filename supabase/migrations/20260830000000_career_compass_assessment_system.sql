@@ -89,12 +89,15 @@ CREATE POLICY "manage_own_assessment"
   WITH CHECK (user_id = auth.uid());
 
 CREATE OR REPLACE FUNCTION set_career_compass_assessments_updated_at()
-RETURNS trigger AS $$
+RETURNS trigger
+LANGUAGE plpgsql
+SET search_path = public
+AS $$
 BEGIN
   NEW.updated_at = now();
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$;
 
 DROP TRIGGER IF EXISTS trg_career_compass_assessments_updated_at ON career_compass_assessments;
 CREATE TRIGGER trg_career_compass_assessments_updated_at
