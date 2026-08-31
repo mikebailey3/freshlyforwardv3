@@ -8,6 +8,7 @@ import { useEntitlements } from '@/hooks/useEntitlements'
 import { supabase } from '@/lib/supabase'
 import { ensureProfile, calculateSearchReadiness, getReadinessFixLink } from '@/lib/profile'
 import { getRecentPublishedPosts } from '@/lib/blog'
+import { ARCHETYPE_LABELS } from '@/lib/careerCompass'
 import { TOOL_TILES } from '@/data/tools'
 import {
   FileText, MessageSquare, Briefcase, Calendar, Mail,
@@ -17,17 +18,6 @@ import type {
   Application, Message, MockInterview, CalendarEvent,
 } from '@/types'
 import type { ArchetypeKey } from '@/types/careerCompass'
-
-// Display labels mirror ARCHETYPE_COPY in CareerCompassResultsPage.tsx --
-// keep wording identical if that file's labels ever change.
-const ARCHETYPE_LABELS: Record<ArchetypeKey, string> = {
-  driver: 'Driver',
-  connector: 'Connector',
-  strategist: 'Strategist',
-  builder: 'Builder',
-  explorer: 'Explorer',
-  creator: 'Creator',
-}
 
 interface CompassSummary {
   primary_archetype: ArchetypeKey

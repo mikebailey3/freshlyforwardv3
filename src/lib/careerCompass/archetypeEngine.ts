@@ -63,3 +63,15 @@ export function runArchetypeAssessment(
     secondaryArchetype: secondary,
   }
 }
+
+// Short display labels for each archetype. Shared by DashboardPage and
+// ForwardDnaPage's CompassSummaryCard so there is exactly one place
+// this mapping lives (previously duplicated locally in DashboardPage.tsx).
+export const ARCHETYPE_LABELS: Record<ArchetypeKey, string> = {
+  driver: 'Driver',
+  connector: 'Connector',
+  strategist: 'Strategist',
+  builder: 'Builder',
+  explorer: 'Explorer',
+  creator: 'Creator',
+}
