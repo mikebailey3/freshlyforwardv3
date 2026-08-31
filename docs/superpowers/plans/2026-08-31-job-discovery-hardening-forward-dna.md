@@ -61,7 +61,7 @@
 **Interfaces:**
 - Produces: `ScrapedJobInput` (shared shape used by every provider in this group), `parseGreenhouseJobs(raw: unknown, companySlug: string): ScrapedJobInput[]`, `fetchGreenhouseJobs(companySlug: string): Promise<ScrapedJobInput[]>`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```ts
 // scripts/jobSources/greenhouse.test.ts
@@ -106,12 +106,12 @@ describe('parseGreenhouseJobs', () => {
 })
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `npx vitest run scripts/jobSources/greenhouse.test.ts`
 Expected: FAIL — `./greenhouse` does not exist yet.
 
-- [ ] **Step 3: Write the shared type and the minimal implementation**
+- [x] **Step 3: Write the shared type and the minimal implementation**
 
 ```ts
 // scripts/jobSources/types.ts
@@ -182,17 +182,17 @@ export async function fetchGreenhouseJobs(companySlug: string): Promise<ScrapedJ
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run scripts/jobSources/greenhouse.test.ts`
 Expected: PASS (2 tests)
 
-- [ ] **Step 5: Verify the live API shape**
+- [x] **Step 5: Verify the live API shape**
 
 Run: `curl "https://boards-api.greenhouse.io/v1/boards/stripe/jobs?content=true" | head -c 500`
 Confirm the `jobs[]` fields (`id`, `title`, `location.name`, `content`, `absolute_url`, `updated_at`) match what `parseGreenhouseJobs` expects. Adjust the fixture/implementation together if Greenhouse has changed its shape since this plan was written.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add scripts/jobSources/types.ts scripts/jobSources/greenhouse.ts scripts/jobSources/greenhouse.test.ts
@@ -209,7 +209,7 @@ git commit -m "feat: add Greenhouse job source provider"
 - Consumes: `ScrapedJobInput` (Task 1)
 - Produces: `parseLeverJobs(raw: unknown, companySlug: string): ScrapedJobInput[]`, `fetchLeverJobs(companySlug: string): Promise<ScrapedJobInput[]>`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```ts
 // scripts/jobSources/lever.test.ts
@@ -253,12 +253,12 @@ describe('parseLeverJobs', () => {
 })
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `npx vitest run scripts/jobSources/lever.test.ts`
 Expected: FAIL — `./lever` does not exist yet.
 
-- [ ] **Step 3: Write the minimal implementation**
+- [x] **Step 3: Write the minimal implementation**
 
 ```ts
 // scripts/jobSources/lever.ts
@@ -302,17 +302,17 @@ export async function fetchLeverJobs(companySlug: string): Promise<ScrapedJobInp
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run scripts/jobSources/lever.test.ts`
 Expected: PASS (2 tests)
 
-- [ ] **Step 5: Verify the live API shape**
+- [x] **Step 5: Verify the live API shape**
 
 Run: `curl "https://api.lever.co/v0/postings/netflix?mode=json" | head -c 500`
 Confirm field names still match; adjust together with the fixture if Lever has changed shape.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add scripts/jobSources/lever.ts scripts/jobSources/lever.test.ts
@@ -329,7 +329,7 @@ git commit -m "feat: add Lever job source provider"
 - Consumes: `ScrapedJobInput` (Task 1)
 - Produces: `parseAshbyJobs(raw: unknown, companySlug: string): ScrapedJobInput[]`, `fetchAshbyJobs(companySlug: string): Promise<ScrapedJobInput[]>`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```ts
 // scripts/jobSources/ashby.test.ts
@@ -376,12 +376,12 @@ describe('parseAshbyJobs', () => {
 })
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `npx vitest run scripts/jobSources/ashby.test.ts`
 Expected: FAIL — `./ashby` does not exist yet.
 
-- [ ] **Step 3: Write the minimal implementation**
+- [x] **Step 3: Write the minimal implementation**
 
 ```ts
 // scripts/jobSources/ashby.ts
@@ -427,17 +427,17 @@ export async function fetchAshbyJobs(companySlug: string): Promise<ScrapedJobInp
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run scripts/jobSources/ashby.test.ts`
 Expected: PASS (2 tests)
 
-- [ ] **Step 5: Verify the live API shape**
+- [x] **Step 5: Verify the live API shape**
 
 Run: `curl "https://api.ashbyhq.com/posting-api/job-board/ashby" | head -c 500`
 Confirm field names still match; adjust together with the fixture if Ashby has changed shape.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add scripts/jobSources/ashby.ts scripts/jobSources/ashby.test.ts
@@ -457,7 +457,7 @@ git commit -m "feat: add Ashby job source provider"
 
 This orchestrator is an I/O shell (network + Supabase writes), matching the existing, deliberately untested `scripts/scrapeIndeed.ts` in this repo — there is no unit test for this task, consistent with that established convention. Verification is manual (Step 4 below).
 
-- [ ] **Step 1: Add the companies config**
+- [x] **Step 1: Add the companies config**
 
 ```json
 // scripts/jobSources/companies.json
@@ -470,7 +470,7 @@ This orchestrator is an I/O shell (network + Supabase writes), matching the exis
 
 This config is intentionally empty of real targets — replace the placeholder slugs with the companies FreshlyForward actually wants to track (find each company's board-token/slug from their own careers page URL, e.g. `boards.greenhouse.io/<slug>`, `jobs.lever.co/<slug>`, `jobs.ashbyhq.com/<slug>`) before running this in production.
 
-- [ ] **Step 2: Write the orchestrator**
+- [x] **Step 2: Write the orchestrator**
 
 ```ts
 // scripts/scrapeCompanies.ts
@@ -547,21 +547,21 @@ main().catch((err) => {
 })
 ```
 
-- [ ] **Step 3: Add the npm script**
+- [x] **Step 3: Add the npm script**
 
 ```json
 // package.json — inside "scripts"
 "scrape:companies": "tsx scripts/scrapeCompanies.ts",
 ```
 
-- [ ] **Step 4: Manually verify against a real board**
+- [x] **Step 4: Manually verify against a real board**
 
 After filling in at least one real company slug in `companies.json`:
 
 Run: `npm run scrape:companies`
 Expected: console output showing jobs fetched and upserted per provider/slug; confirm new rows appear in the `scraped_jobs` table via the Supabase dashboard, with `source` set to `greenhouse`/`lever`/`ashby` as appropriate.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add scripts/jobSources/companies.json scripts/scrapeCompanies.ts package.json
@@ -581,7 +581,7 @@ git commit -m "feat: add multi-source ATS scraper orchestrator (Greenhouse/Lever
 **Interfaces:**
 - Produces: `selectJobsToDeactivate(existingActiveIds: string[], seenIdsThisRun: string[]): string[]`, `isStaleByAge(scrapedAt: string, maxAgeDays: number, now?: Date): boolean`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```ts
 // scripts/jobSources/liveness.test.ts
@@ -615,12 +615,12 @@ describe('isStaleByAge', () => {
 })
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `npx vitest run scripts/jobSources/liveness.test.ts`
 Expected: FAIL — `./liveness` does not exist yet.
 
-- [ ] **Step 3: Write the minimal implementation**
+- [x] **Step 3: Write the minimal implementation**
 
 ```ts
 // scripts/jobSources/liveness.ts
@@ -639,12 +639,12 @@ export function isStaleByAge(scrapedAt: string, maxAgeDays: number, now: Date = 
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run scripts/jobSources/liveness.test.ts`
 Expected: PASS (5 tests)
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add scripts/jobSources/liveness.ts scripts/jobSources/liveness.test.ts
@@ -661,7 +661,7 @@ git commit -m "feat: add pure job-liveness/staleness helpers"
 
 This is an I/O shell modification (Supabase reads/writes) — no new unit test, consistent with Task 4's convention. Verification is manual (Step 3 below).
 
-- [ ] **Step 1: Add per-company "gone" detection**
+- [x] **Step 1: Add per-company "gone" detection**
 
 ```ts
 // scripts/scrapeCompanies.ts — add these imports
@@ -698,7 +698,7 @@ async function deactivateGoneJobs(source: string, companySlug: string, seenIds: 
 }
 ```
 
-- [ ] **Step 2: Add an age-based fallback sweep and call both from `main()`**
+- [x] **Step 2: Add an age-based fallback sweep and call both from `main()`**
 
 ```ts
 // scripts/scrapeCompanies.ts — add this function
@@ -732,12 +732,12 @@ async function deactivateStaleJobs(maxAgeDays: number): Promise<void> {
   await deactivateStaleJobs(45)
 ```
 
-- [ ] **Step 3: Manually verify**
+- [x] **Step 3: Manually verify**
 
 Run: `npm run scrape:companies` twice in a row against a real board with a job temporarily removed between runs (or manually flip one row's `external_id` in Supabase to simulate a posting disappearing).
 Expected: the second run's log shows a `Deactivated N ... job(s) no longer listed.` line, and that row's `is_active` becomes `false` in the Supabase dashboard.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add scripts/scrapeCompanies.ts
@@ -760,7 +760,7 @@ git commit -m "feat: deactivate gone and stale scraped_jobs rows"
 
 This is a type-only change with nothing to unit test on its own; it's verified transitively by Tasks 9-11's tests.
 
-- [ ] **Step 1: Add the two new optional keys**
+- [x] **Step 1: Add the two new optional keys**
 
 ```ts
 // src/types/index.ts — replace the existing JobMatchScoreBreakdown interface
@@ -776,12 +776,12 @@ export interface JobMatchScoreBreakdown {
 
 They are optional (`?:`) because existing rows already stored in `job_matches.score_breakdown` predate this change and won't have these keys — any UI reading them must default to `?? 0`.
 
-- [ ] **Step 2: Type-check**
+- [x] **Step 2: Type-check**
 
 Run: `npx tsc --noEmit`
 Expected: no new errors (optional fields don't break existing object literals that omit them).
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add src/types/index.ts
@@ -798,7 +798,7 @@ git commit -m "feat: add Forward DNA fields to JobMatchScoreBreakdown"
 
 `computeFreshFitScore` currently has zero test coverage. Before changing its behavior in Task 11, lock in today's behavior with characterization tests. Because the implementation already exists, these tests are expected to **pass immediately** — this is the one task in this plan that intentionally isn't red-then-green, since it's documenting existing behavior rather than driving new behavior.
 
-- [ ] **Step 1: Write the tests**
+- [x] **Step 1: Write the tests**
 
 ```ts
 // src/lib/freshFitScore.test.ts
@@ -869,12 +869,12 @@ describe('computeFreshFitScore (baseline, no Forward DNA data)', () => {
 })
 ```
 
-- [ ] **Step 2: Run and confirm it passes immediately**
+- [x] **Step 2: Run and confirm it passes immediately**
 
 Run: `npx vitest run src/lib/freshFitScore.test.ts`
 Expected: PASS (3 tests) — confirms today's behavior before Task 11 changes it.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add src/lib/freshFitScore.test.ts
@@ -891,7 +891,7 @@ git commit -m "test: add baseline characterization tests for computeFreshFitScor
 - Consumes: `CareerSkill` (existing, `src/types/forwardDna.ts`)
 - Produces: `scoreSkillEvidence(careerSkills: CareerSkill[], jdSkills: string[]): { points: number; matched: string[] }`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```ts
 // src/lib/forwardDna/matching.test.ts
@@ -927,12 +927,12 @@ describe('scoreSkillEvidence', () => {
 })
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `npx vitest run src/lib/forwardDna/matching.test.ts`
 Expected: FAIL — `./matching` does not exist yet.
 
-- [ ] **Step 3: Write the minimal implementation**
+- [x] **Step 3: Write the minimal implementation**
 
 ```ts
 // src/lib/forwardDna/matching.ts
@@ -970,12 +970,12 @@ export function scoreSkillEvidence(
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run src/lib/forwardDna/matching.test.ts`
 Expected: PASS (3 tests)
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/lib/forwardDna/matching.ts src/lib/forwardDna/matching.test.ts
@@ -992,7 +992,7 @@ git commit -m "feat: add scoreSkillEvidence Forward DNA scoring factor"
 - Consumes: `CareerScope` (existing, `src/types/forwardDna.ts`)
 - Produces: `scoreScopeFit(careerScope: CareerScope[], jobDescription: string): number`
 
-- [ ] **Step 1: Add the failing tests**
+- [x] **Step 1: Add the failing tests**
 
 ```ts
 // src/lib/forwardDna/matching.test.ts — append
@@ -1030,12 +1030,12 @@ describe('scoreScopeFit', () => {
 })
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `npx vitest run src/lib/forwardDna/matching.test.ts`
 Expected: FAIL — `scoreScopeFit` is not exported yet.
 
-- [ ] **Step 3: Write the minimal implementation**
+- [x] **Step 3: Write the minimal implementation**
 
 ```ts
 // src/lib/forwardDna/matching.ts — append
@@ -1084,12 +1084,12 @@ export function scoreScopeFit(careerScope: CareerScope[], jobDescription: string
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run src/lib/forwardDna/matching.test.ts`
 Expected: PASS (7 tests total)
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/lib/forwardDna/matching.ts src/lib/forwardDna/matching.test.ts
@@ -1106,7 +1106,7 @@ git commit -m "feat: add scoreScopeFit Forward DNA scoring factor"
 - Consumes: `scoreSkillEvidence`, `scoreScopeFit` (Tasks 9-10)
 - Produces: `computeFreshFitScore(profile, job, dna?: { skills: CareerSkill[]; scope: CareerScope[] })` (third parameter is new and optional, defaulting to empty arrays so every existing call site keeps compiling and behaving identically)
 
-- [ ] **Step 1: Add the failing tests**
+- [x] **Step 1: Add the failing tests**
 
 ```ts
 // src/lib/freshFitScore.test.ts — append
@@ -1145,12 +1145,12 @@ describe('computeFreshFitScore (with Forward DNA data)', () => {
 })
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `npx vitest run src/lib/freshFitScore.test.ts`
 Expected: FAIL — `computeFreshFitScore` doesn't accept a third argument yet, `breakdown.dnaSkillEvidence`/`scopeFit` are always 0.
 
-- [ ] **Step 3: Wire the new factors in**
+- [x] **Step 3: Wire the new factors in**
 
 ```ts
 // src/lib/freshFitScore.ts — add these imports at the top
@@ -1194,12 +1194,12 @@ export function computeFreshFitScore(
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run src/lib/freshFitScore.test.ts`
 Expected: PASS (6 tests total)
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/lib/freshFitScore.ts src/lib/freshFitScore.test.ts
@@ -1216,7 +1216,7 @@ git commit -m "feat: wire Forward DNA skill evidence and scope fit into FreshFit
 
 This is an I/O shell modification (Supabase reads) — no new unit test, consistent with this script having no existing test coverage. Verification is manual (Step 3 below).
 
-- [ ] **Step 1: Fetch all career_skills and career_scope rows up front**
+- [x] **Step 1: Fetch all career_skills and career_scope rows up front**
 
 ```ts
 // scripts/syncFreshFitScores.ts — add these imports
@@ -1239,7 +1239,7 @@ import type { CareerSkill, CareerScope } from '../src/types/forwardDna'
   }
 ```
 
-- [ ] **Step 2: Pass the per-member slices into `computeFreshFitScore`**
+- [x] **Step 2: Pass the per-member slices into `computeFreshFitScore`**
 
 ```ts
 // scripts/syncFreshFitScores.ts — replace the existing scoring call inside the double loop
@@ -1249,12 +1249,12 @@ import type { CareerSkill, CareerScope } from '../src/types/forwardDna'
       })
 ```
 
-- [ ] **Step 3: Manually verify**
+- [x] **Step 3: Manually verify**
 
 Run: `npm run sync:freshfit` against a test member who has at least one `career_skills` row matching a scraped job's description.
 Expected: that member's `job_matches.score_breakdown` now includes a non-zero `dnaSkillEvidence` value in the Supabase dashboard.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add scripts/syncFreshFitScores.ts
@@ -1271,7 +1271,7 @@ git commit -m "feat: pass Forward DNA data into the FreshFit sync script"
 - Consumes: `JobMatchWithJob`, `JobMatchScoreBreakdown` (existing / Task 7)
 - Produces: `buildWhyItMatches(match: JobMatchWithJob): string` (pure, exported so `promoteMatchToOpportunity` can call it)
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```ts
 // src/lib/opportunityEngine.test.ts
@@ -1314,12 +1314,12 @@ describe('buildWhyItMatches', () => {
 })
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `npx vitest run src/lib/opportunityEngine.test.ts`
 Expected: FAIL — `buildWhyItMatches` is not exported yet.
 
-- [ ] **Step 3: Write the minimal implementation and use it in `promoteMatchToOpportunity`**
+- [x] **Step 3: Write the minimal implementation and use it in `promoteMatchToOpportunity`**
 
 ```ts
 // src/lib/opportunityEngine.ts — add this import
@@ -1344,12 +1344,12 @@ export function buildWhyItMatches(match: JobMatchWithJob): string {
     why_it_matches: buildWhyItMatches(match),
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run src/lib/opportunityEngine.test.ts`
 Expected: PASS (3 tests)
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/lib/opportunityEngine.ts src/lib/opportunityEngine.test.ts
@@ -1372,7 +1372,7 @@ git commit -m "feat: quote Forward DNA evidence in promoted opportunity's why_it
 
 SQL migrations in this repo have no automated test coverage (none of the existing 21 migration files do) — verification is manual (Step 2 below), consistent with that convention.
 
-- [ ] **Step 1: Write the migration**
+- [x] **Step 1: Write the migration**
 
 ```sql
 -- supabase/migrations/20260901000000_member_submitted_jobs.sql
@@ -1414,7 +1414,7 @@ CREATE POLICY "member_insert_own_job_match"
   WITH CHECK (member_id = auth.uid());
 ```
 
-- [ ] **Step 2: Manually verify**
+- [x] **Step 2: Manually verify**
 
 Run the migration locally (`supabase db push` or the project's existing migration-apply flow), then in the Supabase SQL editor, run as an authenticated test user:
 ```sql
@@ -1424,7 +1424,7 @@ values ('member-submitted', 'test-1', 'Test Title', 'Test Co', 'desc', '', 'memb
 Expected: succeeds. Then try the same insert with `source = 'indeed'` as that same user.
 Expected: fails with a row-level security policy violation.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add supabase/migrations/20260901000000_member_submitted_jobs.sql
@@ -1440,7 +1440,7 @@ git commit -m "feat: add RLS policies for member-submitted jobs and matches"
 **Interfaces:**
 - Produces: `JobSubmissionInput` (interface), `JobSubmissionValidation` (interface), `validateJobSubmission(input: JobSubmissionInput): JobSubmissionValidation`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```ts
 // src/lib/jobSubmission.test.ts
@@ -1470,12 +1470,12 @@ describe('validateJobSubmission', () => {
 })
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `npx vitest run src/lib/jobSubmission.test.ts`
 Expected: FAIL — `./jobSubmission` does not exist yet.
 
-- [ ] **Step 3: Write the minimal implementation**
+- [x] **Step 3: Write the minimal implementation**
 
 ```ts
 // src/lib/jobSubmission.ts
@@ -1512,12 +1512,12 @@ export function validateJobSubmission(input: JobSubmissionInput): JobSubmissionV
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run src/lib/jobSubmission.test.ts`
 Expected: PASS (3 tests)
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/lib/jobSubmission.ts src/lib/jobSubmission.test.ts
@@ -1534,7 +1534,7 @@ git commit -m "feat: add member job-submission validation"
 - Consumes: `JobSubmissionInput` (Task 15), `computeFreshFitScore` (Task 11), the RLS policies from Task 14
 - Produces: `submitMemberJob(profile: MemberProfile, input: JobSubmissionInput, client?: SupabaseClient): Promise<{ match: JobMatchWithJob | null; error: string | null }>`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```ts
 // src/lib/opportunityEngine.test.ts — append
@@ -1607,12 +1607,12 @@ describe('submitMemberJob', () => {
 })
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `npx vitest run src/lib/opportunityEngine.test.ts`
 Expected: FAIL — `submitMemberJob` is not exported yet.
 
-- [ ] **Step 3: Write the minimal implementation**
+- [x] **Step 3: Write the minimal implementation**
 
 ```ts
 // src/lib/opportunityEngine.ts — add these imports
@@ -1679,12 +1679,12 @@ export async function submitMemberJob(
 
 Note: `posting_url` defaults to `''` rather than `null` when omitted because the `scraped_jobs.posting_url` column is `NOT NULL` — matching the same NOT-NULL-with-empty-string convention already used for `company text NOT NULL DEFAULT ''` in that table's own migration.
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run src/lib/opportunityEngine.test.ts`
 Expected: PASS (6 tests total)
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/lib/opportunityEngine.ts src/lib/opportunityEngine.test.ts
@@ -1701,7 +1701,7 @@ git commit -m "feat: add submitMemberJob for member-submitted job leads"
 - Consumes: `submitMemberJob` (Task 16), `validateJobSubmission` (Task 15)
 - Produces: `SubmitJobModal({ profile, onClose, onSubmitted })` React component, following the existing modal convention in `src/components/AddCalendarEventModal.tsx`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```tsx
 // src/components/SubmitJobModal.test.tsx
@@ -1736,12 +1736,12 @@ describe('SubmitJobModal', () => {
 })
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `npx vitest run src/components/SubmitJobModal.test.tsx`
 Expected: FAIL — `./SubmitJobModal` does not exist yet.
 
-- [ ] **Step 3: Write the minimal implementation**
+- [x] **Step 3: Write the minimal implementation**
 
 ```tsx
 // src/components/SubmitJobModal.tsx
@@ -1872,12 +1872,12 @@ export function SubmitJobModal({ profile, onClose, onSubmitted }: SubmitJobModal
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run src/components/SubmitJobModal.test.tsx`
 Expected: PASS (2 tests)
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/components/SubmitJobModal.tsx src/components/SubmitJobModal.test.tsx
@@ -1894,7 +1894,7 @@ git commit -m "feat: add SubmitJobModal component"
 
 This page currently has no test file (consistent with the codebase's convention of not unit-testing top-level connected pages, only their pure/presentational children) — verification is manual (Step 3 below).
 
-- [ ] **Step 1: Add the imports, state, and button**
+- [x] **Step 1: Add the imports, state, and button**
 
 ```tsx
 // src/pages/OpportunityEnginePage.tsx — update imports
@@ -1922,7 +1922,7 @@ export function OpportunityEnginePage() {
         </button>
 ```
 
-- [ ] **Step 2: Render the modal and handle submission**
+- [x] **Step 2: Render the modal and handle submission**
 
 ```tsx
 // src/pages/OpportunityEnginePage.tsx — right before the page's closing </MemberLayout>
@@ -1938,12 +1938,12 @@ export function OpportunityEnginePage() {
       )}
 ```
 
-- [ ] **Step 3: Manually verify end to end**
+- [x] **Step 3: Manually verify end to end**
 
 Run: `npm run dev`, sign in as a member, open `/opportunity-engine`, click "Submit a Job", fill in title/company/description, submit.
 Expected: the modal closes, the new match appears at the top of the list with a FreshFit score, and the row is visible in Supabase's `scraped_jobs` (source `member-submitted`) and `job_matches` tables.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add src/pages/OpportunityEnginePage.tsx
