@@ -124,16 +124,16 @@ svg { flex: 0 0 auto; }
 .eyebrow-light { color: #7ee4b6; }
 
 .site-header { position: sticky; top: 0; z-index: 50; border-bottom: 1px solid rgba(219, 228, 224, .85); background: rgba(255, 255, 255, .92); backdrop-filter: blur(18px); }
-.header-inner { min-height: 78px; display: flex; align-items: center; justify-content: space-between; gap: 28px; }
-.logo { display: inline-flex; align-items: center; min-width: max-content; }
+.header-inner { min-height: 78px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.logo { display: inline-flex; align-items: center; min-width: max-content; flex-shrink: 0; }
 .logo img { display: block; width: 220px; height: auto; }
 .logo:focus-visible { outline-offset: 6px; }
-.site-header nav { width: 100%; display: flex; align-items: center; justify-content: flex-end; gap: clamp(14px, 2vw, 30px); }
-.site-header nav > a { position: relative; font-size: .86rem; font-weight: 700; }
+.site-header nav { width: 100%; display: flex; align-items: center; justify-content: flex-end; gap: clamp(10px, 1.1vw, 18px); }
+.site-header nav > a { position: relative; flex-shrink: 0; white-space: nowrap; font-size: .86rem; font-weight: 700; }
 .site-header nav > a::after { content: ''; position: absolute; left: 0; right: 100%; bottom: -9px; height: 2px; background: var(--green); transition: right .2s ease; }
 .site-header nav > a:hover::after, .site-header nav > a.active::after { right: 0; }
-.nav-actions { display: flex; align-items: center; gap: 12px; margin-left: 8px; }
-.nav-login { padding: 11px 16px; border: 1px solid var(--green); border-radius: 8px; color: var(--green-dark); font-weight: 700; }
+.nav-actions { display: flex; align-items: center; flex-shrink: 0; gap: 8px; margin-left: 4px; }
+.nav-login { padding: 11px 14px; border: 1px solid var(--green); border-radius: 8px; color: var(--green-dark); font-weight: 700; white-space: nowrap; }
 .menu-button { display: none; border: 0; background: transparent; color: var(--navy); cursor: pointer; }
 
 .button { min-height: 48px; display: inline-flex; align-items: center; justify-content: center; gap: 9px; border: 1px solid transparent; border-radius: 9999px; padding: 13px 22px; font-family: 'Manrope', sans-serif; font-size: .9rem; font-weight: 800; cursor: pointer; transition: transform .2s ease, box-shadow .2s ease, background .2s ease; }
