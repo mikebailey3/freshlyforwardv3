@@ -25,6 +25,15 @@ table, column, trigger, or policy is modified.
   dismissed_at to be NULL at insert time, so a member cannot forge a
   row that already looks promoted (pointing at an arbitrary, possibly
   guessed opportunities.id) or pre-dismissed.
+
+## Defense-in-depth: posting_url scheme
+Client-side validation (src/lib/jobSubmission.ts) already rejects
+non-http(s) URL schemes (e.g. javascript:, data:) before a member's
+submission reaches the database, and every render site guards with
+src/lib/url.ts's isSafeHttpUrl() before ever putting the value into a
+live href. This CHECK constraint is a third, DB-level backstop: it
+holds even against a client that skips the app entirely and calls the
+Supabase REST API directly with a valid session token.
 */
 
 DROP POLICY IF EXISTS "member_insert_own_scraped_job" ON scraped_jobs;
@@ -42,3 +51,16 @@ CREATE POLICY "member_insert_own_job_match"
     AND promoted_opportunity_id IS NULL
     AND dismissed_at IS NULL
   );
+
+-- Belt-and-suspenders backstop against javascript:/data:/etc URIs, in
+-- addition to the app-level checks in src/lib/jobSubmission.ts and
+-- src/lib/url.ts. Added NOT VALID so it can't fail this migration against
+-- any pre-existing row from the scraper sources -- it still applies
+-- immediately to every new INSERT/UPDATE going forward. Run
+-- `ALTER TABLE scraped_jobs VALIDATE CONSTRAINT scraped_jobs_posting_url_scheme;`
+-- once existing data has been confirmed clean, to close that gap too.
+ALTER TABLE scraped_jobs DROP CONSTRAINT IF EXISTS scraped_jobs_posting_url_scheme;
+ALTER TABLE scraped_jobs
+  ADD CONSTRAINT scraped_jobs_posting_url_scheme
+  CHECK (posting_url = '' OR posting_url ~* '^https?://')
+  NOT VALID;

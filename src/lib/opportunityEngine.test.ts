@@ -65,7 +65,7 @@ function makeFakeClient(opts: {
     throw new Error(`Unexpected table: ${table}`)
   })
 
-  return { client: { from: fromMock } as unknown as SupabaseClient }
+  return { client: { from: fromMock } as unknown as SupabaseClient, dnaSelect, dnaEq }
 }
 
 const submissionProfile = { user_id: 'member-1', skills: ['sql'] } as unknown as MemberProfile
@@ -79,13 +79,15 @@ describe('submitMemberJob', () => {
       posting_url: '', posted_at: null, search_query: 'member-submitted', is_active: true, scraped_at: '', created_at: '',
     }
     const matchRow = { id: 'match-1', member_id: 'member-1', scraped_job_id: 'job-1' }
-    const { client } = makeFakeClient({ jobRow, matchRow })
+    const { client, dnaSelect, dnaEq } = makeFakeClient({ jobRow, matchRow })
 
     const { match, error } = await submitMemberJob(submissionProfile, submissionInput, client)
 
     expect(error).toBeNull()
     expect(match?.id).toBe('match-1')
     expect(match?.scraped_job).toEqual(jobRow)
+    expect(dnaSelect).toHaveBeenCalledTimes(2)
+    expect(dnaEq).toHaveBeenCalledWith('user_id', 'member-1')
   })
 
   it('returns an error when the scraped_jobs insert fails', async () => {
