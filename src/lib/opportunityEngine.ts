@@ -2,6 +2,8 @@ import { supabase } from '@/lib/supabase'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { createOpportunity } from '@/lib/operations'
 import { computeFreshFitScore } from '@/lib/freshFitScore'
+import { getSkillStates } from '@/lib/forwardDna/skills'
+import { getAllScopeForUser } from '@/lib/forwardDna/scope'
 import type { JobMatchWithJob, JobMatchScoreBreakdown, MemberProfile, ScrapedJob } from '@/types'
 import type { JobSubmissionInput } from '@/lib/jobSubmission'
 
@@ -84,7 +86,11 @@ export async function submitMemberJob(
   }
 
   const job = jobRow as ScrapedJob
-  const result = computeFreshFitScore(profile, job)
+  const [{ skills }, { scope }] = await Promise.all([
+    getSkillStates(profile.user_id, client),
+    getAllScopeForUser(profile.user_id, client),
+  ])
+  const result = computeFreshFitScore(profile, job, { skills, scope })
 
   const { data: matchRow, error: matchError } = await client
     .from('job_matches')

@@ -21,7 +21,10 @@ export function validateJobSubmission(input: JobSubmissionInput): JobSubmissionV
 
   if (input.postingUrl.trim()) {
     try {
-      new URL(input.postingUrl.trim())
+      const parsed = new URL(input.postingUrl.trim())
+      if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+        errors.postingUrl = 'Only http:// or https:// links are allowed.'
+      }
     } catch {
       errors.postingUrl = "That doesn't look like a valid URL."
     }

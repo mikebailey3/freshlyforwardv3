@@ -21,6 +21,10 @@ table, column, trigger, or policy is modified.
   worst case a member inflates their own score, which only changes what
   they see in their own queue; strategists independently review the
   underlying posting before promoting anything to a real Opportunity.
+  The INSERT check additionally requires promoted_opportunity_id and
+  dismissed_at to be NULL at insert time, so a member cannot forge a
+  row that already looks promoted (pointing at an arbitrary, possibly
+  guessed opportunities.id) or pre-dismissed.
 */
 
 DROP POLICY IF EXISTS "member_insert_own_scraped_job" ON scraped_jobs;
@@ -33,4 +37,8 @@ DROP POLICY IF EXISTS "member_insert_own_job_match" ON job_matches;
 CREATE POLICY "member_insert_own_job_match"
   ON job_matches FOR INSERT
   TO authenticated
-  WITH CHECK (member_id = auth.uid());
+  WITH CHECK (
+    member_id = auth.uid()
+    AND promoted_opportunity_id IS NULL
+    AND dismissed_at IS NULL
+  );

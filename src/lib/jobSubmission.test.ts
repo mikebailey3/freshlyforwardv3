@@ -21,4 +21,10 @@ describe('validateJobSubmission', () => {
     expect(validateJobSubmission({ ...valid, postingUrl: '' }).valid).toBe(true)
     expect(validateJobSubmission({ ...valid, postingUrl: 'https://example.com/job/1' }).valid).toBe(true)
   })
+
+  it('rejects non-http(s) URL schemes (javascript:, data:) even though they parse as valid URLs', () => {
+    expect(validateJobSubmission({ ...valid, postingUrl: 'javascript:alert(1)' }).valid).toBe(false)
+    expect(validateJobSubmission({ ...valid, postingUrl: 'data:text/html,<script>alert(1)</script>' }).valid).toBe(false)
+    expect(validateJobSubmission({ ...valid, postingUrl: 'http://example.com/job/1' }).valid).toBe(true)
+  })
 })

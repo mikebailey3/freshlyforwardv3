@@ -55,9 +55,13 @@ function makeFakeClient(opts: {
   })
   const jobMatchesInsert = vi.fn().mockReturnValue({ select: vi.fn().mockReturnValue({ single: jobMatchesSingle }) })
 
+  const dnaEq = vi.fn().mockResolvedValue({ data: [], error: null })
+  const dnaSelect = vi.fn().mockReturnValue({ eq: dnaEq })
+
   const fromMock = vi.fn((table: string) => {
     if (table === 'scraped_jobs') return { insert: scrapedJobsInsert }
     if (table === 'job_matches') return { insert: jobMatchesInsert }
+    if (table === 'career_skills' || table === 'career_scope') return { select: dnaSelect }
     throw new Error(`Unexpected table: ${table}`)
   })
 

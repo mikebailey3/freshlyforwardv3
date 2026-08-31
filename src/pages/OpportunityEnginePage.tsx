@@ -112,15 +112,17 @@ export function OpportunityEnginePage() {
                     </div>
                   )}
 
-                  <a
-                    href={match.scraped_job.posting_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-primary-600 hover:underline"
-                  >
-                    <ExternalLink className="h-3.5 w-3.5" />
-                    View Posting
-                  </a>
+                  {match.scraped_job.posting_url && /^https?:\/\//i.test(match.scraped_job.posting_url) && (
+                    <a
+                      href={match.scraped_job.posting_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-primary-600 hover:underline"
+                    >
+                      <ExternalLink className="h-3.5 w-3.5" />
+                      View Posting
+                    </a>
+                  )}
                 </div>
 
                 <button
