@@ -1,6 +1,6 @@
 import { supabase } from '@/lib/supabase'
 import { createOpportunity } from '@/lib/operations'
-import type { JobMatchWithJob, ScrapedJob } from '@/types'
+import type { JobMatchWithJob, JobMatchScoreBreakdown, ScrapedJob } from '@/types'
 
 // ============================================================
 // JOB MATCHES (read-side; scores are computed by scripts/syncFreshFitScores.ts)
@@ -32,6 +32,21 @@ export async function dismissJobMatch(matchId: string): Promise<void> {
 }
 
 /**
+ * Pure text-builder for the promoted Opportunity's why_it_matches field.
+ * Extracted so Forward-DNA-aware copy is unit-testable without mocking
+ * Supabase or createOpportunity.
+ */
+export function buildWhyItMatches(match: JobMatchWithJob): string {
+  const breakdown = match.score_breakdown as JobMatchScoreBreakdown
+  const skillsNote = `Matched skills: ${match.matched_skills.join(', ') || 'none detected'}.`
+  if (!breakdown?.dnaSkillEvidence) {
+    return `FreshFit score ${match.fresh_fit_score}/100. ${skillsNote}`
+  }
+  const strength = breakdown.dnaSkillEvidence >= 10 ? 'strong' : 'partial'
+  return `FreshFit score ${match.fresh_fit_score}/100. ${skillsNote} Forward DNA evidence backs ${strength} fit on these skills.`
+}
+
+/**
  * Promotes a scraped-job match into the real, member-visible `opportunities`
  * pipeline (strategist-only action, matches existing RLS on `opportunities`).
  * Marks the match as promoted so it drops out of the "pending review" queue.
@@ -53,7 +68,7 @@ export async function promoteMatchToOpportunity(
     posting_date: job.posted_at,
     source: `Opportunity Engine (${job.source})`,
     full_job_description: job.description,
-    why_it_matches: `FreshFit score ${match.fresh_fit_score}/100. Matched skills: ${match.matched_skills.join(', ') || 'none detected'}.`,
+    why_it_matches: buildWhyItMatches(match),
     status: 'needs_review',
   })
 
