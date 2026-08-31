@@ -93,7 +93,7 @@ export function NotificationsPage() {
           <p className="mt-1 text-sm text-neutral-600">
             Stay up to date on your career search activity.
             {unreadCount > 0 && (
-              <span className="ml-1.5 inline-flex items-center gap-1 rounded-full bg-primary-100 px-2.5 py-0.5 text-xs font-medium text-primary-700">
+              <span className="ml-1.5 inline-flex items-center gap-1 border border-primary-300 px-2.5 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide text-primary-700">
                 {unreadCount} unread
               </span>
             )}
@@ -102,7 +102,7 @@ export function NotificationsPage() {
         {unreadCount > 0 && (
           <button
             onClick={handleMarkAllRead}
-            className="flex flex-shrink-0 items-center gap-2 rounded-xl border border-neutral-200 px-4 py-2.5 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-50"
+            className="flex flex-shrink-0 items-center gap-2 border border-neutral-300 px-4 py-2.5 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-50"
           >
             <CheckCheck className="h-4 w-4" />
             Mark all read
@@ -119,10 +119,10 @@ export function NotificationsPage() {
         <button
           onClick={() => setFilter('all')}
           className={cn(
-            'rounded-full px-3 py-1.5 text-xs font-medium transition-colors',
+            'border-b-2 px-3 py-1.5 font-mono text-xs font-medium transition-colors',
             filter === 'all'
-              ? 'bg-primary-600 text-white'
-              : 'bg-white text-neutral-600 border border-neutral-200 hover:bg-neutral-50'
+              ? 'border-primary-600 text-primary-700'
+              : 'border-transparent text-neutral-500 hover:text-neutral-700'
           )}
           aria-pressed={filter === 'all'}
         >
@@ -131,10 +131,10 @@ export function NotificationsPage() {
         <button
           onClick={() => setFilter('unread')}
           className={cn(
-            'rounded-full px-3 py-1.5 text-xs font-medium transition-colors',
+            'border-b-2 px-3 py-1.5 font-mono text-xs font-medium transition-colors',
             filter === 'unread'
-              ? 'bg-primary-600 text-white'
-              : 'bg-white text-neutral-600 border border-neutral-200 hover:bg-neutral-50'
+              ? 'border-primary-600 text-primary-700'
+              : 'border-transparent text-neutral-500 hover:text-neutral-700'
           )}
           aria-pressed={filter === 'unread'}
         >
@@ -149,10 +149,10 @@ export function NotificationsPage() {
               key={type}
               onClick={() => setFilter(type)}
               className={cn(
-                'flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors',
+                'flex items-center gap-1.5 border-b-2 px-3 py-1.5 font-mono text-xs font-medium transition-colors',
                 filter === type
-                  ? 'bg-primary-600 text-white'
-                  : 'bg-white text-neutral-600 border border-neutral-200 hover:bg-neutral-50'
+                  ? 'border-primary-600 text-primary-700'
+                  : 'border-transparent text-neutral-500 hover:text-neutral-700'
               )}
               aria-pressed={filter === type}
             >
@@ -165,7 +165,7 @@ export function NotificationsPage() {
 
       {/* Notifications list */}
       {filtered.length === 0 ? (
-        <div className="rounded-2xl border border-neutral-200 bg-white p-12 text-center">
+        <div className="border border-neutral-200 bg-white p-12 text-center">
           <Bell className="mx-auto h-12 w-12 text-neutral-300" />
           <p className="mt-4 text-sm text-neutral-500">
             {filter === 'unread'
@@ -183,32 +183,24 @@ export function NotificationsPage() {
               <div
                 key={notification.id}
                 className={cn(
-                  'rounded-2xl border bg-white p-5 transition-all hover:shadow-md',
-                  notification.is_read ? 'border-neutral-200' : 'border-primary-200 bg-primary-50/30'
+                  'border bg-white p-5 transition-colors border-l-4',
+                  notification.is_read ? 'border-neutral-200 border-l-neutral-300' : 'border-primary-200 border-l-primary-600 bg-primary-50/30'
                 )}
               >
                 <div className="flex items-start gap-3">
-                  <div
+                  <Icon
                     className={cn(
-                      'flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl',
-                      notification.is_read ? 'bg-neutral-100' : 'bg-primary-100'
+                      'mt-0.5 h-5 w-5 flex-shrink-0',
+                      notification.is_read ? 'text-neutral-500' : 'text-primary-600'
                     )}
-                  >
-                    <Icon
-                      className={cn(
-                        'h-5 w-5',
-                        notification.is_read ? 'text-neutral-500' : 'text-primary-600'
-                      )}
-                    />
-                  </div>
+                  />
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <span className="rounded-full bg-neutral-100 px-2.5 py-0.5 text-xs font-medium text-neutral-600">
+                      <span className="border border-neutral-300 px-2.5 py-0.5 font-mono text-[11px] font-medium uppercase tracking-wide text-neutral-600">
                         {label}
                       </span>
                       {!notification.is_read && (
-                        <span className="flex items-center gap-1 rounded-full bg-primary-100 px-2.5 py-0.5 text-xs font-medium text-primary-700">
-                          <span className="h-1.5 w-1.5 rounded-full bg-primary-600" />
+                        <span className="flex items-center gap-1 border border-primary-300 px-2.5 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide text-primary-700">
                           New
                         </span>
                       )}

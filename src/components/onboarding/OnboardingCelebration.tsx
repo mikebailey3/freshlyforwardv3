@@ -9,7 +9,7 @@ interface OnboardingStepProps {
 export function OnboardingCelebration({ onNext }: OnboardingStepProps) {
   return (
     <div className="text-center">
-      <div className="mx-auto mb-8 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-primary-100 to-secondary-100">
+      <div className="mx-auto mb-8 flex h-20 w-20 items-center justify-center rounded-full bg-primary-100">
         <PartyPopper className="h-10 w-10 text-primary-600" />
       </div>
 
@@ -21,7 +21,7 @@ export function OnboardingCelebration({ onNext }: OnboardingStepProps) {
         and will begin building your personalized career plan.
       </p>
 
-      <div className="mx-auto mt-10 max-w-md rounded-2xl border border-neutral-200 bg-white p-6">
+      <div className="mx-auto mt-10 max-w-md border border-neutral-200 bg-white p-6">
         <div className="flex items-center justify-center gap-2 text-primary-600">
           <Sparkles className="h-5 w-5" />
           <span className="text-sm font-semibold">What happens next?</span>
@@ -48,7 +48,7 @@ export function OnboardingCelebration({ onNext }: OnboardingStepProps) {
 
       <button
         onClick={onNext}
-        className="mt-10 inline-flex items-center gap-2 rounded-xl bg-primary-600 px-8 py-3.5 text-base font-semibold text-white shadow-lg shadow-primary-600/20 transition-all hover:bg-primary-700"
+        className="mt-10 inline-flex items-center gap-2 rounded-full bg-primary-600 px-8 py-3.5 text-base font-semibold text-white transition-all hover:bg-primary-700"
       >
         Go to Your Dashboard
         <ArrowRight className="h-5 w-5" />

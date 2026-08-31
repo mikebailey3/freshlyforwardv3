@@ -22,17 +22,15 @@ export function OnboardingConfirmation({ profile, checkoutSuccess }: OnboardingS
       </p>
 
       {checkoutSuccess && (
-        <div className="mt-6 flex items-center gap-3 rounded-xl bg-success-50 border border-success-200 p-4">
+        <div className="mt-6 flex items-center gap-3 border border-success-300 border-l-4 border-l-success-600 bg-success-50 p-4">
           <Check className="h-5 w-5 text-success-600" />
           <p className="text-sm font-medium text-success-700">Payment successful! Your membership is now active.</p>
         </div>
       )}
 
-      <div className="mt-8 rounded-2xl border border-neutral-200 bg-white p-6 sm:p-8">
+      <div className="mt-8 border border-neutral-200 bg-white p-6 sm:p-8">
         <div className="flex items-center gap-3 border-b border-neutral-200 pb-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary-100">
-            <CreditCard className="h-6 w-6 text-primary-600" />
-          </div>
+          <CreditCard className="h-8 w-8 text-primary-600" />
           <div>
             <h2 className="font-serif text-lg font-semibold text-neutral-900">Active Membership</h2>
             <p className="text-sm text-neutral-600">
@@ -63,14 +61,14 @@ export function OnboardingConfirmation({ profile, checkoutSuccess }: OnboardingS
         </div>
 
         <div className="mt-6 grid gap-3 sm:grid-cols-2">
-          <div className="flex items-start gap-2 rounded-lg bg-neutral-50 p-3">
+          <div className="flex items-start gap-2 border border-neutral-200 bg-neutral-50 p-3">
             <Calendar className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary-600" />
             <div>
               <p className="text-xs font-semibold text-neutral-900">Pause Anytime</p>
               <p className="text-xs text-neutral-600">Pause your membership and resume when ready.</p>
             </div>
           </div>
-          <div className="flex items-start gap-2 rounded-lg bg-neutral-50 p-3">
+          <div className="flex items-start gap-2 border border-neutral-200 bg-neutral-50 p-3">
             <Shield className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary-600" />
             <div>
               <p className="text-xs font-semibold text-neutral-900">Cancel Anytime</p>

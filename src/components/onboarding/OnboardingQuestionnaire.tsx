@@ -196,9 +196,9 @@ export function OnboardingQuestionnaire({ onNext, onBack, user }: OnboardingStep
           <span>Section {sectionIndex + 1} of {totalSections}</span>
           <span>{Math.round(progress)}% complete</span>
         </div>
-        <div className="mt-1.5 h-1.5 w-full rounded-full bg-neutral-100">
+        <div className="mt-1.5 h-1.5 w-full border border-neutral-300 bg-neutral-100">
           <div
-            className="h-full rounded-full bg-primary-600 transition-all duration-500"
+            className="h-full bg-primary-600 transition-all duration-500"
             style={{ width: `${progress}%` }}
             role="progressbar"
             aria-valuenow={Math.round(progress)}
@@ -228,7 +228,7 @@ export function OnboardingQuestionnaire({ onNext, onBack, user }: OnboardingStep
 
       {/* Error summary */}
       {errors.length > 0 && (
-        <div className="mt-6 rounded-xl border border-error-200 bg-error-50 p-4" role="alert">
+        <div className="mt-6 border border-error-300 border-l-4 border-l-error-600 bg-error-50 p-4" role="alert">
           <div className="flex items-start gap-2">
             <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-error-600" />
             <div>
@@ -244,11 +244,9 @@ export function OnboardingQuestionnaire({ onNext, onBack, user }: OnboardingStep
       )}
 
       {/* Section content */}
-      <div key={section.key} className="mt-8 animate-fade-in rounded-2xl border border-neutral-200 bg-white p-6 sm:p-8">
+      <div key={section.key} className="mt-8 animate-fade-in border border-neutral-200 bg-white p-6 sm:p-8">
         <div className="mb-6 flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary-100">
-            <Icon className="h-6 w-6 text-primary-600" />
-          </div>
+          <Icon className="h-8 w-8 text-primary-600" />
           <div>
             <h2 className="font-serif text-xl font-semibold text-neutral-900">{section.title}</h2>
             <p className="text-sm text-neutral-600">{section.description}</p>
@@ -275,14 +273,14 @@ export function OnboardingQuestionnaire({ onNext, onBack, user }: OnboardingStep
       <div className="mt-6 flex items-center justify-between">
         <button
           onClick={handlePrevSection}
-          className="flex items-center gap-1.5 rounded-lg px-4 py-2.5 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-100"
+          className="flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-100"
         >
           <ChevronLeft className="h-4 w-4" />
           {sectionIndex === 0 ? 'Back' : 'Previous'}
         </button>
         <button
           onClick={handleNextSection}
-          className="flex items-center gap-1.5 rounded-lg bg-primary-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-700"
+          className="flex items-center gap-1.5 rounded-full bg-primary-600 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-700"
         >
           {sectionIndex === totalSections - 1 ? 'Complete Questionnaire' : 'Continue'}
           <ChevronRight className="h-4 w-4" />
@@ -319,7 +317,7 @@ function ReviewSection({ responses }: { responses: Record<string, Record<string,
           return (
             <div
               key={sec.key}
-              className={`flex items-center justify-between rounded-lg border p-3 ${
+              className={`flex items-center justify-between border p-3 ${
                 hasData ? 'border-success-200 bg-success-50' : 'border-neutral-200 bg-neutral-50'
               }`}
             >

@@ -44,8 +44,10 @@ export function ForwardFeedWidget() {
         <div className="forward-feed-grid" aria-hidden="true">
           {[0, 1, 2].map((i) => (
             <div key={i} className="forward-feed-card" style={{ opacity: 0.5 }}>
-              <span className="forward-feed-category">Loading&hellip;</span>
-              <p className="forward-feed-title">&nbsp;</p>
+              <div className="forward-feed-card-body">
+                <span className="forward-feed-category">Loading&hellip;</span>
+                <p className="forward-feed-title">&nbsp;</p>
+              </div>
             </div>
           ))}
         </div>
@@ -58,13 +60,18 @@ export function ForwardFeedWidget() {
               className="forward-feed-card"
               data-category={post.category}
             >
-              <span className="forward-feed-category">{post.category}</span>
-              <h3 className="forward-feed-title">{post.title}</h3>
-              <p className="forward-feed-excerpt">{post.excerpt}</p>
-              <div className="forward-feed-meta">
-                <span>{formatPostDate(post.published_at)}</span>
-                <span>&middot;</span>
-                <span>{readTimeLabel(post.read_time_minutes)}</span>
+              {post.cover_image_url && (
+                <div className="forward-feed-card-media"><img src={post.cover_image_url} alt="" /></div>
+              )}
+              <div className="forward-feed-card-body">
+                <span className="forward-feed-category">{post.category}</span>
+                <h3 className="forward-feed-title">{post.title}</h3>
+                <p className="forward-feed-excerpt">{post.excerpt}</p>
+                <div className="forward-feed-meta">
+                  <span>{formatPostDate(post.published_at)}</span>
+                  <span>&middot;</span>
+                  <span>{readTimeLabel(post.read_time_minutes)}</span>
+                </div>
               </div>
             </Link>
           ))}

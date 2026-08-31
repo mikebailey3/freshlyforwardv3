@@ -46,7 +46,7 @@ function SectionCard({ title, result }: { title: string; result: SectionResult }
   const strong = pct >= 80
 
   return (
-    <div className="rounded-2xl border border-neutral-200 bg-white p-5">
+    <div className="border border-neutral-200 bg-white p-5">
       <div className="flex items-center justify-between">
         <h3 className="font-serif text-base font-semibold text-neutral-900">{title}</h3>
         <span className={`text-sm font-bold ${strong ? 'text-success-600' : pct >= 50 ? 'text-warning-600' : 'text-error-600'}`}>
@@ -71,7 +71,7 @@ function SectionCard({ title, result }: { title: string; result: SectionResult }
       )}
 
       {result.suggestion && (
-        <div className="mt-3 flex gap-2 rounded-lg bg-primary-50 p-3 text-sm text-primary-800">
+        <div className="mt-3 flex gap-2 border border-primary-200 bg-primary-50 p-3 text-sm text-primary-800">
           <Lightbulb className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary-600" />
           <span>{result.suggestion}</span>
         </div>
@@ -156,7 +156,7 @@ export function LinkedInOptimizerPage() {
         </div>
       </div>
 
-      <div className="mb-6 flex items-start gap-2 rounded-lg border border-primary-100 bg-primary-50 px-4 py-3 text-sm text-primary-800">
+      <div className="mb-6 flex items-start gap-2 border border-primary-200 bg-primary-50 px-4 py-3 text-sm text-primary-800">
         <Info className="mt-0.5 h-4 w-4 flex-shrink-0" />
         <span>
           LinkedIn doesn't allow apps to auto-import profile data (their API doesn't grant that access,
@@ -167,7 +167,7 @@ export function LinkedInOptimizerPage() {
       </div>
 
       {error && (
-        <div className="mb-6 rounded-lg bg-error-50 border border-error-100 px-4 py-3 text-sm text-error-600">
+        <div className="mb-6 border border-error-200 bg-error-50 px-4 py-3 text-sm text-error-600">
           {error}
         </div>
       )}
@@ -175,7 +175,7 @@ export function LinkedInOptimizerPage() {
       <div className="grid gap-6 lg:grid-cols-5">
         {/* Form */}
         <div className="lg:col-span-3 space-y-4">
-          <div className="rounded-2xl border border-neutral-200 bg-white p-5 space-y-4">
+          <div className="border border-neutral-200 bg-white p-5 space-y-4">
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
                 <label className="mb-1 block text-xs font-medium text-neutral-600">LinkedIn Profile URL</label>
@@ -184,7 +184,7 @@ export function LinkedInOptimizerPage() {
                   value={form.linkedinUrl}
                   onChange={handleChange('linkedinUrl')}
                   placeholder="https://linkedin.com/in/yourname"
-                  className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  className="w-full border border-neutral-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                 />
               </div>
               <div>
@@ -194,7 +194,7 @@ export function LinkedInOptimizerPage() {
                   value={form.targetRole}
                   onChange={handleChange('targetRole')}
                   placeholder="e.g. Senior Operations Manager"
-                  className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  className="w-full border border-neutral-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                 />
               </div>
             </div>
@@ -207,7 +207,7 @@ export function LinkedInOptimizerPage() {
                 onChange={handleChange('headline')}
                 placeholder="Paste your current LinkedIn headline"
                 maxLength={220}
-                className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="w-full border border-neutral-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
               />
             </div>
 
@@ -218,7 +218,7 @@ export function LinkedInOptimizerPage() {
                 onChange={handleChange('about')}
                 rows={6}
                 placeholder="Paste your current LinkedIn About section"
-                className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="w-full border border-neutral-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
               />
             </div>
 
@@ -231,7 +231,7 @@ export function LinkedInOptimizerPage() {
                 onChange={handleChange('experienceBullets')}
                 rows={6}
                 placeholder={'Responsible for managing a team of 5...\nLed a project that improved efficiency...'}
-                className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="w-full border border-neutral-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
               />
             </div>
 
@@ -244,7 +244,7 @@ export function LinkedInOptimizerPage() {
                 onChange={handleChange('skillsInput')}
                 rows={2}
                 placeholder="Project Management, Customer Service, Excel, Leadership"
-                className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="w-full border border-neutral-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
               />
             </div>
 
@@ -255,7 +255,7 @@ export function LinkedInOptimizerPage() {
               <button
                 onClick={handleSync}
                 disabled={saving}
-                className="flex items-center gap-2 rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-700 disabled:opacity-60"
+                className="flex items-center gap-2 rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-700 disabled:opacity-60"
               >
                 {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
                 Analyze &amp; Sync
@@ -268,7 +268,7 @@ export function LinkedInOptimizerPage() {
         <div className="lg:col-span-2 space-y-4">
           {result ? (
             <>
-              <div className="flex flex-col items-center gap-2 rounded-2xl border border-neutral-200 bg-white p-6">
+              <div className="flex flex-col items-center gap-2 border border-neutral-200 bg-white p-6">
                 <CircularProgress value={result.score} size={140} label="Professional Score" />
                 {band && <span className={`text-sm font-semibold ${band.className}`}>{band.label}</span>}
               </div>
@@ -278,7 +278,7 @@ export function LinkedInOptimizerPage() {
               <SectionCard title="Skills" result={result.skills} />
             </>
           ) : (
-            <div className="rounded-2xl border border-neutral-200 bg-white p-8 text-center">
+            <div className="border border-neutral-200 bg-white p-8 text-center">
               <Linkedin className="mx-auto h-10 w-10 text-neutral-300" />
               <p className="mt-4 text-sm text-neutral-500">
                 Fill out the form and click Analyze &amp; Sync to get your Professional Score.

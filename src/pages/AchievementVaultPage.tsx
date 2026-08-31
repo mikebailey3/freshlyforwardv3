@@ -52,7 +52,7 @@ export function AchievementVaultPage() {
         </div>
       </div>
 
-      <div className="rounded-2xl border border-neutral-200 bg-white p-6">
+      <div className="border border-neutral-200 bg-white p-6">
         <h2 className="font-serif text-base font-semibold text-neutral-900">Membership Badges</h2>
         <p className="mt-1 text-xs text-neutral-500">Show your current membership and special status.</p>
         <div className="mt-5 flex flex-wrap gap-8">
@@ -66,7 +66,7 @@ export function AchievementVaultPage() {
         </div>
       </div>
 
-      <div className="mt-6 rounded-2xl border border-neutral-200 bg-white p-6">
+      <div className="mt-6 border border-neutral-200 bg-white p-6">
         <h2 className="font-serif text-base font-semibold text-neutral-900">Achievement Badges</h2>
         <p className="mt-1 text-xs text-neutral-500">Earned by reaching meaningful milestones.</p>
         <div className="mt-5 grid grid-cols-2 gap-6 sm:grid-cols-4 lg:grid-cols-6">
@@ -86,7 +86,7 @@ export function AchievementVaultPage() {
       </div>
 
       {earnedCount === 0 && (
-        <div className="mt-6 rounded-2xl bg-gradient-to-br from-primary-50 to-secondary-50 border border-primary-100 p-6 text-center">
+        <div className="mt-6 border border-dashed border-neutral-300 bg-[var(--cream)] p-6 text-center">
           <p className="text-sm text-neutral-600">
             You haven't earned any badges yet. Complete your Career Profile, submit applications, and land
             interviews to start unlocking achievements.

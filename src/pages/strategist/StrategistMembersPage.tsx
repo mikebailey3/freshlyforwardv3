@@ -112,7 +112,7 @@ export function StrategistMembersPage() {
       </div>
 
       {/* Search & filter bar */}
-      <div className="mb-6 rounded-2xl border border-neutral-200 bg-white p-4">
+      <div className="mb-6 border border-neutral-200 bg-white p-4">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
           <div className="relative flex-1">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
@@ -122,7 +122,7 @@ export function StrategistMembersPage() {
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by name or headline..."
               aria-label="Search members by name or headline"
-              className="w-full rounded-lg border border-neutral-300 bg-white py-2 pl-10 pr-4 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+              className="w-full border border-neutral-300 bg-white py-2 pl-10 pr-4 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
             />
           </div>
           <div className="flex items-center gap-2">
@@ -131,7 +131,7 @@ export function StrategistMembersPage() {
               value={readinessFilter}
               onChange={(e) => setReadinessFilter(e.target.value as ReadinessFilter)}
               aria-label="Filter by search readiness"
-              className="rounded-lg border border-neutral-300 bg-white py-2 pl-3 pr-8 text-sm text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+              className="border border-neutral-300 bg-white py-2 pl-3 pr-8 text-sm text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
             >
               <option value="all">All Readiness</option>
               <option value="ready">Ready (80+)</option>
@@ -144,7 +144,7 @@ export function StrategistMembersPage() {
 
       {/* Members list */}
       {filteredMembers.length === 0 ? (
-        <div className="rounded-2xl border border-neutral-200 bg-white p-12 text-center">
+        <div className="border border-neutral-200 bg-white p-12 text-center">
           <Users className="mx-auto h-10 w-10 text-neutral-300" />
           <p className="mt-4 text-sm text-neutral-500">
             {members.length === 0
@@ -158,7 +158,7 @@ export function StrategistMembersPage() {
             <Link
               key={m.member_id}
               to={`/strategist/members/${m.member_id}`}
-              className="block rounded-2xl border border-neutral-200 bg-white p-5 transition-all hover:border-primary-300 hover:bg-primary-50"
+              className="block border border-neutral-200 border-l-4 border-l-primary-600 bg-white p-5 transition-colors hover:bg-primary-50"
             >
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
                 {/* Avatar */}
@@ -173,7 +173,7 @@ export function StrategistMembersPage() {
                       {m.profile?.full_name || 'Unknown Member'}
                     </h3>
                     {m.profile?.onboarding_completed && (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-success-100 px-2 py-0.5 text-xs font-medium text-success-700">
+                      <span className="inline-flex items-center gap-1 border border-success-300 px-2 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide text-success-700">
                         <CheckCircle2 className="h-3 w-3" />
                         Onboarded
                       </span>
@@ -191,10 +191,10 @@ export function StrategistMembersPage() {
                 <div className="flex flex-col items-start gap-1 sm:items-end">
                   <span className="text-xs font-medium text-neutral-500">Search Readiness</span>
                   <div className="flex items-center gap-2">
-                    <div className="h-2 w-20 overflow-hidden rounded-full bg-neutral-200">
+                    <div className="h-2 w-20 overflow-hidden border border-neutral-300 bg-neutral-100">
                       <div
                         className={cn(
-                          'h-full rounded-full',
+                          'h-full',
                           (m.profile?.search_readiness_score ?? 0) >= 80
                             ? 'bg-success-500'
                             : (m.profile?.search_readiness_score ?? 0) >= 40
@@ -213,13 +213,13 @@ export function StrategistMembersPage() {
                 {/* Badges */}
                 <div className="flex items-center gap-2">
                   {m.pending_approvals > 0 && (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-warning-100 px-2.5 py-1 text-xs font-medium text-warning-700">
+                    <span className="inline-flex items-center gap-1 border border-warning-300 px-2 py-1 font-mono text-[11px] font-semibold uppercase tracking-wide text-warning-700">
                       <AlertCircle className="h-3.5 w-3.5" />
                       {m.pending_approvals} pending
                     </span>
                   )}
                   {m.unread_count > 0 && (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-primary-600 px-2.5 py-1 text-xs font-semibold text-white">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-primary-600 px-2 py-1 font-mono text-[11px] font-semibold uppercase tracking-wide text-white">
                       <MessageSquare className="h-3.5 w-3.5" />
                       {m.unread_count} unread
                     </span>

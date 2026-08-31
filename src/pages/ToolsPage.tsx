@@ -16,17 +16,15 @@ export function ToolsPage() {
         </div>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {TOOL_TILES.map((tool) => (
+      <div className="border border-neutral-200 bg-white">
+        {TOOL_TILES.map((tool, i) => (
           <Link
             key={tool.label}
             to={tool.to}
-            className="flex items-start gap-4 rounded-2xl border border-neutral-200 bg-white p-5 transition-all hover:shadow-md hover:border-primary-200"
+            className={`flex items-center gap-4 p-5 transition-colors hover:bg-neutral-50 ${i !== TOOL_TILES.length - 1 ? 'border-b border-dashed border-neutral-200' : ''}`}
           >
-            <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-primary-100">
-              <tool.icon className="h-5 w-5 text-primary-600" />
-            </div>
-            <div>
+            <tool.icon className="h-5 w-5 flex-shrink-0 text-primary-600" />
+            <div className="flex-1">
               <h3 className="font-serif text-sm font-semibold text-neutral-900">{tool.label}</h3>
               <p className="mt-1 text-xs text-neutral-600">{tool.description}</p>
             </div>

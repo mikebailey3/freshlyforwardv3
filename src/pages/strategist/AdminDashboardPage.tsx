@@ -78,19 +78,19 @@ const STATUS_LABELS: Record<string, string> = {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  preparing_resume: 'bg-neutral-100 text-neutral-700',
-  preparing_cover_letter: 'bg-neutral-100 text-neutral-700',
-  waiting_on_member: 'bg-warning-100 text-warning-700',
-  ready_to_submit: 'bg-accent-100 text-accent-700',
-  submitted: 'bg-primary-100 text-primary-700',
-  employer_viewed: 'bg-primary-100 text-primary-700',
-  follow_up_needed: 'bg-warning-100 text-warning-700',
-  interview_requested: 'bg-accent-100 text-accent-700',
-  interview_scheduled: 'bg-primary-100 text-primary-700',
-  rejected: 'bg-error-100 text-error-700',
-  offer_received: 'bg-success-100 text-success-700',
-  offer_accepted: 'bg-success-100 text-success-700',
-  closed: 'bg-neutral-100 text-neutral-500',
+  preparing_resume: 'border-neutral-300 text-neutral-700',
+  preparing_cover_letter: 'border-neutral-300 text-neutral-700',
+  waiting_on_member: 'border-warning-300 text-warning-700',
+  ready_to_submit: 'border-accent-300 text-accent-700',
+  submitted: 'border-primary-300 text-primary-700',
+  employer_viewed: 'border-primary-300 text-primary-700',
+  follow_up_needed: 'border-warning-300 text-warning-700',
+  interview_requested: 'border-accent-300 text-accent-700',
+  interview_scheduled: 'border-primary-300 text-primary-700',
+  rejected: 'border-error-300 text-error-700',
+  offer_received: 'border-success-300 text-success-700',
+  offer_accepted: 'border-success-300 text-success-700',
+  closed: 'border-neutral-300 text-neutral-500',
 }
 
 const MAX_CAPACITY = 10
@@ -310,7 +310,7 @@ export function AdminDashboardPage() {
         <p className="mt-1 text-sm text-neutral-600">
           Platform-wide analytics across all strategists and members.
         </p>
-        <Link to="/master-admin/feature-entitlements" className="mt-3 inline-flex items-center gap-2 rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50">
+        <Link to="/master-admin/feature-entitlements" className="mt-3 inline-flex items-center gap-2 border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50">
           <Settings className="h-4 w-4" />
           Manage Feature Entitlements
         </Link>
@@ -326,11 +326,9 @@ export function AdminDashboardPage() {
 
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Applications by Strategist */}
-        <div className="rounded-2xl border border-neutral-200 bg-white p-6">
+        <div className="border border-neutral-200 bg-white p-6">
           <div className="mb-4 flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-100">
-              <Users className="h-5 w-5 text-primary-600" />
-            </div>
+            <Users className="h-6 w-6 text-primary-600" />
             <div>
               <h2 className="font-serif text-base font-semibold text-neutral-900">Applications by Strategist</h2>
               <p className="text-xs text-neutral-500">Workload distribution</p>
@@ -346,9 +344,9 @@ export function AdminDashboardPage() {
                     <span className="font-medium text-neutral-900">{s.full_name || 'Unknown Strategist'}</span>
                     <span className="text-neutral-500">{s.application_count} apps · {s.member_count} members</span>
                   </div>
-                  <div className="h-2 overflow-hidden rounded-full bg-neutral-200">
+                  <div className="h-2 overflow-hidden border border-neutral-300 bg-neutral-100">
                     <div
-                      className="h-full rounded-full bg-primary-500"
+                      className="h-full bg-primary-500"
                       style={{ width: `${(s.application_count / maxStrategistApps) * 100}%` }}
                     />
                   </div>
@@ -359,11 +357,9 @@ export function AdminDashboardPage() {
         </div>
 
         {/* Applications by Status */}
-        <div className="rounded-2xl border border-neutral-200 bg-white p-6">
+        <div className="border border-neutral-200 bg-white p-6">
           <div className="mb-4 flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-100">
-              <BarChart3 className="h-5 w-5 text-primary-600" />
-            </div>
+            <BarChart3 className="h-6 w-6 text-primary-600" />
             <div>
               <h2 className="font-serif text-base font-semibold text-neutral-900">Applications by Status</h2>
               <p className="text-xs text-neutral-500">Pipeline distribution</p>
@@ -374,8 +370,8 @@ export function AdminDashboardPage() {
           ) : (
             <div className="space-y-2">
               {byStatus.map((s) => (
-                <div key={s.status} className="flex items-center justify-between rounded-lg border border-neutral-200 px-3 py-2">
-                  <span className={cn('rounded-full px-2.5 py-0.5 text-xs font-medium', STATUS_COLORS[s.status] || 'bg-neutral-100 text-neutral-700')}>
+                <div key={s.status} className="flex items-center justify-between border border-neutral-200 px-3 py-2">
+                  <span className={cn('border px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide', STATUS_COLORS[s.status] || 'border-neutral-300 text-neutral-700')}>
                     {STATUS_LABELS[s.status] || s.status}
                   </span>
                   <span className="text-sm font-semibold text-neutral-900">{s.count}</span>
@@ -386,11 +382,9 @@ export function AdminDashboardPage() {
         </div>
 
         {/* Member Workload */}
-        <div className="rounded-2xl border border-neutral-200 bg-white p-6">
+        <div className="border border-neutral-200 bg-white p-6">
           <div className="mb-4 flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-100">
-              <Briefcase className="h-5 w-5 text-primary-600" />
-            </div>
+            <Briefcase className="h-6 w-6 text-primary-600" />
             <div>
               <h2 className="font-serif text-base font-semibold text-neutral-900">Member Workload</h2>
               <p className="text-xs text-neutral-500">Per-strategist breakdown</p>
@@ -427,11 +421,9 @@ export function AdminDashboardPage() {
         </div>
 
         {/* Strategist Capacity */}
-        <div className="rounded-2xl border border-neutral-200 bg-white p-6">
+        <div className="border border-neutral-200 bg-white p-6">
           <div className="mb-4 flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-100">
-              <TrendingUp className="h-5 w-5 text-primary-600" />
-            </div>
+            <TrendingUp className="h-6 w-6 text-primary-600" />
             <div>
               <h2 className="font-serif text-base font-semibold text-neutral-900">Strategist Capacity</h2>
               <p className="text-xs text-neutral-500">Members per strategist (max {MAX_CAPACITY})</p>
@@ -457,10 +449,10 @@ export function AdminDashboardPage() {
                         {isOverCapacity && ' (over capacity)'}
                       </span>
                     </div>
-                    <div className="h-2 overflow-hidden rounded-full bg-neutral-200">
+                    <div className="h-2 overflow-hidden border border-neutral-300 bg-neutral-100">
                       <div
                         className={cn(
-                          'h-full rounded-full',
+                          'h-full',
                           isOverCapacity ? 'bg-error-500' : isNearCapacity ? 'bg-warning-500' : 'bg-success-500',
                         )}
                         style={{ width: `${pct}%` }}
@@ -474,11 +466,9 @@ export function AdminDashboardPage() {
         </div>
 
         {/* Opportunities Awaiting Review */}
-        <div className="rounded-2xl border border-neutral-200 bg-white p-6">
+        <div className="border border-neutral-200 border-l-4 border-l-warning-500 bg-white p-6">
           <div className="mb-4 flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-warning-100">
-              <Search className="h-5 w-5 text-warning-600" />
-            </div>
+            <Search className="h-6 w-6 text-warning-600" />
             <div>
               <h2 className="font-serif text-base font-semibold text-neutral-900">Opportunities Awaiting Review</h2>
               <p className="text-xs text-neutral-500">{reviewOpps.length} pending review</p>
@@ -489,7 +479,7 @@ export function AdminDashboardPage() {
           ) : (
             <div className="max-h-80 space-y-2 overflow-y-auto">
               {reviewOpps.map((o) => (
-                <div key={o.id} className="rounded-lg border border-neutral-200 p-3">
+                <div key={o.id} className="border border-neutral-200 p-3">
                   <p className="text-sm font-medium text-neutral-900">{o.job_title}</p>
                   <p className="text-xs text-primary-600">{o.employer}</p>
                   <div className="mt-1.5 flex items-center gap-3 text-xs text-neutral-500">
@@ -512,25 +502,23 @@ export function AdminDashboardPage() {
         </div>
 
         {/* Overdue Follow-ups */}
-        <div className="rounded-2xl border border-neutral-200 bg-white p-6">
+        <div className="border border-neutral-200 border-l-4 border-l-error-500 bg-white p-6">
           <div className="mb-4 flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-error-100">
-              <Clock className="h-5 w-5 text-error-600" />
-            </div>
+            <Clock className="h-6 w-6 text-error-600" />
             <div>
               <h2 className="font-serif text-base font-semibold text-neutral-900">Overdue Follow-ups</h2>
               <p className="text-xs text-neutral-500">{overdueFollowUps.length} overdue</p>
             </div>
           </div>
           {overdueFollowUps.length === 0 ? (
-            <div className="flex items-center gap-2 rounded-lg bg-success-50 p-3 text-sm text-success-700">
+            <div className="flex items-center gap-2 border border-success-300 border-l-4 border-l-success-500 bg-success-50 p-3 text-sm text-success-700">
               <CheckCircle2 className="h-4 w-4" />
               All follow-ups are on track.
             </div>
           ) : (
             <div className="max-h-80 space-y-2 overflow-y-auto">
               {overdueFollowUps.map((f) => (
-                <div key={f.id} className="rounded-lg border border-error-200 bg-error-50 p-3">
+                <div key={f.id} className="border border-error-300 border-l-4 border-l-error-500 bg-error-50 p-3">
                   <p className="text-sm font-medium text-neutral-900">{f.title}</p>
                   <div className="mt-1.5 flex items-center gap-3 text-xs text-neutral-500">
                     {f.member_name && (
@@ -554,11 +542,9 @@ export function AdminDashboardPage() {
         </div>
 
         {/* Top Employers Applied To */}
-        <div className="rounded-2xl border border-neutral-200 bg-white p-6 lg:col-span-2">
+        <div className="border border-neutral-200 bg-white p-6 lg:col-span-2">
           <div className="mb-4 flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-100">
-              <Building2 className="h-5 w-5 text-primary-600" />
-            </div>
+            <Building2 className="h-6 w-6 text-primary-600" />
             <div>
               <h2 className="font-serif text-base font-semibold text-neutral-900">Top Employers Applied To</h2>
               <p className="text-xs text-neutral-500">Most frequently targeted companies</p>
@@ -569,15 +555,15 @@ export function AdminDashboardPage() {
           ) : (
             <div className="grid gap-3 sm:grid-cols-2">
               {topEmployers.map((e, idx) => (
-                <div key={e.employer} className="flex items-center gap-3 rounded-lg border border-neutral-200 p-3">
-                  <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-primary-100 text-sm font-semibold text-primary-700">
+                <div key={e.employer} className="flex items-center gap-3 border border-neutral-200 p-3">
+                  <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center border border-primary-300 text-sm font-semibold text-primary-700">
                     {idx + 1}
                   </span>
                   <div className="flex-1 min-w-0">
                     <p className="truncate text-sm font-medium text-neutral-900">{e.employer}</p>
-                    <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-neutral-200">
+                    <div className="mt-1 h-1.5 overflow-hidden border border-neutral-300 bg-neutral-100">
                       <div
-                        className="h-full rounded-full bg-primary-500"
+                        className="h-full bg-primary-500"
                         style={{ width: `${(e.count / maxEmployerCount) * 100}%` }}
                       />
                     </div>
@@ -609,18 +595,17 @@ function SummaryCard({
   color: string
 }) {
   const colors: Record<string, string> = {
-    primary: 'bg-primary-100 text-primary-600',
-    warning: 'bg-warning-100 text-warning-600',
-    accent: 'bg-accent-100 text-accent-600',
-    success: 'bg-success-100 text-success-600',
-    error: 'bg-error-100 text-error-600',
+    primary: 'border-l-primary-600 text-primary-600',
+    warning: 'border-l-warning-500 text-warning-600',
+    accent: 'border-l-accent-500 text-accent-600',
+    success: 'border-l-success-500 text-success-600',
+    error: 'border-l-error-500 text-error-600',
   }
+  const [borderColor, textColor] = colors[color].split(' ')
   return (
-    <div className="rounded-xl border border-neutral-200 bg-white p-4">
+    <div className={cn('border border-neutral-200 border-l-4 bg-white p-4', borderColor)}>
       <div className="flex items-center gap-3">
-        <div className={cn('flex h-10 w-10 items-center justify-center rounded-lg', colors[color])}>
-          <Icon className="h-5 w-5" />
-        </div>
+        <Icon className={cn('h-6 w-6', textColor)} />
         <div>
           <p className="text-2xl font-serif font-bold text-neutral-900">{value}</p>
           <p className="text-xs text-neutral-500">{label}</p>

@@ -188,19 +188,19 @@ export function FeatureEntitlementsPage() {
             </p>
           </div>
           {saveMsg && (
-            <div className="rounded-lg bg-success-50 px-4 py-2 text-sm font-medium text-success-700">
+            <div className="border border-success-300 border-l-4 border-l-success-500 bg-success-50 px-4 py-2 text-sm font-medium text-success-700">
               {saveMsg}
             </div>
           )}
         </div>
 
         {/* Preview filter */}
-        <div className="mb-6 flex items-center gap-3 rounded-xl border border-neutral-200 bg-white p-4">
+        <div className="mb-6 flex items-center gap-3 border border-neutral-200 bg-white p-4">
           <span className="text-sm font-medium text-neutral-700">Preview as plan:</span>
           <select
             value={previewPlan}
             onChange={(e) => setPreviewPlan(e.target.value)}
-            className="rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+            className="border border-neutral-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
           >
             <option value="all">All plans (full matrix)</option>
             {plans.map((p) => (
@@ -210,7 +210,7 @@ export function FeatureEntitlementsPage() {
         </div>
 
         {/* Entitlement Matrix */}
-        <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white">
+        <div className="overflow-hidden border border-neutral-200 bg-white">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
@@ -238,7 +238,7 @@ export function FeatureEntitlementsPage() {
                       <div className="flex items-center gap-2">
                         <span className="font-medium text-neutral-900">{row.feature.display_name}</span>
                         {row.feature.is_coming_soon && (
-                          <span className="rounded-full bg-accent-100 px-2 py-0.5 text-xs text-accent-700">Soon</span>
+                          <span className="border border-accent-300 px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide text-accent-700">Soon</span>
                         )}
                       </div>
                       <p className="text-xs text-neutral-500">{row.feature.feature_key}</p>
@@ -248,10 +248,10 @@ export function FeatureEntitlementsPage() {
                         <button
                           onClick={() => toggleFeature(p.id, row.feature.id, !row.planEnabled[p.id])}
                           disabled={saving}
-                          className={`mx-auto flex h-7 w-7 items-center justify-center rounded-lg transition-colors ${
+                          className={`mx-auto flex h-7 w-7 items-center justify-center border transition-colors ${
                             row.planEnabled[p.id]
-                              ? 'bg-success-100 text-success-700 hover:bg-success-200'
-                              : 'bg-neutral-100 text-neutral-400 hover:bg-neutral-200'
+                              ? 'border-success-300 bg-success-100 text-success-700 hover:bg-success-200'
+                              : 'border-neutral-300 bg-neutral-100 text-neutral-400 hover:bg-neutral-200'
                           }`}
                         >
                           {row.planEnabled[p.id] ? <Check className="h-4 w-4" /> : <X className="h-4 w-4" />}
@@ -262,7 +262,7 @@ export function FeatureEntitlementsPage() {
                       <button
                         onClick={() => cycleVisibility(row.feature.id, row.feature.visibility)}
                         disabled={saving}
-                        className="inline-flex items-center gap-1 rounded-lg border border-neutral-200 px-2 py-1 text-xs font-medium text-neutral-600 hover:bg-neutral-50"
+                        className="inline-flex items-center gap-1 border border-neutral-300 px-2 py-1 text-xs font-medium text-neutral-600 hover:bg-neutral-50"
                       >
                         {row.feature.visibility === 'visible' ? (
                           <><Eye className="h-3 w-3" /> Visible</>
@@ -291,7 +291,7 @@ export function FeatureEntitlementsPage() {
         {/* Edit modal */}
         {editingFeature && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setEditingFeature(null)}>
-            <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
+            <div className="w-full max-w-lg rounded-2xl border border-neutral-200 bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
               <h2 className="font-serif text-lg font-semibold text-neutral-900">Edit Feature</h2>
               <div className="mt-4 space-y-4">
                 <div>
@@ -300,7 +300,7 @@ export function FeatureEntitlementsPage() {
                     type="text"
                     value={editForm.display_name || ''}
                     onChange={(e) => setEditForm({ ...editForm, display_name: e.target.value })}
-                    className="mt-1 w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                    className="mt-1 w-full border border-neutral-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                   />
                 </div>
                 <div>
@@ -309,7 +309,7 @@ export function FeatureEntitlementsPage() {
                     value={editForm.description || ''}
                     onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
                     rows={2}
-                    className="mt-1 w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                    className="mt-1 w-full border border-neutral-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                   />
                 </div>
                 <div>
@@ -318,7 +318,7 @@ export function FeatureEntitlementsPage() {
                     type="text"
                     value={editForm.upgrade_title || ''}
                     onChange={(e) => setEditForm({ ...editForm, upgrade_title: e.target.value })}
-                    className="mt-1 w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                    className="mt-1 w-full border border-neutral-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                   />
                 </div>
                 <div>
@@ -327,7 +327,7 @@ export function FeatureEntitlementsPage() {
                     value={editForm.upgrade_body || ''}
                     onChange={(e) => setEditForm({ ...editForm, upgrade_body: e.target.value })}
                     rows={3}
-                    className="mt-1 w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                    className="mt-1 w-full border border-neutral-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                   />
                 </div>
                 <div>
@@ -336,7 +336,7 @@ export function FeatureEntitlementsPage() {
                     type="text"
                     value={editForm.upgrade_cta || ''}
                     onChange={(e) => setEditForm({ ...editForm, upgrade_cta: e.target.value })}
-                    className="mt-1 w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                    className="mt-1 w-full border border-neutral-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                   />
                 </div>
                 <div className="flex items-center gap-2">
@@ -345,7 +345,7 @@ export function FeatureEntitlementsPage() {
                     id="coming-soon"
                     checked={editForm.is_coming_soon || false}
                     onChange={(e) => setEditForm({ ...editForm, is_coming_soon: e.target.checked })}
-                    className="rounded border-neutral-300"
+                    className="border-neutral-300"
                   />
                   <label htmlFor="coming-soon" className="text-sm text-neutral-700">Mark as Coming Soon</label>
                 </div>
@@ -353,14 +353,14 @@ export function FeatureEntitlementsPage() {
               <div className="mt-6 flex justify-end gap-2">
                 <button
                   onClick={() => setEditingFeature(null)}
-                  className="rounded-lg border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
+                  className="border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={saveEdit}
                   disabled={saving}
-                  className="flex items-center gap-2 rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700 disabled:opacity-60"
+                  className="flex items-center gap-2 rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700 disabled:opacity-60"
                 >
                   {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                   Save

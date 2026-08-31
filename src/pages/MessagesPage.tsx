@@ -190,7 +190,7 @@ export function MessagesPage() {
         <p className="mt-1 text-sm text-neutral-600">Direct communication with your Career Strategist.</p>
       </div>
 
-      <div className="flex h-[calc(100vh-16rem)] overflow-hidden rounded-2xl border border-neutral-200 bg-white">
+      <div className="flex h-[calc(100vh-16rem)] overflow-hidden border border-neutral-200 bg-white">
         {/* Conversation list */}
         <div className="flex w-full flex-col border-r border-neutral-200 sm:w-80 lg:w-96">
           {/* Filters + search */}
@@ -202,7 +202,7 @@ export function MessagesPage() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search messages…"
-                className="w-full rounded-lg border border-neutral-300 py-2 pl-9 pr-3 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="w-full border border-neutral-300 py-2 pl-9 pr-3 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                 aria-label="Search messages"
               />
             </div>
@@ -211,8 +211,8 @@ export function MessagesPage() {
                 <button
                   key={f}
                   onClick={() => setFilter(f)}
-                  className={`rounded-lg px-3 py-1.5 text-xs font-medium capitalize transition-colors ${
-                    filter === f ? 'bg-primary-50 text-primary-700' : 'text-neutral-500 hover:bg-neutral-50'
+                  className={`border-b-2 px-3 py-1.5 font-mono text-xs font-medium capitalize transition-colors ${
+                    filter === f ? 'border-primary-600 text-primary-700' : 'border-transparent text-neutral-500 hover:text-neutral-700'
                   }`}
                 >
                   {f}
@@ -235,21 +235,21 @@ export function MessagesPage() {
                   <button
                     key={conv.id}
                     onClick={() => setActiveConversation(conv)}
-                    className={`flex w-full items-center gap-3 border-b border-neutral-100 p-3 text-left transition-colors hover:bg-neutral-50 ${
-                      activeConversation?.id === conv.id ? 'bg-primary-50' : ''
+                    className={`flex w-full items-center gap-3 border-b border-neutral-100 border-l-2 p-3 text-left transition-colors hover:bg-neutral-50 ${
+                      activeConversation?.id === conv.id ? 'border-l-primary-600 bg-primary-50/60' : 'border-l-transparent'
                     }`}
                   >
-                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-neutral-100">
+                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center border border-neutral-200 bg-neutral-50">
                       <User className="h-5 w-5 text-neutral-500" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="truncate text-sm font-semibold text-neutral-900">Your Career Strategist</p>
-                      <p className="truncate text-xs text-neutral-500">{timeAgo(conv.last_message_at)}</p>
+                      <p className="truncate font-mono text-xs text-neutral-500">{timeAgo(conv.last_message_at)}</p>
                     </div>
                     <div className="flex items-center gap-1">
                       {conv.is_pinned && <Pin className="h-3.5 w-3.5 text-primary-600" fill="currentColor" />}
                       {unreadCount > 0 && (
-                        <span className="rounded-full bg-primary-600 px-2 py-0.5 text-xs font-semibold text-white">
+                        <span className="bg-primary-600 px-2 py-0.5 font-mono text-xs font-semibold text-white">
                           {unreadCount}
                         </span>
                       )}
@@ -273,7 +273,7 @@ export function MessagesPage() {
               {/* Thread header */}
               <div className="flex items-center justify-between border-b border-neutral-200 p-3">
                 <div className="flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-neutral-100">
+                  <div className="flex h-8 w-8 items-center justify-center border border-neutral-200 bg-neutral-50">
                     <User className="h-4 w-4 text-neutral-500" />
                   </div>
                   <span className="text-sm font-semibold text-neutral-900">Your Career Strategist</span>
@@ -281,14 +281,14 @@ export function MessagesPage() {
                 <div className="flex items-center gap-1">
                   <button
                     onClick={() => togglePin(activeConversation)}
-                    className="rounded-lg p-2 text-neutral-400 hover:bg-neutral-50 hover:text-primary-600"
+                    className="p-2 text-neutral-400 hover:bg-neutral-50 hover:text-primary-600"
                     aria-label={activeConversation.is_pinned ? 'Unpin conversation' : 'Pin conversation'}
                   >
                     <Pin className={`h-4 w-4 ${activeConversation.is_pinned ? 'text-primary-600' : ''}`} fill={activeConversation.is_pinned ? 'currentColor' : 'none'} />
                   </button>
                   <button
                     onClick={() => toggleArchive(activeConversation)}
-                    className="rounded-lg p-2 text-neutral-400 hover:bg-neutral-50 hover:text-neutral-700"
+                    className="p-2 text-neutral-400 hover:bg-neutral-50 hover:text-neutral-700"
                     aria-label={activeConversation.is_archived ? 'Unarchive conversation' : 'Archive conversation'}
                   >
                     <Archive className="h-4 w-4" />
@@ -323,7 +323,7 @@ export function MessagesPage() {
                             >
                               {msg.body}
                               {msg.attachment_url && (
-                                <div className={`mt-2 flex items-center gap-2 rounded-lg p-2 text-xs ${
+                                <div className={`mt-2 flex items-center gap-2 p-2 text-xs ${
                                   msg.sender_type === 'member' ? 'bg-primary-700' : 'bg-neutral-200'
                                 }`}>
                                   {msg.attachment_type?.startsWith('image/') ? (
@@ -354,7 +354,7 @@ export function MessagesPage() {
 
               {/* Error */}
               {error && (
-                <div className="mx-4 mb-2 flex items-center gap-2 rounded-lg bg-error-50 border border-error-100 px-3 py-2 text-xs text-error-600">
+                <div className="mx-4 mb-2 flex items-center gap-2 border border-error-200 bg-error-50 px-3 py-2 text-xs text-error-600">
                   <AlertCircle className="h-3.5 w-3.5" />
                   {error}
                 </div>
@@ -362,7 +362,7 @@ export function MessagesPage() {
 
               {/* Attachment preview */}
               {attachment && (
-                <div className="mx-4 mb-2 flex items-center gap-2 rounded-lg bg-primary-50 border border-primary-100 px-3 py-2 text-xs">
+                <div className="mx-4 mb-2 flex items-center gap-2 border border-primary-200 bg-primary-50 px-3 py-2 text-xs">
                   <FileText className="h-3.5 w-3.5 text-primary-600" />
                   <span className="flex-1 text-primary-700">{attachment.name}</span>
                   <button onClick={() => setAttachment(null)} className="text-neutral-400 hover:text-error-600" aria-label="Remove attachment">
@@ -374,7 +374,7 @@ export function MessagesPage() {
               {/* Input */}
               <div className="border-t border-neutral-200 p-3">
                 <form onSubmit={handleSend} className="flex items-center gap-2">
-                  <label className="cursor-pointer rounded-full p-2 text-neutral-400 hover:bg-neutral-50 hover:text-primary-600" aria-label="Attach file">
+                  <label className="cursor-pointer p-2 text-neutral-400 hover:bg-neutral-50 hover:text-primary-600" aria-label="Attach file">
                     {uploading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Paperclip className="h-5 w-5" />}
                     <input
                       type="file"
@@ -388,13 +388,13 @@ export function MessagesPage() {
                     value={body}
                     onChange={(e) => setBody(e.target.value)}
                     placeholder="Type a message…"
-                    className="flex-1 rounded-full border border-neutral-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                    className="flex-1 border border-neutral-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                     aria-label="Message input"
                   />
                   <button
                     type="submit"
                     disabled={sending || (!body.trim() && !attachment)}
-                    className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-600 text-white transition-colors hover:bg-primary-700 disabled:opacity-60"
+                    className="flex h-10 w-10 items-center justify-center bg-primary-600 text-white transition-colors hover:bg-primary-700 disabled:opacity-60"
                     aria-label="Send message"
                   >
                     {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}

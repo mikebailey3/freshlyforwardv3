@@ -17,10 +17,10 @@ const STATUS_LABELS: Record<string, string> = {
   draft: 'Draft', pending_review: 'In Review', approved: 'Approved (awaiting send)', sent: 'Sent to Member',
 }
 const STATUS_COLORS: Record<string, string> = {
-  draft: 'bg-neutral-100 text-neutral-600',
-  pending_review: 'bg-warning-100 text-warning-700',
-  approved: 'bg-accent-100 text-accent-700',
-  sent: 'bg-success-100 text-success-700',
+  draft: 'border-neutral-300 text-neutral-600',
+  pending_review: 'border-warning-300 text-warning-700',
+  approved: 'border-accent-300 text-accent-700',
+  sent: 'border-success-300 text-success-700',
 }
 const STATUS_ICONS: Record<string, typeof Clock> = {
   draft: Clock, pending_review: Clock, approved: AlertCircle, sent: CheckCircle2,
@@ -157,7 +157,7 @@ export function StrategistFridayReportsPage() {
         </p>
       </div>
 
-      <div className="mb-6 rounded-2xl border border-neutral-200 bg-white p-4">
+      <div className="mb-6 border border-neutral-200 bg-white p-4">
         <h2 className="mb-3 font-serif text-base font-semibold text-neutral-900">Start a New Report</h2>
         {members.length === 0 ? (
           <p className="text-sm text-neutral-500">No assigned members yet.</p>
@@ -167,7 +167,7 @@ export function StrategistFridayReportsPage() {
               <button
                 key={m.user_id}
                 onClick={() => startNewReport(m.user_id)}
-                className="flex items-center gap-1.5 rounded-lg border border-neutral-300 px-3 py-2 text-sm font-medium text-neutral-700 hover:border-primary-300 hover:bg-primary-50"
+                className="flex items-center gap-1.5 border border-neutral-300 px-3 py-2 text-sm font-medium text-neutral-700 hover:border-primary-300 hover:bg-primary-50"
               >
                 <Plus className="h-3.5 w-3.5" />
                 {m.full_name || 'Member'}
@@ -179,7 +179,7 @@ export function StrategistFridayReportsPage() {
 
       <h2 className="mb-3 font-serif text-lg font-semibold text-neutral-900">All Reports</h2>
       {reports.length === 0 ? (
-        <div className="rounded-2xl border border-neutral-200 bg-white p-8 text-center">
+        <div className="border border-neutral-200 bg-white p-8 text-center">
           <FileText className="mx-auto h-10 w-10 text-neutral-300" />
           <p className="mt-3 text-sm text-neutral-500">No reports yet. Pick a member above to start one.</p>
         </div>
@@ -193,12 +193,12 @@ export function StrategistFridayReportsPage() {
                 key={r.id}
                 onClick={() => setEditing(r)}
                 disabled={r.approval_status === 'sent'}
-                className="w-full rounded-2xl border border-neutral-200 bg-white p-5 text-left transition-all hover:shadow-md disabled:cursor-default disabled:hover:shadow-none"
+                className="w-full border border-neutral-200 border-l-4 border-l-primary-600 bg-white p-5 text-left transition-colors hover:bg-primary-50 disabled:cursor-default disabled:hover:bg-white"
               >
                 <div className="flex items-center justify-between gap-3">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className={cn('flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium', STATUS_COLORS[r.approval_status])}>
+                      <span className={cn('flex items-center gap-1 border px-2 py-1 font-mono text-[11px] font-semibold uppercase tracking-wide', STATUS_COLORS[r.approval_status])}>
                         <StatusIcon className="h-3 w-3" />
                         {STATUS_LABELS[r.approval_status] || r.approval_status}
                       </span>
@@ -244,13 +244,13 @@ function ReportEditor({ editing, setEditing, memberName, saving, onGenerate, onS
             {isLocked ? 'This report is with an admin for review — editing will pull it back to draft.' : 'Fill in the details below, or auto-fill from real activity data.'}
           </p>
         </div>
-        <button onClick={onGenerate} className="flex items-center gap-1.5 rounded-lg border border-primary-300 bg-primary-50 px-4 py-2.5 text-sm font-medium text-primary-700 hover:bg-primary-100">
+        <button onClick={onGenerate} className="flex items-center gap-1.5 border border-primary-300 bg-primary-50 px-4 py-2.5 text-sm font-medium text-primary-700 hover:bg-primary-100">
           <Sparkles className="h-4 w-4" />
           Generate From Data
         </button>
       </div>
 
-      <div className="space-y-5 rounded-2xl border border-neutral-200 bg-white p-6">
+      <div className="space-y-5 border border-neutral-200 bg-white p-6">
         <div className="grid gap-4 sm:grid-cols-3">
           <Field label="Report Date" type="date" value={editing.report_date} onChange={(v) => set('report_date', v)} />
           <Field label="Period Start" type="date" value={editing.reporting_period_start ?? ''} onChange={(v) => set('reporting_period_start', v)} />
@@ -270,15 +270,15 @@ function ReportEditor({ editing, setEditing, memberName, saving, onGenerate, onS
         <TextArea label="Next Steps" value={editing.next_steps ?? ''} onChange={(v) => set('next_steps', v)} rows={2} />
       </div>
 
-      <div className="sticky bottom-0 z-10 mt-4 flex items-center justify-end gap-3 rounded-2xl border border-neutral-200 bg-white/95 p-4 shadow-lg backdrop-blur-md">
-        <button onClick={onCancel} disabled={saving} className="rounded-lg border border-neutral-300 px-4 py-2.5 text-sm font-medium text-neutral-700 hover:bg-neutral-50 disabled:opacity-60">
+      <div className="sticky bottom-0 z-10 mt-4 flex items-center justify-end gap-3 border border-neutral-200 bg-white/95 p-4 backdrop-blur-md">
+        <button onClick={onCancel} disabled={saving} className="border border-neutral-300 px-4 py-2.5 text-sm font-medium text-neutral-700 hover:bg-neutral-50 disabled:opacity-60">
           Cancel
         </button>
-        <button onClick={onSaveDraft} disabled={saving} className="flex items-center gap-1.5 rounded-lg border border-neutral-300 px-4 py-2.5 text-sm font-medium text-neutral-700 hover:bg-neutral-50 disabled:opacity-60">
+        <button onClick={onSaveDraft} disabled={saving} className="flex items-center gap-1.5 border border-neutral-300 px-4 py-2.5 text-sm font-medium text-neutral-700 hover:bg-neutral-50 disabled:opacity-60">
           {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
           Save Draft
         </button>
-        <button onClick={onSubmit} disabled={saving} className="flex items-center gap-1.5 rounded-lg bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-700 disabled:opacity-60">
+        <button onClick={onSubmit} disabled={saving} className="flex items-center gap-1.5 rounded-full bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-primary-700 disabled:opacity-60">
           {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
           Submit for Admin Review
         </button>
@@ -295,7 +295,7 @@ function Field({ label, value, onChange, type = 'text' }: { label: string; value
         type={type}
         value={value ?? ''}
         onChange={(e) => onChange(e.target.value)}
-        className="mt-1.5 w-full rounded-xl border border-neutral-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+        className="mt-1.5 w-full border border-neutral-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
       />
     </div>
   )
@@ -309,7 +309,7 @@ function TextArea({ label, value, onChange, rows }: { label: string; value: stri
         value={value}
         onChange={(e) => onChange(e.target.value)}
         rows={rows}
-        className="mt-1.5 w-full rounded-xl border border-neutral-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+        className="mt-1.5 w-full border border-neutral-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
       />
     </div>
   )

@@ -44,12 +44,12 @@ const feedbackStatusLabels: Record<string, string> = {
 }
 
 const feedbackStatusColors: Record<string, string> = {
-  open: 'bg-neutral-100 text-neutral-700',
-  under_review: 'bg-accent-100 text-accent-700',
-  planned: 'bg-primary-100 text-primary-700',
-  in_progress: 'bg-primary-600 text-white',
-  completed: 'bg-success-100 text-success-700',
-  declined: 'bg-error-100 text-error-700',
+  open: 'border-neutral-300 text-neutral-700',
+  under_review: 'border-accent-300 text-accent-700',
+  planned: 'border-primary-300 text-primary-700',
+  in_progress: 'rounded-full bg-primary-600 text-white',
+  completed: 'border-success-300 text-success-700',
+  declined: 'border-error-300 text-error-700',
 }
 
 const betaIconMap: Record<string, typeof Rocket> = {
@@ -134,14 +134,12 @@ export function FoundingMemberPage() {
       </div>
 
       {/* Founding Member Badge */}
-      <section className="mb-6 overflow-hidden rounded-2xl border border-primary-200 bg-gradient-to-br from-primary-50 to-secondary-50 p-6 sm:p-8">
+      <section className="mb-6 rounded-2xl border border-primary-200 bg-primary-50 p-6 shadow-sm sm:p-8">
         <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">
-            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary-600 shadow-sm">
-              <Crown className="h-8 w-8 text-white" />
-            </div>
+            <Crown className="h-10 w-10 flex-shrink-0 text-primary-600" />
             <div>
-              <span className="inline-block rounded-full bg-primary-600 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white">
+              <span className="inline-block rounded-full bg-primary-600 px-3 py-1 font-mono text-xs font-semibold uppercase tracking-wide text-white">
                 Founding Member
               </span>
               <p className="mt-2 font-serif text-xl font-semibold text-neutral-900">
@@ -154,7 +152,7 @@ export function FoundingMemberPage() {
               )}
             </div>
           </div>
-          <div className="flex items-center gap-2 rounded-xl bg-white/70 px-4 py-2.5 text-sm font-medium text-primary-700">
+          <div className="flex items-center gap-2 border border-primary-300 bg-white px-4 py-2.5 text-sm font-medium text-primary-700">
             <Sparkles className="h-5 w-5" />
             Thank you for being here.
           </div>
@@ -170,12 +168,10 @@ export function FoundingMemberPage() {
           {foundingBenefits.map((benefit) => (
             <div
               key={benefit.title}
-              className="rounded-2xl border border-neutral-200 bg-white p-5 transition-all hover:shadow-md"
+              className="border border-neutral-200 border-l-4 border-l-primary-600 bg-white p-5"
             >
               <div className="flex items-start gap-3">
-                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-primary-50">
-                  <benefit.icon className="h-5 w-5 text-primary-600" />
-                </div>
+                <benefit.icon className="mt-0.5 h-5 w-5 flex-shrink-0 text-primary-600" />
                 <div>
                   <h3 className="font-serif text-base font-semibold text-neutral-900">
                     {benefit.title}
@@ -195,7 +191,7 @@ export function FoundingMemberPage() {
         </h2>
         <div className="grid gap-6 lg:grid-cols-2">
           {/* Submit form */}
-          <div className="rounded-2xl border border-neutral-200 bg-white p-6">
+          <div className="border border-neutral-200 bg-white p-6">
             <h3 className="font-serif text-base font-semibold text-neutral-900">
               Submit Feedback
             </h3>
@@ -214,7 +210,7 @@ export function FoundingMemberPage() {
                       type="button"
                       onClick={() => setFeedbackType(type.value)}
                       className={cn(
-                        'flex items-center gap-2 rounded-xl border px-3 py-2.5 text-sm font-medium transition-colors',
+                        'flex items-center gap-2 border px-3 py-2.5 text-sm font-medium transition-colors',
                         feedbackType === type.value
                           ? 'border-primary-500 bg-primary-50 text-primary-700'
                           : 'border-neutral-200 bg-white text-neutral-600 hover:bg-neutral-50'
@@ -238,7 +234,7 @@ export function FoundingMemberPage() {
                   onChange={(e) => setTitle(e.target.value)}
                   required
                   placeholder="Brief summary of your feedback"
-                  className="mt-1.5 w-full rounded-xl border border-neutral-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  className="mt-1.5 w-full border border-neutral-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                 />
               </div>
               <div>
@@ -251,13 +247,13 @@ export function FoundingMemberPage() {
                   onChange={(e) => setDescription(e.target.value)}
                   rows={4}
                   placeholder="Add any additional context…"
-                  className="mt-1.5 w-full rounded-xl border border-neutral-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  className="mt-1.5 w-full border border-neutral-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                 />
               </div>
               <button
                 type="submit"
                 disabled={submitting || !title.trim()}
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-primary-700 disabled:opacity-60"
+                className="flex w-full items-center justify-center gap-2 rounded-full bg-primary-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-700 disabled:opacity-60"
               >
                 {submitting ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -278,15 +274,13 @@ export function FoundingMemberPage() {
           </div>
 
           {/* Existing feedback list */}
-          <div className="rounded-2xl border border-neutral-200 bg-white p-6">
+          <div className="border border-neutral-200 bg-white p-6">
             <h3 className="font-serif text-base font-semibold text-neutral-900">
               Your Submitted Feedback
             </h3>
             {feedback.length === 0 ? (
               <div className="mt-6 flex flex-col items-center justify-center text-center">
-                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-neutral-100">
-                  <MessageSquare className="h-7 w-7 text-neutral-400" />
-                </div>
+                <MessageSquare className="h-10 w-10 text-neutral-300" />
                 <p className="mt-4 text-sm text-neutral-500">
                   No feedback submitted yet. Share your first thought!
                 </p>
@@ -296,18 +290,18 @@ export function FoundingMemberPage() {
                 {feedback.map((item) => (
                   <div
                     key={item.id}
-                    className="rounded-xl border border-neutral-200 bg-neutral-50 p-4"
+                    className="border border-neutral-200 border-l-4 border-l-primary-600 bg-neutral-50 p-4"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
-                          <span className="rounded-full bg-white px-2.5 py-0.5 text-xs font-medium text-neutral-600">
+                          <span className="border border-neutral-300 px-2 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide text-neutral-600">
                             {feedbackTypes.find((t) => t.value === item.feedback_type)?.label || item.feedback_type}
                           </span>
                           <span
                             className={cn(
-                              'rounded-full px-2.5 py-0.5 text-xs font-medium',
-                              feedbackStatusColors[item.status] || 'bg-neutral-100 text-neutral-700'
+                              'border px-2 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide',
+                              feedbackStatusColors[item.status] || 'border-neutral-300 text-neutral-700'
                             )}
                           >
                             {feedbackStatusLabels[item.status] || item.status}
@@ -320,7 +314,7 @@ export function FoundingMemberPage() {
                           <p className="mt-1 text-sm text-neutral-600">{item.description}</p>
                         )}
                         {item.admin_response && (
-                          <div className="mt-2 rounded-lg bg-primary-50 p-3 text-sm text-primary-800">
+                          <div className="mt-2 border-l-2 border-primary-300 bg-primary-50 p-3 text-sm text-primary-800">
                             <p className="font-medium">Team response:</p>
                             <p className="mt-0.5">{item.admin_response}</p>
                           </div>
@@ -348,7 +342,7 @@ export function FoundingMemberPage() {
           Beta Features
         </h2>
         {betaFeatures.length === 0 ? (
-          <div className="rounded-2xl border border-neutral-200 bg-white p-8 text-center">
+          <div className="border border-neutral-200 bg-white p-8 text-center">
             <Rocket className="mx-auto h-10 w-10 text-neutral-300" />
             <p className="mt-3 text-sm text-neutral-500">
               No beta features are available right now. Check back soon!
@@ -361,17 +355,15 @@ export function FoundingMemberPage() {
               return (
                 <div
                   key={feature.id}
-                  className="rounded-2xl border border-neutral-200 bg-white p-5 transition-all hover:shadow-md"
+                  className="border border-neutral-200 border-l-4 border-l-secondary-500 bg-white p-5"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-secondary-50">
-                      <Icon className="h-5 w-5 text-secondary-600" />
-                    </div>
+                    <Icon className="h-6 w-6 flex-shrink-0 text-secondary-600" />
                     <div>
                       <h3 className="font-serif text-base font-semibold text-neutral-900">
                         {feature.name}
                       </h3>
-                      <span className="rounded-full bg-secondary-100 px-2.5 py-0.5 text-xs font-medium text-secondary-700">
+                      <span className="border border-secondary-300 px-2 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide text-secondary-700">
                         Beta
                       </span>
                     </div>
@@ -392,10 +384,8 @@ export function FoundingMemberPage() {
         <h2 id="referral-heading" className="mb-4 font-serif text-xl font-semibold text-neutral-900">
           Referral Program
         </h2>
-        <div className="rounded-2xl border border-dashed border-neutral-300 bg-white p-8 text-center">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-accent-100">
-            <Gift className="h-7 w-7 text-accent-600" />
-          </div>
+        <div className="border border-dashed border-neutral-300 bg-white p-8 text-center">
+          <Gift className="mx-auto h-10 w-10 text-accent-500" />
           <h3 className="mt-4 font-serif text-lg font-semibold text-neutral-900">
             Coming Soon
           </h3>
@@ -403,7 +393,7 @@ export function FoundingMemberPage() {
             We're building a referral program exclusively for Founding Members. Invite friends,
             earn rewards, and grow the FreshlyForward community together.
           </p>
-          <span className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-accent-50 px-4 py-2 text-sm font-medium text-accent-700">
+          <span className="mt-4 inline-flex items-center gap-1.5 border border-accent-300 px-4 py-2 font-mono text-xs font-semibold uppercase tracking-wide text-accent-700">
             <Clock className="h-4 w-4" />
             In Development
           </span>
@@ -416,7 +406,7 @@ export function FoundingMemberPage() {
           Success Story Requests
         </h2>
         {storyRequests.length === 0 ? (
-          <div className="rounded-2xl border border-neutral-200 bg-white p-8 text-center">
+          <div className="border border-neutral-200 bg-white p-8 text-center">
             <Heart className="mx-auto h-10 w-10 text-neutral-300" />
             <p className="mt-3 text-sm text-neutral-500">
               No success story requests right now. When your strategist has a story worth sharing,
@@ -428,13 +418,11 @@ export function FoundingMemberPage() {
             {storyRequests.map((req) => (
               <div
                 key={req.id}
-                className="rounded-2xl border border-neutral-200 bg-white p-5"
+                className="border border-neutral-200 border-l-4 border-l-primary-600 bg-white p-5"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-start gap-3">
-                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-primary-50">
-                      <Heart className="h-5 w-5 text-primary-600" />
-                    </div>
+                    <Heart className="mt-0.5 h-5 w-5 flex-shrink-0 text-primary-600" />
                     <div>
                       <h3 className="font-serif text-base font-semibold text-neutral-900">
                         {req.request_type.replace(/_/g, ' ')}
@@ -446,19 +434,19 @@ export function FoundingMemberPage() {
                   </div>
                   <span
                     className={cn(
-                      'flex-shrink-0 rounded-full px-3 py-1 text-xs font-medium',
+                      'flex-shrink-0 border px-2.5 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide',
                       req.status === 'pending'
-                        ? 'bg-warning-100 text-warning-700'
+                        ? 'border-warning-300 text-warning-700'
                         : req.status === 'completed'
-                          ? 'bg-success-100 text-success-700'
-                          : 'bg-neutral-100 text-neutral-700'
+                          ? 'border-success-300 text-success-700'
+                          : 'border-neutral-300 text-neutral-700'
                     )}
                   >
                     {req.status}
                   </span>
                 </div>
                 {req.member_response && (
-                  <p className="mt-3 rounded-lg bg-neutral-50 p-3 text-sm text-neutral-600">
+                  <p className="mt-3 border-l-2 border-neutral-300 bg-neutral-50 p-3 text-sm text-neutral-600">
                     {req.member_response}
                   </p>
                 )}

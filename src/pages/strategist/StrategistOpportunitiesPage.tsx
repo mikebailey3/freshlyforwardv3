@@ -3,6 +3,7 @@ import { StrategistLayout } from '@/components/StrategistLayout'
 import { useAuth } from '@/context/AuthContext'
 import { supabase } from '@/lib/supabase'
 import { getAssignedMembers, createOpportunity } from '@/lib/operations'
+import { isSafeHttpUrl } from '@/lib/url'
 import { cn, formatDate, timeAgo } from '@/lib/utils'
 import {
   Search, Plus, X, MapPin, DollarSign, Briefcase, ExternalLink,
@@ -21,16 +22,16 @@ interface MemberOption {
 type StatusFilter = 'all' | (typeof OPPORTUNITY_STATUSES)[number]
 
 const STATUS_COLORS: Record<string, string> = {
-  researching: 'bg-neutral-100 text-neutral-700',
-  needs_review: 'bg-accent-100 text-accent-700',
-  recommended: 'bg-primary-100 text-primary-700',
-  awaiting_member_approval: 'bg-warning-100 text-warning-700',
-  approved: 'bg-success-100 text-success-700',
-  declined: 'bg-error-100 text-error-700',
-  preparing_application: 'bg-primary-100 text-primary-700',
-  submitted: 'bg-success-100 text-success-700',
-  expired: 'bg-neutral-100 text-neutral-500',
-  archived: 'bg-neutral-100 text-neutral-500',
+  researching: 'border-neutral-300 text-neutral-700',
+  needs_review: 'border-accent-300 text-accent-700',
+  recommended: 'border-primary-300 text-primary-700',
+  awaiting_member_approval: 'border-warning-300 text-warning-700',
+  approved: 'border-success-300 text-success-700',
+  declined: 'border-error-300 text-error-700',
+  preparing_application: 'border-primary-300 text-primary-700',
+  submitted: 'border-success-300 text-success-700',
+  expired: 'border-neutral-300 text-neutral-500',
+  archived: 'border-neutral-300 text-neutral-500',
 }
 
 const STATUS_LABELS: Record<string, string> = {
@@ -230,7 +231,7 @@ export function StrategistOpportunitiesPage() {
         </div>
         <button
           onClick={() => setShowCreateForm(true)}
-          className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-700"
+          className="inline-flex items-center justify-center gap-2 rounded-full bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-700"
         >
           <Plus className="h-4 w-4" />
           Create Opportunity
@@ -238,7 +239,7 @@ export function StrategistOpportunitiesPage() {
       </div>
 
       {/* Search & filter */}
-      <div className="mb-6 rounded-2xl border border-neutral-200 bg-white p-4">
+      <div className="mb-6 border border-neutral-200 bg-white p-4">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
           <div className="relative flex-1">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
@@ -248,7 +249,7 @@ export function StrategistOpportunitiesPage() {
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by employer or job title..."
               aria-label="Search opportunities"
-              className="w-full rounded-lg border border-neutral-300 bg-white py-2 pl-10 pr-4 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+              className="w-full border border-neutral-300 bg-white py-2 pl-10 pr-4 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
             />
           </div>
           <div className="flex items-center gap-2">
@@ -260,7 +261,7 @@ export function StrategistOpportunitiesPage() {
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
               aria-label="Filter by status"
-              className="rounded-lg border border-neutral-300 bg-white py-2 pl-3 pr-8 text-sm text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+              className="border border-neutral-300 bg-white py-2 pl-3 pr-8 text-sm text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
             >
               <option value="all">All Statuses ({opportunities.length})</option>
               {OPPORTUNITY_STATUSES.map((s) => (
@@ -275,7 +276,7 @@ export function StrategistOpportunitiesPage() {
 
       {/* Opportunities grouped by status */}
       {filteredOpportunities.length === 0 ? (
-        <div className="rounded-2xl border border-neutral-200 bg-white p-12 text-center">
+        <div className="border border-neutral-200 bg-white p-12 text-center">
           <Search className="mx-auto h-10 w-10 text-neutral-300" />
           <p className="mt-4 text-sm text-neutral-500">
             {opportunities.length === 0
@@ -288,7 +289,7 @@ export function StrategistOpportunitiesPage() {
           {Object.entries(groupedOpportunities).map(([status, opps]) => (
             <div key={status}>
               <div className="mb-3 flex items-center gap-2">
-                <span className={cn('rounded-full px-3 py-1 text-xs font-semibold', STATUS_COLORS[status] || 'bg-neutral-100 text-neutral-700')}>
+                <span className={cn('border px-3 py-1 font-mono text-[11px] font-semibold uppercase tracking-wide', STATUS_COLORS[status] || 'border-neutral-300 text-neutral-700')}>
                   {STATUS_LABELS[status] || status}
                 </span>
                 <span className="text-sm text-neutral-500">({opps.length})</span>
@@ -310,13 +311,13 @@ export function StrategistOpportunitiesPage() {
       {/* Create Opportunity Modal */}
       {showCreateForm && (
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-neutral-900/50 p-4 py-8">
-          <div className="w-full max-w-2xl rounded-2xl bg-white shadow-xl">
-            <div className="sticky top-0 flex items-center justify-between rounded-t-2xl border-b border-neutral-200 bg-white px-6 py-4">
+          <div className="w-full max-w-2xl rounded-2xl border border-neutral-200 bg-white shadow-xl">
+            <div className="sticky top-0 flex items-center justify-between border-b border-neutral-200 bg-white px-6 py-4">
               <h2 className="font-serif text-lg font-semibold text-neutral-900">Create Opportunity</h2>
               <button
                 onClick={() => { setShowCreateForm(false); resetForm() }}
                 aria-label="Close create opportunity form"
-                className="rounded-lg p-1.5 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-600"
+                className="p-1.5 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-600"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -333,7 +334,7 @@ export function StrategistOpportunitiesPage() {
                   required
                   value={formData.member_id}
                   onChange={(e) => handleFormChange('member_id', e.target.value)}
-                  className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  className="w-full border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                 >
                   <option value="">Select a member...</option>
                   {members.map((m) => (
@@ -356,7 +357,7 @@ export function StrategistOpportunitiesPage() {
                     required
                     value={formData.employer}
                     onChange={(e) => handleFormChange('employer', e.target.value)}
-                    className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                    className="w-full border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                   />
                 </div>
                 <div>
@@ -369,7 +370,7 @@ export function StrategistOpportunitiesPage() {
                     required
                     value={formData.job_title}
                     onChange={(e) => handleFormChange('job_title', e.target.value)}
-                    className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                    className="w-full border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                   />
                 </div>
               </div>
@@ -383,7 +384,7 @@ export function StrategistOpportunitiesPage() {
                     type="text"
                     value={formData.location}
                     onChange={(e) => handleFormChange('location', e.target.value)}
-                    className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                    className="w-full border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                   />
                 </div>
                 <div>
@@ -394,7 +395,7 @@ export function StrategistOpportunitiesPage() {
                     value={formData.source}
                     onChange={(e) => handleFormChange('source', e.target.value)}
                     placeholder="LinkedIn, Indeed, Referral..."
-                    className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                    className="w-full border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                   />
                 </div>
               </div>
@@ -409,7 +410,7 @@ export function StrategistOpportunitiesPage() {
                     value={formData.salary_min}
                     onChange={(e) => handleFormChange('salary_min', e.target.value)}
                     placeholder="50000"
-                    className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                    className="w-full border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                   />
                 </div>
                 <div>
@@ -420,7 +421,7 @@ export function StrategistOpportunitiesPage() {
                     value={formData.salary_max}
                     onChange={(e) => handleFormChange('salary_max', e.target.value)}
                     placeholder="80000"
-                    className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                    className="w-full border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                   />
                 </div>
               </div>
@@ -433,7 +434,7 @@ export function StrategistOpportunitiesPage() {
                     id="work_arrangement"
                     value={formData.work_arrangement}
                     onChange={(e) => handleFormChange('work_arrangement', e.target.value)}
-                    className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                    className="w-full border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                   >
                     <option value="">Select...</option>
                     {WORK_ARRANGEMENTS.map((w) => (
@@ -447,7 +448,7 @@ export function StrategistOpportunitiesPage() {
                     id="employment_type"
                     value={formData.employment_type}
                     onChange={(e) => handleFormChange('employment_type', e.target.value)}
-                    className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                    className="w-full border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                   >
                     <option value="">Select...</option>
                     {EMPLOYMENT_TYPES.map((t) => (
@@ -466,7 +467,7 @@ export function StrategistOpportunitiesPage() {
                   value={formData.posting_url}
                   onChange={(e) => handleFormChange('posting_url', e.target.value)}
                   placeholder="https://..."
-                  className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  className="w-full border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                 />
               </div>
 
@@ -477,7 +478,7 @@ export function StrategistOpportunitiesPage() {
                   id="authorization_mode"
                   value={formData.authorization_mode}
                   onChange={(e) => handleFormChange('authorization_mode', e.target.value)}
-                  className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  className="w-full border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                 >
                   <option value="approval_required">Approval Required (member must approve)</option>
                   <option value="preauthorized">Preauthorized (member has given blanket consent)</option>
@@ -492,7 +493,7 @@ export function StrategistOpportunitiesPage() {
                   rows={4}
                   value={formData.full_job_description}
                   onChange={(e) => handleFormChange('full_job_description', e.target.value)}
-                  className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  className="w-full border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                 />
               </div>
 
@@ -504,7 +505,7 @@ export function StrategistOpportunitiesPage() {
                   rows={3}
                   value={formData.research_notes}
                   onChange={(e) => handleFormChange('research_notes', e.target.value)}
-                  className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  className="w-full border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                 />
               </div>
 
@@ -516,7 +517,7 @@ export function StrategistOpportunitiesPage() {
                   rows={3}
                   value={formData.why_it_matches}
                   onChange={(e) => handleFormChange('why_it_matches', e.target.value)}
-                  className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  className="w-full border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                 />
               </div>
 
@@ -528,7 +529,7 @@ export function StrategistOpportunitiesPage() {
                   rows={3}
                   value={formData.potential_concerns}
                   onChange={(e) => handleFormChange('potential_concerns', e.target.value)}
-                  className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  className="w-full border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                 />
               </div>
 
@@ -537,14 +538,14 @@ export function StrategistOpportunitiesPage() {
                 <button
                   type="button"
                   onClick={() => { setShowCreateForm(false); resetForm() }}
-                  className="rounded-lg border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50"
+                  className="border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="inline-flex items-center gap-2 rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="inline-flex items-center gap-2 rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {submitting ? (
                     <>
@@ -569,13 +570,13 @@ export function StrategistOpportunitiesPage() {
 
 function OpportunityCard({ opportunity, memberName }: { opportunity: Opportunity; memberName: string }) {
   return (
-    <div className="rounded-2xl border border-neutral-200 bg-white p-4 transition-all hover:border-primary-300">
+    <div className="border border-neutral-200 border-l-4 border-l-primary-600 bg-white p-4 transition-colors hover:border-l-primary-700">
       <div className="mb-2 flex items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
           <h3 className="font-serif text-sm font-semibold text-neutral-900 truncate">{opportunity.job_title}</h3>
           <p className="text-sm text-primary-600 font-medium truncate">{opportunity.employer}</p>
         </div>
-        <span className={cn('flex-shrink-0 rounded-full px-2 py-0.5 text-xs font-medium', STATUS_COLORS[opportunity.status] || 'bg-neutral-100 text-neutral-700')}>
+        <span className={cn('flex-shrink-0 border px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide', STATUS_COLORS[opportunity.status] || 'border-neutral-300 text-neutral-700')}>
           {STATUS_LABELS[opportunity.status] || opportunity.status}
         </span>
       </div>
@@ -608,11 +609,11 @@ function OpportunityCard({ opportunity, memberName }: { opportunity: Opportunity
             </span>
           </div>
         )}
-        {opportunity.posting_url && (
+        {isSafeHttpUrl(opportunity.posting_url) && (
           <div className="flex items-center gap-1.5">
             <ExternalLink className="h-3.5 w-3.5 text-neutral-400" />
             <a
-              href={opportunity.posting_url}
+              href={opportunity.posting_url ?? undefined}
               target="_blank"
               rel="noopener noreferrer"
               className="truncate text-primary-600 hover:text-primary-700"

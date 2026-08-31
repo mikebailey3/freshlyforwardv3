@@ -34,11 +34,9 @@ export function OnboardingDashboardIntro({ onNext }: OnboardingStepProps) {
         {features.map((feature) => (
           <div
             key={feature.title}
-            className="flex items-start gap-3 rounded-xl border border-neutral-200 bg-white p-5 transition-all hover:shadow-md"
+            className="flex items-start gap-3 border border-neutral-200 border-l-4 border-l-primary-600 bg-white p-5 transition-all"
           >
-            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-primary-100">
-              <feature.icon className="h-5 w-5 text-primary-600" />
-            </div>
+            <feature.icon className="h-6 w-6 flex-shrink-0 text-primary-600" />
             <div>
               <h3 className="font-serif text-base font-semibold text-neutral-900">{feature.title}</h3>
               <p className="mt-1 text-sm text-neutral-600">{feature.desc}</p>
@@ -47,7 +45,7 @@ export function OnboardingDashboardIntro({ onNext }: OnboardingStepProps) {
         ))}
       </div>
 
-      <div className="mt-8 rounded-xl bg-primary-50 border border-primary-100 p-5 text-center">
+      <div className="mt-8 border border-primary-300 border-l-4 border-l-primary-600 bg-primary-50 p-5 text-center">
         <p className="text-sm text-primary-700">
           Ready to explore? Your dashboard is just one click away.
         </p>

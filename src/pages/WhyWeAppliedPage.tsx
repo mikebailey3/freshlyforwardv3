@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { MemberLayout } from '@/components/MemberLayout'
 import { getWhyWeApplied } from '@/lib/operations'
+import { isSafeHttpUrl } from '@/lib/url'
 import { formatDate } from '@/lib/utils'
 import {
   ArrowLeft, Loader2, MapPin, DollarSign, Calendar, ExternalLink,
@@ -10,11 +11,11 @@ import {
 import type { WhyWeApplied } from '@/types'
 
 const statusColors: Record<string, string> = {
-  submitted: 'bg-primary-600 text-white',
-  employer_viewed: 'bg-primary-100 text-primary-700',
-  interview_scheduled: 'bg-primary-600 text-white',
-  offer_received: 'bg-success-100 text-success-700',
-  rejected: 'bg-error-100 text-error-700',
+  submitted: 'rounded-full bg-primary-600 text-white',
+  employer_viewed: 'border-primary-300 text-primary-700',
+  interview_scheduled: 'rounded-full bg-primary-600 text-white',
+  offer_received: 'border-success-300 text-success-700',
+  rejected: 'border-error-300 text-error-700',
 }
 
 export function WhyWeAppliedPage() {
@@ -43,7 +44,7 @@ export function WhyWeAppliedPage() {
   if (!data) {
     return (
       <MemberLayout>
-        <div className="rounded-2xl border border-neutral-200 bg-white p-12 text-center">
+        <div className="border border-neutral-200 bg-white p-12 text-center">
           <AlertCircle className="mx-auto h-12 w-12 text-neutral-300" />
           <p className="mt-4 text-sm text-neutral-500">Why We Applied details are not available yet.</p>
           <Link to="/applications" className="mt-4 inline-block text-primary-600 hover:underline">
@@ -61,9 +62,9 @@ export function WhyWeAppliedPage() {
         Back to Applications
       </Link>
 
-      <div className="rounded-2xl border border-neutral-200 bg-white p-6 sm:p-8">
+      <div className="border border-neutral-200 bg-white p-6 sm:p-8">
         <div className="flex items-center gap-2">
-          <span className={`rounded-full px-3 py-1 text-xs font-medium ${statusColors[data.current_status] || 'bg-neutral-100 text-neutral-700'}`}>
+          <span className={`border px-2.5 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide ${statusColors[data.current_status] || 'border-neutral-300 text-neutral-700'}`}>
             {data.current_status.replace(/_/g, ' ')}
           </span>
         </div>
@@ -92,10 +93,10 @@ export function WhyWeAppliedPage() {
         </div>
 
         {/* Posting Link */}
-        {data.posting_link && (
+        {isSafeHttpUrl(data.posting_link) && (
           <div className="mt-6">
             <a
-              href={data.posting_link}
+              href={data.posting_link ?? undefined}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 text-sm font-medium text-primary-600 hover:underline"
@@ -130,11 +131,11 @@ export function WhyWeAppliedPage() {
         {/* Documents Used */}
         <Section title="Documents Used" icon={FileText}>
           <div className="space-y-2">
-            <div className="flex items-center gap-2 rounded-lg bg-neutral-50 p-3">
+            <div className="flex items-center gap-2 border-l-2 border-neutral-300 bg-neutral-50 p-3">
               <FileText className="h-4 w-4 text-primary-600" />
               <span className="text-sm text-neutral-700">Resume: {data.resume_version_title || 'Master Resume'}</span>
             </div>
-            <div className="flex items-center gap-2 rounded-lg bg-neutral-50 p-3">
+            <div className="flex items-center gap-2 border-l-2 border-neutral-300 bg-neutral-50 p-3">
               <Mail className="h-4 w-4 text-primary-600" />
               <span className="text-sm text-neutral-700">Cover Letter: {data.cover_letter_title || 'Custom Cover Letter'}</span>
             </div>
@@ -161,7 +162,7 @@ export function WhyWeAppliedPage() {
 
 function DetailCard({ icon: Icon, label, value }: { icon: typeof User; label: string; value: string }) {
   return (
-    <div className="rounded-xl bg-neutral-50 p-4">
+    <div className="border border-neutral-200 bg-neutral-50 p-4">
       <div className="flex items-center gap-2">
         <Icon className="h-4 w-4 text-neutral-400" />
         <span className="text-xs text-neutral-500">{label}</span>

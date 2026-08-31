@@ -13,6 +13,7 @@
 import { createClient } from '@supabase/supabase-js'
 import { computeFreshFitScore } from '../src/lib/freshFitScore'
 import type { MemberProfile, ScrapedJob } from '../src/types'
+import type { CareerSkill, CareerScope } from '../src/types/forwardDna'
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL
 const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -52,13 +53,29 @@ async function main() {
   const members = (profiles ?? []) as MemberProfile[]
   const activeJobs = (jobs ?? []) as ScrapedJob[]
 
+  const { data: skillRows } = await supabase.from('career_skills').select('*')
+  const { data: scopeRows } = await supabase.from('career_scope').select('*')
+
+  const skillsByUser = new Map<string, CareerSkill[]>()
+  for (const row of (skillRows ?? []) as CareerSkill[]) {
+    skillsByUser.set(row.user_id, [...(skillsByUser.get(row.user_id) ?? []), row])
+  }
+
+  const scopeByUser = new Map<string, CareerScope[]>()
+  for (const row of (scopeRows ?? []) as CareerScope[]) {
+    scopeByUser.set(row.user_id, [...(scopeByUser.get(row.user_id) ?? []), row])
+  }
+
   console.log(`Scoring ${members.length} member(s) against ${activeJobs.length} job(s)...`)
 
   const rows: Record<string, unknown>[] = []
 
   for (const member of members) {
     for (const job of activeJobs) {
-      const result = computeFreshFitScore(member, job)
+      const result = computeFreshFitScore(member, job, {
+        skills: skillsByUser.get(member.user_id) ?? [],
+        scope: scopeByUser.get(member.user_id) ?? [],
+      })
       if (result.score < MIN_SCORE_TO_STORE) continue
 
       rows.push({

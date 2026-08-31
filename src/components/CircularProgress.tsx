@@ -30,7 +30,7 @@ export function CircularProgress({ value, size = 80, strokeWidth = 8, label = 'C
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className={`font-serif font-bold ${textColorClass}`} style={{ fontSize: size * 0.24 }}>
+        <span className={`font-mono font-bold ${textColorClass}`} style={{ fontSize: size * 0.22 }}>
           {clamped}%
         </span>
         {label && <span className="text-neutral-500" style={{ fontSize: size * 0.09 }}>{label}</span>}

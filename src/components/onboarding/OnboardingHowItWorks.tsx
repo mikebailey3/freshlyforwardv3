@@ -52,11 +52,9 @@ export function OnboardingHowItWorks({ onNext }: OnboardingStepProps) {
         {steps.map((step, i) => (
           <div
             key={i}
-            className="flex items-start gap-4 rounded-xl border border-neutral-200 bg-white p-5 transition-all hover:shadow-md"
+            className="flex items-start gap-4 border border-neutral-200 border-l-4 border-l-primary-600 bg-white p-5 transition-all"
           >
-            <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-primary-100">
-              <step.icon className="h-6 w-6 text-primary-600" />
-            </div>
+            <step.icon className="h-6 w-6 flex-shrink-0 text-primary-600" />
             <div className="flex-1">
               <h3 className="font-serif text-base font-semibold text-neutral-900">{step.title}</h3>
               <p className="mt-1 text-sm text-neutral-600">{step.desc}</p>
@@ -65,7 +63,7 @@ export function OnboardingHowItWorks({ onNext }: OnboardingStepProps) {
         ))}
       </div>
 
-      <div className="mt-8 rounded-xl bg-primary-50 border border-primary-100 p-5 text-center">
+      <div className="mt-8 border border-primary-300 border-l-4 border-l-primary-600 bg-primary-50 p-5 text-center">
         <p className="text-sm text-primary-700">
           <strong>Quality over quantity.</strong> We do not focus on application volume. We focus on finding the right
           opportunities and crafting applications that stand out.

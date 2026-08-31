@@ -73,8 +73,8 @@ export function TimelinePage() {
 
                   {/* Card */}
                   <div className={`flex-1 sm:w-1/2 ${isLeft ? 'sm:pr-8' : 'sm:pl-8'}`}>
-                    <div className="rounded-xl border border-neutral-200 bg-white p-4 shadow-sm transition-all hover:shadow-md">
-                      <p className="text-xs text-neutral-400">{formatDate(event.event_date)}</p>
+                    <div className="border border-neutral-200 border-l-4 border-l-primary-600 bg-white p-4 transition-colors">
+                      <p className="font-mono text-xs text-neutral-400">{formatDate(event.event_date)}</p>
                       <p className="mt-1 font-serif text-sm font-semibold text-neutral-900">{event.event_title}</p>
                       {event.event_description && (
                         <p className="mt-1 text-sm text-neutral-600">{event.event_description}</p>
@@ -87,7 +87,7 @@ export function TimelinePage() {
           </div>
         </div>
       ) : (
-        <div className="rounded-2xl border border-neutral-200 bg-white p-12 text-center">
+        <div className="border border-neutral-200 bg-white p-12 text-center">
           <Compass className="mx-auto h-12 w-12 text-neutral-300" />
           <p className="mt-4 text-sm text-neutral-500">
             Your timeline will populate as your career journey progresses. Complete onboarding to get started!

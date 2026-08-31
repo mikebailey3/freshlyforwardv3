@@ -188,6 +188,8 @@ export interface MemberProfile {
   jobs_not_enjoyed: string | null
   motivators: string | null
   biggest_challenge: string | null
+  target_role: string | null
+  target_timeframe: string | null
   application_authorized: boolean
   electronic_consent: boolean
   consent_date: string | null
@@ -206,6 +208,7 @@ export interface MemberProfile {
 }
 
 export interface EmploymentEntry {
+  id?: string
   company: string
   title: string
   start_date: string
@@ -419,6 +422,8 @@ export interface JobMatchScoreBreakdown {
   roleRelevance: number
   locationFit: number
   keywordDensity: number
+  dnaSkillEvidence?: number
+  scopeFit?: number
 }
 
 export interface JobMatch {

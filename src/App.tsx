@@ -19,7 +19,11 @@ import { SignUpPage } from '@/pages/SignUpPage'
 import { CheckoutPage } from '@/pages/CheckoutPage'
 import { OnboardingPage } from '@/pages/OnboardingPage'
 import { DashboardPage } from '@/pages/DashboardPage'
+import { CareerCompassIntroPage } from '@/pages/CareerCompassIntroPage'
+import { CareerCompassAssessmentPage } from '@/pages/CareerCompassAssessmentPage'
+import { CareerCompassResultsPage } from '@/pages/CareerCompassResultsPage'
 import { CareerProfilePage } from '@/pages/CareerProfilePage'
+import { ForwardDnaPage } from '@/pages/ForwardDnaPage'
 import { MembershipPage } from '@/pages/MembershipPage'
 import { CareerSuccessPage } from '@/pages/CareerSuccessPage'
 import { TimelinePage } from '@/pages/TimelinePage'
@@ -62,7 +66,7 @@ import { StrategistLayout } from '@/components/StrategistLayout'
 const publicRoutes = [
   '/', '/pricing', '/how-it-works', '/services', '/why-freshlyforward',
   '/about', '/contact', '/faq', '/authorization', '/privacy', '/terms',
-  '/signin', '/signup', '/forward-feed',
+  '/signin', '/signup', '/forward-feed', '/career-compass',
 ]
 
 function App() {
@@ -71,9 +75,17 @@ function App() {
 
   if (loading) return <LoadingScreen />
 
-  const isPublicRoute = publicRoutes.some((route) =>
-    route === '/' ? location.pathname === '/' : location.pathname.startsWith(route)
-  )
+  // '/career-compass' is a prefix match for BOTH '/career-compass/results'
+  // (should get SiteHeader/SiteFooter -- a normal Persuade-mode page) and
+  // '/career-compass/assessment' (should NOT -- WizardShell renders its own
+  // full-page chrome, same as /onboarding). A plain startsWith() can't tell
+  // those apart since they're siblings under the same base path, so the
+  // assessment route is carved out explicitly here.
+  const isPublicRoute =
+    location.pathname !== '/career-compass/assessment' &&
+    publicRoutes.some((route) =>
+      route === '/' ? location.pathname === '/' : location.pathname.startsWith(route)
+    )
 
   return (
     <>
@@ -95,6 +107,15 @@ function App() {
         <Route path="/terms" element={<TermsPage />} />
         <Route path="/signin" element={<SignInPage />} />
         <Route path="/signup" element={<SignUpPage />} />
+        <Route path="/career-compass" element={<CareerCompassIntroPage />} />
+        <Route path="/career-compass/results" element={<CareerCompassResultsPage />} />
+
+        {/* Career Compass assessment: public/unprotected (anonymous-first
+            design), but NOT in publicRoutes -- WizardShell provides its own
+            full-page chrome, same pattern as /onboarding not double-wrapping
+            with SiteHeader/SiteFooter. Unlike /onboarding it's intentionally
+            NOT wrapped in ProtectedRoute or MemberLayout either. */}
+        <Route path="/career-compass/assessment" element={<CareerCompassAssessmentPage />} />
 
         {/* Checkout */}
         <Route
@@ -128,6 +149,14 @@ function App() {
           element={
             <ProtectedRoute>
               <MemberLayout><CareerProfilePage /></MemberLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/forward-dna"
+          element={
+            <ProtectedRoute>
+              <ForwardDnaPage />
             </ProtectedRoute>
           }
         />

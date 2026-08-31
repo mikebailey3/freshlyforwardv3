@@ -115,7 +115,7 @@ export function CareerProfilePage() {
         </div>
         <button
           onClick={startEditing}
-          className="flex items-center gap-1.5 rounded-lg bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-700"
+          className="flex items-center gap-1.5 rounded-full bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-700"
         >
           <Pencil className="h-4 w-4" />
           Edit Profile
@@ -201,7 +201,7 @@ export function CareerProfilePage() {
             {p?.skills && p.skills.length > 0 ? (
               <div className="flex flex-wrap gap-2">
                 {p.skills.map((skill, i) => (
-                  <span key={i} className="rounded-full bg-primary-100 px-3 py-1.5 text-sm font-medium text-primary-700">
+                  <span key={i} className="border border-primary-300 px-3 py-1.5 font-mono text-sm font-medium text-primary-700">
                     {skill}
                   </span>
                 ))}
@@ -273,7 +273,7 @@ export function CareerProfilePage() {
             {documents.length > 0 ? (
               <div className="space-y-2">
                 {documents.map((doc) => (
-                  <div key={doc.id} className="flex items-center gap-3 rounded-lg border border-neutral-200 p-3">
+                  <div key={doc.id} className="flex items-center gap-3 border border-neutral-200 p-3">
                     <FileText className="h-4 w-4 text-neutral-400" />
                     <div className="flex-1">
                       <p className="text-sm font-medium text-neutral-900">{doc.file_name}</p>
@@ -285,7 +285,7 @@ export function CareerProfilePage() {
             ) : (
               <EmptyState text="No documents uploaded yet." />
             )}
-            <label className="mt-4 flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed border-neutral-300 px-4 py-3 text-sm font-medium text-neutral-600 transition-colors hover:border-primary-400 hover:text-primary-600">
+            <label className="mt-4 flex cursor-pointer items-center justify-center gap-2 border border-dashed border-neutral-300 px-4 py-3 text-sm font-medium text-neutral-600 transition-colors hover:border-primary-400 hover:text-primary-600">
               {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
               {uploading ? 'Uploading…' : 'Upload Document'}
               <input
@@ -309,11 +309,9 @@ export function CareerProfilePage() {
 
 function ProfileCard({ icon: Icon, title, children }: { icon: typeof User; title: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-2xl border border-neutral-200 bg-white p-6">
-      <div className="mb-4 flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-100">
-          <Icon className="h-5 w-5 text-primary-600" />
-        </div>
+    <div className="border border-neutral-200 bg-white p-6">
+      <div className="mb-4 flex items-center gap-3 border-b border-neutral-100 pb-3">
+        <Icon className="h-5 w-5 text-primary-600" />
         <h3 className="font-serif text-base font-semibold text-neutral-900">{title}</h3>
       </div>
       {children}

@@ -38,7 +38,7 @@ export function RoadmapPage() {
       </div>
 
       {careerBuilderBadge && (
-        <div className="mb-6 flex items-center gap-4 rounded-2xl border border-accent-200 bg-accent-50 p-5">
+        <div className="mb-6 flex items-center gap-4 border border-accent-200 border-l-4 border-l-accent-500 bg-accent-50 p-5">
           <AchievementBadgeCircle badge={careerBuilderBadge} size="md" />
           <div>
             <p className="font-serif text-sm font-semibold text-neutral-900">Career Builder badge earned!</p>
@@ -54,10 +54,8 @@ export function RoadmapPage() {
       ) : milestones.length > 0 ? (
         <div className="space-y-3">
           {milestones.map((m) => (
-            <div key={m.id} className="flex items-start gap-3 rounded-xl border border-neutral-200 bg-white p-4">
-              <div className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-primary-100">
-                <Flag className="h-4 w-4 text-primary-600" />
-              </div>
+            <div key={m.id} className="flex items-start gap-3 border border-neutral-200 border-l-4 border-l-primary-600 bg-white p-4">
+              <Flag className="mt-0.5 h-5 w-5 flex-shrink-0 text-primary-600" />
               <div>
                 <p className="text-sm font-semibold text-neutral-900">{m.event_title}</p>
                 {m.event_description && <p className="text-sm text-neutral-600">{m.event_description}</p>}
@@ -67,7 +65,7 @@ export function RoadmapPage() {
           ))}
         </div>
       ) : (
-        <div className="rounded-2xl border border-neutral-200 bg-white p-12 text-center">
+        <div className="border border-neutral-200 bg-white p-12 text-center">
           <Map className="mx-auto h-12 w-12 text-neutral-300" />
           <p className="mt-4 text-sm text-neutral-500">
             Your roadmap hasn't been built yet. Your Career Strategist will work with you to map out
@@ -75,7 +73,7 @@ export function RoadmapPage() {
           </p>
           <Link
             to="/messages"
-            className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-primary-700"
+            className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-primary-700"
           >
             <MessageSquare className="h-4 w-4" />
             Ask your Strategist to build one
@@ -84,7 +82,7 @@ export function RoadmapPage() {
       )}
 
       {hasBadge('goal-achieved') && (
-        <div className="mt-6 flex items-center gap-2 rounded-xl bg-success-50 p-4 text-success-700">
+        <div className="mt-6 flex items-center gap-2 border border-success-300 bg-success-50 p-4 text-success-700">
           <CheckCircle2 className="h-5 w-5" />
           <p className="text-sm font-medium">You've achieved a major career goal on your roadmap. Nicely done.</p>
         </div>

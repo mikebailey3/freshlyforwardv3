@@ -27,19 +27,19 @@ const statusLabels: Record<string, string> = {
 }
 
 const statusColors: Record<string, string> = {
-  preparing_resume: 'bg-neutral-100 text-neutral-700',
-  preparing_cover_letter: 'bg-neutral-100 text-neutral-700',
-  waiting_on_member: 'bg-warning-100 text-warning-700',
-  ready_to_submit: 'bg-accent-100 text-accent-700',
-  submitted: 'bg-primary-600 text-white',
-  employer_viewed: 'bg-primary-100 text-primary-700',
-  follow_up_needed: 'bg-warning-100 text-warning-700',
-  interview_requested: 'bg-primary-100 text-primary-700',
-  interview_scheduled: 'bg-primary-600 text-white',
-  rejected: 'bg-error-100 text-error-700',
-  offer_received: 'bg-success-100 text-success-700',
-  offer_accepted: 'bg-success-600 text-white',
-  closed: 'bg-neutral-100 text-neutral-500',
+  preparing_resume: 'border-neutral-300 text-neutral-700',
+  preparing_cover_letter: 'border-neutral-300 text-neutral-700',
+  waiting_on_member: 'border-warning-500 text-warning-700',
+  ready_to_submit: 'border-accent-500 text-accent-700',
+  submitted: 'border-primary-600 bg-primary-600 text-white',
+  employer_viewed: 'border-primary-500 text-primary-700',
+  follow_up_needed: 'border-warning-500 text-warning-700',
+  interview_requested: 'border-primary-500 text-primary-700',
+  interview_scheduled: 'border-primary-600 bg-primary-600 text-white',
+  rejected: 'border-error-500 text-error-700',
+  offer_received: 'border-success-500 text-success-700',
+  offer_accepted: 'border-success-600 bg-success-600 text-white',
+  closed: 'border-neutral-300 text-neutral-500',
 }
 
 export function MemberApplicationsPage() {
@@ -84,7 +84,7 @@ export function MemberApplicationsPage() {
       </div>
 
       {applications.length === 0 ? (
-        <div className="rounded-2xl border border-neutral-200 bg-white p-12 text-center">
+        <div className="border border-neutral-200 bg-white p-12 text-center">
           <FileText className="mx-auto h-12 w-12 text-neutral-300" />
           <p className="mt-4 text-sm text-neutral-500">
             No applications yet. Your Career Strategist will begin preparing applications once opportunities are approved.
@@ -117,18 +117,18 @@ export function MemberApplicationsPage() {
 
 function ApplicationCard({ app }: { app: Application }) {
   return (
-    <div className="rounded-2xl border border-neutral-200 bg-white p-6 transition-all hover:shadow-md">
+    <div className="border border-neutral-200 border-l-4 border-l-primary-600 bg-white p-6 transition-colors hover:border-l-primary-800">
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1">
           <div className="flex items-center gap-2">
-            <span className={`rounded-full px-3 py-1 text-xs font-medium ${statusColors[app.status] || 'bg-neutral-100 text-neutral-700'}`}>
+            <span className={`border-2 px-2.5 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide ${statusColors[app.status] || 'border-neutral-300 text-neutral-700'}`}>
               {statusLabels[app.status] || app.status}
             </span>
           </div>
           <h3 className="mt-3 font-serif text-lg font-semibold text-neutral-900">{app.job_title}</h3>
           <p className="text-sm text-neutral-600">{app.employer}</p>
 
-          <div className="mt-3 flex flex-wrap gap-3 text-xs text-neutral-500">
+          <div className="mt-3 flex flex-wrap gap-3 font-mono text-xs text-neutral-500">
             {app.date_submitted && (
               <span className="flex items-center gap-1">
                 <Calendar className="h-3.5 w-3.5" />
@@ -150,14 +150,14 @@ function ApplicationCard({ app }: { app: Application }) {
           </div>
 
           {app.member_notes && (
-            <p className="mt-3 rounded-lg bg-neutral-50 p-3 text-sm text-neutral-600">{app.member_notes}</p>
+            <p className="mt-3 border border-dashed border-neutral-300 bg-neutral-50 p-3 text-sm text-neutral-600">{app.member_notes}</p>
           )}
         </div>
 
         {app.status === 'submitted' && (
           <Link
             to={`/why-we-applied/${app.id}`}
-            className="flex flex-shrink-0 items-center gap-1.5 rounded-lg border border-primary-200 bg-primary-50 px-4 py-2 text-sm font-medium text-primary-700 transition-colors hover:bg-primary-100"
+            className="flex flex-shrink-0 items-center gap-1.5 border border-primary-600 px-4 py-2 text-sm font-medium text-primary-700 transition-colors hover:bg-primary-50"
           >
             Why We Applied
             <ArrowRight className="h-4 w-4" />

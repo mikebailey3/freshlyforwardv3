@@ -7,12 +7,22 @@
     <title>FreshlyForward — Career Success Platform</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    <meta property="og:image" content="https://bolt.new/static/og_default.png">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content="https://bolt.new/static/og_default.png">
+    <!-- Manrope (headings) + DM Sans (body) + Fraunces (editorial display serif, added
+         for the Concierge Editorial redesign) are what index.css actually requests. -->
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Manrope:wght@500;700;800&family=DM+Sans:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
 </head>
   <body>
+    <!--
+    PROVENANCE: This build originally shipped as "Production Call Sheet" (see git
+    history / docs/superpowers/specs/ for the earlier design docs) -- paper-white
+    ground, broadsheet-ink black rules, brand green as the "approved" stamp color,
+    Space Mono for call-sheet metadata. As of 2026-08-28 that direction is being
+    superseded, page by page, by "Concierge Editorial" (soft rounded cards, real
+    editorial serif via Fraunces, the actual Friday Report artifact used as proof
+    rather than claims) -- see docs/superpowers/specs/2026-08-28-concierge-editorial-redesign-design.md
+    for the full spec and phased rollout. Pages not yet migrated still render in
+    the original Call Sheet style; that's expected mid-rollout, not a bug.
+    -->
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

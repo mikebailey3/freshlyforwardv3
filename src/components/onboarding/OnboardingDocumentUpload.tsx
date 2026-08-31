@@ -83,7 +83,7 @@ export function OnboardingDocumentUpload({ onNext, user }: OnboardingStepProps) 
       </p>
 
       {error && (
-        <div className="mt-6 flex items-start gap-2 rounded-lg bg-error-50 border border-error-100 px-4 py-3 text-sm text-error-600">
+        <div className="mt-6 flex items-start gap-2 border border-error-300 border-l-4 border-l-error-600 bg-error-50 px-4 py-3 text-sm text-error-600">
           <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
           <span>{error}</span>
         </div>
@@ -97,7 +97,7 @@ export function OnboardingDocumentUpload({ onNext, user }: OnboardingStepProps) 
           setDragOver(false)
           if (e.dataTransfer.files.length > 0) handleUpload(e.dataTransfer.files)
         }}
-        className={`mt-8 rounded-2xl border-2 border-dashed p-8 text-center transition-all ${
+        className={`mt-8 border-2 border-dashed p-8 text-center transition-all ${
           dragOver ? 'border-primary-500 bg-primary-50' : 'border-neutral-300 bg-neutral-50'
         }`}
       >
@@ -130,10 +130,8 @@ export function OnboardingDocumentUpload({ onNext, user }: OnboardingStepProps) 
         <div className="mt-6 space-y-2">
           <h3 className="text-sm font-semibold text-neutral-700">Uploaded Files</h3>
           {uploadedFiles.map((file, i) => (
-            <div key={i} className="flex items-center gap-3 rounded-lg border border-neutral-200 bg-white p-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-50">
-                <FileText className="h-4 w-4 text-primary-600" />
-              </div>
+            <div key={i} className="flex items-center gap-3 border border-neutral-200 bg-white p-3">
+              <FileText className="h-6 w-6 flex-shrink-0 text-primary-600" />
               <div className="flex-1">
                 <p className="text-sm font-medium text-neutral-900">{file.name}</p>
                 <p className="text-xs text-neutral-500">
@@ -146,7 +144,7 @@ export function OnboardingDocumentUpload({ onNext, user }: OnboardingStepProps) 
         </div>
       )}
 
-      <div className="mt-8 rounded-xl bg-neutral-50 border border-neutral-200 p-4">
+      <div className="mt-8 border border-neutral-200 bg-neutral-50 p-4">
         <p className="text-sm text-neutral-600">
           <strong>Prefer to skip this step?</strong> You can upload documents anytime from your dashboard.
           Your Career Strategist can also help you create or refine your resume.

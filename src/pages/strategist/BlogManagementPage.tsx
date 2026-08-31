@@ -11,9 +11,9 @@ import type { BlogPost, BlogPostStatus } from '@/types'
 type StatusTab = 'all' | BlogPostStatus
 
 const STATUS_BADGE: Record<BlogPostStatus, string> = {
-  published: 'bg-success-100 text-success-700',
-  draft: 'bg-neutral-100 text-neutral-600',
-  scheduled: 'bg-warning-100 text-warning-700',
+  published: 'border-success-300 text-success-700',
+  draft: 'border-neutral-300 text-neutral-600',
+  scheduled: 'border-warning-300 text-warning-700',
 }
 
 export function BlogManagementPage() {
@@ -91,7 +91,7 @@ export function BlogManagementPage() {
         </div>
         <button
           onClick={() => navigate('/strategist/blog-posts/new')}
-          className="flex items-center gap-1.5 rounded-lg bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-700"
+          className="flex items-center gap-1.5 rounded-full bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-700"
         >
           <Plus className="h-4 w-4" />
           Add New Post
@@ -99,21 +99,21 @@ export function BlogManagementPage() {
       </div>
 
       {error && (
-        <div className="mb-6 flex items-start gap-2 rounded-lg bg-error-50 border border-error-100 px-4 py-3 text-sm text-error-600">
+        <div className="mb-6 flex items-start gap-2 border border-error-300 border-l-4 border-l-error-500 bg-error-50 px-4 py-3 text-sm text-error-600">
           <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
-      <div className="mb-6 flex flex-col gap-4 rounded-2xl border border-neutral-200 bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mb-6 flex flex-col gap-4 border border-neutral-200 bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-wrap gap-1">
           {tabs.map((tab) => (
             <button
               key={tab.key}
               onClick={() => setStatusTab(tab.key)}
               className={cn(
-                'rounded-lg px-3 py-2 text-xs font-semibold transition-colors',
-                statusTab === tab.key ? 'bg-primary-50 text-primary-700' : 'text-neutral-500 hover:bg-neutral-50',
+                'border px-3 py-2 text-xs font-semibold uppercase tracking-wide transition-colors',
+                statusTab === tab.key ? 'border-primary-300 bg-primary-50 text-primary-700' : 'border-transparent text-neutral-500 hover:bg-neutral-50',
               )}
             >
               {tab.label}
@@ -128,20 +128,20 @@ export function BlogManagementPage() {
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search posts..."
             aria-label="Search posts by title"
-            className="w-full rounded-lg border border-neutral-300 bg-white py-2 pl-10 pr-4 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 sm:w-64"
+            className="w-full border border-neutral-300 bg-white py-2 pl-10 pr-4 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 sm:w-64"
           />
         </div>
       </div>
 
       {filteredPosts.length === 0 ? (
-        <div className="rounded-2xl border border-neutral-200 bg-white p-12 text-center">
+        <div className="border border-neutral-200 bg-white p-12 text-center">
           <Newspaper className="mx-auto h-10 w-10 text-neutral-300" />
           <p className="mt-4 text-sm text-neutral-500">
             {posts.length === 0 ? 'No posts yet. Write the first one!' : 'No posts match your search or filter.'}
           </p>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white">
+        <div className="overflow-hidden border border-neutral-200 bg-white">
           <table className="w-full text-left text-sm">
             <thead className="border-b border-neutral-200 bg-neutral-50 text-xs font-semibold uppercase tracking-wide text-neutral-500">
               <tr>
@@ -160,7 +160,7 @@ export function BlogManagementPage() {
                   <td className="px-5 py-3.5 text-neutral-600">{post.category}</td>
                   <td className="px-5 py-3.5 text-neutral-600">{post.author_name || '—'}</td>
                   <td className="px-5 py-3.5">
-                    <span className={cn('rounded-full px-2 py-0.5 text-xs font-medium capitalize', STATUS_BADGE[post.status])}>
+                    <span className={cn('border px-2 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide', STATUS_BADGE[post.status])}>
                       {post.status}
                     </span>
                   </td>
@@ -171,7 +171,7 @@ export function BlogManagementPage() {
                     <div className="flex items-center justify-end gap-2">
                       <Link
                         to={`/strategist/blog-posts/${post.id}`}
-                        className="flex items-center gap-1 rounded-lg border border-neutral-200 px-2.5 py-1.5 text-xs font-medium text-neutral-600 transition-colors hover:bg-neutral-100"
+                        className="flex items-center gap-1 border border-neutral-200 px-2.5 py-1.5 text-xs font-medium text-neutral-600 transition-colors hover:bg-neutral-100"
                       >
                         <Pencil className="h-3.5 w-3.5" />
                         Edit
@@ -179,7 +179,7 @@ export function BlogManagementPage() {
                       <button
                         onClick={() => handleDelete(post)}
                         disabled={deletingId === post.id}
-                        className="flex items-center gap-1 rounded-lg border border-error-200 px-2.5 py-1.5 text-xs font-medium text-error-600 transition-colors hover:bg-error-50 disabled:opacity-60"
+                        className="flex items-center gap-1 border border-error-200 px-2.5 py-1.5 text-xs font-medium text-error-600 transition-colors hover:bg-error-50 disabled:opacity-60"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                         Delete

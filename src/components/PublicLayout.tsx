@@ -5,6 +5,7 @@ import { useAuth } from '@/context/AuthContext'
 
 const navigation = [
   ['/how-it-works', 'How It Works'],
+  ['/career-compass', 'Free Assessment'],
   ['/services', 'Services'],
   ['/why-freshlyforward', 'Why FreshlyForward'],
   ['/pricing', 'Pricing'],
@@ -15,7 +16,7 @@ const navigation = [
 export function Logo() {
   return (
     <Link to="/" className="logo" aria-label="FreshlyForward home">
-      <img src="/images/c1d368c4-ef41-494f-9a54-f5303e6f864d.png?v=2" alt="FreshlyForward — Your Next Chapter Starts Here" />
+      <img src="/images/c1d368c4-ef41-494f-9a54-f5303e6f864d.png?v=2" alt="" />
     </Link>
   )
 }
@@ -64,7 +65,7 @@ export function SiteFooter() {
         <div><strong>Legal</strong><Link to="/privacy">Privacy</Link><Link to="/terms">Terms</Link><Link to="/signin">Client login</Link><Link to="/signup">Get started</Link></div>
       </div>
       <div className="shell footer-bottom">
-        <span>© 2026 FreshlyForward. All rights reserved.</span>
+        <span>© {new Date().getFullYear()} FreshlyForward. All rights reserved.</span>
         <span>Real people. Thoughtful work. Forward momentum.</span>
       </div>
       {role === 'admin' && (

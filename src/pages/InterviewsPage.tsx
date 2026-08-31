@@ -82,7 +82,7 @@ export function InterviewsPage() {
         </div>
         <Link
           to="/mock-interviews"
-          className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-300 px-3 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
+          className="inline-flex items-center gap-1.5 border border-neutral-300 px-3 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
         >
           <Video className="h-4 w-4" />
           Mock Interviews
@@ -90,13 +90,13 @@ export function InterviewsPage() {
       </div>
 
       {error && (
-        <div className="mb-4 rounded-lg border border-error-200 bg-error-50 px-4 py-2.5 text-sm text-error-700">
+        <div className="mb-4 border border-error-200 bg-error-50 px-4 py-2.5 text-sm text-error-700">
           {error}
         </div>
       )}
 
       {applications.length === 0 ? (
-        <div className="rounded-2xl border border-neutral-200 bg-white p-12 text-center">
+        <div className="border border-neutral-200 bg-white p-12 text-center">
           <Briefcase className="mx-auto h-12 w-12 text-neutral-300" />
           <p className="mt-4 text-sm text-neutral-500">
             No applications yet. Interviews will show up here once your strategist starts applying on your behalf.
@@ -185,11 +185,11 @@ function InterviewCard({ app, editing, saving, onEdit, onCancelEdit, onSave }: I
   }
 
   return (
-    <div className="rounded-2xl border border-neutral-200 bg-white p-6 transition-all hover:shadow-md">
+    <div className="border border-neutral-200 border-l-4 border-l-primary-600 bg-white p-6 transition-colors hover:border-l-primary-800">
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1">
           {isActive && (
-            <span className="rounded-full bg-primary-600 px-3 py-1 text-xs font-medium text-white">
+            <span className="border-2 border-primary-600 px-2.5 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide text-primary-700">
               Interview Scheduled
             </span>
           )}
@@ -206,12 +206,12 @@ function InterviewCard({ app, editing, saving, onEdit, onCancelEdit, onSave }: I
                 value={localValue}
                 onChange={(e) => setLocalValue(e.target.value)}
                 required
-                className="rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="border border-neutral-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
               />
               <button
                 type="submit"
                 disabled={saving || !localValue}
-                className="flex items-center gap-1.5 rounded-lg bg-primary-600 px-3 py-2 text-sm font-medium text-white hover:bg-primary-700 disabled:opacity-60"
+                className="flex items-center gap-1.5 bg-primary-600 px-3 py-2 text-sm font-medium text-white hover:bg-primary-700 disabled:opacity-60"
               >
                 {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
                 Save
@@ -220,7 +220,7 @@ function InterviewCard({ app, editing, saving, onEdit, onCancelEdit, onSave }: I
                 type="button"
                 onClick={onCancelEdit}
                 disabled={saving}
-                className="flex items-center gap-1.5 rounded-lg border border-neutral-300 px-3 py-2 text-sm font-medium text-neutral-600 hover:bg-neutral-50"
+                className="flex items-center gap-1.5 border border-neutral-300 px-3 py-2 text-sm font-medium text-neutral-600 hover:bg-neutral-50"
               >
                 <X className="h-4 w-4" />
                 Cancel
@@ -231,7 +231,7 @@ function InterviewCard({ app, editing, saving, onEdit, onCancelEdit, onSave }: I
               {app.interview_date ? (
                 <button
                   onClick={onEdit}
-                  className="mt-3 flex items-center gap-1.5 text-sm font-medium text-neutral-700 hover:text-primary-700"
+                  className="mt-3 flex items-center gap-1.5 font-mono text-sm font-medium text-neutral-700 hover:text-primary-700"
                 >
                   <Calendar className="h-4 w-4 text-primary-600" />
                   {new Date(app.interview_date).toLocaleString('en-US', {
@@ -242,7 +242,7 @@ function InterviewCard({ app, editing, saving, onEdit, onCancelEdit, onSave }: I
               ) : (
                 <button
                   onClick={onEdit}
-                  className="mt-3 flex items-center gap-1.5 rounded-lg border border-dashed border-primary-300 px-3 py-1.5 text-sm font-medium text-primary-700 hover:bg-primary-50"
+                  className="mt-3 flex items-center gap-1.5 border border-dashed border-primary-300 px-3 py-1.5 text-sm font-medium text-primary-700 hover:bg-primary-50"
                 >
                   <Plus className="h-4 w-4" />
                   Add Interview Date
@@ -252,12 +252,12 @@ function InterviewCard({ app, editing, saving, onEdit, onCancelEdit, onSave }: I
           )}
 
           {app.date_submitted && (
-            <p className="mt-2 text-xs text-neutral-400">Applied {formatDate(app.date_submitted)}</p>
+            <p className="mt-2 font-mono text-xs text-neutral-400">Applied {formatDate(app.date_submitted)}</p>
           )}
         </div>
         <Link
           to={`/why-we-applied/${app.id}`}
-          className="flex flex-shrink-0 items-center gap-1.5 rounded-lg border border-primary-200 bg-primary-50 px-4 py-2 text-sm font-medium text-primary-700 transition-colors hover:bg-primary-100"
+          className="flex flex-shrink-0 items-center gap-1.5 border border-primary-600 px-4 py-2 text-sm font-medium text-primary-700 transition-colors hover:bg-primary-50"
         >
           Prep Notes
           <ArrowRight className="h-4 w-4" />

@@ -27,6 +27,11 @@ export function ForwardFeedPage() {
   return (
     <main>
       <section className="page-hero page-hero-centered shell">
+        <div className="cs-masthead" style={{ justifyContent: 'center', marginBottom: 24 }}>
+          <span>FRESHLYFORWARD</span>
+          <span>THE FORWARD FEED</span>
+          <span>UPDATED WEEKLY</span>
+        </div>
         <div>
           <p className="eyebrow">The Forward Feed</p>
           <h1>Career insights, straight from your search team.</h1>
@@ -72,13 +77,18 @@ export function ForwardFeedPage() {
                 className="forward-feed-card"
                 data-category={post.category}
               >
-                <span className="forward-feed-category">{post.category}</span>
-                <h3 className="forward-feed-title">{post.title}</h3>
-                <p className="forward-feed-excerpt">{post.excerpt}</p>
-                <div className="forward-feed-meta">
-                  <span>{formatPostDate(post.published_at)}</span>
-                  <span>&middot;</span>
-                  <span>{readTimeLabel(post.read_time_minutes)}</span>
+                {post.cover_image_url && (
+                  <div className="forward-feed-card-media"><img src={post.cover_image_url} alt="" /></div>
+                )}
+                <div className="forward-feed-card-body">
+                  <span className="forward-feed-category">{post.category}</span>
+                  <h3 className="forward-feed-title">{post.title}</h3>
+                  <p className="forward-feed-excerpt">{post.excerpt}</p>
+                  <div className="forward-feed-meta">
+                    <span>{formatPostDate(post.published_at)}</span>
+                    <span>&middot;</span>
+                    <span>{readTimeLabel(post.read_time_minutes)}</span>
+                  </div>
                 </div>
               </Link>
             ))}

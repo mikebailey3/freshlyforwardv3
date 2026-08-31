@@ -8,6 +8,7 @@ export function SignUpPage() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const planSlug = searchParams.get('plan')
+  const compass = searchParams.get('compass')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -34,10 +35,11 @@ export function SignUpPage() {
       setError(signUpError)
       setLoading(false)
     } else {
-      // If a plan was already selected (from the Pricing page), continue to
-      // checkout for that plan. Otherwise, get the member straight into the
-      // career wizard so they can start building their profile immediately.
-      navigate(planSlug ? `/checkout/${planSlug}` : '/onboarding')
+      // Career Compass takes priority: a visitor arriving here to save their
+      // free assessment result should land back on their dashboard with it,
+      // even if a plan was also selected elsewhere. Otherwise, continue to
+      // checkout for a selected plan, or into the career wizard by default.
+      navigate(compass ? '/dashboard?compass=saved' : planSlug ? `/checkout/${planSlug}` : '/onboarding')
     }
   }
 

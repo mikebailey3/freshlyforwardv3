@@ -14,11 +14,9 @@ export function SearchReadinessWidget({ profile }: { profile: MemberProfile | nu
   const fixLink = useMemo(() => getReadinessFixLink(missing), [missing])
 
   return (
-    <div className="rounded-2xl border border-neutral-200 bg-white p-6">
-      <div className="flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-100">
-          <TrendingUp className="h-5 w-5 text-primary-600" />
-        </div>
+    <div className="border border-neutral-200 bg-white p-6">
+      <div className="flex items-center gap-3 border-b border-neutral-100 pb-3">
+        <TrendingUp className="h-5 w-5 text-primary-600" />
         <div>
           <h3 className="font-serif text-base font-semibold text-neutral-900">Search Readiness</h3>
           <p className="text-xs text-neutral-500">Profile completeness</p>
@@ -47,14 +45,14 @@ export function SearchReadinessWidget({ profile }: { profile: MemberProfile | nu
           </ul>
           <Link
             to={fixLink}
-            className="mt-4 flex w-full items-center justify-center gap-1.5 rounded-lg bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-700"
+            className="mt-4 flex w-full items-center justify-center gap-1.5 rounded-full bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-700"
           >
             Let&rsquo;s fix it
             <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
       ) : (
-        <div className="mt-6 flex items-center gap-2 rounded-lg bg-success-50 p-3">
+        <div className="mt-6 flex items-center gap-2 border border-success-300 bg-success-50 p-3">
           <Check className="h-5 w-5 text-success-600" />
           <p className="text-sm text-success-700">Your profile is complete. Your Strategist has everything needed.</p>
         </div>

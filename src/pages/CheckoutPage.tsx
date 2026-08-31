@@ -136,27 +136,27 @@ export function CheckoutPage() {
       <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
         <Link to="/" className="mb-8 flex items-center gap-2">
           <Compass className="h-7 w-7 text-primary-600" />
-          <span className="font-serif text-xl font-semibold text-neutral-900">FreshlyForward</span>
+          <span className="font-display text-xl font-semibold text-neutral-900">FreshlyForward</span>
         </Link>
 
         <div className="rounded-2xl border border-neutral-200 bg-white p-8 shadow-sm">
-          <h1 className="font-serif text-2xl font-semibold text-neutral-900">Checkout</h1>
+          <h1 className="font-display text-2xl font-semibold text-neutral-900">Checkout</h1>
           <p className="mt-2 text-sm text-neutral-600">Review your plan and complete your purchase.</p>
 
           {/* Plan Summary */}
-          <div className="mt-6 rounded-xl border border-neutral-200 bg-neutral-50 p-6">
+          <div className="mt-6 rounded-xl border border-neutral-200 border-l-4 border-l-primary-600 bg-neutral-50 p-6">
             <div className="flex items-start justify-between">
               <div>
-                <h2 className="font-serif text-lg font-semibold text-neutral-900">{plan.name}</h2>
+                <h2 className="font-display text-lg font-semibold text-neutral-900">{plan.name}</h2>
                 {plan.badge && (
-                  <span className="mt-1 inline-block rounded-full bg-primary-100 px-3 py-0.5 text-xs font-medium text-primary-700">
+                  <span className="mt-1 inline-block rounded-full border border-primary-300 px-2.5 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide text-primary-700">
                     {plan.badge}
                   </span>
                 )}
                 <p className="mt-2 text-sm text-neutral-600">{plan.description}</p>
               </div>
               <div className="text-right">
-                <div className="font-serif text-3xl font-bold text-neutral-900">
+                <div className="font-display text-3xl font-bold text-neutral-900">
                   {formatCurrency(plan.price_cents)}
                 </div>
                 <div className="text-sm text-neutral-500">/{plan.interval}</div>
@@ -184,12 +184,12 @@ export function CheckoutPage() {
                   value={discountCode}
                   onChange={(e) => setDiscountCode(e.target.value)}
                   placeholder="Enter discount code"
-                  className="w-full rounded-lg border border-neutral-300 py-2.5 pl-10 pr-3 text-sm text-neutral-900 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  className="w-full rounded-full border border-neutral-300 py-2.5 pl-10 pr-3 text-sm text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                 />
               </div>
               <button
                 type="submit"
-                className="rounded-lg border border-neutral-300 px-4 py-2.5 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50"
+                className="rounded-full border border-neutral-300 px-4 py-2.5 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50"
               >
                 Apply
               </button>
@@ -203,7 +203,7 @@ export function CheckoutPage() {
           </div>
 
           {error && (
-            <div className="mt-4 flex items-start gap-2 rounded-lg bg-error-50 border border-error-100 px-4 py-3 text-sm text-error-600">
+            <div className="mt-4 flex items-start gap-2 rounded-xl border border-error-200 bg-error-50 px-4 py-3 text-sm text-error-600">
               <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
               <span>{error}</span>
             </div>
@@ -213,7 +213,7 @@ export function CheckoutPage() {
           <button
             onClick={handleCheckout}
             disabled={processing}
-            className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-primary-600 px-6 py-3.5 text-base font-semibold text-white shadow-lg shadow-primary-600/20 transition-all hover:bg-primary-700 disabled:opacity-60"
+            className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-primary-600 px-6 py-3.5 text-base font-semibold text-white shadow-sm transition-colors hover:bg-primary-700 disabled:opacity-60"
           >
             {processing ? (
               <>

@@ -179,12 +179,10 @@ export function StrategistDashboardPage() {
         {/* Left: Members awaiting review */}
         <div className="lg:col-span-2 space-y-6">
           {/* Members */}
-          <div className="rounded-2xl border border-neutral-200 bg-white p-6">
+          <div className="border border-neutral-200 bg-white p-6">
             <div className="mb-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-100">
-                  <Users className="h-5 w-5 text-primary-600" />
-                </div>
+                <Users className="h-6 w-6 text-primary-600" />
                 <div>
                   <h3 className="font-serif text-base font-semibold text-neutral-900">Assigned Members</h3>
                   <p className="text-xs text-neutral-500">{members.length} active</p>
@@ -202,7 +200,7 @@ export function StrategistDashboardPage() {
                   <Link
                     key={m.member_id}
                     to={`/strategist/members/${m.member_id}`}
-                    className="flex items-center gap-3 rounded-lg border border-neutral-200 p-3 transition-all hover:border-primary-300 hover:bg-primary-50"
+                    className="flex items-center gap-3 border border-neutral-200 border-l-4 border-l-primary-600 p-3 transition-colors hover:bg-primary-50"
                   >
                     <div className="flex h-10 w-10 items-center justify-center rounded-full bg-neutral-100">
                       <User className="h-5 w-5 text-neutral-500" />
@@ -213,12 +211,12 @@ export function StrategistDashboardPage() {
                     </div>
                     <div className="flex items-center gap-2">
                       {m.pending_approvals > 0 && (
-                        <span className="rounded-full bg-warning-100 px-2 py-0.5 text-xs font-medium text-warning-700">
+                        <span className="border border-warning-300 px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide text-warning-700">
                           {m.pending_approvals} pending
                         </span>
                       )}
                       {m.unread_count > 0 && (
-                        <span className="rounded-full bg-primary-600 px-2 py-0.5 text-xs font-semibold text-white">
+                        <span className="rounded-full bg-primary-600 px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide text-white">
                           {m.unread_count}
                         </span>
                       )}
@@ -230,11 +228,9 @@ export function StrategistDashboardPage() {
           </div>
 
           {/* Follow-ups */}
-          <div className="rounded-2xl border border-neutral-200 bg-white p-6">
+          <div className="border border-neutral-200 bg-white p-6">
             <div className="mb-4 flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-100">
-                <Clock className="h-5 w-5 text-primary-600" />
-              </div>
+              <Clock className="h-6 w-6 text-primary-600" />
               <div>
                 <h3 className="font-serif text-base font-semibold text-neutral-900">Follow-Ups</h3>
                 <p className="text-xs text-neutral-500">Scheduled reminders</p>
@@ -276,11 +272,9 @@ export function StrategistDashboardPage() {
 
         {/* Right: Quick actions + capacity */}
         <div className="space-y-6">
-          <div className="rounded-2xl border border-neutral-200 bg-white p-6">
+          <div className="border border-neutral-200 bg-white p-6">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-100">
-                <Activity className="h-5 w-5 text-primary-600" />
-              </div>
+              <Activity className="h-6 w-6 text-primary-600" />
               <div>
                 <h3 className="font-serif text-base font-semibold text-neutral-900">Quick Actions</h3>
               </div>
@@ -288,21 +282,21 @@ export function StrategistDashboardPage() {
             <div className="mt-4 space-y-2">
               <Link
                 to="/strategist/opportunities"
-                className="flex items-center gap-2 rounded-lg border border-neutral-200 px-4 py-2.5 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50"
+                className="flex items-center gap-2 border border-neutral-200 px-4 py-2.5 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50"
               >
                 <Plus className="h-4 w-4 text-primary-600" />
                 Add Opportunity
               </Link>
               <Link
                 to="/strategist/applications"
-                className="flex items-center gap-2 rounded-lg border border-neutral-200 px-4 py-2.5 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50"
+                className="flex items-center gap-2 border border-neutral-200 px-4 py-2.5 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50"
               >
                 <FileText className="h-4 w-4 text-primary-600" />
                 View Applications
               </Link>
               <Link
                 to="/strategist/members"
-                className="flex items-center gap-2 rounded-lg border border-neutral-200 px-4 py-2.5 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50"
+                className="flex items-center gap-2 border border-neutral-200 px-4 py-2.5 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50"
               >
                 <Users className="h-4 w-4 text-primary-600" />
                 Review Members
@@ -311,11 +305,9 @@ export function StrategistDashboardPage() {
           </div>
 
           {/* Strategist Capacity */}
-          <div className="rounded-2xl border border-neutral-200 bg-white p-6">
+          <div className="border border-neutral-200 bg-white p-6">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-100">
-                <TrendingUp className="h-5 w-5 text-primary-600" />
-              </div>
+              <TrendingUp className="h-6 w-6 text-primary-600" />
               <div>
                 <h3 className="font-serif text-base font-semibold text-neutral-900">Capacity</h3>
                 <p className="text-xs text-neutral-500">Active workload</p>
@@ -348,18 +340,17 @@ export function StrategistDashboardPage() {
 
 function StatCard({ icon: Icon, label, value, color }: { icon: typeof User; label: string; value: number; color: string }) {
   const colors: Record<string, string> = {
-    primary: 'bg-primary-100 text-primary-600',
-    warning: 'bg-warning-100 text-warning-600',
-    accent: 'bg-accent-100 text-accent-600',
-    success: 'bg-success-100 text-success-600',
-    error: 'bg-error-100 text-error-600',
+    primary: 'border-l-primary-600 text-primary-600',
+    warning: 'border-l-warning-500 text-warning-600',
+    accent: 'border-l-accent-500 text-accent-600',
+    success: 'border-l-success-500 text-success-600',
+    error: 'border-l-error-500 text-error-600',
   }
+  const [borderColor, textColor] = colors[color].split(' ')
   return (
-    <div className="rounded-xl border border-neutral-200 bg-white p-4">
+    <div className={`border border-neutral-200 border-l-4 bg-white p-4 ${borderColor}`}>
       <div className="flex items-center gap-3">
-        <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${colors[color]}`}>
-          <Icon className="h-5 w-5" />
-        </div>
+        <Icon className={`h-6 w-6 ${textColor}`} />
         <div>
           <p className="text-2xl font-serif font-bold text-neutral-900">{value}</p>
           <p className="text-xs text-neutral-500">{label}</p>
@@ -371,8 +362,8 @@ function StatCard({ icon: Icon, label, value, color }: { icon: typeof User; labe
 
 function FollowUpCard({ followUp, overdue, completed }: { followUp: FollowUp; overdue?: boolean; completed?: boolean }) {
   return (
-    <div className={`flex items-start gap-3 rounded-lg border p-3 ${
-      overdue ? 'border-error-200 bg-error-50' : completed ? 'border-success-200 bg-success-50' : 'border-neutral-200 bg-neutral-50'
+    <div className={`flex items-start gap-3 border border-l-4 p-3 ${
+      overdue ? 'border-neutral-200 border-l-error-500 bg-error-50' : completed ? 'border-neutral-200 border-l-success-500 bg-success-50' : 'border-neutral-200 border-l-neutral-400 bg-neutral-50'
     }`}>
       <div className="flex-1">
         <p className="text-sm font-medium text-neutral-900">{followUp.title}</p>

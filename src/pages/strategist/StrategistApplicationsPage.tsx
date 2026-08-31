@@ -14,19 +14,19 @@ import { APPLICATION_STATUSES } from '@/types'
 type StatusFilter = 'all' | (typeof APPLICATION_STATUSES)[number]
 
 const STATUS_COLORS: Record<string, string> = {
-  preparing_resume: 'bg-neutral-100 text-neutral-700',
-  preparing_cover_letter: 'bg-neutral-100 text-neutral-700',
-  waiting_on_member: 'bg-warning-100 text-warning-700',
-  ready_to_submit: 'bg-accent-100 text-accent-700',
-  submitted: 'bg-primary-100 text-primary-700',
-  employer_viewed: 'bg-primary-100 text-primary-700',
-  follow_up_needed: 'bg-warning-100 text-warning-700',
-  interview_requested: 'bg-accent-100 text-accent-700',
-  interview_scheduled: 'bg-primary-100 text-primary-700',
-  rejected: 'bg-error-100 text-error-700',
-  offer_received: 'bg-success-100 text-success-700',
-  offer_accepted: 'bg-success-100 text-success-700',
-  closed: 'bg-neutral-100 text-neutral-500',
+  preparing_resume: 'border-neutral-300 text-neutral-700',
+  preparing_cover_letter: 'border-neutral-300 text-neutral-700',
+  waiting_on_member: 'border-warning-300 text-warning-700',
+  ready_to_submit: 'border-accent-300 text-accent-700',
+  submitted: 'border-primary-300 text-primary-700',
+  employer_viewed: 'border-primary-300 text-primary-700',
+  follow_up_needed: 'border-warning-300 text-warning-700',
+  interview_requested: 'border-accent-300 text-accent-700',
+  interview_scheduled: 'border-primary-300 text-primary-700',
+  rejected: 'border-error-300 text-error-700',
+  offer_received: 'border-success-300 text-success-700',
+  offer_accepted: 'border-success-300 text-success-700',
+  closed: 'border-neutral-300 text-neutral-500',
 }
 
 const STATUS_LABELS: Record<string, string> = {
@@ -139,7 +139,7 @@ export function StrategistApplicationsPage() {
       </div>
 
       {/* Search & filter */}
-      <div className="mb-6 rounded-2xl border border-neutral-200 bg-white p-4">
+      <div className="mb-6 border border-neutral-200 bg-white p-4">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
           <div className="relative flex-1">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
@@ -149,7 +149,7 @@ export function StrategistApplicationsPage() {
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by employer or job title..."
               aria-label="Search applications"
-              className="w-full rounded-lg border border-neutral-300 bg-white py-2 pl-10 pr-4 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+              className="w-full border border-neutral-300 bg-white py-2 pl-10 pr-4 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
             />
           </div>
           <div className="flex items-center gap-2">
@@ -161,7 +161,7 @@ export function StrategistApplicationsPage() {
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
               aria-label="Filter by application status"
-              className="rounded-lg border border-neutral-300 bg-white py-2 pl-3 pr-8 text-sm text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+              className="border border-neutral-300 bg-white py-2 pl-3 pr-8 text-sm text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
             >
               <option value="all">All Statuses ({applications.length})</option>
               {APPLICATION_STATUSES.map((s) => (
@@ -176,7 +176,7 @@ export function StrategistApplicationsPage() {
 
       {/* Applications list */}
       {filteredApplications.length === 0 ? (
-        <div className="rounded-2xl border border-neutral-200 bg-white p-12 text-center">
+        <div className="border border-neutral-200 bg-white p-12 text-center">
           <FileText className="mx-auto h-10 w-10 text-neutral-300" />
           <p className="mt-4 text-sm text-neutral-500">
             {applications.length === 0
@@ -210,14 +210,14 @@ interface ApplicationCardProps {
 
 function ApplicationCard({ application, memberName, updating, onStatusChange }: ApplicationCardProps) {
   return (
-    <div className="rounded-2xl border border-neutral-200 bg-white p-5 transition-all hover:border-primary-300">
+    <div className="border border-neutral-200 border-l-4 border-l-primary-600 bg-white p-5 transition-colors hover:border-l-primary-700">
       {/* Header */}
       <div className="mb-3 flex items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
           <h3 className="font-serif text-sm font-semibold text-neutral-900 truncate">{application.job_title}</h3>
           <p className="text-sm font-medium text-primary-600 truncate">{application.employer}</p>
         </div>
-        <span className={cn('flex-shrink-0 rounded-full px-2.5 py-0.5 text-xs font-medium', STATUS_COLORS[application.status] || 'bg-neutral-100 text-neutral-700')}>
+        <span className={cn('flex-shrink-0 border px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide', STATUS_COLORS[application.status] || 'border-neutral-300 text-neutral-700')}>
           {STATUS_LABELS[application.status] || application.status}
         </span>
       </div>
@@ -278,7 +278,7 @@ function ApplicationCard({ application, memberName, updating, onStatusChange }: 
             value={application.status}
             disabled={updating}
             onChange={(e) => onStatusChange(application.id, e.target.value)}
-            className="w-full appearance-none rounded-lg border border-neutral-300 bg-white py-2 pl-3 pr-9 text-sm font-medium text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 disabled:cursor-not-allowed disabled:opacity-50"
+            className="w-full appearance-none border border-neutral-300 bg-white py-2 pl-3 pr-9 text-sm font-medium text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {APPLICATION_STATUSES.map((s) => (
               <option key={s} value={s}>{STATUS_LABELS[s]}</option>
