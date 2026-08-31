@@ -77,6 +77,9 @@ async function deactivateGoneJobs(source: string, companySlug: string, seenIds: 
 }
 
 async function deactivateStaleJobs(maxAgeDays: number): Promise<void> {
+  // Deliberately global (no source filter): covers legacy scrapeIndeed.ts
+  // rows and, once Task Group 4 ships, member-submitted jobs too -- any
+  // scraped_jobs row not re-confirmed in maxAgeDays goes inactive.
   const { data, error } = await supabase.from('scraped_jobs').select('id, scraped_at').eq('is_active', true)
 
   if (error) {
