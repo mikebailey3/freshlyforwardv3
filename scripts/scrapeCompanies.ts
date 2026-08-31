@@ -22,6 +22,7 @@ import companies from './jobSources/companies.json'
 import { fetchGreenhouseJobs } from './jobSources/greenhouse'
 import { fetchLeverJobs } from './jobSources/lever'
 import { fetchAshbyJobs } from './jobSources/ashby'
+import { selectJobsToDeactivate, isStaleByAge } from './jobSources/liveness'
 import type { ScrapedJobInput } from './jobSources/types'
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL
@@ -48,6 +49,52 @@ async function upsertJobs(jobs: ScrapedJobInput[]): Promise<void> {
   else console.log(`Upserted ${rows.length} job(s).`)
 }
 
+async function deactivateGoneJobs(source: string, companySlug: string, seenIds: string[]): Promise<void> {
+  const { data, error } = await supabase
+    .from('scraped_jobs')
+    .select('external_id')
+    .eq('source', source)
+    .eq('search_query', companySlug)
+    .eq('is_active', true)
+
+  if (error) {
+    console.error(`Error reading existing ${source}/${companySlug} jobs:`, error)
+    return
+  }
+
+  const existingIds = (data ?? []).map((row) => row.external_id as string)
+  const toDeactivate = selectJobsToDeactivate(existingIds, seenIds)
+  if (toDeactivate.length === 0) return
+
+  const { error: updateError } = await supabase
+    .from('scraped_jobs')
+    .update({ is_active: false })
+    .eq('source', source)
+    .in('external_id', toDeactivate)
+
+  if (updateError) console.error(`Error deactivating gone ${source}/${companySlug} jobs:`, updateError)
+  else console.log(`Deactivated ${toDeactivate.length} ${source}/${companySlug} job(s) no longer listed.`)
+}
+
+async function deactivateStaleJobs(maxAgeDays: number): Promise<void> {
+  const { data, error } = await supabase.from('scraped_jobs').select('id, scraped_at').eq('is_active', true)
+
+  if (error) {
+    console.error('Error reading scraped_jobs for staleness sweep:', error)
+    return
+  }
+
+  const staleIds = (data ?? [])
+    .filter((row) => isStaleByAge(row.scraped_at as string, maxAgeDays))
+    .map((row) => row.id as string)
+
+  if (staleIds.length === 0) return
+
+  const { error: updateError } = await supabase.from('scraped_jobs').update({ is_active: false }).in('id', staleIds)
+  if (updateError) console.error('Error deactivating stale jobs:', updateError)
+  else console.log(`Deactivated ${staleIds.length} stale job(s) not re-confirmed in ${maxAgeDays} days.`)
+}
+
 async function main() {
   for (const [providerName, slugs] of Object.entries(companies as Record<string, string[]>)) {
     const fetchJobs = PROVIDERS[providerName]
@@ -61,11 +108,13 @@ async function main() {
         console.log(`Fetching ${providerName}/${slug}...`)
         const jobs = await fetchJobs(slug)
         await upsertJobs(jobs)
+        await deactivateGoneJobs(providerName, slug, jobs.map((j) => j.external_id))
       } catch (err) {
         console.error(`Failed on ${providerName}/${slug}:`, err)
       }
     }
   }
+  await deactivateStaleJobs(45)
   console.log('Done.')
 }
 
