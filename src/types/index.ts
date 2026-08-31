@@ -422,6 +422,8 @@ export interface JobMatchScoreBreakdown {
   roleRelevance: number
   locationFit: number
   keywordDensity: number
+  dnaSkillEvidence?: number
+  scopeFit?: number
 }
 
 export interface JobMatch {
