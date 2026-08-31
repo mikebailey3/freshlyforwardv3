@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import { MemberLayout } from '@/components/MemberLayout'
+import { SubmitJobModal } from '@/components/SubmitJobModal'
 import { useAuth } from '@/context/AuthContext'
 import { getJobMatches, dismissJobMatch } from '@/lib/opportunityEngine'
-import { Loader2, MapPin, DollarSign, ExternalLink, X, Sparkles } from 'lucide-react'
+import { Loader2, MapPin, DollarSign, ExternalLink, X, Sparkles, PlusCircle } from 'lucide-react'
 import type { JobMatchWithJob } from '@/types'
 
 function scoreColor(score: number): string {
@@ -12,9 +13,10 @@ function scoreColor(score: number): string {
 }
 
 export function OpportunityEnginePage() {
-  const { user } = useAuth()
+  const { user, profile } = useAuth()
   const [matches, setMatches] = useState<JobMatchWithJob[]>([])
   const [loading, setLoading] = useState(true)
+  const [showSubmitModal, setShowSubmitModal] = useState(false)
 
   useEffect(() => {
     if (!user) return
@@ -50,6 +52,13 @@ export function OpportunityEnginePage() {
           Job postings automatically matched against your Career Profile, scored by FreshFit.
           Strong matches get promoted to your Career Strategist for review.
         </p>
+        <button
+          onClick={() => setShowSubmitModal(true)}
+          className="mt-4 inline-flex items-center gap-2 rounded-full bg-primary-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-700"
+        >
+          <PlusCircle className="h-4 w-4" />
+          Submit a Job
+        </button>
       </div>
 
       {matches.length === 0 ? (
@@ -125,6 +134,17 @@ export function OpportunityEnginePage() {
             </div>
           ))}
         </div>
+      )}
+
+      {showSubmitModal && profile && (
+        <SubmitJobModal
+          profile={profile}
+          onClose={() => setShowSubmitModal(false)}
+          onSubmitted={(match) => {
+            setMatches((prev) => [match, ...prev])
+            setShowSubmitModal(false)
+          }}
+        />
       )}
     </MemberLayout>
   )
