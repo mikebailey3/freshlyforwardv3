@@ -3,6 +3,7 @@ import { MemberLayout } from '@/components/MemberLayout'
 import { SubmitJobModal } from '@/components/SubmitJobModal'
 import { useAuth } from '@/context/AuthContext'
 import { getJobMatches, dismissJobMatch } from '@/lib/opportunityEngine'
+import { isSafeHttpUrl } from '@/lib/url'
 import { Loader2, MapPin, DollarSign, ExternalLink, X, Sparkles, PlusCircle } from 'lucide-react'
 import type { JobMatchWithJob } from '@/types'
 
@@ -112,7 +113,7 @@ export function OpportunityEnginePage() {
                     </div>
                   )}
 
-                  {match.scraped_job.posting_url && /^https?:\/\//i.test(match.scraped_job.posting_url) && (
+                  {isSafeHttpUrl(match.scraped_job.posting_url) && (
                     <a
                       href={match.scraped_job.posting_url}
                       target="_blank"

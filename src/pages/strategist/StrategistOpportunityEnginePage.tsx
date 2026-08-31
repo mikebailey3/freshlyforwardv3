@@ -4,6 +4,7 @@ import { useAuth } from '@/context/AuthContext'
 import { supabase } from '@/lib/supabase'
 import { getAssignedMembers } from '@/lib/operations'
 import { getJobMatchesForStrategist, promoteMatchToOpportunity } from '@/lib/opportunityEngine'
+import { isSafeHttpUrl } from '@/lib/url'
 import { Loader2, MapPin, DollarSign, ExternalLink, ArrowUpRight, Sparkles } from 'lucide-react'
 import type { JobMatchWithJob, MemberProfile } from '@/types'
 
@@ -129,15 +130,19 @@ export function StrategistOpportunityEnginePage() {
               )}
 
               <div className="mt-3 flex items-center justify-between border-t border-neutral-100 pt-3">
-                <a
-                  href={match.scraped_job.posting_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-xs font-medium text-neutral-500 hover:text-neutral-700"
-                >
-                  <ExternalLink className="h-3.5 w-3.5" />
-                  Posting
-                </a>
+                {isSafeHttpUrl(match.scraped_job.posting_url) ? (
+                  <a
+                    href={match.scraped_job.posting_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-xs font-medium text-neutral-500 hover:text-neutral-700"
+                  >
+                    <ExternalLink className="h-3.5 w-3.5" />
+                    Posting
+                  </a>
+                ) : (
+                  <span className="text-xs text-neutral-400">No link provided</span>
+                )}
                 <button
                   onClick={() => handlePromote(match)}
                   disabled={promotingId === match.id}

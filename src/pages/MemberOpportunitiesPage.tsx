@@ -4,6 +4,7 @@ import { MemberLayout } from '@/components/MemberLayout'
 import { useAuth } from '@/context/AuthContext'
 import { supabase } from '@/lib/supabase'
 import { createFeedback } from '@/lib/operations'
+import { isSafeHttpUrl } from '@/lib/url'
 import {
   Search, Check, X, MessageSquare, AlertCircle, Loader2,
   MapPin, DollarSign, Briefcase, Calendar, ExternalLink,
@@ -183,9 +184,9 @@ export function MemberOpportunitiesPage() {
                     </div>
                   )}
 
-                  {opp.posting_url && (
+                  {isSafeHttpUrl(opp.posting_url) && (
                     <a
-                      href={opp.posting_url}
+                      href={opp.posting_url ?? undefined}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-primary-600 hover:underline"

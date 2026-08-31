@@ -3,6 +3,7 @@ import { StrategistLayout } from '@/components/StrategistLayout'
 import { useAuth } from '@/context/AuthContext'
 import { supabase } from '@/lib/supabase'
 import { getAssignedMembers, createOpportunity } from '@/lib/operations'
+import { isSafeHttpUrl } from '@/lib/url'
 import { cn, formatDate, timeAgo } from '@/lib/utils'
 import {
   Search, Plus, X, MapPin, DollarSign, Briefcase, ExternalLink,
@@ -608,11 +609,11 @@ function OpportunityCard({ opportunity, memberName }: { opportunity: Opportunity
             </span>
           </div>
         )}
-        {opportunity.posting_url && (
+        {isSafeHttpUrl(opportunity.posting_url) && (
           <div className="flex items-center gap-1.5">
             <ExternalLink className="h-3.5 w-3.5 text-neutral-400" />
             <a
-              href={opportunity.posting_url}
+              href={opportunity.posting_url ?? undefined}
               target="_blank"
               rel="noopener noreferrer"
               className="truncate text-primary-600 hover:text-primary-700"

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { MemberLayout } from '@/components/MemberLayout'
 import { getWhyWeApplied } from '@/lib/operations'
+import { isSafeHttpUrl } from '@/lib/url'
 import { formatDate } from '@/lib/utils'
 import {
   ArrowLeft, Loader2, MapPin, DollarSign, Calendar, ExternalLink,
@@ -92,10 +93,10 @@ export function WhyWeAppliedPage() {
         </div>
 
         {/* Posting Link */}
-        {data.posting_link && (
+        {isSafeHttpUrl(data.posting_link) && (
           <div className="mt-6">
             <a
-              href={data.posting_link}
+              href={data.posting_link ?? undefined}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 text-sm font-medium text-primary-600 hover:underline"
