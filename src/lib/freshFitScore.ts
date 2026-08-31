@@ -1,4 +1,6 @@
 import type { MemberProfile, ScrapedJob, JobMatchScoreBreakdown } from '@/types'
+import { scoreSkillEvidence, scoreScopeFit } from './forwardDna/matching'
+import type { CareerSkill, CareerScope } from '@/types/forwardDna'
 
 /**
  * FreshFit Score — pure, deterministic resume<->job matching.
@@ -141,24 +143,35 @@ export interface FreshFitResult {
   breakdown: JobMatchScoreBreakdown
 }
 
-export function computeFreshFitScore(profile: MemberProfile, job: ScrapedJob): FreshFitResult {
+export function computeFreshFitScore(
+  profile: MemberProfile,
+  job: ScrapedJob,
+  dna: { skills: CareerSkill[]; scope: CareerScope[] } = { skills: [], scope: [] }
+): FreshFitResult {
   const jdSkills = findSkillsInText(`${job.title} ${job.description}`)
   const skillsResult = scoreSkillsCoverage(profile.skills || [], jdSkills)
   const roleRelevance = scoreRoleRelevance(profile, job)
   const locationFit = scoreLocationFit(profile, job)
   const keywordDensity = scoreKeywordDensity(profile, job)
+  const dnaSkillResult = scoreSkillEvidence(dna.skills, jdSkills)
+  const scopeFit = scoreScopeFit(dna.scope, job.description)
 
-  const score = Math.min(100, skillsResult.points + roleRelevance + locationFit + keywordDensity)
+  const score = Math.min(
+    100,
+    skillsResult.points + roleRelevance + locationFit + keywordDensity + dnaSkillResult.points + scopeFit
+  )
 
   return {
     score,
-    matchedSkills: skillsResult.matched.slice(0, 10),
+    matchedSkills: [...new Set([...skillsResult.matched, ...dnaSkillResult.matched])].slice(0, 10),
     missingSkills: skillsResult.missing,
     breakdown: {
       skillsCoverage: skillsResult.points,
       roleRelevance,
       locationFit,
       keywordDensity,
+      dnaSkillEvidence: dnaSkillResult.points,
+      scopeFit,
     },
   }
 }
