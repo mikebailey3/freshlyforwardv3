@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "test": "vitest run",
     "scrape:indeed": "tsx scripts/scrapeIndeed.ts",
+    "scrape:companies": "tsx scripts/scrapeCompanies.ts",
     "sync:freshfit": "tsx scripts/syncFreshFitScores.ts"
   },
   "dependencies": {
