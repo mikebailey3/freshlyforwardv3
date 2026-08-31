@@ -39,8 +39,12 @@ function ResponsibilityRow({
 
   const handleAdd = async () => {
     if (!entry.id || !newTag.trim()) return
-    await onAdd(entry.id, newTag.trim())
-    setNewTag('')
+    try {
+      await onAdd(entry.id, newTag.trim())
+      setNewTag('')
+    } catch {
+      // Swallow: leave the typed text in place so the user can retry the add.
+    }
   }
 
   return (

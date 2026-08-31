@@ -43,14 +43,17 @@ function ScopeRow({
   const handleSave = async () => {
     if (!entry.id) return
     setSaving(true)
-    await onSave(entry.id, {
-      revenue_managed_cents: dollarsToCents(revenue),
-      budget_managed_cents: dollarsToCents(budget),
-      team_size: teamSize ? Number(teamSize) : null,
-      direct_reports: directReports ? Number(directReports) : null,
-      notes: notes || null,
-    })
-    setSaving(false)
+    try {
+      await onSave(entry.id, {
+        revenue_managed_cents: dollarsToCents(revenue),
+        budget_managed_cents: dollarsToCents(budget),
+        team_size: teamSize ? Number(teamSize) : null,
+        direct_reports: directReports ? Number(directReports) : null,
+        notes: notes || null,
+      })
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (

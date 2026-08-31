@@ -35,8 +35,11 @@ function SkillRow({ skill, onChangeState }: { skill: CareerSkill; onChangeState:
 
   const handleChange = async (state: SkillState) => {
     setSaving(true)
-    await onChangeState(skill.skill_name, state)
-    setSaving(false)
+    try {
+      await onChangeState(skill.skill_name, state)
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (

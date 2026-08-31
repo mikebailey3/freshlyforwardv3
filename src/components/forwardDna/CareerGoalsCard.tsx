@@ -14,8 +14,11 @@ export function CareerGoalsCard({ profile, onSaveTargets }: CareerGoalsCardProps
 
   const handleSave = async () => {
     setSaving(true)
-    await onSaveTargets(targetRole, targetTimeframe)
-    setSaving(false)
+    try {
+      await onSaveTargets(targetRole, targetTimeframe)
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
