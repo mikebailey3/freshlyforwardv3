@@ -21,7 +21,7 @@ export function parseLeverJobs(raw: unknown, companySlug: string): ScrapedJobInp
     salary_text: null,
     employment_type: posting.categories?.commitment ?? null,
     posting_url: posting.hostedUrl,
-    posted_at: new Date(posting.createdAt).toISOString().slice(0, 10),
+    posted_at: posting.createdAt ? new Date(posting.createdAt).toISOString().slice(0, 10) : null,
     search_query: companySlug,
   }))
 }

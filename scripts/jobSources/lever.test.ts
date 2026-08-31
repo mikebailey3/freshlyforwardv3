@@ -35,4 +35,11 @@ describe('parseLeverJobs', () => {
   it('returns an empty array for an empty postings list', () => {
     expect(parseLeverJobs([], 'acme')).toEqual([])
   })
+
+  it('does not throw and falls back to null posted_at when createdAt is missing', () => {
+    const brokenFixture = [{ ...fixture[0], createdAt: undefined as unknown as number }]
+    const result = parseLeverJobs(brokenFixture, 'acme')
+    expect(result).toHaveLength(1)
+    expect(result[0].posted_at).toBeNull()
+  })
 })
