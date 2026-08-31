@@ -437,6 +437,27 @@ export function DashboardPage() {
         )}
       </div>
 
+      {/* Forward DNA */}
+      <div className="mt-6 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+        <div className="flex items-center justify-between">
+          <h2 className="font-display text-base font-semibold text-neutral-900">Forward DNA</h2>
+        </div>
+        <div className="mt-4 flex items-center justify-between gap-3">
+          <div>
+            <p className="text-sm font-medium text-neutral-900">Your professional intelligence profile</p>
+            <p className="mt-1 text-xs text-neutral-500">
+              Career history, scope, responsibilities, skills, and goals — the real profile behind your resume.
+            </p>
+          </div>
+          <Link
+            to="/forward-dna"
+            className="flex-shrink-0 rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-700"
+          >
+            Open
+          </Link>
+        </div>
+      </div>
+
       {/* Forward Feed */}
       <div className="mt-6 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
         <div className="flex items-center justify-between">

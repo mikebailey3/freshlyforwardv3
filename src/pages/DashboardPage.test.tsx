@@ -100,3 +100,14 @@ describe('DashboardPage - Career Compass card', () => {
     expect(screen.queryByText('Discover your Career Compass')).not.toBeInTheDocument()
   })
 })
+
+describe('DashboardPage - Forward DNA card', () => {
+  it('always shows the Forward DNA teaser card', async () => {
+    setCompassRow(null)
+
+    renderPage()
+
+    await waitFor(() => expect(screen.getByText('Your professional intelligence profile')).toBeInTheDocument())
+    expect(screen.getByRole('link', { name: 'Open' })).toHaveAttribute('href', '/forward-dna')
+  })
+})
