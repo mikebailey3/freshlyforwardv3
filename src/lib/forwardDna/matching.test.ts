@@ -48,6 +48,11 @@ describe('scoreScopeFit', () => {
     expect(result).toBeGreaterThan(0)
   })
 
+  it('awards points from direct_reports when the JD is phrased as "N direct reports" rather than "team of N"', () => {
+    const result = scoreScopeFit([makeScope({ direct_reports: 12 })], 'This role will have 10 direct reports.')
+    expect(result).toBeGreaterThan(0)
+  })
+
   it('awards points when the member has managed at least as much budget as the JD implies', () => {
     const result = scoreScopeFit([makeScope({ budget_managed_cents: 5_000_000_00 })], 'Own a $2M budget.')
     expect(result).toBeGreaterThan(0)
