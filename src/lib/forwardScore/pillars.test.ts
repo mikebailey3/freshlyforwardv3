@@ -93,6 +93,14 @@ describe('evidenceQualityPillar', () => {
     const result = evidenceQualityPillar([makeSkill({ skill_name: 'sql', state: 'claimed' })], [])
     expect(result.improvementLink).toEqual({ label: expect.any(String), to: '/forward-dna' })
   })
+
+  it('dedupes duplicate flat-skill names (case-insensitive) instead of counting each occurrence separately', () => {
+    const withDuplicate = evidenceQualityPillar([], ['sql', 'sql', 'SQL'])
+    const withoutDuplicate = evidenceQualityPillar([], ['sql'])
+    expect(withDuplicate.score).toBe(withoutDuplicate.score)
+    expect(withDuplicate.explanation).toContain('1')
+    expect(withDuplicate.explanation).not.toContain('3')
+  })
 })
 
 describe('careerMomentumPillar', () => {

@@ -12,6 +12,10 @@ function improvementLink(score: number, label: string, to: string): { label: str
  * (career scope, responsibilities, skill evidence, education, target
  * role/timeframe -- see calculateForwardDnaCompleteness). The score is
  * computed elsewhere and simply passed through here.
+ *
+ * @param completenessScore Assumed to already be in the 0-100 range
+ *   (calculateForwardDnaCompleteness's contract) -- this function does
+ *   not clamp or rescale it.
  */
 export function forwardDnaDepthPillar(completenessScore: number): ForwardScorePillarResult {
   return {
@@ -35,6 +39,12 @@ interface CombinedSkill {
  * row wins with its real state, and any flat skill not already tracked in
  * career_skills is treated as implicit 'claimed'. Pure -- never mutates
  * either input, never writes anywhere.
+ *
+ * flatSkills is deduped case-insensitively before combining (consistent
+ * with the case-insensitive lookup used everywhere else in this
+ * function) so an accidental duplicate name in the flat list -- e.g.
+ * ['sql', 'sql'] -- can't inflate the skill count or silently skew the
+ * weighted average.
  */
 function reconcileSkills(careerSkills: CareerSkill[], flatSkills: string[]): CombinedSkill[] {
   const byName = new Map(careerSkills.map((s) => [s.skill_name.toLowerCase(), s]))
@@ -43,8 +53,11 @@ function reconcileSkills(careerSkills: CareerSkill[], flatSkills: string[]): Com
     weight: STATE_WEIGHT[s.state],
   }))
 
+  const seenFlatNames = new Set<string>()
   for (const flatName of flatSkills) {
-    if (byName.has(flatName.toLowerCase())) continue
+    const key = flatName.toLowerCase()
+    if (byName.has(key) || seenFlatNames.has(key)) continue
+    seenFlatNames.add(key)
     combined.push({ name: flatName, weight: STATE_WEIGHT.claimed })
   }
 
@@ -70,10 +83,13 @@ export function evidenceQualityPillar(
       : Math.round((combined.reduce((sum, s) => sum + s.weight, 0) / combined.length) * 100)
 
   const evidenced = combined.filter((s) => s.weight > STATE_WEIGHT.claimed).length
+  const unevidenced = combined.length - evidenced
   const explanation =
     combined.length === 0
       ? 'No skills recorded yet -- add skills and back them up with evidence to raise this score.'
-      : `${evidenced} of ${combined.length} skills are backed by demonstrated or supported evidence; the rest are only claimed.`
+      : unevidenced === 0
+        ? `All ${combined.length} of your skills are backed by demonstrated or supported evidence.`
+        : `${evidenced} of ${combined.length} skills are backed by demonstrated or supported evidence; the rest are only claimed.`
 
   return {
     key: 'evidenceQuality',
@@ -129,6 +145,10 @@ export function careerMomentumPillar(input: CareerMomentumInput): ForwardScorePi
  * readiness_scores.careerDirection (0-100, passed through untouched -- no
  * rescaling). A null input means the member has no current Career Compass
  * result yet.
+ *
+ * @param careerDirectionScore Assumed to already be in the 0-100 range
+ *   when non-null (readiness_scores.careerDirection's contract) -- this
+ *   function does not clamp or rescale it.
  *
  * Locked terminology: label is always exactly "Goal Alignment" and the
  * word "readiness" never appears in this pillar's label or explanation,
