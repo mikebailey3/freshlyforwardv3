@@ -1,6 +1,12 @@
 # ForwardOS Project 2 — Career Vault + Capability Engine + Forward DNA Evidence Integration — Design Spec
 
-**Status: DESIGN ONLY. Not approved. No migration written. No production code changed.**
+**Status: Design direction approved 2026-09-01. Three previously-open
+product decisions (evidence-state ceiling, brand-new-capability entry
+point, scope-check deferrals) are now LOCKED — see §7.1 and §19. No
+migration written, no schema applied, no implementation code changed.
+Awaiting approval of the companion implementation plan
+(`docs/superpowers/plans/2026-09-01-career-vault-capability-engine.md`)
+before any coding begins.**
 
 ## 0. Product Principle (restated, unchanged)
 
@@ -161,7 +167,7 @@ instruction to prefer relationships over duplicated tables. This is the
 | `career_win_id` | `uuid not null references career_wins(id) on delete cascade` | |
 | `user_id` | `uuid not null references auth.users(id) on delete cascade` | Denormalized (same pattern as `career_scope`/`career_responsibilities` carrying `user_id` alongside a text reference) — keeps RLS a single-column check instead of a subquery join, and makes "all of a member's confirmed capabilities" a one-table query. |
 | `skill_name` | `text not null` | Matches `career_skills.skill_name` exactly (same free-text space, no separate taxonomy — see §7). |
-| `suggested_state` | `text not null check (suggested_state in ('demonstrated','supported'))` | What state this evidence supports. Never `'claimed'` — evidence can only ever argue *up* from claimed, never re-assert the base state. |
+| `suggested_state` | `text not null check (suggested_state = 'demonstrated')` | **Locked for v1 (§7.1):** always `'demonstrated'`. Constrained to the single literal value at the DB layer, not merely an app-level default -- a single Career Win can never suggest or write `'supported'` in v1, enforced so a future application bug cannot bypass this rule. Widening this constraint to also allow `'supported'` is an explicit future migration, once the stronger/multiple-evidence criteria for `'supported'` are designed (not in this project). Never `'claimed'` either way -- evidence can only ever argue *up* from claimed, never re-assert the base state. |
 | `source` | `text not null check (source in ('system','member'))` | Distinguishes a deterministic-interpreter suggestion from a capability the member manually added themselves (the spec's "member can... potentially add another applicable capability"). |
 | `inference_reason` | `text null` | Short, deterministic, human-readable explanation (e.g. `"Statement mentions a dollar-value reduction in inventory loss"`). Always present when `source = 'system'`; always `null` when `source = 'member'` (there's no inference to explain). |
 | `status` | `text not null default 'pending' check (status in ('pending','confirmed','rejected'))` | See §8 for exactly when each value is written. In the v1 mobile flow (§5), only `'confirmed'` rows are ever actually persisted — `'pending'`/`'rejected'` exist in the schema for forward-compatibility with a possible future async/strategist-proposed confirmation flow, not exercised by v1 UI. |
@@ -361,27 +367,62 @@ creating (§ Non-Negotiables): two overlapping "what can this person do"
 systems that could drift out of sync. Reuse is both the simplest and
 the lowest-risk answer.
 
-**Open decision requiring your explicit approval before implementation**
-(flagged rather than silently decided, per instructions):
+### 7.1 LOCKED for v1 (decided 2026-09-01 -- no longer open)
 
-- **What distinguishes `demonstrated` from `supported`?** Today's
-  codebase defines the three states by name and by FreshFit weight
-  (0.5 / 0.8 / 1.0) but never documents the semantic difference between
-  the top two. This design's default recommendation: Career Win
-  evidence confirmation upgrades a skill to **`demonstrated`** only.
-  Reaching `supported` stays a deliberate, separate member action (or a
-  future rule, e.g. "2+ independent confirmed Career Wins," or
-  strategist sign-off) — **not** decided or built in v1. If you'd
-  rather a single strong Career Win be able to suggest `supported`
-  directly, say so and this design will be revised before
-  implementation.
-- **Does a brand-new capability (no existing `career_skills` row at
-  all) get created at `demonstrated` on first confirmation**, skipping
-  `claimed` entirely? This design assumes yes — the evidence itself
-  *is* the demonstration, there's no separate unproven "claim" to make
-  first. Flagging because the spec's own worked example only covers the
-  *upgrade* case (existing `claimed` → `demonstrated`), not the
-  brand-new-capability case.
+**Locked principle: skill evidence status represents evidence
+strength, not a workflow sequence.**
+
+- `claimed` = the member says they possess it. Self-reported, no
+  evidence required.
+- `demonstrated` = at least one meaningful, user-confirmed piece of
+  career evidence demonstrates it.
+- `supported` = multiple and/or stronger independent evidence signals
+  support it, per criteria defined separately (not in this project).
+
+Because the states describe *how strong the evidence is* rather than
+*which stage of a pipeline the skill has reached*, **a skill does not
+have to pass through `claimed` before becoming `demonstrated`.** If
+qualifying evidence already exists at the moment a capability is first
+recorded, it is entered directly at `demonstrated`. This is a
+deliberate rejection of a linear claimed-then-demonstrated-then-
+supported *workflow* model in favor of an evidence-strength *model* --
+implementers must not "fix" this later into a forced sequence.
+
+**Decision 1 -- Career Win evidence caps at `demonstrated`.** A single
+Career Win, however strong, never suggests or writes `supported`
+directly in v1. `supported` remains reserved for stronger/multiple
+independent evidence signals or future validation logic, not yet
+designed. A confirmed Career Win *can contribute toward* a future
+`supported` determination, but Career Vault v1 does not assign
+`supported` itself. Enforced at the strongest available layer, not
+just in application code: the `career_win_capabilities.suggested_state`
+DB column is constrained to the single literal value `'demonstrated'`
+in v1's migration (§4.2, updated) -- not merely convention -- so a
+future application bug cannot write `supported` through this path even
+by accident. Widening that constraint to also allow `supported` is an
+explicit, separate, additive migration for whenever the
+stronger/multiple-evidence criteria mentioned above are actually
+designed; it is not scaffolded speculatively now.
+
+**Decision 2 -- brand-new capabilities may be created directly at
+`demonstrated`, skipping `claimed`.** If the member has provided an
+actual Career Win, the deterministic engine generated the capability
+suggestion, and the member explicitly confirmed that the Win
+demonstrates the capability, that is already more evidence than a bare
+self-claim -- there is no reason to force it through an intermediate,
+unproven `claimed` state first. Example: Career Win "Developed three
+associates who were later promoted into leadership" -> suggested
+capability People Development -> member confirms -> result: `People
+Development` created directly at `demonstrated`, with the Career Win
+stored as its supporting evidence via `career_win_capabilities` so the
+status remains fully explainable (§9).
+
+This is fully compatible with the existing
+`hasSkillEvidenceBeyondClaimed` Forward DNA completeness check (§12) --
+that check already reads "is the state anything other than `claimed`,"
+not "has the state visited `claimed` on its way here," so a
+skip-straight-to-`demonstrated` skill trips it correctly with zero
+code change. Confirmed during the self-review in §20.
 
 ---
 
@@ -684,35 +725,62 @@ to solve.
 
 ---
 
-## 17. Scope Check — Explicitly NOT Built in v1
+## 17. Scope Check — Explicitly NOT Built in v1 (LOCKED 2026-09-01)
 
-Per the spec's own instructions to avoid premature complexity, the
-following are recognized as future/adjacent work and are **not**
-part of this design's v1 scope:
+**Locked ground rule:** do not pull anything into v1 unless it is
+technically necessary to complete the core Career Vault -> Capability
+Engine -> Forward DNA evidence flow. The Scope Check deferrals below
+are locked, not aspirational -- an implementer finding it "easy" to
+add one of these along the way is not sufficient reason to do so.
 
-- Any AI/LLM-backed interpreter — the interface exists, the
-  implementation doesn't.
+Explicitly, v1 does **not** expand into:
+
+- **AI/LLM interpretation** — the `CareerWinInterpreter` interface
+  exists so a future implementation can slot in later; no AI/LLM
+  implementation, API integration, or prompt exists in v1.
+- **Standalone capability analytics** — no dedicated analytics/insights
+  screen beyond the one small in-place evidence disclosure in §9.
+- **Automatic `supported` status** — locked in §7.1: a single Career
+  Win never produces `supported`, and no "N confirmed wins
+  auto-upgrades to `supported`" aggregation logic is built in v1
+  either. That criteria is explicitly future work, undesigned.
+- **Career Path** — not touched, not extended, not referenced.
+- **Forward Score** — does not exist yet elsewhere in this codebase and
+  is not introduced here.
+- **FreshFit redesign** — `scoreSkillEvidence()` in `matching.ts` is
+  read-compatible with Career Vault's output by construction (§10) and
+  requires zero changes; no redesign of FreshFit scoring is in scope.
+- **Job discovery** — untouched; no interaction with ATS sourcing,
+  liveness sweeps, or member-submitted jobs.
+- **Advanced strategist editing** — strategist/admin access is
+  read-only, full stop (§11). No edit, annotate, or override affordance
+  of any kind.
+- **Major Forward DNA completeness changes** — the existing
+  `hasSkillEvidenceBeyondClaimed` check already covers Career Vault's
+  contribution for free (§12); no new completeness signal, weighting
+  change, or restructuring of `calculateForwardDnaCompleteness()` is in
+  scope.
+- **Search Readiness changes** — zero columns, functions, triggers, or
+  views from that system are touched (§12's exhaustive list still
+  applies unchanged).
+- **Large taxonomy management tooling** — no admin UI for managing,
+  merging, or normalizing `skill_name` strings; no fuzzy-matching or
+  controlled vocabulary (§16's capability-taxonomy risk is accepted,
+  not solved, in v1).
+
+Also still out of scope, carried over unchanged from the original
+draft:
+
 - Editing a `career_wins` row's `original_statement` after save (v1 is
-  create + delete only; the trigger in §14 is a placeholder for a
-  possible future edit flow, not a commitment to build one now).
+  create + delete only; the `updated_at` trigger in §14 is a
+  placeholder for a possible future edit flow, not a commitment to
+  build one now).
 - Persisting `'rejected'`/`'pending'` `career_win_capabilities` rows in
   the v1 UI flow (schema supports it; the fast mobile flow doesn't use
   it).
-- Fuzzy-matching or normalizing `skill_name` strings across members
-  (capability taxonomy risk, §16).
-- Any dedicated Career-Vault-specific Forward DNA completeness signal
-  (§12) — deferred, documented, not built.
 - Consolidating Search Readiness and Forward DNA completeness into one
-  score — out of scope for this project entirely (was already deferred
-  by Project 1, restated here for continuity).
-- A dedicated "Why ForwardOS believes this" analytics screen beyond the
-  small in-place evidence disclosure in §9.
-- Strategist editing, collaborative Career Vault management, or any
-  strategist write path to `career_wins`/`career_win_capabilities`.
-- Resume generation, interview prep, career path, Forward Score, or
-  FreshFit changes that *consume* Career Vault data beyond the existing
-  `career_skills.state` channel — explicitly named as future systems
-  this design prepares for but does not build.
+  score (already deferred by Project 1, restated here for continuity).
+- Resume generation or interview prep referencing Career Vault data.
 - A separate strategist-facing Career Vault application of any kind.
 - Any new `FeatureKey`/entitlement gate — Career Vault is free for
   every authenticated member, full stop.
@@ -726,9 +794,10 @@ Forward DNA and Job Discovery Hardening projects — small, TDD'd,
 independently-reviewable commits:
 
 1. **Types + migration.** `src/types/careerVault.ts`, then the
-   migration file itself (§14) — written and reviewed, but the two new
-   open decisions in §7 must be resolved *before* this step, since they
-   affect the `career_win_capabilities.suggested_state` semantics.
+   migration file itself (§14), now using the **locked** §7.1
+   decisions (`suggested_state` constrained to `'demonstrated'` only;
+   brand-new skills may be inserted directly at `demonstrated`). No
+   decisions remain open for this step.
 2. **Deterministic interpreter**, TDD, including the full
    anti-fabrication test suite (§15) before any capability-engine work
    starts — this is the highest-risk-of-getting-wrong piece and should
@@ -758,20 +827,96 @@ project.
 
 ---
 
-## 19. Open Decisions Requiring Your Approval Before Implementation
+## 19. Locked Decisions Record (2026-09-01)
 
-1. **`demonstrated` vs. `supported` semantics** (§7) — does Career Win
-   evidence ever suggest `supported` directly, or always cap at
-   `demonstrated`?
-2. **Brand-new capability creation** (§7) — does confirming a
-   suggestion for a skill with no existing `career_skills` row create
-   it at `demonstrated` (this design's assumption), or should
-   first-time capabilities always start at `claimed` regardless of
-   evidence?
-3. Anything in §17's scope-check list you'd actually like pulled into
-   v1 instead of deferred.
+All three items previously listed here as open have been decided and
+are now binding for v1:
 
-Everything else in this document is a concrete recommendation, not an
-open question — but flagging these three explicitly rather than
-guessing, per your instruction not to silently invent product
-decisions.
+1. **`demonstrated` vs. `supported` (§7.1):** Career Win evidence caps
+   at `demonstrated`. A single Career Win never jumps a skill directly
+   to `supported`. Enforced at the DB layer via a single-value CHECK
+   constraint (§4.2), not just convention. `supported` is reserved for
+   multiple/stronger independent evidence signals or future validation
+   logic, not designed in this project; a confirmed Career Win can
+   *contribute toward* a future `supported` determination without v1
+   assigning it directly.
+2. **Brand-new capability creation (§7.1):** confirming evidence for a
+   skill with no existing `career_skills` row creates it directly at
+   `demonstrated`. It is never forced through `claimed` first. This
+   follows from the locked principle that skill evidence status
+   represents *evidence strength*, not a *workflow sequence* (§7.1).
+3. **Scope Check (§17):** all listed deferrals remain deferred,
+   locked, and explicitly enumerated per the exact exclusion list
+   provided (AI/LLM interpretation, standalone capability analytics,
+   automatic `supported` status, Career Path, Forward Score, FreshFit
+   redesign, job discovery, advanced strategist editing, major Forward
+   DNA completeness changes, Search Readiness changes, large taxonomy
+   management tooling). Nothing is pulled into v1 unless technically
+   necessary to complete the core Career Vault -> Capability Engine ->
+   Forward DNA evidence flow.
+
+No further open decisions remain in this spec. Implementation planning
+proceeds on the plan document referenced in §20.
+
+---
+
+## 20. Consistency Self-Review (performed 2026-09-01, post-lock)
+
+Performed before treating this spec as final, checking every place the
+now-locked decisions could have left a stale or contradictory
+statement elsewhere in the document:
+
+- **§4.2 schema table** — `suggested_state` CHECK updated from
+  `in ('demonstrated','supported')` to `= 'demonstrated'`. Confirmed
+  this is the only column in either new table whose allowed values
+  were affected by the lock; `status`, `source`, `evidence_type`, and
+  `metric_type` were never in question and are unchanged.
+- **§5 (data flow) step 5c** — already read "insert at
+  `state = suggested_state`" / "upgrade to `suggested_state`" without
+  hardcoding a literal value; since `suggested_state` is now
+  constrained to always be `'demonstrated'`, this logic requires **no
+  rewording** — it was already written generically enough to be
+  correct under the lock. Confirmed no other paragraph in §5 implies a
+  skill could reach `supported` through this flow.
+- **§7 vs. §7.1** — the original §7 recommendation text ("reuse
+  `career_skills`, don't build a new taxonomy") is unaffected by the
+  lock and left as-is; §7.1 was added as the locked-decisions
+  subsection directly beneath it rather than rewriting §7, so the
+  document shows the original reasoning and the final decision
+  together without contradiction.
+- **§12 (Forward DNA / completeness)** — re-verified the specific claim
+  that `hasSkillEvidenceBeyondClaimed` is compatible with a
+  skip-straight-to-`demonstrated` skill: that check tests
+  `s.state !== 'claimed'` (confirmed against the live source in
+  `src/lib/forwardDna/completeness.ts` during the original audit), which
+  is true for a skill that starts at `demonstrated` and never touches
+  `claimed` at all. No change needed to §12's text; cross-reference
+  added at the end of §7.1 pointing back here.
+- **§14 (migration strategy)** — confirmed the CHECK constraint change
+  is still purely additive from the standpoint of *other* tables (only
+  `career_win_capabilities`, a brand-new table, is affected) and does
+  not change the rollback statement, index list, or trigger list
+  already described there.
+- **§15 (testing strategy)** — confirmed the existing anti-fabrication
+  and CRUD test bullets already describe behavior consistent with the
+  lock (e.g. "calls `upsertSkillState` with the higher state" already
+  assumed a single ceiling, never described a `supported`-producing
+  path). Added explicit new test requirements for the locked
+  constraint itself in the implementation plan (see §20 pointer below),
+  rather than editing this section further, to avoid duplicating test
+  lists across two documents.
+- **§16 (risks)** — no risk entry claimed or depended on a Career Win
+  ever producing `supported`; no changes needed.
+- **§17/§18/§19** — rewritten/added as described above; verified no
+  remaining sentence anywhere in the document still frames these three
+  items as "open" (searched for "open decision" post-edit — no
+  remaining hits outside this section's own historical framing).
+- **Cross-document consistency** — the companion implementation plan
+  (`docs/superpowers/plans/2026-09-01-career-vault-capability-engine.md`,
+  written alongside this update) was authored directly from this
+  locked spec, not from the original open-question draft, so no
+  stale assumption propagates forward into task-level detail.
+
+**Result: no contradictions found.** The spec is internally consistent
+under the three locked decisions and is ready to move from "design" to
+"plan review."
