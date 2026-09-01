@@ -18,9 +18,16 @@ export interface ForwardScoreResult {
   pillars: ForwardScorePillarResult[]
 }
 
-/** Identifies which deterministic "next best move" rule matched for the current user. */
+/**
+ * Identifies which deterministic "next best move" rule matched for the
+ * current user. `stay_the_course` is the neutral fallback used when no
+ * pillar is below the actionable threshold (or Career Momentum is low
+ * but the member has no active application to review) -- see
+ * `src/lib/forwardScore/nextBestMove.ts`.
+ */
 export type NextBestMoveKey =
   | 'add_career_win' | 'complete_forward_dna' | 'review_direction' | 'review_activity'
+  | 'stay_the_course'
 
 /** A single recommended action surfaced to the user based on their Forward Score inputs. */
 export interface NextBestMove {
