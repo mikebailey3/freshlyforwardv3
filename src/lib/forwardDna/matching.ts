@@ -1,6 +1,12 @@
 import type { CareerSkill, CareerScope, SkillState } from '@/types/forwardDna'
 
-const STATE_WEIGHT: Record<SkillState, number> = { claimed: 0.5, demonstrated: 0.8, supported: 1 }
+/**
+ * How much evidence-weight each skill state contributes when averaging
+ * "how good is this evidence" across the app. Shared by scoreSkillEvidence
+ * (JD-match bonus points) and forwardScore's evidenceQualityPillar (the
+ * Forward Score composite) -- one weighting scheme, not two.
+ */
+export const STATE_WEIGHT: Record<SkillState, number> = { claimed: 0.5, demonstrated: 0.8, supported: 1 }
 
 /**
  * Bonus points (0-15) for JD-detected skills the member has recorded as
