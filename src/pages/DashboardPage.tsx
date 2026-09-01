@@ -5,6 +5,10 @@ import { MemberLayout } from '@/components/MemberLayout'
 import { CircularProgress } from '@/components/CircularProgress'
 import { useAuth } from '@/context/AuthContext'
 import { useEntitlements } from '@/hooks/useEntitlements'
+import { useForwardScore } from '@/hooks/useForwardScore'
+import { ForwardScoreWidget } from '@/components/forwardScore/ForwardScoreWidget'
+import { NextBestMoveCard } from '@/components/forwardScore/NextBestMoveCard'
+import { PillarCard } from '@/components/forwardScore/PillarCard'
 import { supabase } from '@/lib/supabase'
 import { ensureProfile, calculateSearchReadiness, getReadinessFixLink } from '@/lib/profile'
 import { getRecentPublishedPosts } from '@/lib/blog'
@@ -12,17 +16,9 @@ import { ARCHETYPE_LABELS } from '@/lib/careerCompass'
 import { TOOL_TILES } from '@/data/tools'
 import {
   FileText, MessageSquare, Briefcase, Calendar, Mail,
-  Lightbulb, Flag, Loader2, Sparkles, Lock, Compass, X,
+  Lightbulb, Flag, Loader2, Sparkles, Lock, Compass, X, Archive,
 } from 'lucide-react'
-import type {
-  Application, Message, MockInterview, CalendarEvent,
-} from '@/types'
-import type { ArchetypeKey } from '@/types/careerCompass'
-
-interface CompassSummary {
-  primary_archetype: ArchetypeKey
-  recommended_plan_slug: string | null
-}
+import type { Message, CalendarEvent } from '@/types'
 
 const TIPS_OF_THE_DAY = [
   'Tailor your resume for each application by matching your experience to the job description. It makes a big difference!',
@@ -57,16 +53,27 @@ export function DashboardPage() {
   const { user, profile, refreshProfile } = useAuth()
   const { canAccess } = useEntitlements()
   const [searchParams] = useSearchParams()
-  const [applications, setApplications] = useState<Application[]>([])
   const [unreadMessages, setUnreadMessages] = useState<Message[]>([])
   const [allMessages, setAllMessages] = useState<Message[]>([])
-  const [mockInterviews, setMockInterviews] = useState<MockInterview[]>([])
   const [upcomingEvents, setUpcomingEvents] = useState<CalendarEvent[]>([])
   const [recentPosts, setRecentPosts] = useState<Awaited<ReturnType<typeof getRecentPublishedPosts>>>([])
   const [loading, setLoading] = useState(true)
-  const [compassResult, setCompassResult] = useState<CompassSummary | null>(null)
-  const [compassLoading, setCompassLoading] = useState(true)
   const [savedBannerDismissed, setSavedBannerDismissed] = useState(false)
+
+  // Forward Score, its 4 pillars, the Next Best Move, and (Task 7) the raw
+  // applications/mock_interviews rows and Career Compass summary this page
+  // used to fetch itself -- now a single shared fetch instead of two
+  // competing queries of the same tables.
+  const {
+    forwardScore,
+    nextBestMove,
+    loading: forwardScoreLoading,
+    applications,
+    mockInterviews,
+    hasActiveApplication,
+    hasRecentOrUpcomingInterview,
+    compassSummary,
+  } = useForwardScore(profile)
 
   useEffect(() => {
     if (!user) return
@@ -75,8 +82,7 @@ export function DashboardPage() {
       await ensureProfile(user.id)
       await refreshProfile()
 
-      const [appsRes, unreadRes, allMsgRes, mockRes, eventsRes, postsRes] = await Promise.all([
-        supabase.from('applications').select('*').eq('member_id', user.id),
+      const [unreadRes, allMsgRes, eventsRes, postsRes] = await Promise.all([
         supabase
           .from('messages')
           .select('*')
@@ -84,7 +90,6 @@ export function DashboardPage() {
           .eq('is_read', false)
           .order('created_at', { ascending: false }),
         supabase.from('messages').select('*').eq('user_id', user.id),
-        supabase.from('mock_interviews').select('*').eq('user_id', user.id),
         supabase
           .from('calendar_events')
           .select('*')
@@ -95,10 +100,8 @@ export function DashboardPage() {
         getRecentPublishedPosts(3),
       ])
 
-      setApplications((appsRes.data as Application[]) || [])
       setUnreadMessages((unreadRes.data as Message[]) || [])
       setAllMessages((allMsgRes.data as Message[]) || [])
-      setMockInterviews((mockRes.data as MockInterview[]) || [])
       setUpcomingEvents((eventsRes.data as CalendarEvent[]) || [])
       setRecentPosts(postsRes)
 
@@ -108,38 +111,11 @@ export function DashboardPage() {
     loadData()
   }, [user, refreshProfile])
 
-  // Own effect, deliberately not part of the Promise.all above -- a slow or
-  // failed Career Compass lookup should never block the rest of the
-  // dashboard from rendering.
-  useEffect(() => {
-    if (!user) return
-
-    let cancelled = false
-    supabase
-      .from('career_compass_results')
-      .select('primary_archetype, recommended_plan_slug')
-      .eq('user_id', user.id)
-      .eq('is_current', true)
-      .maybeSingle()
-      .then(
-        ({ data, error }) => {
-          if (cancelled) return
-          setCompassResult(!error && data ? (data as CompassSummary) : null)
-          setCompassLoading(false)
-        },
-        () => {
-          if (cancelled) return
-          setCompassResult(null)
-          setCompassLoading(false)
-        },
-      )
-
-    return () => {
-      cancelled = true
-    }
-  }, [user])
-
-  if (loading) {
+  // A single combined loading gate -- the page waits on both this effect's
+  // own fetches and useForwardScore's fetch before showing content, so the
+  // stat cards (which now source applications/mock_interviews data from
+  // the hook) never flash a transient "0" before the hook resolves.
+  if (loading || forwardScoreLoading) {
     return (
       <MemberLayout>
         <div className="flex items-center justify-center py-20">
@@ -202,28 +178,143 @@ export function DashboardPage() {
           to both this page's own h1 and every other (not-yet-migrated) page
           in the app, which still uses a heading font throughout. */}
       <div className="mb-6">
+        <p className="font-mono text-[11px] font-semibold uppercase tracking-wide text-primary-600">
+          ForwardOS Home
+        </p>
         <h1 className="font-display text-2xl font-semibold text-neutral-900 sm:text-3xl">
           {greeting()}{profile?.full_name ? `, ${profile.full_name.split(' ')[0]}` : ''}! \u2615
         </h1>
         <p className="mt-1 text-sm text-neutral-600">Ready to make today a step forward?</p>
       </div>
 
-      {/* Stat cards */}
-      <div className="overflow-hidden rounded-xl border border-neutral-200 shadow-sm">
-        <div className="grid gap-0 lg:grid-cols-4">
-          <div className="border-b border-neutral-200 p-5 lg:border-b-0 lg:border-r">
-            <p className="text-sm font-semibold text-neutral-700">Search Readiness</p>
-            <div className="mt-3 flex items-center gap-3">
-              <CircularProgress value={readiness.score} size={56} strokeWidth={6} label="" />
-              <p className="text-xs text-neutral-500">
-                {readiness.score >= 80 ? "You're doing great! Keep going." : 'Keep going, you\u2019re getting closer.'}
+      {/* Forward Score hero (locked layout position 1) */}
+      {forwardScore && <ForwardScoreWidget result={forwardScore} />}
+
+      {/* Next Best Move (locked layout position 2) */}
+      {nextBestMove && (
+        <div className="mt-6">
+          <NextBestMoveCard move={nextBestMove} />
+        </div>
+      )}
+
+      {/* Forward Score pillars, fixed order (locked layout position 3):
+          Forward DNA Depth, Evidence Quality, Career Momentum, Goal
+          Alignment -- this is exactly the order computeForwardScore()
+          always returns result.pillars in, so no re-sorting needed here. */}
+      {forwardScore && (
+        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {forwardScore.pillars.map((pillar) => (
+            <PillarCard key={pillar.key} pillar={pillar} />
+          ))}
+        </div>
+      )}
+
+      {/* Forward DNA (locked layout position 4) */}
+      <div className="mt-6 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+        <div className="flex items-center justify-between">
+          <h2 className="font-display text-base font-semibold text-neutral-900">Forward DNA</h2>
+        </div>
+        <div className="mt-4 flex items-center justify-between gap-3">
+          <div>
+            <p className="text-sm font-medium text-neutral-900">Your professional intelligence profile</p>
+            <p className="mt-1 text-xs text-neutral-500">
+              Career history, scope, responsibilities, skills, and goals — the real profile behind your resume.
+            </p>
+          </div>
+          <Link
+            to="/forward-dna"
+            className="flex-shrink-0 rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-700"
+          >
+            Open
+          </Link>
+        </div>
+      </div>
+
+      {/* Career Vault (locked layout position 5) -- graceful placeholder.
+          No Career Vault table/route/component exists on this branch yet
+          (unmerged, separate work), so this is intentionally the
+          least-polished card on the page: static, prop-less, zero queries,
+          and no link at all (there's nothing real to link to yet). */}
+      <CareerVaultPlaceholderCard />
+
+      {/* Career Compass (locked layout position 6) */}
+      <div className="mt-6 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+        <div className="flex items-center justify-between">
+          <h2 className="font-display text-base font-semibold text-neutral-900">Career Compass</h2>
+          {!forwardScoreLoading && compassSummary && (
+            <Link to="/career-compass" className="font-mono text-xs font-medium text-primary-600 hover:text-primary-700">
+              Retake
+            </Link>
+          )}
+        </div>
+        {forwardScoreLoading ? (
+          <div className="mt-4 flex items-center gap-3" role="status" aria-label="Loading Career Compass">
+            <Compass className="h-5 w-5 flex-shrink-0 animate-pulse text-neutral-300" />
+            <div className="h-4 w-48 animate-pulse rounded bg-neutral-100" />
+          </div>
+        ) : compassSummary ? (
+          <div className="mt-4 flex items-center gap-3">
+            <Compass className="h-5 w-5 flex-shrink-0 text-primary-600" />
+            <div>
+              <p className="text-sm font-medium text-neutral-900">
+                You're a {ARCHETYPE_LABELS[compassSummary.primary_archetype]}.
+              </p>
+              <p className="mt-1 text-xs text-neutral-500">
+                Curious how things have shifted? Retake the free assessment anytime.
               </p>
             </div>
-            <Link to={readiness.missing.length > 0 ? getReadinessFixLink(readiness.missing) : '/profile'} className="mt-3 inline-block font-mono text-xs font-medium text-primary-600 hover:text-primary-700">
-              {readiness.missing.length > 0 ? "Let's fix it" : 'View My Progress'}
+          </div>
+        ) : (
+          <div className="mt-4 flex items-center justify-between gap-3">
+            <div>
+              <p className="text-sm font-medium text-neutral-900">Discover your Career Compass</p>
+              <p className="mt-1 text-xs text-neutral-500">
+                Take the free 5-minute assessment to find your career archetype and readiness score.
+              </p>
+            </div>
+            <Link
+              to="/career-compass"
+              className="flex-shrink-0 rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-700"
+            >
+              Start Now
             </Link>
           </div>
+        )}
+      </div>
 
+      {/* Search Readiness (locked layout position 7) -- extracted from the
+          old 4-cell stat row into its own card, contents and calculation
+          completely untouched (still calculateSearchReadiness(profile)).
+          Only change here is CSS: a visually-elevated border/shadow when
+          the member has an active application or a recent/upcoming
+          interview -- the exact same two booleans useForwardScore already
+          derives for the Career Momentum pillar, reused for this UI
+          decision only, never a second/competing definition. */}
+      <div
+        className={`mt-6 rounded-xl border bg-white p-5 ${
+          hasActiveApplication || hasRecentOrUpcomingInterview
+            ? 'border-primary-300 shadow-md'
+            : 'border-neutral-200 shadow-sm'
+        }`}
+      >
+        <p className="text-sm font-semibold text-neutral-700">Search Readiness</p>
+        <div className="mt-3 flex items-center gap-3">
+          <CircularProgress value={readiness.score} size={56} strokeWidth={6} label="" />
+          <p className="text-xs text-neutral-500">
+            {readiness.score >= 80 ? "You're doing great! Keep going." : 'Keep going, you\u2019re getting closer.'}
+          </p>
+        </div>
+        <Link to={readiness.missing.length > 0 ? getReadinessFixLink(readiness.missing) : '/profile'} className="mt-3 inline-block font-mono text-xs font-medium text-primary-600 hover:text-primary-700">
+          {readiness.missing.length > 0 ? "Let's fix it" : 'View My Progress'}
+        </Link>
+      </div>
+
+      {/* Remaining sections (locked layout position 8): supporting career
+          tools, unchanged content, repositioned below the fold. */}
+
+      {/* Stat cards */}
+      <div className="overflow-hidden rounded-xl border border-neutral-200 shadow-sm">
+        <div className="grid gap-0 lg:grid-cols-3">
           <div className="border-b border-neutral-200 p-5 lg:border-b-0 lg:border-r">
             <p className="text-sm font-semibold text-neutral-700">Applications</p>
             <p className="mt-2 font-mono text-3xl font-bold text-neutral-900">{activeApplications.length}</p>
@@ -392,72 +483,6 @@ export function DashboardPage() {
         </div>
       </div>
 
-      {/* Career Compass */}
-      <div className="mt-6 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
-        <div className="flex items-center justify-between">
-          <h2 className="font-display text-base font-semibold text-neutral-900">Career Compass</h2>
-          {!compassLoading && compassResult && (
-            <Link to="/career-compass" className="font-mono text-xs font-medium text-primary-600 hover:text-primary-700">
-              Retake
-            </Link>
-          )}
-        </div>
-        {compassLoading ? (
-          <div className="mt-4 flex items-center gap-3" role="status" aria-label="Loading Career Compass">
-            <Compass className="h-5 w-5 flex-shrink-0 animate-pulse text-neutral-300" />
-            <div className="h-4 w-48 animate-pulse rounded bg-neutral-100" />
-          </div>
-        ) : compassResult ? (
-          <div className="mt-4 flex items-center gap-3">
-            <Compass className="h-5 w-5 flex-shrink-0 text-primary-600" />
-            <div>
-              <p className="text-sm font-medium text-neutral-900">
-                You're a {ARCHETYPE_LABELS[compassResult.primary_archetype]}.
-              </p>
-              <p className="mt-1 text-xs text-neutral-500">
-                Curious how things have shifted? Retake the free assessment anytime.
-              </p>
-            </div>
-          </div>
-        ) : (
-          <div className="mt-4 flex items-center justify-between gap-3">
-            <div>
-              <p className="text-sm font-medium text-neutral-900">Discover your Career Compass</p>
-              <p className="mt-1 text-xs text-neutral-500">
-                Take the free 5-minute assessment to find your career archetype and readiness score.
-              </p>
-            </div>
-            <Link
-              to="/career-compass"
-              className="flex-shrink-0 rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-700"
-            >
-              Start Now
-            </Link>
-          </div>
-        )}
-      </div>
-
-      {/* Forward DNA */}
-      <div className="mt-6 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
-        <div className="flex items-center justify-between">
-          <h2 className="font-display text-base font-semibold text-neutral-900">Forward DNA</h2>
-        </div>
-        <div className="mt-4 flex items-center justify-between gap-3">
-          <div>
-            <p className="text-sm font-medium text-neutral-900">Your professional intelligence profile</p>
-            <p className="mt-1 text-xs text-neutral-500">
-              Career history, scope, responsibilities, skills, and goals — the real profile behind your resume.
-            </p>
-          </div>
-          <Link
-            to="/forward-dna"
-            className="flex-shrink-0 rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-700"
-          >
-            Open
-          </Link>
-        </div>
-      </div>
-
       {/* Forward Feed */}
       <div className="mt-6 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
         <div className="flex items-center justify-between">
@@ -505,6 +530,31 @@ export function DashboardPage() {
         </div>
       </div>
     </MemberLayout>
+  )
+}
+
+/**
+ * Task 7: Career Vault graceful placeholder. This branch has no
+ * `career_wins` table, no `/career-vault` route, and no Career Vault
+ * component to reuse (that work is unmerged, on a separate branch).
+ * Deliberately the least-polished card on the page -- an honest
+ * reflection of its actual current state, not something to over-build:
+ * static, prop-less, zero queries, and no link/href at all (there's
+ * nothing real to link to yet, so no dead `href="#"` either).
+ */
+function CareerVaultPlaceholderCard() {
+  return (
+    <div className="mt-6 rounded-xl border border-dashed border-neutral-300 bg-neutral-50 p-6">
+      <div className="flex items-center gap-3">
+        <Archive className="h-5 w-5 flex-shrink-0 text-neutral-400" />
+        <div>
+          <h2 className="font-display text-base font-semibold text-neutral-500">Career Vault — coming soon</h2>
+          <p className="mt-1 text-xs text-neutral-500">
+            Track evidence-backed career wins here once Career Vault ships.
+          </p>
+        </div>
+      </div>
+    </div>
   )
 }
 

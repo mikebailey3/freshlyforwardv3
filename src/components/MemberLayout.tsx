@@ -33,7 +33,7 @@ const navGroups: NavGroup[] = [
   {
     label: 'My Search',
     items: [
-      { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+      { to: '/dashboard', label: 'ForwardOS Home', icon: LayoutDashboard },
       { to: '/opportunities', label: 'Opportunities', icon: Search, feature: 'hand_selected_opportunities' },
       { to: '/opportunity-engine', label: 'Opportunity Engine', icon: Sparkles, isNew: true },
       { to: '/applications', label: 'Applications', icon: FileText, feature: 'applications' },
@@ -316,7 +316,7 @@ export function MemberLayout({ children }: { children: ReactNode }) {
       <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-neutral-200 bg-white lg:hidden">
         <div className="flex items-center justify-around px-2 py-2">
           {[
-            { to: '/dashboard', label: 'Home', icon: LayoutDashboard },
+            { to: '/dashboard', label: 'ForwardOS Home', icon: LayoutDashboard },
             { to: '/opportunities', label: 'Opps', icon: Search },
             { to: '/applications', label: 'Apps', icon: FileText },
             { to: '/messages', label: 'Chat', icon: MessageSquare },

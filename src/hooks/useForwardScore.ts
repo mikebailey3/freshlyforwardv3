@@ -10,6 +10,7 @@ import { computeForwardScore, getNextBestMove } from '@/lib/forwardScore'
 import type { ForwardScoreInputs } from '@/lib/forwardScore'
 import type { ForwardScoreResult, NextBestMove } from '@/types/forwardScore'
 import type { MemberProfile, Application, MockInterview } from '@/types'
+import type { ArchetypeKey } from '@/types/careerCompass'
 
 /**
  * Application statuses that no longer count as "active" -- mirrors
@@ -20,18 +21,46 @@ const INACTIVE_APPLICATION_STATUSES = ['rejected', 'closed', 'offer_accepted']
 
 const MS_PER_DAY = 86400000
 
-interface CompassReadinessRow {
+interface CompassRow {
   readiness_scores: { careerDirection?: number | null } | null
+  primary_archetype: ArchetypeKey | null
+  recommended_plan_slug: string | null
 }
 
 interface UnreadMessageRow {
   id: string
 }
 
+/** The small subset of the `career_compass_results` row DashboardPage's
+ * Career Compass summary card needs -- exposed here so that card and
+ * this hook share the single fetch of that table instead of each
+ * running its own competing query for a different column slice. */
+export interface CompassSummary {
+  primary_archetype: ArchetypeKey
+  recommended_plan_slug: string | null
+}
+
 export interface UseForwardScoreResult {
   forwardScore: ForwardScoreResult | null
   nextBestMove: NextBestMove | null
   loading: boolean
+  /** Raw rows this hook already fetched -- exposed so DashboardPage.tsx
+   * doesn't need its own separate applications/mock_interviews queries
+   * just to render the Applications/Interviews stat cards and
+   * recommendations (Task 7: DRY, one fetch instead of two). */
+  applications: Application[]
+  mockInterviews: MockInterview[]
+  /** The exact same two booleans the Career Momentum pillar is built
+   * from -- exposed for DashboardPage's Search Readiness card visual
+   * emphasis so that decision never drifts from this hook's own
+   * definition of "active application" / "recent or upcoming
+   * interview". */
+  hasActiveApplication: boolean
+  hasRecentOrUpcomingInterview: boolean
+  /** Null while loading, while the member has no current Career Compass
+   * result, or if that row failed to load -- same fail-closed shape the
+   * page's old standalone compass fetch used. */
+  compassSummary: CompassSummary | null
 }
 
 /**
@@ -56,12 +85,22 @@ export function useForwardScore(
   const [forwardScore, setForwardScore] = useState<ForwardScoreResult | null>(null)
   const [nextBestMove, setNextBestMove] = useState<NextBestMove | null>(null)
   const [loading, setLoading] = useState(!!profile)
+  const [applications, setApplications] = useState<Application[]>([])
+  const [mockInterviews, setMockInterviews] = useState<MockInterview[]>([])
+  const [hasActiveApplication, setHasActiveApplication] = useState(false)
+  const [hasRecentOrUpcomingInterview, setHasRecentOrUpcomingInterview] = useState(false)
+  const [compassSummary, setCompassSummary] = useState<CompassSummary | null>(null)
 
   useEffect(() => {
     if (!profile) {
       setForwardScore(null)
       setNextBestMove(null)
       setLoading(false)
+      setApplications([])
+      setMockInterviews([])
+      setHasActiveApplication(false)
+      setHasRecentOrUpcomingInterview(false)
+      setCompassSummary(null)
       return
     }
 
@@ -77,7 +116,7 @@ export function useForwardScore(
         getSkillStates(userId, client),
         client
           .from('career_compass_results')
-          .select('readiness_scores')
+          .select('readiness_scores, primary_archetype, recommended_plan_slug')
           .eq('user_id', userId)
           .eq('is_current', true)
           .maybeSingle(),
@@ -92,10 +131,14 @@ export function useForwardScore(
       const responsibilities = respRes.responsibilities
       const skills = skillsRes.skills
 
-      const compassResult = compassRes.error ? null : (compassRes.data as CompassReadinessRow | null)
+      const compassResult = compassRes.error ? null : (compassRes.data as CompassRow | null)
       const applications = (appsRes.error ? null : (appsRes.data as Application[] | null)) ?? []
       const mockInterviews = (mockRes.error ? null : (mockRes.data as MockInterview[] | null)) ?? []
       const unreadMessages = (messagesRes.error ? null : (messagesRes.data as UnreadMessageRow[] | null)) ?? []
+
+      const compassSummary: CompassSummary | null = compassResult?.primary_archetype
+        ? { primary_archetype: compassResult.primary_archetype, recommended_plan_slug: compassResult.recommended_plan_slug ?? null }
+        : null
 
       const hasCareerCompassResult = !!compassResult
       const completenessInput = buildForwardDnaCompletenessInput(
@@ -133,6 +176,11 @@ export function useForwardScore(
 
       setForwardScore(score)
       setNextBestMove(move)
+      setApplications(applications)
+      setMockInterviews(mockInterviews)
+      setHasActiveApplication(inputs.momentum.hasActiveApplication)
+      setHasRecentOrUpcomingInterview(inputs.momentum.hasRecentOrUpcomingInterview)
+      setCompassSummary(compassSummary)
       setLoading(false)
     }
 
@@ -143,6 +191,11 @@ export function useForwardScore(
       if (cancelled) return
       setForwardScore(null)
       setNextBestMove(null)
+      setApplications([])
+      setMockInterviews([])
+      setHasActiveApplication(false)
+      setHasRecentOrUpcomingInterview(false)
+      setCompassSummary(null)
       setLoading(false)
     })
 
@@ -151,5 +204,14 @@ export function useForwardScore(
     }
   }, [profile, client])
 
-  return { forwardScore, nextBestMove, loading }
+  return {
+    forwardScore,
+    nextBestMove,
+    loading,
+    applications,
+    mockInterviews,
+    hasActiveApplication,
+    hasRecentOrUpcomingInterview,
+    compassSummary,
+  }
 }

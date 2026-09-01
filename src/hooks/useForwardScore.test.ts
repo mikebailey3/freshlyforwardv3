@@ -110,7 +110,16 @@ describe('useForwardScore', () => {
     const { client, fromMock } = makeFakeClient(allTables())
     const { result } = renderHook(() => useForwardScore(null, client))
 
-    expect(result.current).toEqual({ forwardScore: null, nextBestMove: null, loading: false })
+    expect(result.current).toEqual({
+      forwardScore: null,
+      nextBestMove: null,
+      loading: false,
+      applications: [],
+      mockInterviews: [],
+      hasActiveApplication: false,
+      hasRecentOrUpcomingInterview: false,
+      compassSummary: null,
+    })
     expect(fromMock).not.toHaveBeenCalled()
   })
 
@@ -126,7 +135,10 @@ describe('useForwardScore', () => {
           data: [{ id: 'sk1', user_id: 'u1', skill_name: 'SQL', state: 'demonstrated', evidence_note: null }],
           error: null,
         },
-        career_compass_results: { data: { readiness_scores: { careerDirection: 80 } }, error: null },
+        career_compass_results: {
+          data: { readiness_scores: { careerDirection: 80 }, primary_archetype: 'driver', recommended_plan_slug: 'career-growth' },
+          error: null,
+        },
         applications: {
           data: [{ id: 'a1', member_id: 'u1', status: 'submitted', date_submitted: tenDaysAgo, interview_date: null }],
           error: null,
@@ -168,6 +180,18 @@ describe('useForwardScore', () => {
 
     expect(result.current.nextBestMove).not.toBeNull()
     expect(result.current.nextBestMove!.key).toBe('stay_the_course')
+
+    // Task 7: raw applications/mockInterviews rows and the momentum
+    // booleans are exposed directly so DashboardPage.tsx doesn't need a
+    // second, competing fetch of the same tables.
+    expect(result.current.applications).toHaveLength(1)
+    expect(result.current.mockInterviews).toHaveLength(1)
+    expect(result.current.hasActiveApplication).toBe(true)
+    expect(result.current.hasRecentOrUpcomingInterview).toBe(true)
+
+    // Task 7: the Career Compass summary card's data comes from this
+    // same single fetch instead of its own separate query.
+    expect(result.current.compassSummary).toEqual({ primary_archetype: 'driver', recommended_plan_slug: 'career-growth' })
   })
 
   it('no career_compass_results row: careerDirectionScore is null, goalAlignment pillar is 0, does not throw', async () => {
@@ -179,6 +203,7 @@ describe('useForwardScore', () => {
     expect(result.current.forwardScore).not.toBeNull()
     const goalAlignment = result.current.forwardScore!.pillars.find((p) => p.key === 'goalAlignment')!
     expect(goalAlignment.score).toBe(0)
+    expect(result.current.compassSummary).toBeNull()
   })
 
   it('empty career_skills and empty profile.skills: Evidence Quality pillar is 0, does not throw', async () => {
