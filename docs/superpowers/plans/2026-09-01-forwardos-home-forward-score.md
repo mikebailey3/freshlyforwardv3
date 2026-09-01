@@ -210,8 +210,10 @@ defensive-clamping style already used in `freshFitScore.ts`'s `Math
 - All four pillar inputs at their respective 0 states → total 0.
 - All four at 100 → total 100.
 - A known mixed case computed by hand (e.g. DNA=80, Evidence=60,
-  Momentum=40, Goal=20 → `0.25*80 + 0.30*60 + 0.20*40 + 0.25*20 =
-  20+18+8+5 = 51`) asserted exactly, not just "in range."
+  Momentum=45, Goal=20 -- Career Momentum's real checklist values
+  (30/25/25/20) cannot sum to 40, so 45 is the nearest achievable value --
+  `0.25*80 + 0.30*60 + 0.20*45 + 0.25*20 = 20+18+9+5 = 52`) asserted
+  exactly, not just "in range."
 - `pillars` array always has exactly 4 entries, in the fixed order
   Forward DNA Depth, Evidence Quality, Career Momentum, Goal
   Alignment (fixed order matches the spec's hierarchy and avoids
