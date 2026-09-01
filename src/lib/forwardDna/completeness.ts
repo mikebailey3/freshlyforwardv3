@@ -1,3 +1,6 @@
+import type { MemberProfile } from '@/types'
+import type { CareerScope, CareerResponsibility, CareerSkill } from '@/types/forwardDna'
+
 export interface ForwardDnaCompletenessInput {
   hasCareerCompassResult: boolean
   hasScopeEntry: boolean
@@ -39,4 +42,29 @@ export function calculateForwardDnaCompleteness(
   }
 
   return { score: Math.round((earned / total) * 100), missing }
+}
+
+/**
+ * Pure derivation of a ForwardDnaCompletenessInput from the raw Forward
+ * DNA data sources. Extracted so both ForwardDnaPage.tsx (rendering the
+ * completeness widget) and useForwardScore (computing the Forward DNA
+ * Depth pillar) share one derivation instead of two copies that could
+ * silently drift apart.
+ */
+export function buildForwardDnaCompletenessInput(
+  profile: Pick<MemberProfile, 'education' | 'certifications' | 'target_role' | 'target_timeframe'>,
+  scope: CareerScope[],
+  responsibilities: CareerResponsibility[],
+  skills: CareerSkill[],
+  hasCareerCompassResult: boolean
+): ForwardDnaCompletenessInput {
+  return {
+    hasCareerCompassResult,
+    hasScopeEntry: scope.length > 0,
+    hasResponsibilityTag: responsibilities.length > 0,
+    hasSkillEvidenceBeyondClaimed: skills.some((s) => s.state !== 'claimed'),
+    hasEducationOrCertifications:
+      (profile.education?.length ?? 0) > 0 || (profile.certifications?.length ?? 0) > 0,
+    hasTargetRoleAndTimeframe: !!profile.target_role && !!profile.target_timeframe,
+  }
 }

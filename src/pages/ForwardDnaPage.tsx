@@ -8,6 +8,7 @@ import { getAllScopeForUser, upsertScope } from '@/lib/forwardDna/scope'
 import type { CareerScopeUpdate } from '@/lib/forwardDna/scope'
 import { getAllResponsibilitiesForUser, addResponsibility, removeResponsibility } from '@/lib/forwardDna/responsibilities'
 import { getSkillStates, upsertSkillState, syncSkillsFromProfile } from '@/lib/forwardDna/skills'
+import { buildForwardDnaCompletenessInput } from '@/lib/forwardDna/completeness'
 import type { SkillState } from '@/types/forwardDna'
 import { CompassSummaryCard } from '@/components/forwardDna/CompassSummaryCard'
 import { CareerScopeCard } from '@/components/forwardDna/CareerScopeCard'
@@ -192,14 +193,7 @@ export function ForwardDnaPage() {
         </div>
         <div>
           <CompletenessWidget
-            input={{
-              hasCareerCompassResult: !!compassResult,
-              hasScopeEntry: scope.length > 0,
-              hasResponsibilityTag: responsibilities.length > 0,
-              hasSkillEvidenceBeyondClaimed: skills.some((s) => s.state !== 'claimed'),
-              hasEducationOrCertifications: (profile.education?.length ?? 0) > 0 || (profile.certifications?.length ?? 0) > 0,
-              hasTargetRoleAndTimeframe: !!profile.target_role && !!profile.target_timeframe,
-            }}
+            input={buildForwardDnaCompletenessInput(profile, scope, responsibilities, skills, !!compassResult)}
           />
         </div>
       </div>
