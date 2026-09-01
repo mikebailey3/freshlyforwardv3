@@ -1,9 +1,11 @@
 # ForwardOS Project 3 — ForwardOS Home + Forward Score — Design Spec
 
-**Status: Design direction LOCKED 2026-09-01 — see §8 Locked Decisions.
-No migration written, no schema applied, no implementation code
-changed. Awaiting your approval of this revised spec before an
-implementation plan is written.**
+**Status: Design APPROVED 2026-09-01. Final requirements (visual
+direction, terminology, Next Best Move design, explainability
+enforcement) LOCKED in §10. No migration written, no schema applied,
+no implementation code changed. Companion implementation plan:
+`docs/superpowers/plans/2026-09-01-forwardos-home-forward-score.md`,
+awaiting your approval before any coding begins.**
 
 Branch: `forwardos-home-forward-score`, cut from `main` @ `76b86cb`.
 Deliberately not based on, and does not merge, the unmerged
@@ -383,10 +385,85 @@ spec applied in its own §20:
   one — so the "no migration" claim still holds under the revised
   design, not just the original one.
 
+## 10. Final Locked Requirements (2026-09-01, second round)
+
+Approved alongside sign-off on §8. These refine, not replace, the §8
+decisions — no pillar, weight, or non-goal changed here.
+
+**Visual direction.** Deep navy + focused green, premium/clean/high-
+trust, restrained shadows, rounded cards, generous whitespace —
+confirmed **not a new visual language**: `--navy: #071a31`,
+`--green: #078a58` (identical hex to `--color-primary-600`),
+`--shadow`, `--radius: 22px` already exist in `src/index.css` and are
+already used elsewhere in this app (marketing pages, the Concierge
+Editorial Dashboard pass). No new color tokens are introduced. Desktop
+sidebar nav and mobile bottom nav are **already built** in
+`MemberLayout.tsx` — ForwardOS Home renders inside that existing
+shell, unchanged. Where the mockup implies data or a component this
+branch doesn't have (Career Vault content, chiefly), the graceful-
+degradation rule wins over visual fidelity — see the implementation
+plan's Task 7 for the specific placeholder design (a muted "coming
+soon" tile, zero queries against any Career-Vault-shaped table, no
+link to a route that doesn't exist on this branch).
+
+**Information hierarchy, locked:** Forward Score (hero) → Next Best
+Move → Forward DNA Depth / Evidence Quality / Goal Alignment pillar
+cards → Search Readiness and supporting career tools. Search Readiness
+is useful but clearly secondary, both visually and in document order.
+
+**Terminology, locked exactly:**
+- **Search Readiness** — unchanged name, unchanged meaning:
+  operational readiness for FreshlyForward to run an effective job
+  search on the member's behalf.
+- **Forward Score** — unchanged name: broader career-position
+  intelligence, a snapshot, not a judgment.
+- **Goal Alignment** — the pillar's locked label. Never "Career
+  Direction Readiness." The mockup's "Your Direction" card title is
+  treated as an acceptable synonym but **not adopted** — one label
+  used consistently everywhere (type names, card headings, copy) to
+  avoid exactly the kind of terminology drift §9's naming-collision
+  finding already warned about. Enforced by an automated test in the
+  implementation plan (Task 2), not left to copy-review discipline
+  alone.
+- Career Compass's internal `careerDirection` dimension score is an
+  **input to** Goal Alignment, never itself exposed as a second
+  headline "readiness" metric on ForwardOS Home.
+
+**Next Best Move.** A deterministic recommendation layer, not a
+chatbot — a fixed-priority rule table over the four pillar scores plus
+one piece of context (whether the member has an active application),
+mirroring the same fixed-priority tie-break discipline
+`readinessEngine.ts`'s own `BARRIER_PRIORITY` already establishes
+elsewhere in this codebase. Full rule table in the implementation
+plan's Task 4. No recommendation requires a system that doesn't exist
+today (e.g. "Add a Career Win" links to `/forward-dna`, not to a
+Career-Vault-only route).
+
+**Explainability enforcement.** Not just a written requirement —
+automated: the implementation plan's Task 6 includes a test asserting
+the rendered widget never contains any of the five banned framing
+phrases, so a future copy edit can't silently reintroduce one.
+
+**Career Vault dependency, reconfirmed.** Forward Score may read
+`career_skills` only. No merge, cherry-pick, or duplication of Career
+Vault code. Once Career Vault merges, Evidence Quality benefits
+automatically with zero Forward Score code changes — unchanged
+conclusion from §2.
+
+**Search Readiness, reconfirmed.** No modification to its
+implementation, database behavior, trigger, badge, calculation, views,
+or strategist/admin dependencies. Read/display the existing value
+only — unchanged conclusion from §6/§8.
+
+**Existing dashboard, reconfirmed.** Upgrade `DashboardPage.tsx` in
+place. No second competing dashboard. User-facing name: ForwardOS
+Home. `/dashboard` routing stays for compatibility — unchanged
+conclusion from §4/§8.
+
 ---
 
-**Next step, per your instruction: this stops here for your approval,
-not implementation.** Once you sign off on this revised spec, I'll
-write the implementation plan (task breakdown, TDD sequence, review
-checkpoints) — mirroring the process already used successfully for
-Projects 1 and 2 — before any code is written.
+**Next step: this stops here for your approval, not implementation.**
+The companion implementation plan
+(`docs/superpowers/plans/2026-09-01-forwardos-home-forward-score.md`)
+is written and ready for review alongside this spec. No code has been
+written. Implementation begins only after you approve both documents.
