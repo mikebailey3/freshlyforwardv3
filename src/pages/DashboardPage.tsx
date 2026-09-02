@@ -6,7 +6,9 @@ import { CircularProgress } from '@/components/CircularProgress'
 import { useAuth } from '@/context/AuthContext'
 import { useEntitlements } from '@/hooks/useEntitlements'
 import { useForwardScore } from '@/hooks/useForwardScore'
+import { useTopJobMatch } from '@/hooks/useTopJobMatch'
 import { ForwardScoreWidget } from '@/components/forwardScore/ForwardScoreWidget'
+import { OpportunityEngineTeaserCard } from '@/components/opportunityEngine/OpportunityEngineTeaserCard'
 import { NextBestMoveCard } from '@/components/forwardScore/NextBestMoveCard'
 import { PillarCard } from '@/components/forwardScore/PillarCard'
 import { supabase } from '@/lib/supabase'
@@ -75,6 +77,12 @@ export function DashboardPage() {
     compassSummary,
   } = useForwardScore(profile)
 
+  // Opportunity Engine 2.0 Phase 1: light Dashboard integration only --
+  // its own small hook (not folded into useForwardScore's fetch) so this
+  // already-large file's central data-loading effect doesn't grow
+  // further. See useTopJobMatch.ts.
+  const { topMatch, loading: topMatchLoading } = useTopJobMatch(user?.id)
+
   useEffect(() => {
     if (!user) return
 
@@ -115,7 +123,7 @@ export function DashboardPage() {
   // own fetches and useForwardScore's fetch before showing content, so the
   // stat cards (which now source applications/mock_interviews data from
   // the hook) never flash a transient "0" before the hook resolves.
-  if (loading || forwardScoreLoading) {
+  if (loading || forwardScoreLoading || topMatchLoading) {
     return (
       <MemberLayout>
         <div className="flex items-center justify-center py-20">
@@ -308,6 +316,12 @@ export function DashboardPage() {
           {readiness.missing.length > 0 ? "Let's fix it" : 'View My Progress'}
         </Link>
       </div>
+
+      {/* Opportunity Engine teaser (Phase 1 addition, not part of the
+          original locked-position sequence above) -- a light entry point
+          per the Opportunity Engine 2.0 Phase 1 scope: this card, not a
+          reordering of anything else, is the entire Dashboard change. */}
+      <OpportunityEngineTeaserCard topMatch={topMatch} />
 
       {/* Remaining sections (locked layout position 8): supporting career
           tools, unchanged content, repositioned below the fold. */}

@@ -37,6 +37,12 @@ vi.mock('@/lib/blog', () => ({
   getRecentPublishedPosts: vi.fn().mockResolvedValue([]),
 }))
 
+const { mockGetJobMatches } = vi.hoisted(() => ({ mockGetJobMatches: vi.fn().mockResolvedValue([]) }))
+
+vi.mock('@/lib/opportunityEngine', () => ({
+  getJobMatches: mockGetJobMatches,
+}))
+
 interface QueryResult {
   data: unknown
   error: null
@@ -179,5 +185,51 @@ describe('DashboardPage - Forward Score integration (Task 7)', () => {
 
     const allLinks = Array.from(container.querySelectorAll('a'))
     expect(allLinks.some((a) => a.getAttribute('href') === '/career-vault')).toBe(false)
+  })
+})
+
+describe('DashboardPage - Opportunity Engine teaser card (light integration)', () => {
+  it('shows a no-match CTA state when the member has no matches, without inventing fake data', async () => {
+    setCompassRow(null)
+    mockGetJobMatches.mockResolvedValue([])
+
+    renderPage()
+
+        await waitFor(() => expect(screen.getByText('Opportunity Engine')).toBeInTheDocument())
+    expect(screen.getByRole('link', { name: 'Open Opportunity Engine' })).toHaveAttribute('href', '/opportunity-engine')
+  })
+
+  it('surfaces the strongest match title, company, and FreshFit score with a CTA', async () => {
+    setCompassRow(null)
+    mockGetJobMatches.mockResolvedValue([
+      {
+        id: 'm1', member_id: 'user-1', scraped_job_id: 'job-1', fresh_fit_score: 88,
+        matched_skills: [], missing_skills: [], score_breakdown: {}, dismissed_at: null,
+        promoted_opportunity_id: null, computed_at: '2026-01-01',
+        scraped_job: {
+          id: 'job-1', source: 'greenhouse', external_id: 'e1', title: 'Staff Engineer', company: 'Acme',
+          location: null, description: '', salary_text: null, employment_type: null,
+          posting_url: 'https://example.com', posted_at: null, search_query: null,
+          is_active: true, scraped_at: '', created_at: '',
+        },
+      },
+    ])
+
+    renderPage()
+
+    await waitFor(() => expect(screen.getByText('Staff Engineer')).toBeInTheDocument())
+    expect(screen.getByText('Acme')).toBeInTheDocument()
+    expect(screen.getByText('88')).toBeInTheDocument()
+  })
+
+  it('does not materially change the rest of the page -- Forward Score hero still renders first', async () => {
+    setCompassRow(null)
+    mockGetJobMatches.mockResolvedValue([])
+
+    renderPage()
+
+    await waitFor(() => expect(screen.getByText('Forward Score')).toBeInTheDocument())
+    expect(screen.getByText('Search Readiness')).toBeInTheDocument()
+    expect(screen.getByText('Career Vault \u2014 coming soon')).toBeInTheDocument()
   })
 })

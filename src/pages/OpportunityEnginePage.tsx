@@ -1,23 +1,27 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { MemberLayout } from '@/components/MemberLayout'
 import { SubmitJobModal } from '@/components/SubmitJobModal'
+import { MatchFilterBar } from '@/components/opportunityEngine/MatchFilterBar'
+import { MatchCard } from '@/components/opportunityEngine/MatchCard'
+import { EmptyMatchesState } from '@/components/opportunityEngine/EmptyMatchesState'
 import { useAuth } from '@/context/AuthContext'
 import { getJobMatches, dismissJobMatch } from '@/lib/opportunityEngine'
-import { isSafeHttpUrl } from '@/lib/url'
-import { Loader2, MapPin, DollarSign, ExternalLink, X, Sparkles, PlusCircle } from 'lucide-react'
+import { DEFAULT_FILTER_STATE, filterAndSortMatches, type MatchFilterState } from '@/lib/opportunityEngineFilters'
+import { getFreshFitTier, PRESENTATION_TIER_LABELS, type PresentationTier } from '@/lib/opportunityEngineTiers'
+import { Loader2, Sparkles, PlusCircle } from 'lucide-react'
 import type { JobMatchWithJob } from '@/types'
 
-function scoreColor(score: number): string {
-  if (score >= 75) return 'border-success-300 text-success-700'
-  if (score >= 50) return 'border-primary-300 text-primary-700'
-  return 'border-neutral-300 text-neutral-600'
-}
+/** Render order for tier sections -- highest first, so the strongest
+ * matches are always what a member sees first regardless of how the
+ * underlying list is sorted internally. */
+const TIER_ORDER: PresentationTier[] = ['highest', 'stronger', 'other']
 
 export function OpportunityEnginePage() {
   const { user, profile } = useAuth()
   const [matches, setMatches] = useState<JobMatchWithJob[]>([])
   const [loading, setLoading] = useState(true)
   const [showSubmitModal, setShowSubmitModal] = useState(false)
+  const [filters, setFilters] = useState<MatchFilterState>(DEFAULT_FILTER_STATE)
 
   useEffect(() => {
     if (!user) return
@@ -32,6 +36,16 @@ export function OpportunityEnginePage() {
     setMatches((prev) => prev.filter((m) => m.id !== matchId))
   }
 
+  const visibleMatches = useMemo(() => filterAndSortMatches(matches, filters), [matches, filters])
+
+  const tierGroups = useMemo(() => {
+    const groups: Record<PresentationTier, JobMatchWithJob[]> = { highest: [], stronger: [], other: [] }
+    for (const match of visibleMatches) {
+      groups[getFreshFitTier(match.fresh_fit_score)].push(match)
+    }
+    return groups
+  }, [visibleMatches])
+
   if (loading) {
     return (
       <MemberLayout>
@@ -45,7 +59,7 @@ export function OpportunityEnginePage() {
   return (
     <MemberLayout>
       <div className="mb-6">
-        <h1 className="flex items-center gap-2 font-serif text-2xl font-semibold text-neutral-900 sm:text-3xl">
+        <h1 className="flex items-center gap-2 font-display text-2xl font-semibold text-neutral-900 sm:text-3xl">
           <Sparkles className="h-6 w-6 text-primary-600" />
           Opportunity Engine
         </h1>
@@ -63,80 +77,36 @@ export function OpportunityEnginePage() {
       </div>
 
       {matches.length === 0 ? (
-        <div className="border border-neutral-200 bg-white p-12 text-center">
-          <Sparkles className="mx-auto h-12 w-12 text-neutral-300" />
-          <p className="mt-4 text-sm text-neutral-500">
-            No matches yet. Keep your Career Profile (skills, preferred roles) up to date to improve matching.
-          </p>
-        </div>
+        <EmptyMatchesState />
       ) : (
-        <div className="space-y-4">
-          {matches.map((match) => (
-            <div key={match.id} className="border border-neutral-200 border-l-4 border-l-primary-600 bg-white p-6">
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <span className={`border px-2.5 py-0.5 font-mono text-[11px] font-bold uppercase tracking-wide ${scoreColor(match.fresh_fit_score)}`}>
-                      FreshFit {match.fresh_fit_score}
-                    </span>
-                    {match.promoted_opportunity_id && (
-                      <span className="border border-accent-300 px-2.5 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide text-accent-700">
-                        Sent to Strategist
-                      </span>
-                    )}
-                  </div>
-                  <h3 className="mt-3 font-serif text-lg font-semibold text-neutral-900">{match.scraped_job.title}</h3>
-                  <p className="text-sm text-neutral-600">{match.scraped_job.company}</p>
+        <>
+          <MatchFilterBar filters={filters} onChange={setFilters} />
 
-                  <div className="mt-3 flex flex-wrap gap-3 text-xs text-neutral-500">
-                    {match.scraped_job.location && (
-                      <span className="flex items-center gap-1">
-                        <MapPin className="h-3.5 w-3.5" />
-                        {match.scraped_job.location}
-                      </span>
-                    )}
-                    {match.scraped_job.salary_text && (
-                      <span className="flex items-center gap-1">
-                        <DollarSign className="h-3.5 w-3.5" />
-                        {match.scraped_job.salary_text}
-                      </span>
-                    )}
-                  </div>
-
-                  {match.matched_skills.length > 0 && (
-                    <div className="mt-3 flex flex-wrap gap-1.5">
-                      {match.matched_skills.map((skill) => (
-                        <span key={skill} className="border border-success-300 px-2 py-0.5 font-mono text-[11px] font-medium text-success-700">
-                          {skill}
-                        </span>
+          {visibleMatches.length === 0 ? (
+            <p className="mt-6 rounded-xl border border-dashed border-neutral-300 bg-white p-8 text-center text-sm text-neutral-500">
+              No matches found for these filters. Try clearing one to see more.
+            </p>
+          ) : (
+            <div className="mt-6 space-y-8">
+              {TIER_ORDER.map((tier) => {
+                const tierMatches = tierGroups[tier]
+                if (tierMatches.length === 0) return null
+                return (
+                  <div key={tier}>
+                    <h2 className="font-mono text-xs font-semibold uppercase tracking-wide text-neutral-500">
+                      {PRESENTATION_TIER_LABELS[tier]}
+                    </h2>
+                    <div className="mt-3 space-y-4">
+                      {tierMatches.map((match) => (
+                        <MatchCard key={match.id} match={match} onDismiss={handleDismiss} />
                       ))}
                     </div>
-                  )}
-
-                  {isSafeHttpUrl(match.scraped_job.posting_url) && (
-                    <a
-                      href={match.scraped_job.posting_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-primary-600 hover:underline"
-                    >
-                      <ExternalLink className="h-3.5 w-3.5" />
-                      View Posting
-                    </a>
-                  )}
-                </div>
-
-                <button
-                  onClick={() => handleDismiss(match.id)}
-                  aria-label="Dismiss match"
-                  className="p-2 text-neutral-400 transition-colors hover:bg-neutral-50 hover:text-neutral-600"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
+                  </div>
+                )
+              })}
             </div>
-          ))}
-        </div>
+          )}
+        </>
       )}
 
       {showSubmitModal && profile && (
