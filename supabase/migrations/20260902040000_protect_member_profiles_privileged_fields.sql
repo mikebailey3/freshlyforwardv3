@@ -40,19 +40,44 @@
 -- Legacy `status` and `search_readiness_score` columns are explicitly out
 -- of scope for this change and are left untouched.
 --
+-- Privilege model: this function is intentionally SECURITY INVOKER (the
+-- default -- no SECURITY DEFINER clause). It never reads or writes
+-- anything beyond the NEW/OLD row already supplied by the trigger
+-- mechanism for the statement in progress, so it needs no privilege
+-- beyond whatever the invoking statement already has; granting it
+-- definer-level elevation would violate least privilege for no benefit.
+-- Trigger firing itself does not depend on EXECUTE privilege or on
+-- DEFINER/INVOKER -- Postgres invokes trigger functions directly via the
+-- trigger catalog, bypassing the ACL check that gates an explicit SQL
+-- call, and it fires for every statement against this table regardless
+-- of RLS/BYPASSRLS status. auth.jwt() reads the request-scoped JWT-claims
+-- GUC set by PostgREST for the actual calling session; that is unaffected
+-- by SECURITY DEFINER/INVOKER either way, so the trust check below
+-- behaves identically under both models -- INVOKER is strictly safer here
+-- with no functional trade-off. auth.jwt()/auth.role() are always called
+-- schema-qualified in this function, so search_path cannot be hijacked to
+-- shadow them; SET search_path = public is kept anyway as cheap,
+-- convention-matching defense-in-depth.
+--
 -- This is a forward-only migration. Do NOT apply it here -- it must be
 -- reviewed and pushed through the normal Supabase deploy process.
 
 CREATE OR REPLACE FUNCTION protect_member_profiles_privileged_fields()
 RETURNS trigger
 LANGUAGE plpgsql
-SECURITY DEFINER
 SET search_path = public
 AS $$
 DECLARE
   v_is_trusted boolean;
 BEGIN
-  v_is_trusted := auth.role() = 'service_role'
+  -- auth.jwt() ->> 'role' reads the top-level `role` claim carried by the
+  -- service-role key's own JWT (distinct from auth.role(), a legacy
+  -- Supabase helper still used in an earlier historical migration in this
+  -- repo -- left untouched there, since historical migrations aren't
+  -- edited). app_metadata is used for the admin check, never
+  -- user_metadata, since user_metadata is end-user-writable and would let
+  -- a member grant themselves admin.
+  v_is_trusted := (auth.jwt() ->> 'role') = 'service_role'
                OR (auth.jwt() -> 'app_metadata' ->> 'role') = 'admin';
 
   IF NOT v_is_trusted THEN
