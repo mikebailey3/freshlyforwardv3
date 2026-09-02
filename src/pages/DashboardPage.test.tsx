@@ -111,3 +111,73 @@ describe('DashboardPage - Forward DNA card', () => {
     expect(screen.getByRole('link', { name: 'Open' })).toHaveAttribute('href', '/forward-dna')
   })
 })
+
+describe('DashboardPage - Forward Score integration (Task 7)', () => {
+  it('renders the ForwardScoreWidget, NextBestMoveCard, and all 4 PillarCards', async () => {
+    setCompassRow(null)
+
+    renderPage()
+
+    await waitFor(() => expect(screen.getByText('Forward Score')).toBeInTheDocument())
+    expect(screen.getByText('Next Best Move')).toBeInTheDocument()
+    // Each pillar label renders twice -- once in ForwardScoreWidget's
+    // compact hero summary, once in its own full PillarCard below --
+    // "Goal Alignment" must be the only label used anywhere, never a
+    // synonym like "Your Direction".
+    expect(screen.getAllByText('Forward DNA Depth').length).toBeGreaterThanOrEqual(2)
+    expect(screen.getAllByText('Evidence Quality').length).toBeGreaterThanOrEqual(2)
+    expect(screen.getAllByText('Career Momentum').length).toBeGreaterThanOrEqual(2)
+    expect(screen.getAllByText('Goal Alignment').length).toBeGreaterThanOrEqual(2)
+  })
+
+  it('renders "ForwardOS Home" prominently near the top of the page', async () => {
+    setCompassRow(null)
+
+    renderPage()
+
+    // "ForwardOS Home" also appears as the (now-renamed) sidebar/bottom-nav
+    // label rendered by the real MemberLayout this page wraps itself in --
+    // so at least one match, not exactly one.
+    await waitFor(() => expect(screen.getAllByText('ForwardOS Home').length).toBeGreaterThanOrEqual(1))
+  })
+
+  it('still renders Search Readiness with the real calculateSearchReadiness(profile) score', async () => {
+    setCompassRow(null)
+
+    renderPage()
+
+    await waitFor(() => expect(screen.getByText('Search Readiness')).toBeInTheDocument())
+    // calculateSearchReadiness is mocked (above) to always return score: 50
+    // -- CircularProgress renders that exact clamped value as "50%" (the
+    // "Profile Completeness" progress bar further down also reads the same
+    // score, so at least one "50%" match, not exactly one).
+    expect(screen.getAllByText('50%').length).toBeGreaterThanOrEqual(1)
+  })
+
+  it('places the Forward Score hero widget before the Search Readiness card in the DOM', async () => {
+    setCompassRow(null)
+
+    renderPage()
+
+    await waitFor(() => expect(screen.getByText('Forward Score')).toBeInTheDocument())
+    const hero = screen.getByText('Forward Score')
+    const searchReadinessLabel = screen.getByText('Search Readiness')
+
+    // Node.DOCUMENT_POSITION_FOLLOWING (4): searchReadinessLabel comes
+    // after hero in document order.
+    // eslint-disable-next-line no-bitwise
+    expect(hero.compareDocumentPosition(searchReadinessLabel) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  })
+
+  it('renders the Career Vault placeholder card with no link anywhere pointing at /career-vault', async () => {
+    setCompassRow(null)
+
+    const { container } = renderPage()
+
+    await waitFor(() => expect(screen.getByText('Career Vault \u2014 coming soon')).toBeInTheDocument())
+    expect(screen.getByText('Track evidence-backed career wins here once Career Vault ships.')).toBeInTheDocument()
+
+    const allLinks = Array.from(container.querySelectorAll('a'))
+    expect(allLinks.some((a) => a.getAttribute('href') === '/career-vault')).toBe(false)
+  })
+})

@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react'
 import type { Session, User } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase'
 import type { MemberProfile, UserRole } from '@/types'
@@ -24,7 +24,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [role, setRole] = useState<UserRole>('member')
   const [loading, setLoading] = useState(true)
 
-  const fetchProfile = async (userId: string, userMetadata?: User): Promise<UserRole> => {
+  // Memoized with an empty dep array: this function only ever touches
+  // stable `useState` setters (setRole/setProfile) and the module-level
+  // `supabase` client -- it never closes over `user`/`profile`/anything
+  // else that changes across renders, so an empty dep array is correct,
+  // not a lie to satisfy exhaustive-deps. This keeps its identity stable
+  // forever, which `refreshProfile` below depends on.
+  const fetchProfile = useCallback(async (userId: string, userMetadata?: User): Promise<UserRole> => {
     const adminRole = userMetadata?.app_metadata?.['role']
     if (adminRole === 'admin') {
       setRole('admin')
@@ -66,7 +72,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     setRole(determinedRole)
     return determinedRole
-  }
+  }, [])
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -136,11 +142,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setRole('member')
   }
 
-  const refreshProfile = async () => {
+  // Memoized so consumers whose effects list `refreshProfile` as a
+  // dependency (DashboardPage, CareerProfilePage, ForwardDnaPage,
+  // OnboardingPage) don't see a new function identity -- and therefore
+  // don't re-fire -- on every AuthProvider render. `user` is the only
+  // reactive value this closes over, and `user` itself is stable across
+  // that loop (only ever set from the one-time auth effect or `signIn`,
+  // never from `fetchProfile`/`refreshProfile`), so `[user, fetchProfile]`
+  // is both correct and sufficient.
+  const refreshProfile = useCallback(async () => {
     if (user) {
       await fetchProfile(user.id, user)
     }
-  }
+  }, [user, fetchProfile])
 
   return (
     <AuthContext.Provider
