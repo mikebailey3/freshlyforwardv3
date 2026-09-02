@@ -9,7 +9,7 @@ import type { MembershipPlan } from '@/types'
 
 export function CheckoutPage() {
   const { planSlug } = useParams<{ planSlug: string }>()
-  const { user } = useAuth()
+  const { user, session } = useAuth()
   const navigate = useNavigate()
   const [plan, setPlan] = useState<MembershipPlan | null>(null)
   const [loading, setLoading] = useState(true)
@@ -71,11 +71,16 @@ export function CheckoutPage() {
 
     try {
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+      const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
       const response = await fetch(`${supabaseUrl}/functions/v1/stripe-checkout`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          // The real signed-in user's session token identifies the caller
+          // for the edge function's auth.getUser() check; the anon key is
+          // only the API-gateway key, not a substitute for it.
+          Authorization: `Bearer ${session?.access_token}`,
+          apikey: anonKey,
         },
         body: JSON.stringify({
           plan_slug: plan.slug,
@@ -96,10 +101,9 @@ export function CheckoutPage() {
       }
 
       if (data.fallback) {
-        await supabase
-          .from('member_profiles')
-          .update({ plan_id: plan.id, subscription_status: 'active' })
-          .eq('user_id', user.id)
+        // The server (stripe-checkout edge function) now always performs
+        // this member_profiles activation itself before returning
+        // fallback: true -- the client no longer writes it directly.
         navigate('/onboarding')
         return
       }

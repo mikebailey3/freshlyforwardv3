@@ -10,7 +10,7 @@ import {
 import type { MembershipPlan } from '@/types'
 
 export function MembershipPage() {
-  const { user, profile, refreshProfile } = useAuth()
+  const { user, profile, session, refreshProfile } = useAuth()
   const [plan, setPlan] = useState<MembershipPlan | null>(null)
   const [loading, setLoading] = useState(true)
   const [actionLoading, setActionLoading] = useState(false)
@@ -33,6 +33,16 @@ export function MembershipPage() {
       })
   }, [user, profile])
 
+  // The real signed-in user's session token identifies the caller for the
+  // edge function's auth.getUser() check; the anon key alone (no session
+  // token) has no `sub` claim and can't resolve a user -- it belongs in
+  // `apikey`, not `Authorization`, for every stripe-portal call below.
+  const portalHeaders = () => ({
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${session?.access_token}`,
+    apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
+  })
+
   const handlePortal = async () => {
     setPortalLoading(true)
     setError(null)
@@ -40,10 +50,7 @@ export function MembershipPage() {
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
       const response = await fetch(`${supabaseUrl}/functions/v1/stripe-portal`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-        },
+        headers: portalHeaders(),
       })
 
       if (!response.ok) {
@@ -71,10 +78,8 @@ export function MembershipPage() {
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
       const response = await fetch(`${supabaseUrl}/functions/v1/stripe-portal`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-        },
+        headers: portalHeaders(),
+        body: JSON.stringify({ action: 'pause' }),
       })
 
       if (response.ok) {
@@ -83,14 +88,14 @@ export function MembershipPage() {
           window.location.href = data.url
           return
         }
+        if (data.fallback) {
+          await refreshProfile()
+          setActionLoading(false)
+          return
+        }
       }
 
-      // Fallback: update status directly
-      await supabase
-        .from('member_profiles')
-        .update({ subscription_status: 'paused' })
-        .eq('user_id', user.id)
-      await refreshProfile()
+      throw new Error('Could not pause membership. Please try again.')
     } catch {
       setError('Could not pause membership. Please try again.')
     }
@@ -102,11 +107,27 @@ export function MembershipPage() {
     setActionLoading(true)
     setError(null)
     try {
-      await supabase
-        .from('member_profiles')
-        .update({ subscription_status: 'active' })
-        .eq('user_id', user.id)
-      await refreshProfile()
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+      const response = await fetch(`${supabaseUrl}/functions/v1/stripe-portal`, {
+        method: 'POST',
+        headers: portalHeaders(),
+        body: JSON.stringify({ action: 'resume' }),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        if (data.url) {
+          window.location.href = data.url
+          return
+        }
+        if (data.fallback) {
+          await refreshProfile()
+          setActionLoading(false)
+          return
+        }
+      }
+
+      throw new Error('Could not resume membership.')
     } catch {
       setError('Could not resume membership.')
     }
@@ -122,10 +143,8 @@ export function MembershipPage() {
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
       const response = await fetch(`${supabaseUrl}/functions/v1/stripe-portal`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-        },
+        headers: portalHeaders(),
+        body: JSON.stringify({ action: 'cancel' }),
       })
 
       if (response.ok) {
@@ -134,14 +153,14 @@ export function MembershipPage() {
           window.location.href = data.url
           return
         }
+        if (data.fallback) {
+          await refreshProfile()
+          setActionLoading(false)
+          return
+        }
       }
 
-      // Fallback
-      await supabase
-        .from('member_profiles')
-        .update({ subscription_status: 'canceled' })
-        .eq('user_id', user.id)
-      await refreshProfile()
+      throw new Error('Could not cancel membership.')
     } catch {
       setError('Could not cancel membership.')
     }

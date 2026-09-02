@@ -15,13 +15,6 @@ Deno.serve(async (req: Request) => {
   try {
     const stripeSecretKey = Deno.env.get("STRIPE_SECRET_KEY");
 
-    if (!stripeSecretKey) {
-      return new Response(
-        JSON.stringify({ error: "Stripe is not configured. Add your Stripe secret key to enable billing management." }),
-        { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
@@ -46,6 +39,32 @@ Deno.serve(async (req: Request) => {
       });
     }
 
+    const body = await req.json().catch(() => ({}));
+    const action: string | undefined = body?.action;
+    const actionToStatus: Record<string, string> = {
+      pause: "paused",
+      resume: "active",
+      cancel: "canceled",
+    };
+    const mappedStatus = action ? actionToStatus[action] : undefined;
+
+    if (!stripeSecretKey) {
+      if (mappedStatus) {
+        await supabase
+          .from("member_profiles")
+          .update({ subscription_status: mappedStatus })
+          .eq("user_id", user.id);
+        return new Response(JSON.stringify({ fallback: true }), {
+          status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      return new Response(
+        JSON.stringify({ error: "Stripe is not configured. Add your Stripe secret key to enable billing management." }),
+        { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const { data: profile } = await supabase
       .from("member_profiles")
       .select("stripe_customer_id")
@@ -53,6 +72,16 @@ Deno.serve(async (req: Request) => {
       .maybeSingle();
 
     if (!profile?.stripe_customer_id) {
+      if (mappedStatus) {
+        await supabase
+          .from("member_profiles")
+          .update({ subscription_status: mappedStatus })
+          .eq("user_id", user.id);
+        return new Response(JSON.stringify({ fallback: true }), {
+          status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
       return new Response(JSON.stringify({ error: "No billing account found." }), {
         status: 404,
         headers: { ...corsHeaders, "Content-Type": "application/json" },

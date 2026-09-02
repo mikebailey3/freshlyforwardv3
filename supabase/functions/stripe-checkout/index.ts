@@ -15,14 +15,6 @@ Deno.serve(async (req: Request) => {
   try {
     const stripeSecretKey = Deno.env.get("STRIPE_SECRET_KEY");
 
-    // If Stripe is not configured, return fallback so the UI can proceed in dev mode
-    if (!stripeSecretKey) {
-      return new Response(
-        JSON.stringify({ fallback: true, message: "Stripe not configured — proceeding in development mode." }),
-        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
@@ -68,8 +60,10 @@ Deno.serve(async (req: Request) => {
       });
     }
 
-    // If no Stripe price ID, use fallback
-    if (!plan.stripe_price_id) {
+    // If Stripe isn't configured, or this plan has no Stripe price ID, fall
+    // back to a server-side direct activation (always, so the client never
+    // has to perform this member_profiles write itself).
+    if (!stripeSecretKey || !plan.stripe_price_id) {
       await supabase
         .from("member_profiles")
         .update({ plan_id: plan.id, subscription_status: "active" })
