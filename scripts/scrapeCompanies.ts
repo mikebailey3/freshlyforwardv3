@@ -23,6 +23,8 @@ import { fetchGreenhouseJobs } from './jobSources/greenhouse'
 import { fetchLeverJobs } from './jobSources/lever'
 import { fetchAshbyJobs } from './jobSources/ashby'
 import { selectJobsToDeactivate, isStaleByAge } from './jobSources/liveness'
+import { computeUpsertCounts } from './jobSources/upsertCounts'
+import { summarizeRun, type AttemptResult } from './lib/runSummary'
 import type { ScrapedJobInput } from './jobSources/types'
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL
@@ -41,12 +43,28 @@ export const PROVIDERS: Record<string, (slug: string) => Promise<ScrapedJobInput
   ashby: fetchAshbyJobs,
 }
 
-async function upsertJobs(jobs: ScrapedJobInput[]): Promise<void> {
-  if (jobs.length === 0) return
+// Throws on failure (rather than logging and swallowing) so the per-company
+// loop in main() can correctly record this company as failed instead of
+// silently treating an unpersisted batch as a success.
+async function upsertJobs(jobs: ScrapedJobInput[]): Promise<{ inserted: number; updated: number }> {
+  if (jobs.length === 0) return { inserted: 0, updated: 0 }
+
+  const source = jobs[0].source
+  const externalIds = jobs.map((job) => job.external_id)
+  const { data: existing, error: selectError } = await supabase
+    .from('scraped_jobs')
+    .select('external_id')
+    .eq('source', source)
+    .in('external_id', externalIds)
+  if (selectError) throw selectError
+
+  const counts = computeUpsertCounts((existing ?? []).map((row) => row.external_id as string), externalIds)
+
   const rows = jobs.map((job) => ({ ...job, is_active: true, scraped_at: new Date().toISOString() }))
   const { error } = await supabase.from('scraped_jobs').upsert(rows, { onConflict: 'source,external_id' })
-  if (error) console.error('Error upserting scraped jobs:', error)
-  else console.log(`Upserted ${rows.length} job(s).`)
+  if (error) throw error
+
+  return counts
 }
 
 async function deactivateGoneJobs(source: string, companySlug: string, seenIds: string[]): Promise<void> {
@@ -99,6 +117,11 @@ async function deactivateStaleJobs(maxAgeDays: number): Promise<void> {
 }
 
 async function main() {
+  const results: AttemptResult[] = []
+  let totalDiscovered = 0
+  let totalInserted = 0
+  let totalUpdated = 0
+
   for (const [providerName, slugs] of Object.entries(companies as Record<string, string[]>)) {
     const fetchJobs = PROVIDERS[providerName]
     if (!fetchJobs) {
@@ -107,18 +130,52 @@ async function main() {
     }
 
     for (const slug of slugs) {
+      const label = `${providerName}/${slug}`
       try {
-        console.log(`Fetching ${providerName}/${slug}...`)
+        console.log(`Fetching ${label}...`)
         const jobs = await fetchJobs(slug)
-        await upsertJobs(jobs)
+        const { inserted, updated } = await upsertJobs(jobs)
         await deactivateGoneJobs(providerName, slug, jobs.map((j) => j.external_id))
+
+        totalDiscovered += jobs.length
+        totalInserted += inserted
+        totalUpdated += updated
+        // A successful fetch that legitimately found zero open jobs right
+        // now is still a success -- it is not the same thing as a failure
+        // to reach/parse the board, which is caught below instead.
+        console.log(`${label}: found ${jobs.length} job(s), ${inserted} new, ${updated} already known.`)
+        results.push({ label, status: 'success' })
       } catch (err) {
-        console.error(`Failed on ${providerName}/${slug}:`, err)
+        const detail = err instanceof Error ? err.message : String(err)
+        console.error(`Failed on ${label}: ${detail}`)
+        results.push({ label, status: 'failure', detail })
       }
     }
   }
+
   await deactivateStaleJobs(45)
-  console.log('Done.')
+
+  const summary = summarizeRun(results)
+  console.log('')
+  console.log('=== Job Discovery: Scrape Summary ===')
+  console.log(`Companies attempted: ${summary.total} (succeeded: ${summary.succeeded}, failed: ${summary.failed})`)
+  console.log(`Jobs discovered this run: ${totalDiscovered} (${totalInserted} new, ${totalUpdated} already known)`)
+  console.log(`Status: ${summary.status.toUpperCase()}`)
+  console.log('======================================')
+
+  // A company/provider having zero open jobs right now is not a failure --
+  // only a genuine fetch/parse error counts against it (see the catch
+  // block above). This only fires when NOTHING could be processed at all:
+  // either every configured company failed, or companies.json is empty --
+  // both mean the pipeline did not actually do its job this run.
+  if (summary.status === 'failed') {
+    console.error('Every configured company/provider failed -- nothing could be scraped this run.')
+    process.exit(1)
+  }
+  if (summary.status === 'empty') {
+    console.error('No companies are configured in companies.json -- nothing was scraped. Failing so this misconfiguration is visible.')
+    process.exit(1)
+  }
 }
 
 main().catch((err) => {

@@ -1,0 +1,66 @@
+name: Job Discovery Pipeline
+
+# Runs the existing, unmodified scrape -> score scripts on a schedule so
+# scraped_jobs / job_matches stay fresh without a manual `npm run`.
+#
+# To change frequency later, edit ONLY the cron line below -- everything
+# else (steps, secrets, scripts) stays the same:
+#   every 6 hours (current): '0 */6 * * *'
+#   daily:                   '0 0 * * *'
+#   hourly:                  '0 * * * *'
+# GitHub Actions cron is always UTC.
+"on":
+  schedule:
+    - cron: '0 */6 * * *'
+  workflow_dispatch: {}
+
+# If a run is still going when the next scheduled trigger fires, queue the
+# new run instead of running both at once or cancelling the in-progress
+# one -- this is the "no double-run" guard for scraped_jobs/job_matches
+# writes. cancel-in-progress is deliberately false: an in-progress run is
+# never intentionally cancelled just because another run wants to start.
+concurrency:
+  group: job-discovery-pipeline
+  cancel-in-progress: false
+
+jobs:
+  discover-and-score:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - run: npm ci
+
+      # Greenhouse/Lever/Ashby only. scrapeIndeed.ts is intentionally never
+      # referenced here -- it stays a manual, non-scheduled fallback (see
+      # its own docstring for why: Indeed ToS risk).
+      #
+      # Exits non-zero only when NOTHING could be scraped this run (every
+      # configured company failed, or companies.json is empty). A single
+      # bad company slug does not fail this step -- see the per-company
+      # try/catch and summary in scrapeCompanies.ts.
+      - name: Scrape companies (Greenhouse / Lever / Ashby)
+        # Secrets scoped to only the steps that actually need them --
+        # checkout/setup-node/npm ci never see the service role key.
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: npm run scrape:companies
+
+      # Runs even if the scrape step above failed outright, because
+      # syncFreshFitScores.ts scores ALL active scraped_jobs each run, not
+      # just ones from this cycle -- a scrape failure doesn't make
+      # re-scoring against the existing backlog pointless. The job's
+      # overall status still reflects the scrape failure via the step above.
+      - name: Sync FreshFit scores
+        if: ${{ !cancelled() }}
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: npm run sync:freshfit

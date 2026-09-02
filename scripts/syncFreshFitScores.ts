@@ -12,6 +12,7 @@
  */
 import { createClient } from '@supabase/supabase-js'
 import { computeFreshFitScore } from '../src/lib/freshFitScore'
+import { summarizeRun, type AttemptResult } from './lib/runSummary'
 import type { MemberProfile, ScrapedJob } from '../src/types'
 import type { CareerSkill, CareerScope } from '../src/types/forwardDna'
 
@@ -69,25 +70,58 @@ async function main() {
   console.log(`Scoring ${members.length} member(s) against ${activeJobs.length} job(s)...`)
 
   const rows: Record<string, unknown>[] = []
+  // One entry per (member, job) pair attempted -- so a single malformed
+  // profile or job row can't silently abort scoring for everyone else,
+  // and the run's final report can distinguish "a few pairs failed" from
+  // "nothing could be scored at all".
+  const results: AttemptResult[] = []
 
   for (const member of members) {
     for (const job of activeJobs) {
-      const result = computeFreshFitScore(member, job, {
-        skills: skillsByUser.get(member.user_id) ?? [],
-        scope: scopeByUser.get(member.user_id) ?? [],
-      })
-      if (result.score < MIN_SCORE_TO_STORE) continue
+      const label = `member ${member.user_id} x job ${job.id}`
+      try {
+        const result = computeFreshFitScore(member, job, {
+          skills: skillsByUser.get(member.user_id) ?? [],
+          scope: scopeByUser.get(member.user_id) ?? [],
+        })
+        results.push({ label, status: 'success' })
+        if (result.score < MIN_SCORE_TO_STORE) continue
 
-      rows.push({
-        member_id: member.user_id,
-        scraped_job_id: job.id,
-        fresh_fit_score: result.score,
-        matched_skills: result.matchedSkills,
-        missing_skills: result.missingSkills,
-        score_breakdown: result.breakdown,
-        computed_at: new Date().toISOString(),
-      })
+        rows.push({
+          member_id: member.user_id,
+          scraped_job_id: job.id,
+          fresh_fit_score: result.score,
+          matched_skills: result.matchedSkills,
+          missing_skills: result.missingSkills,
+          score_breakdown: result.breakdown,
+          computed_at: new Date().toISOString(),
+        })
+      } catch (err) {
+        const detail = err instanceof Error ? err.message : String(err)
+        console.error(`Failed scoring ${label}: ${detail}`)
+        results.push({ label, status: 'failure', detail })
+      }
     }
+  }
+
+  const summary = summarizeRun(results)
+  console.log('')
+  console.log('=== Job Discovery: FreshFit Scoring Summary ===')
+  console.log(`Pairs attempted: ${summary.total} (succeeded: ${summary.succeeded}, failed: ${summary.failed})`)
+  console.log(`Matches meeting the ${MIN_SCORE_TO_STORE}+ threshold: ${rows.length}`)
+  console.log(`Status: ${summary.status.toUpperCase()}`)
+  console.log('================================================')
+
+  if (summary.status === 'failed') {
+    console.error('Every scoring attempt failed -- nothing could be scored this run.')
+    process.exit(1)
+  }
+  // 'empty' just means there were no active members and/or no active jobs
+  // to pair up yet -- a legitimate state (e.g. before the first signup or
+  // between scrape cycles), not a pipeline failure, so it is reported but
+  // does not fail the run.
+  if (summary.status === 'empty') {
+    console.log('No (member, job) pairs to score this run (no active members and/or no active jobs yet).')
   }
 
   if (rows.length === 0) {

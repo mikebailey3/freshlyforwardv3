@@ -1,5 +1,5 @@
 {
-  "greenhouse": ["REPLACE_WITH_REAL_COMPANY_SLUG"],
-  "lever": ["REPLACE_WITH_REAL_COMPANY_SLUG"],
-  "ashby": ["REPLACE_WITH_REAL_COMPANY_SLUG"]
+  "greenhouse": ["pinterest", "doordash"],
+  "lever": ["netflix", "eventbrite"],
+  "ashby": ["ashby", "ramp"]
 }
