@@ -35,6 +35,14 @@ import strategistDashboardPageSource from '../../pages/strategist/StrategistDash
 import searchReadinessWidgetSource from '../../components/SearchReadinessWidget.tsx?raw'
 import badgeSystemSqlSource from '../../../supabase/migrations/20260818010000_badge_system.sql?raw'
 
+// -- 3b. SQL view migrations that also SELECT mp.search_readiness_score
+//        for admin/strategist consumption -- an even more literal match
+//        for the spec's "admin/strategist reads" language than some of
+//        the TSX pages above. --
+import adminMemberManagementSqlSource from '../../../supabase/migrations/20260818020000_admin_member_management.sql?raw'
+import strategistEnrollmentSqlSource from '../../../supabase/migrations/20260820000000_strategist_enrollment.sql?raw'
+import adminStrategistAssignmentSqlSource from '../../../supabase/migrations/20260822000000_admin_strategist_assignment.sql?raw'
+
 describe('Search Readiness regression proof (Task 8 -- whole-project tripwire)', () => {
   describe('1. calculateSearchReadiness() weighted-checklist field list is byte-for-byte unchanged', () => {
     // Extracted live from profile.ts's source, NOT a copy-pasted
@@ -123,7 +131,7 @@ describe('Search Readiness regression proof (Task 8 -- whole-project tripwire)',
     }
   })
 
-  describe('3. Zero-diff proof: badge_system.sql trigger + every audited admin/strategist/member page', () => {
+  describe('3. Zero-diff proof: badge_system.sql trigger + AdminMemberSummary-family SQL views + every audited admin/strategist/member page', () => {
     it('badge_system.sql still defines the search-ready trigger off search_readiness_score >= 100', () => {
       expect(badgeSystemSqlSource).toContain('IF NEW.search_readiness_score >= 100 THEN')
       expect(badgeSystemSqlSource).toContain("PERFORM award_badge(NEW.user_id, 'search-ready')")
@@ -158,6 +166,18 @@ describe('Search Readiness regression proof (Task 8 -- whole-project tripwire)',
 
     it('SearchReadinessWidget.tsx still calls calculateSearchReadiness(profile)', () => {
       expect(searchReadinessWidgetSource).toContain('calculateSearchReadiness')
+    })
+
+    it('admin_member_management.sql (AdminMemberSummary-family view) still selects mp.search_readiness_score', () => {
+      expect(adminMemberManagementSqlSource).toContain('mp.search_readiness_score')
+    })
+
+    it('strategist_enrollment.sql (AdminMemberSummary-family view) still selects mp.search_readiness_score', () => {
+      expect(strategistEnrollmentSqlSource).toContain('mp.search_readiness_score')
+    })
+
+    it('admin_strategist_assignment.sql (AdminMemberSummary-family view) still selects mp.search_readiness_score', () => {
+      expect(adminStrategistAssignmentSqlSource).toContain('mp.search_readiness_score')
     })
   })
 })
