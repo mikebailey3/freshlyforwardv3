@@ -29,21 +29,30 @@ already read locally -- no renaming, no second config system for CI:
 Only a repo admin can set these; this is a manual, credential-handling step
 that has to happen before the workflow can do anything real.
 
-## companies.json: seeded slugs are NOT independently verified
+## companies.json: verification history
 
-`scripts/jobSources/companies.json` was seeded with a small set of real
-companies believed to run public Greenhouse/Lever/Ashby job boards
-(`pinterest`, `doordash` / `netflix`, `eventbrite` / `ashby`, `ramp`).
+`scripts/jobSources/companies.json` was originally seeded with six guessed
+slugs (not independently fetched or confirmed live from the environment
+that wrote them). A live `workflow_dispatch` run confirmed three of them
+real (`pinterest`, `ashby/ashby`, `ashby/ramp`) and three dead
+(`greenhouse/doordash`, `lever/netflix`, `lever/eventbrite` all 404'd).
 
-**These slugs were not fetched or confirmed live** -- the environment that
-seeded them has no general outbound internet access to arbitrary domains
-(only GitHub Actions' own runners do). Treat them as a reasonable starting
-point, not a verified one. The first `workflow_dispatch` run described
-below is the actual verification point: its per-company summary output
-will show exactly which slugs are live/correct today and which need
-swapping for a real one from that company's current careers page
+The three dead slugs have since been corrected based on live verification
+performed outside this repo's own dev sandbox (which has no general
+outbound internet access): `doordash` -> `doordashusa` (Greenhouse),
+`eventbrite` moved providers to `eventbriteinc` (Greenhouse, was Lever),
+and `netflix` (no longer available on a supported provider) was replaced
+with `workwave` (Lever). Current configuration:
+
+- Greenhouse: `pinterest`, `doordashusa`, `eventbriteinc`
+- Lever: `workwave`
+- Ashby: `ashby`, `ramp`
+
+If any of these ever go stale again, the same signal applies: a
+`workflow_dispatch` run's per-company summary output shows exactly which
+slugs are failing
 (`boards.greenhouse.io/<slug>`, `jobs.lever.co/<slug>`,
-`jobs.ashbyhq.com/<slug>`).
+`jobs.ashbyhq.com/<slug>` are where to find a company's current one).
 
 To add/change a company, edit `scripts/jobSources/companies.json` directly
 -- it's a plain `{ "greenhouse": [...], "lever": [...], "ashby": [...] }`
