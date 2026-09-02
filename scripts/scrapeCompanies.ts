@@ -22,6 +22,7 @@ import companies from './jobSources/companies.json'
 import { fetchGreenhouseJobs } from './jobSources/greenhouse'
 import { fetchLeverJobs } from './jobSources/lever'
 import { fetchAshbyJobs } from './jobSources/ashby'
+import { fetchWorkdayJobs } from './jobSources/workday'
 import { selectJobsToDeactivate, isStaleByAge } from './jobSources/liveness'
 import type { ScrapedJobInput } from './jobSources/types'
 
@@ -39,6 +40,7 @@ export const PROVIDERS: Record<string, (slug: string) => Promise<ScrapedJobInput
   greenhouse: fetchGreenhouseJobs,
   lever: fetchLeverJobs,
   ashby: fetchAshbyJobs,
+  workday: fetchWorkdayJobs,
 }
 
 async function upsertJobs(jobs: ScrapedJobInput[]): Promise<void> {
