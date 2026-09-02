@@ -32,7 +32,12 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          # @supabase/supabase-js (and its realtime-js/auth-js/etc deps)
+          # require Node >=22 -- on Node 20, createClient() throws
+          # "Node.js detected but native WebSocket not found" before
+          # either script does anything. Verified via a live
+          # workflow_dispatch run on Node 20 that failed this way.
+          node-version: '22'
           cache: npm
 
       - run: npm ci
