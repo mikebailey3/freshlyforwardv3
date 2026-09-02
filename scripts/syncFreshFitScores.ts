@@ -13,6 +13,7 @@
 import { createClient } from '@supabase/supabase-js'
 import { computeFreshFitScore } from '../src/lib/freshFitScore'
 import { summarizeRun, type AttemptResult } from './lib/runSummary'
+import { getErrorDetail } from './lib/errorDetail'
 import type { MemberProfile, ScrapedJob } from '../src/types'
 import type { CareerSkill, CareerScope } from '../src/types/forwardDna'
 
@@ -97,7 +98,7 @@ async function main() {
           computed_at: new Date().toISOString(),
         })
       } catch (err) {
-        const detail = err instanceof Error ? err.message : String(err)
+        const detail = getErrorDetail(err)
         console.error(`Failed scoring ${label}: ${detail}`)
         results.push({ label, status: 'failure', detail })
       }
