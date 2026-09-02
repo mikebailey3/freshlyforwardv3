@@ -601,6 +601,88 @@ every prior guardrail in this whole ForwardOS initiative.
 
 ---
 
+## Status: Task 10 -- Full Regression Pass + Final Self-Review (complete)
+
+All 10 tasks complete, all committed on `forwardos-home-forward-score`,
+no merge to `main` performed (per explicit standing instruction --
+awaiting the user's explicit approval).
+
+**Verification, re-run fresh at Task 10 (not just trusting per-task
+reports):**
+- `npx vitest run`: 48 test files, 262 tests, all green.
+- `npx tsc --noEmit`: clean, zero errors.
+- `npm run build`: clean production build (`vite build` succeeds; one
+  pre-existing, whole-app bundle-size advisory warning about the main
+  chunk exceeding 500kB post-minification -- present independent of this
+  project's own additions, not a new regression, not investigated further
+  as out of scope for this feature branch).
+- Whole-branch diff against merge-base (`git diff --stat 76b86cb..HEAD`):
+  26 files changed, 3228 insertions(+), 139 deletions(-). Purely additive
+  except 4 small, deliberate, reviewed edits: `matching.ts` (+8/-0, export
+  `STATE_WEIGHT` instead of duplicating it), `ForwardDnaPage.tsx` (+10/-8,
+  extract `buildForwardDnaCompletenessInput` instead of duplicating the
+  inline derivation), `DashboardPage.tsx` (the integration itself),
+  `MemberLayout.tsx` (+4/-2, nav label only).
+
+**Point-by-point self-review against the design spec's locked decisions
+(§8), verified against shipped code, not re-reading the plan:**
+
+| # | Decision | Verified by |
+|---|---|---|
+| 1 | Search Readiness excluded from calculation | Task 3's `score.ts` tripwire tests + Task 8's dedicated 30-test regression suite, all green |
+| 2 | Four pillars, exact weights 0.25/0.30/0.20/0.25 | Task 3's hand-computed weighted-sum tests (0, 100, and a mixed 52 case independently re-derived twice -- once by the implementer, once by the reviewer -- after the brief's own original example turned out arithmetically impossible and was corrected) |
+| 3 | Goal Alignment grounded in `readiness_scores.careerDirection` | Task 2's `goalAlignmentPillar` tests + confirmed directly in `useForwardScore.ts`: `careerDirectionScore: compassResult?.readiness_scores?.careerDirection ?? null` |
+| 4 | No persistence | `git diff --stat` against merge-base on `supabase/migrations/` returns empty -- zero new migration files anywhere in this project |
+| 5 | Zero Search Readiness modification | `git diff --stat` against merge-base on `src/lib/profile.ts`, every strategist/admin page, and `SearchReadinessWidget.tsx` all return empty -- confirmed zero-diff directly, not just "no obvious violation" |
+| 6 | ForwardOS Home name, `/dashboard` route unchanged | Task 7's nav-label tests + `git diff --stat` on `src/App.tsx` returns empty -- no new route added |
+| 7 | Search Readiness secondary, contextual prominence | Verified visually, firsthand, by loading and inspecting the actual Task 9 screenshots -- Search Readiness renders at locked position 7 with a real score, elevated-treatment class applied only per the two momentum booleans |
+| 8 | Explainability, banned framings | Task 6's explicit 6-phrase banned-word DOM-rendered regression test (verified genuinely non-vacuous by the reviewer) + every pillar carries a real `explanation` field (Task 2/3 tests) |
+| -- | Career Vault dependency (§2) -- zero coupling to unmerged branch | Task 3's/Task 8's import-graph tripwires; Task 7's placeholder card performs zero queries, contains no dead `/career-vault` link anywhere on the page (explicit regression test) |
+| -- | "Goal Alignment" naming-collision risk (§9) | Confirmed via grep across all Task 7 copy -- "Goal Alignment" is the only label used, zero occurrences of "Your Direction" or any synonym |
+
+**Two real, material findings surfaced during this project's own
+verification work (Task 9), both pre-existing and correctly NOT fixed
+inline, both flagged here for prioritized follow-up outside this branch:**
+
+1. **Severe:** `AuthContext.tsx`'s `refreshProfile` is an unmemoized
+   function recreated on every `AuthProvider` render; `DashboardPage`'s
+   own pre-existing effect (predates this entire project) depends on it
+   and calls it internally, creating a self-sustaining render loop --
+   empirically measured at 42-136 redundant `member_profiles` fetches
+   per single page load, confirmed via direct source read of
+   `AuthContext.tsx`, not just trusted from a sub-agent's claim. This
+   branch's own new `useForwardScore` hook also depends on `[profile,
+   client]`, so it additionally re-fires on every lap of this
+   pre-existing loop -- meaning this branch measurably increases the
+   cost of an existing bug (7 more redundant queries per lap) even
+   though it didn't create the loop itself. Recommend a fast, separate
+   follow-up: wrap `refreshProfile` in `useCallback`.
+2. **Cosmetic, pre-existing, repo-wide:** `MemberLayout` renders
+   twice/nested on `DashboardPage` (and other pages, e.g.
+   `CareerProfilePage.tsx`, `CalendarPage.tsx`) because both `App.tsx`
+   and the page component itself wrap content in `<MemberLayout>`.
+   Confirmed visually in the Task 9 screenshots (two stacked headers).
+   Pre-existing, unrelated to this project's own changes.
+
+Also re-confirmed visually (not just theoretically flagged in earlier
+tasks): the pre-existing `\u2615`/`\u2014` literal-JSX-escape display
+bug is genuinely visible on the live rendered page ("Good evening,
+Taylor! \u2615"), unrelated to this project, correctly left untouched.
+
+**Fix-loop summary across all 10 tasks:** Tasks 6 and 8 each required
+one fix round (both Important-severity, both closed same-session with a
+scoped re-review confirming the fix and introducing no new issues).
+Tasks 1-5, 7 required zero fix rounds. Task 9 required one screenshot
+re-take round after the controller session's own direct visual
+inspection caught a stuck-loading-spinner render that the sub-agent's
+first-pass report had incorrectly characterized as "all pass."
+
+**Awaiting explicit user approval before any merge to `main`,** per the
+standing guardrail restated at the top of this plan and honored
+throughout every task in this project.
+
+---
+
 ## What This Plan Does Not Cover (intentionally)
 
 - Historical Forward Score tracking — explicitly deferred future work
