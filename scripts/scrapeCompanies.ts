@@ -25,6 +25,7 @@ import { fetchAshbyJobs } from './jobSources/ashby'
 import { selectJobsToDeactivate, isStaleByAge } from './jobSources/liveness'
 import { computeUpsertCounts } from './jobSources/upsertCounts'
 import { summarizeRun, type AttemptResult } from './lib/runSummary'
+import { getErrorDetail } from './lib/errorDetail'
 import type { ScrapedJobInput } from './jobSources/types'
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL
@@ -146,7 +147,7 @@ async function main() {
         console.log(`${label}: found ${jobs.length} job(s), ${inserted} new, ${updated} already known.`)
         results.push({ label, status: 'success' })
       } catch (err) {
-        const detail = err instanceof Error ? err.message : String(err)
+        const detail = getErrorDetail(err)
         console.error(`Failed on ${label}: ${detail}`)
         results.push({ label, status: 'failure', detail })
       }
