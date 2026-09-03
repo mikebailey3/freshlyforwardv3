@@ -1,9 +1,30 @@
-import { ArrowRight, Check, Compass, FileText, FolderOpen, MessageCircleMore, MessagesSquare, PenLine, PlayCircle, Rocket, Search, Target, TrendingUp } from 'lucide-react'
+import { ArrowRight, Check, Compass, FileStack, FileText, FolderOpen, HelpCircle, LayoutGrid, MessageCircleMore, MessageCircleOff, MessagesSquare, PenLine, PlayCircle, Rocket, Search, Target, TrendingUp, UserX } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { LinkButton, SectionHeading } from '@/components/ui'
 import { HeroFreshFitCenterpiece } from '@/components/homepage/HeroFreshFitCenterpiece'
 import { HeroFloatingCard } from '@/components/homepage/HeroFloatingCard'
 import { HeroCareerPath } from '@/components/homepage/HeroCareerPath'
+import { NodeGraph, type GraphNode } from '@/components/homepage/NodeGraph'
+
+// Homepage Redesign Phase 1 / Task 7: "Why FreshlyForward?" node-graph
+// comparison. Left side is deliberately generic/negative (no real product
+// or competitor named); right side is every real capability referenced
+// elsewhere on this page, connected in the same order as How It Works.
+const traditionalNodes: GraphNode[] = [
+  { icon: LayoutGrid, label: 'Endless job boards', x: 15, y: 20 },
+  { icon: FileStack, label: 'Generic templates', x: 75, y: 15 },
+  { icon: HelpCircle, label: 'No fit signal', x: 30, y: 65 },
+  { icon: MessageCircleOff, label: 'No feedback', x: 80, y: 70 },
+  { icon: UserX, label: "You're on your own", x: 50, y: 40 },
+]
+
+const connectedNodes: GraphNode[] = [
+  { icon: Compass, label: 'Career Compass', x: 15, y: 75 },
+  { icon: Search, label: 'Opportunity Engine', x: 35, y: 30 },
+  { icon: Target, label: 'FreshFit', x: 60, y: 15 },
+  { icon: FolderOpen, label: 'Career Vault', x: 82, y: 35 },
+  { icon: MessageCircleMore, label: 'Human Strategist', x: 70, y: 75 },
+]
 
 // Homepage Redesign Phase 1 / Task 5: flagship feature showcase. Career
 // Vault is included per the locked spec decision (kept in the flagship
@@ -283,6 +304,36 @@ export function LandingPage() {
               </LinkButton>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Homepage Redesign Phase 1 / Task 7: "Why FreshlyForward?" node-graph
+          comparison -- a genuine attempt at the reference image's tangled-
+          vs-connected illustration style using NodeGraph (see that
+          component for why a faithful attempt was chosen over a plain
+          checklist). */}
+      <section className="shell py-20" aria-labelledby="why-title">
+        <SectionHeading
+          title="One connected system for your entire career move."
+          copy="Traditional job searching means juggling disconnected tools. FreshlyForward connects every piece."
+          id="why-title"
+          centered
+        />
+        <div className="relative mt-12 grid gap-16 md:grid-cols-2 md:gap-8">
+          <div>
+            <h3 className="text-center font-display text-lg font-semibold text-neutral-500">Traditional Job Search</h3>
+            <NodeGraph nodes={traditionalNodes} tangled />
+          </div>
+          <div>
+            <h3 className="text-center font-display text-lg font-semibold text-[color:var(--color-primary-600)]">FreshlyForward</h3>
+            <NodeGraph nodes={connectedNodes} tangled={false} />
+          </div>
+          <span
+            className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[var(--navy)] px-4 py-2 text-sm font-bold text-white shadow-[var(--shadow)] md:flex"
+            aria-hidden="true"
+          >
+            VS
+          </span>
         </div>
       </section>
     </main>
