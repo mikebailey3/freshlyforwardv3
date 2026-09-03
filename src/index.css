@@ -516,7 +516,7 @@ pricing-section { padding-bottom: 100px; }
    correctly (a later task in this same pass adds that to the hero section). */
 .site-header-dark { position: absolute; top: 0; left: 0; right: 0; background: transparent; border-bottom: none; backdrop-filter: none; z-index: 40; }
 .site-header-dark .logo img { filter: brightness(0) invert(1); }
-.site-header-dark .site-header nav > a,
+.site-header-dark nav > a,
 .site-header-dark .nav-dropdown-trigger { color: white; }
-.site-header-dark .site-header nav > a::after { background: #7ee4b6; }
+.site-header-dark nav > a::after { background: #7ee4b6; }
 .site-header-dark .nav-login { border-color: #7ee4b6; color: #7ee4b6; }
