@@ -5,6 +5,7 @@ import { HeroFreshFitCenterpiece } from '@/components/homepage/HeroFreshFitCente
 import { HeroFloatingCard } from '@/components/homepage/HeroFloatingCard'
 import { HeroCareerPath } from '@/components/homepage/HeroCareerPath'
 import { NodeGraph, type GraphNode } from '@/components/homepage/NodeGraph'
+import { PricingTeaser } from '@/components/homepage/PricingTeaser'
 
 // Homepage Redesign Phase 1 / Task 7: "Why FreshlyForward?" node-graph
 // comparison. Left side is deliberately generic/negative (no real product
@@ -336,6 +337,12 @@ export function LandingPage() {
           </span>
         </div>
       </section>
+
+      {/* Homepage Redesign Phase 1 / Task 8: Pricing section -- real
+          membership_plans data only, via PricingTeaser (see that component
+          for why it duplicates PricingPage's fetch rather than sharing a
+          new hook). */}
+      <PricingTeaser />
     </main>
   )
 }

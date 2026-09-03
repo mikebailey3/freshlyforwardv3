@@ -1,7 +1,48 @@
-import { describe, it, expect } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { describe, it, expect, vi } from 'vitest'
+import { render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { LandingPage } from './LandingPage'
+import type { MembershipPlan } from '@/types'
+
+// Homepage Redesign Phase 1 / Task 8: the homepage's pricing section
+// (PricingTeaser) must render real membership_plans rows, never hardcoded
+// numbers -- so this file now controls exactly what "real" data looks like
+// via a mocked supabase client, the same pattern DashboardPage.test.tsx
+// uses for its own supabase-backed cards.
+const { mockFrom } = vi.hoisted(() => ({ mockFrom: vi.fn() }))
+
+vi.mock('@/lib/supabase', () => ({
+  supabase: { from: mockFrom },
+}))
+
+function makeBuilder(data: MembershipPlan[]) {
+  const builder: Record<string, unknown> = {}
+  const chain = () => builder
+  builder.select = chain
+  builder.eq = chain
+  builder.order = () => Promise.resolve({ data, error: null })
+  return builder
+}
+
+const realPlan: MembershipPlan = {
+  id: 'plan-1',
+  slug: 'career-growth',
+  name: 'Career Growth',
+  description: 'Ongoing support for an active search.',
+  price_cents: 14900,
+  interval: 'month',
+  stripe_price_id: null,
+  stripe_product_id: null,
+  features: ['Career Compass', 'Opportunity Engine', 'Human strategist'],
+  badge: 'Most Popular',
+  promotional_text: null,
+  is_featured: true,
+  is_enabled: true,
+  is_archived: false,
+  sort_order: 1,
+  created_at: '',
+  updated_at: '',
+}
 
 // Homepage Redesign Phase 1 / Task 5: enforces the locked spec constraints
 // that aren't safe to leave to visual review alone -- "Applications" not
@@ -11,6 +52,7 @@ import { LandingPage } from './LandingPage'
 // since this task doesn't touch pricing) so Task 8 can't reintroduce them
 // without breaking an existing test.
 function renderLandingPage() {
+  mockFrom.mockImplementation(() => makeBuilder([realPlan]))
   render(
     <MemoryRouter>
       <LandingPage />
@@ -55,5 +97,15 @@ describe('LandingPage - no fabricated/unsupported content (Homepage Redesign Pha
     renderLandingPage()
     const starRatings = document.querySelectorAll('[data-testid="star-rating"], .star-rating, [aria-label*="star" i]')
     expect(starRatings.length).toBe(0)
+  })
+
+  // Homepage Redesign Phase 1 / Task 8: pricing must come from the real
+  // membership_plans table, never be hardcoded.
+  it('renders the real fetched plan name and price, and never a hardcoded fake plan', async () => {
+    renderLandingPage()
+    await waitFor(() => expect(screen.getByText('Career Growth')).toBeInTheDocument())
+    expect(screen.getByText('$149')).toBeInTheDocument()
+    expect(screen.queryByText('Starter')).not.toBeInTheDocument()
+    expect(screen.queryByText('Strategist+')).not.toBeInTheDocument()
   })
 })
