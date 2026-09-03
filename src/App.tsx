@@ -89,7 +89,7 @@ function App() {
 
   return (
     <>
-      {isPublicRoute && <SiteHeader />}
+      {isPublicRoute && <SiteHeader variant={location.pathname === '/' ? 'dark' : 'light'} />}
       <Routes>
         {/* Public routes */}
         <Route path="/" element={<LandingPage />} />

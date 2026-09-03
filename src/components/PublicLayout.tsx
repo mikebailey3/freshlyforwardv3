@@ -94,12 +94,12 @@ export function Logo() {
   )
 }
 
-export function SiteHeader() {
+export function SiteHeader({ variant = 'light' }: { variant?: 'light' | 'dark' }) {
   const [open, setOpen] = useState(false)
   const { user, signOut } = useAuth()
 
   return (
-    <header className="site-header">
+    <header className={`site-header ${variant === 'dark' ? 'site-header-dark' : ''}`}>
       <div className="shell header-inner">
         <Logo />
         <button

@@ -127,3 +127,23 @@ describe('Route coverage - nothing orphaned by the restructure', () => {
     void headerContainer
   })
 })
+
+describe('SiteHeader - variant prop', () => {
+  it('defaults to the light variant (no dark class) when variant is omitted', () => {
+    render(
+      <MemoryRouter>
+        <SiteHeader />
+      </MemoryRouter>
+    )
+    expect(document.querySelector('.site-header')).not.toHaveClass('site-header-dark')
+  })
+
+  it('applies the dark variant class when variant="dark" is passed', () => {
+    render(
+      <MemoryRouter>
+        <SiteHeader variant="dark" />
+      </MemoryRouter>
+    )
+    expect(document.querySelector('.site-header')).toHaveClass('site-header-dark')
+  })
+})
