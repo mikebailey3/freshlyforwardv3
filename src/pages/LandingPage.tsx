@@ -1,7 +1,6 @@
-import { ArrowRight, CalendarCheck, Check, ClipboardCheck, FilePenLine, Handshake, MessageCircleMore, PauseCircle, Search, ShieldCheck, Target, UserRoundCheck, X } from 'lucide-react'
+import { ArrowRight, CalendarCheck, Check, ClipboardCheck, FilePenLine, Handshake, MessageCircleMore, PauseCircle, PlayCircle, Search, ShieldCheck, Target, UserRoundCheck, X } from 'lucide-react'
 import { LinkButton, SectionHeading } from '@/components/ui'
 import { ForwardFeedWidget } from '@/components/ForwardFeedWidget'
-import { FridayReportCard, type FridayReportCardData } from '@/components/FridayReportCard'
 import { useScrollReveal } from '@/hooks/useScrollReveal'
 
 const manifest = [
@@ -21,58 +20,47 @@ const scenes: [string, string, string][] = [
   ['SC. 05', 'Prepare with confidence', 'We coach your interviews, run mock sessions, and help you evaluate offers.'],
 ]
 
-// Explicitly labeled sample data for the hero -- never implied as a real
-// member's report. See docs/superpowers/specs/2026-08-28-concierge-editorial-redesign-design.md
-// for why this reuses the real FridayReport shape instead of inventing one.
-const sampleReport: FridayReportCardData = {
-  title: 'Week 5 Progress Report',
-  report_date: '2026-05-08',
-  summary: 'Strong week. Three roles cleared review and went out with tailored materials, and one first-round interview is on the books.',
-  opportunities_reviewed: 18,
-  applications_submitted: 3,
-  interviews_scheduled: 1,
-  next_steps: 'Finalize tailored resume for the Product Ops role\nPrep talking points for Thursday\'s interview\nReview two new leads flagged this week',
-  approval_status: 'sent',
-}
+// Homepage Redesign Phase 1 / Task 2: three short trust bullets under the
+// hero CTAs, replacing the old "Human-led / No mass applying / Pause
+// anytime" set now that the hero itself carries the human-led/no-mass-apply
+// message in its subcopy -- kept short per the North Star reference.
+const heroFeatureBullets = ['Personalized', 'AI-powered career intelligence', 'Human experts']
 
 export function LandingPage() {
   const [verdictRef, verdictVisible] = useScrollReveal<HTMLElement>(0.4)
 
   return (
     <main className="callsheet">
-      <section className="bg-[var(--cream)] py-14 lg:py-24">
+      <section className="bg-[var(--navy)] py-14 text-white lg:py-24">
         <div className="shell grid items-center gap-12 lg:grid-cols-2">
           <div>
-            <h1 className="font-display text-4xl font-semibold leading-[1.1] text-[var(--navy)] sm:text-5xl lg:text-6xl">
-              A better search needs better judgment.
+            <h1 className="font-display text-4xl font-semibold leading-[1.1] sm:text-5xl lg:text-6xl">
+              Your Career <span className="text-[#7ee4b6]">Operating System</span> for What's Next.
             </h1>
-            <p className="mt-6 max-w-lg text-lg leading-relaxed text-neutral-600">
-              FreshlyForward is a human-led career concierge. One real strategist searches,
-              applies, and reports back — so you're never doing this alone, and never
-              guessing what's happening behind the scenes.
+            <p className="mt-6 max-w-lg text-lg leading-relaxed text-[#bac8d6]">
+              One connected system for your career search: Career Compass points you in the right
+              direction, the Opportunity Engine and FreshFit surface and score the roles worth your
+              time, Applications keeps everything moving, and a real human strategist is there when
+              you need one.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <LinkButton to="/signup">
-                Get started <ArrowRight size={18} />
+              <LinkButton to="/career-compass">
+                Take Career Compass <ArrowRight size={18} />
               </LinkButton>
               <LinkButton to="/how-it-works" variant="secondary">
-                See how it works
+                <PlayCircle size={18} /> See How It Works
               </LinkButton>
             </div>
             <div className="mt-7 flex flex-wrap gap-x-5 gap-y-2" aria-label="Service assurances">
-              <span className="flex items-center gap-1.5 text-sm font-medium text-neutral-600">
-                <Check size={16} className="text-primary-600" /> Human-led
-              </span>
-              <span className="flex items-center gap-1.5 text-sm font-medium text-neutral-600">
-                <Check size={16} className="text-primary-600" /> No mass applying
-              </span>
-              <span className="flex items-center gap-1.5 text-sm font-medium text-neutral-600">
-                <Check size={16} className="text-primary-600" /> Pause anytime
-              </span>
+              {heroFeatureBullets.map((bullet) => (
+                <span key={bullet} className="flex items-center gap-1.5 text-sm font-medium text-[#bac8d6]">
+                  <Check size={16} className="text-[#7ee4b6]" /> {bullet}
+                </span>
+              ))}
             </div>
           </div>
-          <div className="mx-auto w-full max-w-md lg:max-w-none">
-            <FridayReportCard report={sampleReport} isSample />
+          <div className="relative hidden lg:block" aria-hidden="false">
+            {/* Task 3: FreshFit centerpiece + career-path graphic + floating cards + human figure */}
           </div>
         </div>
       </section>
@@ -145,9 +133,11 @@ export function LandingPage() {
           trust signal; the Concierge Editorial hero rebuild (2026-08-28) replaced
           it with a sample Friday Report artifact instead, so as of that change
           this page has no human-face or third-party proof at all above the fold.
-          Before the next marketing push, add 2-3 real client quotes/outcomes here
-          (name + result, with permission) or a placement/client-count stat.
-          Do not fill this with placeholder/fabricated quotes. */}
+          Homepage Redesign Phase 1's Human Support section (Task 6) adds real,
+          non-fabricated capability description in this spirit, but per the
+          approved spec (locked decision #5) this page must never carry invented
+          testimonials, ratings, or counts -- so this TODO stays open rather than
+          being closed by fabrication. */}
 
       <section className="closing-cta cs-final-call">
         <div className="shell closing-inner">
