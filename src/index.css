@@ -134,6 +134,16 @@ svg { flex: 0 0 auto; }
 .site-header nav > a:hover::after, .site-header nav > a.active::after { right: 0; }
 .nav-actions { display: flex; align-items: center; flex-shrink: 0; gap: 8px; margin-left: 4px; }
 .nav-login { padding: 11px 14px; border: 1px solid var(--green); border-radius: 8px; color: var(--green-dark); font-weight: 700; white-space: nowrap; }
+
+/* Homepage Redesign Phase 1 / Task 1: Product/Resources nav dropdowns.
+   Additive only -- matches the existing .site-header nav > a treatment
+   (same font-size/weight) since NavDropdown's trigger is a <button>, not
+   an <a>, so it doesn't inherit that selector automatically. */
+.nav-dropdown { position: relative; flex-shrink: 0; }
+.nav-dropdown-trigger { display: flex; align-items: center; gap: 4px; padding: 0; border: 0; background: none; font-family: inherit; font-size: .86rem; font-weight: 700; color: var(--navy); cursor: pointer; }
+.nav-dropdown-menu { position: absolute; top: calc(100% + 14px); left: 0; z-index: 60; display: flex; min-width: 180px; flex-direction: column; padding: 8px; border: 1px solid var(--line); border-radius: 10px; background: white; box-shadow: 0 20px 30px rgba(7, 26, 49, .1); }
+.nav-dropdown-menu a { padding: 9px 10px; border-radius: 6px; font-size: .86rem; font-weight: 600; color: var(--navy); }
+.nav-dropdown-menu a:hover { background: var(--mint, #eef7f2); }
 .menu-button { display: none; border: 0; background: transparent; color: var(--navy); cursor: pointer; }
 
 .button { min-height: 48px; display: inline-flex; align-items: center; justify-content: center; gap: 9px; border: 1px solid transparent; border-radius: 9999px; padding: 13px 22px; font-family: 'Manrope', sans-serif; font-size: .9rem; font-weight: 800; cursor: pointer; transition: transform .2s ease, box-shadow .2s ease, background .2s ease; }
@@ -412,6 +422,8 @@ pricing-section { padding-bottom: 100px; }
   .site-header nav.nav-open { max-height: 600px; padding: 12px 16px 22px; border-top: 1px solid var(--line); }
   .site-header nav > a { padding: 14px 8px; border-bottom: 1px solid var(--line); font-size: .9rem; }
   .site-header nav > a::after { display: none; }
+  .nav-dropdown-trigger { width: 100%; justify-content: space-between; padding: 14px 8px; border-bottom: 1px solid var(--line); font-size: .9rem; }
+  .nav-dropdown-menu { position: static; margin: 0; border: 0; box-shadow: none; padding: 0 0 0 16px; }
   .nav-actions { margin: 14px 0 0; }
   .nav-actions a { flex: 1; text-align: center; }
     .forward-feed-grid, .blog-listing-grid { grid-template-columns: 1fr; }
