@@ -1,26 +1,20 @@
-import { ArrowRight, CalendarCheck, Check, ClipboardCheck, FilePenLine, Handshake, MessageCircleMore, PauseCircle, PlayCircle, Search, ShieldCheck, Target, UserRoundCheck, X } from 'lucide-react'
+import { ArrowRight, Check, Compass, FolderOpen, PlayCircle, Rocket, Search, Target } from 'lucide-react'
 import { LinkButton, SectionHeading } from '@/components/ui'
-import { ForwardFeedWidget } from '@/components/ForwardFeedWidget'
-import { useScrollReveal } from '@/hooks/useScrollReveal'
 import { HeroFreshFitCenterpiece } from '@/components/homepage/HeroFreshFitCenterpiece'
 import { HeroFloatingCard } from '@/components/homepage/HeroFloatingCard'
 import { HeroCareerPath } from '@/components/homepage/HeroCareerPath'
 
-const manifest = [
-  { icon: ShieldCheck, title: '100% Human-Led Service', copy: 'No bots, no shortcuts. Every decision is made by a real career professional.' },
-  { icon: Search, title: 'Hand-Selected Opportunities', copy: 'We research roles for fit, trajectory, compensation, and your personal goals.' },
-  { icon: FilePenLine, title: 'Hand-Crafted Applications', copy: 'Every resume adjustment and cover letter is built around one specific opportunity.' },
-  { icon: CalendarCheck, title: 'Weekly Progress Every Friday', copy: 'See what we found, where we applied, and what happens next—every single week.' },
-  { icon: MessageCircleMore, title: 'Personal Strategist Support', copy: 'Your dedicated strategist stays available for questions, decisions, and momentum.' },
-  { icon: PauseCircle, title: 'No Contracts. Pause Anytime.', copy: 'A flexible month-to-month partnership designed around real life and real careers.' },
-]
-
-const scenes: [string, string, string][] = [
-  ['SC. 01', 'Tell us your story', 'We learn your background, goals, preferences, strengths, and non-negotiables.'],
-  ['SC. 02', 'Build your strategy', 'Your strategist sharpens your positioning and creates a focused search plan.'],
-  ['SC. 03', 'We search and apply', 'We handpick strong-fit roles and craft each application one at a time.'],
-  ['SC. 04', 'Review Friday progress', 'You receive a clear weekly report with decisions, applications, and next steps.'],
-  ['SC. 05', 'Prepare with confidence', 'We coach your interviews, run mock sessions, and help you evaluate offers.'],
+// Homepage Redesign Phase 1 / Task 4: "How FreshlyForward Works" -- 5 steps
+// grounded in real, currently-shipped (or explicitly Coming Soon) product
+// capabilities, per the approved North Star structure. Build/Career Vault
+// is marked Coming Soon here too, matching the locked spec decision and the
+// Task 4 plan step's explicit instruction to do so wherever it's mentioned.
+const howItWorksSteps = [
+  { icon: Compass, title: 'Discover', copy: 'Career Compass points you toward roles and directions that actually fit your goals.' },
+  { icon: FolderOpen, title: 'Build', copy: 'Career Vault keeps your wins, resume assets, and story organized in one place. Coming Soon.' },
+  { icon: Search, title: 'Find', copy: 'The Opportunity Engine surfaces real roles worth your time, not another endless job board.' },
+  { icon: Target, title: 'Understand', copy: 'FreshFit scores how well each role actually fits you, so you know where to focus first.' },
+  { icon: Rocket, title: 'Move Forward', copy: 'Applications keeps everything moving, with a real human strategist there when you need one.' },
 ]
 
 // Homepage Redesign Phase 1 / Task 2: three short trust bullets under the
@@ -30,8 +24,6 @@ const scenes: [string, string, string][] = [
 const heroFeatureBullets = ['Personalized', 'AI-powered career intelligence', 'Human experts']
 
 export function LandingPage() {
-  const [verdictRef, verdictVisible] = useScrollReveal<HTMLElement>(0.4)
-
   return (
     <main className="callsheet">
       <section className="bg-[var(--navy)] py-14 text-white lg:py-24">
@@ -107,87 +99,40 @@ export function LandingPage() {
         </div>
       </section>
 
-      <section className="cs-manifest-section" aria-labelledby="promise-title">
-        <div className="shell">
-          <SectionHeading title="High-touch help for a high-stakes moment." id="promise-title" />
-          <div className="cs-manifest-table" role="table" aria-label="What's included">
-            {manifest.map(({ icon: Icon, title, copy }) => (
-              <div className="cs-manifest-row" role="row" key={title}>
-                <Icon aria-hidden="true" className="cs-manifest-icon" />
-                <div role="cell">
-                  <h3>{title}</h3>
-                  <p>{copy}</p>
-                </div>
-                <Check aria-hidden="true" className="cs-manifest-check" />
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section ref={verdictRef} className={`contrast-section shell${verdictVisible ? ' cs-verdict-visible' : ''}`}>
-        <div className="contrast-intro">
-          <h2>No AI mass applications. No spray-and-pray search.</h2>
-          <p>One carefully chosen opportunity is worth more than a hundred generic submissions. We use technology as a tool—not as a substitute for judgment, care, or accountability.</p>
-        </div>
-        <div className="contrast-card contrast-muted cs-redline">
-          <span>Mass application services</span>
-          {['Hundreds of generic submissions', 'Template-based materials', 'Little context on role selection', 'No person accountable to you'].map((item) => <p key={item}><X size={16} /> {item}</p>)}
-        </div>
-        <div className="contrast-card contrast-positive cs-stamped">
-          <span className="cs-stamp" aria-hidden="true">APPROVED</span>
-          <span>The FreshlyForward standard</span>
-          {['Opportunities selected for fit', 'Materials tailored by hand', 'A reason behind every application', 'A strategist who knows your story'].map((item) => <p key={item}><Check size={16} /> {item}</p>)}
-        </div>
-      </section>
-
-      <section className="cs-schedule-section shell">
-        <SectionHeading title="Your concierge process" copy="You stay focused on your life and your future. We keep the search moving with care and consistency." />
-        <div className="cs-schedule">
-          {scenes.map(([scene, title, copy]) => (
-            <article className="cs-scene" key={scene}>
-              <span className="cs-scene-tag">{scene}</span>
-              <h3>{title}</h3>
-              <p>{copy}</p>
-            </article>
+      {/* Homepage Redesign Phase 1 / Task 4: "How FreshlyForward Works".
+          Replaces the old Concierge Editorial "manifest" / "concierge
+          process" / "service preview" / ForwardFeedWidget / closing-CTA
+          sections below the hero -- those told a different product story
+          (a white-glove application-submission service) than the approved
+          North Star's "Career Operating System" positioning, so this is a
+          full replacement of the page below the hero, built out
+          section-by-section across Tasks 4-9, not an addition alongside the
+          old copy. Sections 4-10 of the approved structure land here in
+          later tasks. */}
+      <section className="shell py-20" aria-labelledby="how-it-works-title">
+        <SectionHeading
+          title="How FreshlyForward Works"
+          copy="One connected path from where you are now to your next role -- not five disconnected tools."
+          id="how-it-works-title"
+        />
+        <ol className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-5">
+          {howItWorksSteps.map(({ icon: Icon, title, copy }, index) => (
+            <li key={title} className="relative flex flex-col items-center text-center">
+              {index < howItWorksSteps.length - 1 && (
+                <span className="absolute left-1/2 top-8 hidden h-px w-full bg-[color:var(--color-primary-600)]/25 lg:block" aria-hidden="true" />
+              )}
+              <span className="relative z-10 flex h-16 w-16 items-center justify-center rounded-full bg-[var(--navy)] text-[#7ee4b6] shadow-[var(--shadow)]">
+                <Icon size={26} aria-hidden="true" />
+              </span>
+              <h3 className="font-display mt-4 text-lg font-semibold">{title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-neutral-600">{copy}</p>
+            </li>
           ))}
-        </div>
-      </section>
-
-      <section className="service-preview shell">
-        <div className="service-preview-copy">
-          <h2>Strategy, execution, and support—working together.</h2>
-          <p>FreshlyForward closes the gap between knowing you need a better role and having enough time, energy, and expertise to pursue it well.</p>
-          <LinkButton to="/services" variant="secondary">Explore services <ArrowRight size={18} /></LinkButton>
-        </div>
-        <div className="service-stack">
-          <div><Target /><span><strong>Search strategy</strong>Define the right roles, companies, and story.</span></div>
-          <div><ClipboardCheck /><span><strong>Application execution</strong>Research, tailor, review, and submit.</span></div>
-          <div><UserRoundCheck /><span><strong>Interview readiness</strong>Practice, refine, and build confidence.</span></div>
-          <div><Handshake /><span><strong>Ongoing coaching</strong>Navigate decisions, offers, and next moves.</span></div>
-        </div>
-      </section>
-
-      <ForwardFeedWidget />
-
-      {/* TODO(social-proof): homepage currently has zero third-party validation.
-          The hero used to carry a founder testimonial/photo as its only human
-          trust signal; the Concierge Editorial hero rebuild (2026-08-28) replaced
-          it with a sample Friday Report artifact instead, so as of that change
-          this page has no human-face or third-party proof at all above the fold.
-          Homepage Redesign Phase 1's Human Support section (Task 6) adds real,
-          non-fabricated capability description in this spirit, but per the
-          approved spec (locked decision #5) this page must never carry invented
-          testimonials, ratings, or counts -- so this TODO stays open rather than
-          being closed by fabrication. */}
-
-      <section className="closing-cta cs-final-call">
-        <div className="shell closing-inner">
-          <div>
-            <span className="cs-stamp cs-stamp-light" aria-hidden="true">FINAL CALL</span>
-            <h2>Let's make your job search feel lighter—and work harder.</h2>
-          </div>
-          <LinkButton to="/signup" variant="light">Get started <ArrowRight size={18} /></LinkButton>
+        </ol>
+        <div className="mt-12 flex justify-center">
+          <LinkButton to="/career-compass">
+            Start Your Career Journey <ArrowRight size={18} />
+          </LinkButton>
         </div>
       </section>
     </main>
