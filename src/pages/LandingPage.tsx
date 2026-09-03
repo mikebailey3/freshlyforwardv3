@@ -1,8 +1,46 @@
-import { ArrowRight, Check, Compass, FolderOpen, PlayCircle, Rocket, Search, Target } from 'lucide-react'
+import { ArrowRight, Check, Compass, FileText, FolderOpen, MessageCircleMore, PlayCircle, Rocket, Search, Target } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import { LinkButton, SectionHeading } from '@/components/ui'
 import { HeroFreshFitCenterpiece } from '@/components/homepage/HeroFreshFitCenterpiece'
 import { HeroFloatingCard } from '@/components/homepage/HeroFloatingCard'
 import { HeroCareerPath } from '@/components/homepage/HeroCareerPath'
+
+// Homepage Redesign Phase 1 / Task 5: flagship feature showcase. Career
+// Vault is included per the locked spec decision (kept in the flagship
+// slot, clearly "Coming Soon", no route/link) rather than substituted with
+// Achievement Vault or omitted.
+const flagshipFeatures = [
+  {
+    icon: Search,
+    title: 'Opportunity Engine',
+    copy: 'Real roles, ranked by fit -- not another feed to scroll through by hand.',
+    to: '/opportunity-engine',
+    comingSoon: false,
+  },
+  {
+    icon: Target,
+    title: 'FreshFit',
+    copy: 'A directional fit score for every role, so you know which ones deserve your time first.',
+    to: '/opportunity-engine',
+    comingSoon: false,
+  },
+  {
+    icon: FolderOpen,
+    title: 'Career Vault',
+    copy: 'Your resume versions, wins, and career story, organized in one place.',
+    to: null,
+    comingSoon: true,
+  },
+] as const
+
+// Supporting capabilities. Human Strategists intentionally stays brief here
+// -- Task 6's Human Support section carries the fuller treatment, this card
+// just establishes it exists as a real capability alongside the other two.
+const supportingCapabilities = [
+  { icon: Compass, title: 'Career Compass', copy: 'A short assessment that points you toward directions worth pursuing.', to: '/career-compass' },
+  { icon: FileText, title: 'Applications', copy: 'Every application you send, tracked in one place -- no spreadsheets required.', to: '/applications' },
+  { icon: MessageCircleMore, title: 'Human Strategists', copy: 'Real career professionals available when you need direction, not just data.', to: null },
+] as const
 
 // Homepage Redesign Phase 1 / Task 4: "How FreshlyForward Works" -- 5 steps
 // grounded in real, currently-shipped (or explicitly Coming Soon) product
@@ -133,6 +171,65 @@ export function LandingPage() {
           <LinkButton to="/career-compass">
             Start Your Career Journey <ArrowRight size={18} />
           </LinkButton>
+        </div>
+      </section>
+
+      {/* Homepage Redesign Phase 1 / Task 5: flagship feature showcase +
+          supporting capabilities. Flagship cards match the hero's dark
+          navy/green treatment; Career Vault's card carries a visible
+          "Coming Soon" badge and has no href, matching the locked spec
+          decision and the test in LandingPage.test.tsx enforcing it. */}
+      <section className="bg-[var(--navy)] py-20 text-white" aria-labelledby="flagship-title">
+        <div className="shell">
+          <SectionHeading
+            title="Powerful tools. One connected system."
+            copy="Not six separate apps -- one system where each part makes the others better."
+            id="flagship-title"
+          />
+          <div className="mt-12 grid gap-6 lg:grid-cols-3">
+            {flagshipFeatures.map(({ icon: Icon, title, copy, to, comingSoon }) => {
+              const cardClassName = "flex flex-col rounded-[var(--radius)] bg-[var(--navy-soft)] p-8 shadow-[var(--shadow)] transition hover:bg-[color-mix(in_srgb,var(--navy-soft),white_6%)]"
+              const inner = (
+                <>
+                  <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-[#7ee4b6]">
+                    <Icon size={22} aria-hidden="true" />
+                  </span>
+                  <div className="mt-4 flex items-center gap-2">
+                    <h3 className="font-display text-xl font-semibold">{title}</h3>
+                    {comingSoon && (
+                      <span className="rounded-full bg-white/10 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[#bac8d6]">Coming Soon</span>
+                    )}
+                  </div>
+                  <p className="mt-3 text-sm leading-relaxed text-[#bac8d6]">{copy}</p>
+                </>
+              )
+              return to ? (
+                <Link key={title} to={to} className={cardClassName}>{inner}</Link>
+              ) : (
+                <div key={title} className={cardClassName}>{inner}</div>
+              )
+            })}
+          </div>
+
+          <div className="mt-8 grid gap-6 sm:grid-cols-3">
+            {supportingCapabilities.map(({ icon: Icon, title, copy, to }) => {
+              const cardClassName = "rounded-[var(--radius)] border border-white/10 p-6"
+              const inner = (
+                <>
+                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-[#7ee4b6]">
+                    <Icon size={18} aria-hidden="true" />
+                  </span>
+                  <h4 className="font-display mt-3 text-base font-semibold">{title}</h4>
+                  <p className="mt-2 text-sm leading-relaxed text-[#bac8d6]">{copy}</p>
+                </>
+              )
+              return to ? (
+                <Link key={title} to={to} className={`${cardClassName} block transition hover:border-white/25`}>{inner}</Link>
+              ) : (
+                <div key={title} className={cardClassName}>{inner}</div>
+              )
+            })}
+          </div>
         </div>
       </section>
     </main>
