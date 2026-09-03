@@ -175,7 +175,7 @@ const freshlyForwardItems = [
 export function LandingPage() {
   return (
     <main className="callsheet">
-      <section className="bg-[var(--navy)] py-14 text-white lg:py-24">
+      <section className="relative bg-[var(--navy)] py-14 text-white lg:py-24">
         <div className="shell grid items-center gap-12 lg:grid-cols-2">
           <div>
             <h1 className="font-hero-sans text-4xl font-bold leading-[1.1] sm:text-5xl lg:text-5xl xl:text-6xl">
@@ -233,32 +233,32 @@ export function LandingPage() {
               <HeroFreshFitCenterpiece size={196} />
             </div>
 
-            <HeroFloatingCard className="reveal right-0 top-2" style={{ animationDelay: '.35s' }}>
+            <HeroFloatingCard className="reveal right-4 top-6" style={{ animationDelay: '.35s' }}>
               <p className="text-[10px] font-semibold uppercase tracking-wide text-[#7ee4b6]">Top Opportunity</p>
               <p className="mt-1 text-sm font-semibold text-white">Senior Product Manager</p>
               <p className="text-xs text-[#bac8d6]">92 FreshFit -- Highest Fit</p>
             </HeroFloatingCard>
-            <HeroFloatingCard className="reveal left-0 top-32 hidden lg:block" style={{ animationDelay: '.5s' }}>
+            <HeroFloatingCard className="reveal left-6 top-28 hidden lg:block" style={{ animationDelay: '.5s' }}>
               <p className="text-[10px] font-semibold uppercase tracking-wide text-[#7ee4b6]">Search Readiness</p>
               <p className="mt-1 text-lg font-bold text-white">78<span className="text-xs font-normal text-[#bac8d6]">/100</span></p>
             </HeroFloatingCard>
-            <HeroFloatingCard className="reveal bottom-24 right-4 hidden lg:block" style={{ animationDelay: '.65s' }}>
+            <HeroFloatingCard className="reveal bottom-20 right-10 hidden lg:block" style={{ animationDelay: '.65s' }}>
               <p className="text-[10px] font-semibold uppercase tracking-wide text-[#7ee4b6]">Applications</p>
               <p className="mt-1 text-lg font-bold text-white">6 <span className="text-xs font-normal text-[#bac8d6]">this month</span></p>
             </HeroFloatingCard>
-            <HeroFloatingCard className="reveal left-6 top-0 hidden lg:block" style={{ animationDelay: '.4s' }}>
+            <HeroFloatingCard className="reveal left-14 top-4 hidden lg:block" style={{ animationDelay: '.4s' }}>
               <p className="text-[10px] font-semibold uppercase tracking-wide text-[#7ee4b6]">Career Vault</p>
               <p className="mt-1 text-sm font-semibold text-white">Coming Soon</p>
             </HeroFloatingCard>
-            <HeroFloatingCard className="reveal right-0 top-56 hidden lg:block" style={{ animationDelay: '.55s' }}>
+            <HeroFloatingCard className="reveal right-6 top-48 hidden lg:block" style={{ animationDelay: '.55s' }}>
               <p className="text-[10px] font-semibold uppercase tracking-wide text-[#7ee4b6]">Skill Gap</p>
               <p className="mt-1 text-lg font-bold text-white">3 <span className="text-xs font-normal text-[#bac8d6]">focus areas</span></p>
             </HeroFloatingCard>
-            <HeroFloatingCard className="reveal left-10 bottom-10 hidden lg:block" style={{ animationDelay: '.7s' }}>
+            <HeroFloatingCard className="reveal left-16 bottom-16 hidden lg:block" style={{ animationDelay: '.7s' }}>
               <p className="text-[10px] font-semibold uppercase tracking-wide text-[#7ee4b6]">Goal Progress</p>
               <p className="mt-1 text-lg font-bold text-white">75%<span className="text-xs font-normal text-[#bac8d6]"> on track</span></p>
             </HeroFloatingCard>
-            <HeroFloatingCard className="reveal right-16 bottom-0 hidden lg:flex lg:items-center lg:gap-2" style={{ animationDelay: '.8s' }}>
+            <HeroFloatingCard className="reveal right-20 bottom-4 hidden lg:flex lg:items-center lg:gap-2" style={{ animationDelay: '.8s' }}>
               <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-white/10">
                 <User size={14} className="text-[#7ee4b6]" aria-hidden="true" />
               </span>

@@ -27,9 +27,14 @@ export function HeroFreshFitCenterpiece({ size = 168 }: { size?: number }) {
   const compact = size < 150
 
   return (
-    <div
-      className={`flex flex-col items-center gap-3 rounded-[var(--radius)] bg-[var(--navy-soft)] shadow-[var(--shadow)] ${compact ? 'p-5' : 'p-8'}`}
-    >
+    <div className="relative flex flex-col items-center gap-3">
+      {/* Soft radial glow behind the ring instead of a boxed card -- matches
+          the North Star's floating centerpiece treatment. */}
+      <div
+        className="absolute left-1/2 top-1/2 -z-10 h-[140%] w-[140%] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-60 blur-3xl"
+        style={{ background: 'radial-gradient(circle, rgba(126,228,182,0.35) 0%, rgba(10,26,45,0) 70%)' }}
+        aria-hidden="true"
+      />
       <p className={`font-mono font-semibold uppercase tracking-wide text-[#7ee4b6] ${compact ? 'text-[10px]' : 'text-[11px]'}`}>
         FreshFit Score
       </p>

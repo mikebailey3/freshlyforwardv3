@@ -68,10 +68,30 @@ export function HeroCareerPath({ className = '', simplified = false }: { classNa
       <circle cx={end.x} cy={end.y} r="15" stroke="#7ee4b6" strokeOpacity="0.5" strokeWidth="2" />
       <circle cx={end.x} cy={end.y} r="9" fill="#7ee4b6" />
 
-      {/* Human figure -- standing at the path's starting node, small and
-          supporting (never the focal point). Same coordinate space as the
-          path itself, so it's guaranteed to sit on it rather than drift. */}
-      <g transform={`translate(${start.x - 15}, ${start.y - 48})`} opacity="0.9">
+      {/* Continuation segment: the path keeps going past the FreshFit
+          destination node toward an arrow, echoing the "forward momentum"
+          motif used elsewhere on the page (e.g. the Human Support section's
+          arrow graphic). Purely decorative -- no new claims. */}
+      <path
+        d={simplified ? 'M 190 290 C 210 270, 230 255, 250 235' : 'M 205 270 C 230 248, 250 230, 270 205'}
+        stroke={`url(#${gradientId})`}
+        strokeWidth="4"
+        strokeLinecap="round"
+        opacity="0.8"
+      />
+      <path
+        d={simplified ? 'M 244 246 L 250 235 L 258 244' : 'M 264 219 L 270 205 L 278 217'}
+        stroke="#7ee4b6"
+        strokeWidth="3"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="none"
+      />
+
+      {/* Human figure -- now placed partway up the path (not just at the
+          starting node) so it reads as walking the journey rather than
+          standing beside it. Same small/supporting scale as before. */}
+      <g transform={`translate(${(start.x + end.x) / 2 - 15}, ${(start.y + end.y) / 2 - 48})`} opacity="0.9">
         <circle cx="15" cy="10" r="9" fill="#d7e3ee" />
         <path d="M 3 48 C 3 24, 6 12, 15 12 C 24 12, 27 24, 27 48 Z" fill="#d7e3ee" />
       </g>
