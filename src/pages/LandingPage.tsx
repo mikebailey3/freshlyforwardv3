@@ -178,7 +178,7 @@ export function LandingPage() {
       <section className="bg-[var(--navy)] py-14 text-white lg:py-24">
         <div className="shell grid items-center gap-12 lg:grid-cols-2">
           <div>
-            <h1 className="font-display text-4xl font-semibold leading-[1.1] sm:text-5xl lg:text-5xl xl:text-6xl">
+            <h1 className="font-hero-sans text-4xl font-bold leading-[1.1] sm:text-5xl lg:text-5xl xl:text-6xl">
               Your Career <span className="text-[#7ee4b6] lg:whitespace-nowrap">Operating System</span> for What's Next.
             </h1>
             <p className="mt-6 max-w-lg text-lg leading-relaxed text-[#bac8d6]">

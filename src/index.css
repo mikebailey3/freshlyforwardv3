@@ -520,3 +520,9 @@ pricing-section { padding-bottom: 100px; }
 .site-header-dark .nav-dropdown-trigger { color: white; }
 .site-header-dark nav > a::after { background: #7ee4b6; }
 .site-header-dark .nav-login { border-color: #7ee4b6; color: #7ee4b6; }
+
+/* Homepage-only: the North Star hero headline is a bold sans-serif, not
+   the site-wide Concierge Editorial serif (Fraunces) used by h1/h2/h3
+   everywhere else. Scoped to this one class so the other ~15 already-
+   migrated pages are completely unaffected. */
+.font-hero-sans { font-family: 'Manrope', sans-serif; }
