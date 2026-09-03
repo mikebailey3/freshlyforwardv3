@@ -41,4 +41,19 @@ describe('LandingPage - no fabricated/unsupported content (Homepage Redesign Pha
       expect(screen.queryByText(new RegExp(fake.replace('+', '\\+').replace('$', '\\$'), 'i'))).not.toBeInTheDocument()
     }
   })
+
+  // Homepage Redesign Phase 1 / Task 6: locked spec decision #5 -- no
+  // fabricated testimonials, ratings, user counts, or awards, in any form.
+  it('never shows a testimonial-shaped quote attributed to a named person', () => {
+    renderLandingPage()
+    expect(screen.queryByText(/Alex R\.?,?\s*Product Manager/i)).not.toBeInTheDocument()
+    const blockquotes = document.querySelectorAll('blockquote, [data-testid="testimonial"]')
+    expect(blockquotes.length).toBe(0)
+  })
+
+  it('never renders star-rating markup or graphics anywhere on the page', () => {
+    renderLandingPage()
+    const starRatings = document.querySelectorAll('[data-testid="star-rating"], .star-rating, [aria-label*="star" i]')
+    expect(starRatings.length).toBe(0)
+  })
 })

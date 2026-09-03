@@ -1,4 +1,4 @@
-import { ArrowRight, Check, Compass, FileText, FolderOpen, MessageCircleMore, PlayCircle, Rocket, Search, Target } from 'lucide-react'
+import { ArrowRight, Check, Compass, FileText, FolderOpen, MessageCircleMore, MessagesSquare, PenLine, PlayCircle, Rocket, Search, Target, TrendingUp } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { LinkButton, SectionHeading } from '@/components/ui'
 import { HeroFreshFitCenterpiece } from '@/components/homepage/HeroFreshFitCenterpiece'
@@ -41,6 +41,19 @@ const supportingCapabilities = [
   { icon: FileText, title: 'Applications', copy: 'Every application you send, tracked in one place -- no spreadsheets required.', to: '/applications' },
   { icon: MessageCircleMore, title: 'Human Strategists', copy: 'Real career professionals available when you need direction, not just data.', to: null },
 ] as const
+
+// Homepage Redesign Phase 1 / Task 6: Human Support section. Bullets
+// grounded in real strategist-support capabilities (career strategy,
+// application feedback, interview prep, negotiation/next-steps) rather than
+// invented ones. Per the locked spec (decision #5), no testimonial, no
+// star rating, no invented quote -- credibility here comes from describing
+// the real capability plainly, backed by LandingPage.test.tsx.
+const humanSupportBullets = [
+  { icon: Compass, text: 'Career strategy and planning tailored to where you actually want to go.' },
+  { icon: PenLine, text: 'Resume and application feedback from a real person, not a generic checklist.' },
+  { icon: MessagesSquare, text: 'Interview preparation, so you walk in ready instead of guessing.' },
+  { icon: TrendingUp, text: 'Support through offers and negotiation, all the way to your next step.' },
+]
 
 // Homepage Redesign Phase 1 / Task 4: "How FreshlyForward Works" -- 5 steps
 // grounded in real, currently-shipped (or explicitly Coming Soon) product
@@ -229,6 +242,46 @@ export function LandingPage() {
                 <div key={title} className={cardClassName}>{inner}</div>
               )
             })}
+          </div>
+        </div>
+      </section>
+
+      {/* Homepage Redesign Phase 1 / Task 6: Human Support section --
+          warmer visual treatment (cream background, matching this
+          codebase's existing --cream token) contrasting with the navy
+          sections above/below. Real founder photo (also used on AboutPage),
+          not a stock scene. No testimonial, no star rating -- see the
+          Task 6 tests in LandingPage.test.tsx. */}
+      <section className="bg-[var(--cream)] py-20" aria-labelledby="human-support-title">
+        <div className="shell grid items-center gap-12 lg:grid-cols-2">
+          <div>
+            <img
+              src="/images/headshot.png?v=2"
+              alt="Mike Bailey, founder of FreshlyForward"
+              className="w-full max-w-md rounded-[var(--radius)] object-cover shadow-[var(--shadow)]"
+            />
+          </div>
+          <div>
+            <SectionHeading
+              title="Technology gets you the data. A person helps you use it."
+              copy="Every FreshlyForward plan includes real human support -- not a chatbot, not a template."
+              id="human-support-title"
+            />
+            <ul className="mt-8 space-y-5">
+              {humanSupportBullets.map(({ icon: Icon, text }) => (
+                <li key={text} className="flex items-start gap-3">
+                  <span className="mt-0.5 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-white text-[color:var(--color-primary-600)] shadow-[var(--shadow)]">
+                    <Icon size={18} aria-hidden="true" />
+                  </span>
+                  <p className="text-neutral-700">{text}</p>
+                </li>
+              ))}
+            </ul>
+            <div className="mt-8">
+              <LinkButton to="/why-freshlyforward" variant="secondary">
+                See How Human Support Works <ArrowRight size={18} />
+              </LinkButton>
+            </div>
           </div>
         </div>
       </section>
