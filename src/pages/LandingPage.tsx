@@ -96,6 +96,17 @@ const howItWorksSteps = [
 // message in its subcopy -- kept short per the North Star reference.
 const heroFeatureBullets = ['Personalized', 'AI-powered career intelligence', 'Human experts']
 
+// Homepage Redesign Phase 1 / Task 9: FAQ teaser -- 4 of the 8 real
+// questions from FaqPage.tsx verbatim (same source of truth, no rewritten
+// or invented answers), chosen for relevance to a first-time visitor
+// rather than existing-member specifics like Friday report contents.
+const faqTeaserQuestions: [string, string][] = [
+  ['Is FreshlyForward an AI application service?', 'No. FreshlyForward is a human-led career concierge. Technology may support organization and research, but people select opportunities, shape strategy, craft materials, and remain accountable for the work.'],
+  ['Can you guarantee I get hired?', 'No ethical service can guarantee a hiring outcome. FreshlyForward provides the strategy, execution, preparation, and support that help you run a stronger search.'],
+  ['Can I pause or cancel?', 'Yes. Concierge service has no long-term contract and can be paused before the next monthly renewal.'],
+  ['Who is this service best for?', 'FreshlyForward is designed for busy professionals, career changers, people returning to work, and job seekers who want a more personal and accountable search partner.'],
+]
+
 export function LandingPage() {
   return (
     <main className="callsheet">
@@ -343,6 +354,39 @@ export function LandingPage() {
           for why it duplicates PricingPage's fetch rather than sharing a
           new hook). */}
       <PricingTeaser />
+
+      {/* Homepage Redesign Phase 1 / Task 9: FAQ teaser, reusing FaqPage's
+          existing .faq-list accordion styling (Q.01 counter, + toggle) so
+          this doesn't invent a second FAQ visual language. */}
+      <section className="faq-list shell" aria-labelledby="faq-title">
+        <SectionHeading eyebrow="Straightforward by design" title="Frequently asked questions" id="faq-title" />
+        {faqTeaserQuestions.map(([question, answer], index) => (
+          <details key={question} open={index === 0}>
+            <summary>{question}<span>+</span></summary>
+            <p>{answer}</p>
+          </details>
+        ))}
+        <div className="mt-8 flex justify-center">
+          <LinkButton to="/faq" variant="secondary">See all FAQs</LinkButton>
+        </div>
+      </section>
+
+      {/* Homepage Redesign Phase 1 / Task 9: Final CTA band -- bookends the
+          hero with the same navy/green treatment and the same primary CTA
+          (Career Compass), plus a secondary path to a human strategist for
+          visitors who'd rather talk than take an assessment first. */}
+      <section className="bg-[var(--navy)] py-20 text-center text-white" aria-labelledby="final-cta-title">
+        <div className="shell">
+          <h2 id="final-cta-title" className="font-display text-3xl font-semibold sm:text-4xl">Ready to move your career forward?</h2>
+          <p className="mx-auto mt-4 max-w-xl text-[#bac8d6]">Start with Career Compass to see where you stand, or reach out to talk with a human strategist first.</p>
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
+            <LinkButton to="/career-compass">
+              Take Career Compass <ArrowRight size={18} />
+            </LinkButton>
+            <LinkButton to="/contact" variant="secondary">Talk to a Strategist</LinkButton>
+          </div>
+        </div>
+      </section>
     </main>
   )
 }
