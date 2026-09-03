@@ -108,4 +108,43 @@ describe('LandingPage - no fabricated/unsupported content (Homepage Redesign Pha
     expect(screen.queryByText('Starter')).not.toBeInTheDocument()
     expect(screen.queryByText('Strategist+')).not.toBeInTheDocument()
   })
+
+  // North Star fidelity pass: the denser hero/flagship previews must stay
+  // illustrative, never implying a specific real, currently-online person
+  // or a populated Career Vault -- see ChatPreviewCard.tsx for the
+  // generic-avatar convention this follows instead.
+  it('never invents a named or "online" strategist presence in the hero', () => {
+    renderLandingPage()
+    expect(screen.queryByText(/is online/i)).not.toBeInTheDocument()
+    expect(screen.queryByText(/Monica/i)).not.toBeInTheDocument()
+  })
+
+  it('never shows a specific fabricated Career Vault asset count like "23 Assets"', () => {
+    renderLandingPage()
+    expect(screen.queryByText(/23 Assets/i)).not.toBeInTheDocument()
+  })
+
+  it('marks illustrative preview data (FreshFit breakdown, matches, application counts) as Sample', () => {
+    renderLandingPage()
+    expect(screen.getAllByText(/Sample/i).length).toBeGreaterThan(0)
+  })
+
+  // North Star fidelity pass: the final CTA's headline/CTA copy is locked
+  // verbatim by the approved spec's structure section ("Your next move
+  // starts here." / Take Career Compass / See How It Works) -- this
+  // guards against copy drifting again the way it did in the first pass.
+  it('shows the spec-locked final CTA headline and both CTA labels', () => {
+    renderLandingPage()
+    expect(screen.getByText('Your next move starts here.')).toBeInTheDocument()
+    const seeHowItWorksLinks = screen.getAllByText(/See How It Works/i)
+    expect(seeHowItWorksLinks.length).toBeGreaterThan(0)
+  })
+
+  // North Star fidelity pass: FAQ expanded from 4 to 6 real FaqPage.tsx
+  // questions, split into two columns -- still no invented questions.
+  it('renders 6 real FAQ questions across two columns, still verbatim from FaqPage', () => {
+    renderLandingPage()
+    expect(screen.getByText('Do you apply without my permission?')).toBeInTheDocument()
+    expect(screen.getByText('Do you help with interviews?')).toBeInTheDocument()
+  })
 })

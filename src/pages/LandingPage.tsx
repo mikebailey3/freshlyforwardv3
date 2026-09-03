@@ -1,4 +1,5 @@
-import { ArrowRight, Check, Compass, FileStack, FileText, FolderOpen, HelpCircle, LayoutGrid, MessageCircleMore, MessageCircleOff, MessagesSquare, PenLine, PlayCircle, Rocket, Search, Target, TrendingUp, UserX } from 'lucide-react'
+import type { ReactNode } from 'react'
+import { ArrowRight, Check, Compass, FileStack, FileText, FolderOpen, HelpCircle, LayoutGrid, MessageCircleMore, MessageCircleOff, MessagesSquare, PenLine, PlayCircle, Rocket, Search, Target, TrendingUp, User, UserX, X } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { LinkButton, SectionHeading } from '@/components/ui'
 import { HeroFreshFitCenterpiece } from '@/components/homepage/HeroFreshFitCenterpiece'
@@ -6,6 +7,13 @@ import { HeroFloatingCard } from '@/components/homepage/HeroFloatingCard'
 import { HeroCareerPath } from '@/components/homepage/HeroCareerPath'
 import { NodeGraph, type GraphNode } from '@/components/homepage/NodeGraph'
 import { PricingTeaser } from '@/components/homepage/PricingTeaser'
+import { CareerCompassRadar } from '@/components/homepage/CareerCompassRadar'
+import { ApplicationsStatusPreview } from '@/components/homepage/ApplicationsStatusPreview'
+import { FlagshipOpportunityPreview } from '@/components/homepage/FlagshipOpportunityPreview'
+import { FlagshipFreshFitPreview } from '@/components/homepage/FlagshipFreshFitPreview'
+import { FlagshipVaultPreview } from '@/components/homepage/FlagshipVaultPreview'
+import { HowItWorksConnector } from '@/components/homepage/HowItWorksConnector'
+import { FooterCareerPath } from '@/components/homepage/FooterCareerPath'
 
 // Homepage Redesign Phase 1 / Task 7: "Why FreshlyForward?" node-graph
 // comparison. Left side is deliberately generic/negative (no real product
@@ -27,17 +35,21 @@ const connectedNodes: GraphNode[] = [
   { icon: MessageCircleMore, label: 'Human Strategist', x: 70, y: 75 },
 ]
 
-// Homepage Redesign Phase 1 / Task 5: flagship feature showcase. Career
-// Vault is included per the locked spec decision (kept in the flagship
-// slot, clearly "Coming Soon", no route/link) rather than substituted with
-// Achievement Vault or omitted.
-const flagshipFeatures = [
+// Homepage Redesign Phase 1 / Task 5 (extended for North Star fidelity):
+// flagship feature showcase. Career Vault is included per the locked spec
+// decision (kept in the flagship slot, clearly "Coming Soon", no
+// route/link) rather than substituted with Achievement Vault or omitted.
+// Each card now carries a `preview` -- a miniature, product-realistic UI
+// matching the North Star reference's density (see the individual preview
+// components for exactly what real data/fields ground each one).
+const flagshipFeatures: { icon: typeof Search; title: string; copy: string; to: string | null; comingSoon: boolean; preview: ReactNode }[] = [
   {
     icon: Search,
     title: 'Opportunity Engine',
     copy: 'Real roles, ranked by fit -- not another feed to scroll through by hand.',
     to: '/opportunity-engine',
     comingSoon: false,
+    preview: <FlagshipOpportunityPreview />,
   },
   {
     icon: Target,
@@ -45,6 +57,7 @@ const flagshipFeatures = [
     copy: 'A directional fit score for every role, so you know which ones deserve your time first.',
     to: '/opportunity-engine',
     comingSoon: false,
+    preview: <FlagshipFreshFitPreview />,
   },
   {
     icon: FolderOpen,
@@ -52,17 +65,44 @@ const flagshipFeatures = [
     copy: 'Your resume versions, wins, and career story, organized in one place.',
     to: null,
     comingSoon: true,
+    preview: <FlagshipVaultPreview />,
   },
-] as const
+]
 
 // Supporting capabilities. Human Strategists intentionally stays brief here
 // -- Task 6's Human Support section carries the fuller treatment, this card
 // just establishes it exists as a real capability alongside the other two.
-const supportingCapabilities = [
-  { icon: Compass, title: 'Career Compass', copy: 'A short assessment that points you toward directions worth pursuing.', to: '/career-compass' },
-  { icon: FileText, title: 'Applications', copy: 'Every application you send, tracked in one place -- no spreadsheets required.', to: '/applications' },
-  { icon: MessageCircleMore, title: 'Human Strategists', copy: 'Real career professionals available when you need direction, not just data.', to: null },
-] as const
+// `visual` adds the North Star's small illustrative graphic per card.
+const supportingCapabilities: { icon: typeof Compass; title: string; copy: string; to: string | null; visual: ReactNode }[] = [
+  {
+    icon: Compass,
+    title: 'Career Compass',
+    copy: 'A short assessment that points you toward directions worth pursuing.',
+    to: '/career-compass',
+    visual: <CareerCompassRadar />,
+  },
+  {
+    icon: FileText,
+    title: 'Applications',
+    copy: 'Every application you send, tracked in one place -- no spreadsheets required.',
+    to: '/applications',
+    visual: <ApplicationsStatusPreview />,
+  },
+  {
+    icon: MessageCircleMore,
+    title: 'Human Strategists',
+    copy: 'Real career professionals available when you need direction, not just data.',
+    to: null,
+    visual: (
+      <img
+        src="/images/headshot.png?v=2"
+        alt=""
+        aria-hidden="true"
+        className="mt-3 h-16 w-16 rounded-full object-cover ring-2 ring-white/20"
+      />
+    ),
+  },
+]
 
 // Homepage Redesign Phase 1 / Task 6: Human Support section. Bullets
 // grounded in real strategist-support capabilities (career strategy,
@@ -96,15 +136,40 @@ const howItWorksSteps = [
 // message in its subcopy -- kept short per the North Star reference.
 const heroFeatureBullets = ['Personalized', 'AI-powered career intelligence', 'Human experts']
 
-// Homepage Redesign Phase 1 / Task 9: FAQ teaser -- 4 of the 8 real
-// questions from FaqPage.tsx verbatim (same source of truth, no rewritten
-// or invented answers), chosen for relevance to a first-time visitor
-// rather than existing-member specifics like Friday report contents.
+// Homepage Redesign Phase 1 / Task 9 (extended for North Star fidelity):
+// FAQ teaser -- 6 of the 8 real questions from FaqPage.tsx verbatim (same
+// source of truth, no rewritten or invented answers), chosen for relevance
+// to a first-time visitor, split into two columns to match the reference's
+// density (see the .faq-list wrapper markup below for how the counter
+// numbering stays correct across both columns).
 const faqTeaserQuestions: [string, string][] = [
   ['Is FreshlyForward an AI application service?', 'No. FreshlyForward is a human-led career concierge. Technology may support organization and research, but people select opportunities, shape strategy, craft materials, and remain accountable for the work.'],
+  ['Do you apply without my permission?', 'No. Your application authorization is documented before applications begin, and you can update or withdraw it. We also follow the role preferences and boundaries established with your strategist.'],
   ['Can you guarantee I get hired?', 'No ethical service can guarantee a hiring outcome. FreshlyForward provides the strategy, execution, preparation, and support that help you run a stronger search.'],
   ['Can I pause or cancel?', 'Yes. Concierge service has no long-term contract and can be paused before the next monthly renewal.'],
+  ['Do you help with interviews?', 'Yes. Interview preparation can include role research, answer development, mock interviews, feedback, follow-up strategy, and offer decision support.'],
   ['Who is this service best for?', 'FreshlyForward is designed for busy professionals, career changers, people returning to work, and job seekers who want a more personal and accountable search partner.'],
+]
+
+// Homepage Redesign Phase 1 / North Star fidelity pass: itemized lists for
+// the "Why FreshlyForward?" comparison, alongside the existing node graphs
+// (kept, not discarded -- see NodeGraph.tsx). Every FreshlyForward item
+// names a real capability already referenced elsewhere on this page;
+// nothing on the traditional side names a real competitor or product.
+const traditionalJobSearchItems = [
+  'Endless job boards',
+  'Generic resume templates',
+  'Spreadsheets and scattered notes',
+  'No fit signal before you apply',
+  "You're on your own",
+]
+
+const freshlyForwardItems = [
+  'Career Compass for direction',
+  'Opportunity Engine for discovery',
+  'FreshFit for fit intelligence',
+  'Applications for execution',
+  'Human strategists when you need them',
 ]
 
 export function LandingPage() {
@@ -139,31 +204,33 @@ export function LandingPage() {
             </div>
           </div>
 
-          {/* Homepage Redesign Phase 1 / Task 3 (owner checkpoint round 1):
-              FreshFit centerpiece + career-path graphic (path now includes
-              node emphasis, glow, upward-flow animation, and the human
-              figure composed directly onto it) + floating cards. All
-              floating-card content is hand-authored sample/marketing data
-              grounded in real capabilities (Opportunity Engine tier
-              language, real Dashboard stat categories) -- never live
-              member data.
+          {/* Homepage Redesign Phase 1 / Task 3 + North Star fidelity pass:
+              FreshFit centerpiece + career-path graphic + floating cards.
+              All floating-card content is hand-authored sample/marketing
+              data grounded in real capabilities (Opportunity Engine tier
+              language, real Dashboard stat categories, real Forward Score
+              pillars, real APPLICATION_STATUSES groupings) -- never live
+              member data, and never a named/status-implied real person (see
+              the generic `User` icon avatar on Strategist Support below,
+              matching the ChatPreviewCard.tsx convention already used
+              elsewhere in this codebase).
 
               Visible from `md` up per the owner's requirement that tablet
               keep a simplified version of the graphic rather than hiding it
-              entirely -- only mobile collapses to text-only. Each piece
-              renders two variants (simplified md-only, full lg+) toggled
-              with Tailwind's `md:block lg:hidden` / `hidden lg:block` pairs
-              rather than a JS media-query hook, matching this codebase's
-              existing responsive-nav pattern. */}
-          <div className="relative hidden min-h-[300px] md:block lg:min-h-[420px]">
+              entirely -- only mobile collapses to text-only. The 4 extra
+              cards added for North Star density (Career Vault, Skill Gap,
+              Goal Progress, Strategist Support) are `lg`-only, same as the
+              original Search Readiness/Applications cards, so tablet stays
+              exactly as uncrowded as before. */}
+          <div className="relative hidden min-h-[300px] md:block lg:min-h-[460px]">
             <HeroCareerPath simplified className="absolute inset-0 h-full w-full lg:hidden" />
             <HeroCareerPath className="absolute inset-0 hidden h-full w-full lg:block" />
 
-            <div className="reveal mx-auto w-fit lg:hidden" style={{ animationDelay: '.2s' }}>
+            <div className="reveal relative z-10 mx-auto w-fit lg:hidden" style={{ animationDelay: '.2s' }}>
               <HeroFreshFitCenterpiece size={120} />
             </div>
-            <div className="reveal mx-auto hidden w-fit lg:block" style={{ animationDelay: '.2s' }}>
-              <HeroFreshFitCenterpiece />
+            <div className="reveal relative z-10 mx-auto hidden w-fit lg:block" style={{ animationDelay: '.2s' }}>
+              <HeroFreshFitCenterpiece size={196} />
             </div>
 
             <HeroFloatingCard className="reveal right-0 top-2" style={{ animationDelay: '.35s' }}>
@@ -178,6 +245,27 @@ export function LandingPage() {
             <HeroFloatingCard className="reveal bottom-24 right-4 hidden lg:block" style={{ animationDelay: '.65s' }}>
               <p className="text-[10px] font-semibold uppercase tracking-wide text-[#7ee4b6]">Applications</p>
               <p className="mt-1 text-lg font-bold text-white">6 <span className="text-xs font-normal text-[#bac8d6]">this month</span></p>
+            </HeroFloatingCard>
+            <HeroFloatingCard className="reveal left-6 top-0 hidden lg:block" style={{ animationDelay: '.4s' }}>
+              <p className="text-[10px] font-semibold uppercase tracking-wide text-[#7ee4b6]">Career Vault</p>
+              <p className="mt-1 text-sm font-semibold text-white">Coming Soon</p>
+            </HeroFloatingCard>
+            <HeroFloatingCard className="reveal right-0 top-56 hidden lg:block" style={{ animationDelay: '.55s' }}>
+              <p className="text-[10px] font-semibold uppercase tracking-wide text-[#7ee4b6]">Skill Gap</p>
+              <p className="mt-1 text-lg font-bold text-white">3 <span className="text-xs font-normal text-[#bac8d6]">focus areas</span></p>
+            </HeroFloatingCard>
+            <HeroFloatingCard className="reveal left-10 bottom-10 hidden lg:block" style={{ animationDelay: '.7s' }}>
+              <p className="text-[10px] font-semibold uppercase tracking-wide text-[#7ee4b6]">Goal Progress</p>
+              <p className="mt-1 text-lg font-bold text-white">75%<span className="text-xs font-normal text-[#bac8d6]"> on track</span></p>
+            </HeroFloatingCard>
+            <HeroFloatingCard className="reveal right-16 bottom-0 hidden lg:flex lg:items-center lg:gap-2" style={{ animationDelay: '.8s' }}>
+              <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-white/10">
+                <User size={14} className="text-[#7ee4b6]" aria-hidden="true" />
+              </span>
+              <span>
+                <p className="text-[10px] font-semibold uppercase tracking-wide text-[#7ee4b6]">Strategist Support</p>
+                <p className="text-xs text-[#bac8d6]">Here when you need one</p>
+              </span>
             </HeroFloatingCard>
           </div>
         </div>
@@ -199,14 +287,15 @@ export function LandingPage() {
           copy="One connected path from where you are now to your next role -- not five disconnected tools."
           id="how-it-works-title"
         />
-        <ol className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-5">
+        <ol className="relative mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-5">
+          <HowItWorksConnector className="pointer-events-none absolute left-0 top-8 hidden h-8 w-full text-[color:var(--color-primary-600)]/25 lg:block" />
           {howItWorksSteps.map(({ icon: Icon, title, copy }, index) => (
             <li key={title} className="relative flex flex-col items-center text-center">
-              {index < howItWorksSteps.length - 1 && (
-                <span className="absolute left-1/2 top-8 hidden h-px w-full bg-[color:var(--color-primary-600)]/25 lg:block" aria-hidden="true" />
-              )}
               <span className="relative z-10 flex h-16 w-16 items-center justify-center rounded-full bg-[var(--navy)] text-[#7ee4b6] shadow-[var(--shadow)]">
                 <Icon size={26} aria-hidden="true" />
+                <span className="absolute -right-1 -top-1 flex h-6 w-6 items-center justify-center rounded-full bg-[color:var(--color-primary-600)] text-xs font-bold text-white ring-2 ring-white">
+                  {index + 1}
+                </span>
               </span>
               <h3 className="font-display mt-4 text-lg font-semibold">{title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-neutral-600">{copy}</p>
@@ -233,8 +322,8 @@ export function LandingPage() {
             id="flagship-title"
           />
           <div className="mt-12 grid gap-6 lg:grid-cols-3">
-            {flagshipFeatures.map(({ icon: Icon, title, copy, to, comingSoon }) => {
-              const cardClassName = "flex flex-col rounded-[var(--radius)] bg-[var(--navy-soft)] p-8 shadow-[var(--shadow)] transition hover:bg-[color-mix(in_srgb,var(--navy-soft),white_6%)]"
+            {flagshipFeatures.map(({ icon: Icon, title, copy, to, comingSoon, preview }) => {
+              const cardClassName = "flex flex-col rounded-[var(--radius)] bg-[var(--navy-soft)] p-8 shadow-xl shadow-black/20 ring-1 ring-white/5 transition hover:bg-[color-mix(in_srgb,var(--navy-soft),white_6%)]"
               const inner = (
                 <>
                   <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-[#7ee4b6]">
@@ -247,6 +336,7 @@ export function LandingPage() {
                     )}
                   </div>
                   <p className="mt-3 text-sm leading-relaxed text-[#bac8d6]">{copy}</p>
+                  {preview}
                 </>
               )
               return to ? (
@@ -258,8 +348,8 @@ export function LandingPage() {
           </div>
 
           <div className="mt-8 grid gap-6 sm:grid-cols-3">
-            {supportingCapabilities.map(({ icon: Icon, title, copy, to }) => {
-              const cardClassName = "rounded-[var(--radius)] border border-white/10 p-6"
+            {supportingCapabilities.map(({ icon: Icon, title, copy, to, visual }) => {
+              const cardClassName = "rounded-[var(--radius)] border border-white/10 bg-white/[0.03] p-6 shadow-lg shadow-black/10"
               const inner = (
                 <>
                   <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-[#7ee4b6]">
@@ -267,6 +357,7 @@ export function LandingPage() {
                   </span>
                   <h4 className="font-display mt-3 text-base font-semibold">{title}</h4>
                   <p className="mt-2 text-sm leading-relaxed text-[#bac8d6]">{copy}</p>
+                  {visual}
                 </>
               )
               return to ? (
@@ -319,33 +410,57 @@ export function LandingPage() {
         </div>
       </section>
 
-      {/* Homepage Redesign Phase 1 / Task 7: "Why FreshlyForward?" node-graph
-          comparison -- a genuine attempt at the reference image's tangled-
-          vs-connected illustration style using NodeGraph (see that
-          component for why a faithful attempt was chosen over a plain
-          checklist). */}
-      <section className="shell py-20" aria-labelledby="why-title">
-        <SectionHeading
-          title="One connected system for your entire career move."
-          copy="Traditional job searching means juggling disconnected tools. FreshlyForward connects every piece."
-          id="why-title"
-          centered
-        />
-        <div className="relative mt-12 grid gap-16 md:grid-cols-2 md:gap-8">
-          <div>
-            <h3 className="text-center font-display text-lg font-semibold text-neutral-500">Traditional Job Search</h3>
-            <NodeGraph nodes={traditionalNodes} tangled />
+      {/* Homepage Redesign Phase 1 / Task 7 (extended for North Star
+          fidelity): "Why FreshlyForward?" comparison. Switched to a navy
+          section per the reference, with an itemized red-X / green-check
+          list layered above the existing node-graph illustration -- the
+          graph is retained as the decorative comparison graphic (per
+          explicit instruction not to discard it), not replaced by the
+          list. Every FreshlyForward item names a real capability already
+          referenced elsewhere on this page; nothing on the traditional
+          side names a real competitor or product. Heading text color
+          comes from the section's `text-white`, same inherited-color
+          pattern the flagship section above already relies on. */}
+      <section className="bg-[var(--navy)] py-20 text-white" aria-labelledby="why-title">
+        <div className="shell">
+          <SectionHeading
+            title="One connected system for your entire career move."
+            copy="Traditional job searching means juggling disconnected tools. FreshlyForward connects every piece."
+            id="why-title"
+            centered
+          />
+          <div className="relative mt-12 grid gap-10 md:grid-cols-2 md:gap-8">
+            <div className="rounded-[var(--radius)] bg-[var(--navy-soft)] p-6 shadow-xl shadow-black/20">
+              <h3 className="text-center font-display text-lg font-semibold text-[#bac8d6]">Traditional Job Search</h3>
+              <ul className="mt-5 space-y-2.5">
+                {traditionalJobSearchItems.map((item) => (
+                  <li key={item} className="flex items-start gap-2.5 text-sm text-[#bac8d6]">
+                    <X size={16} className="mt-0.5 flex-shrink-0 text-red-400" aria-hidden="true" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <NodeGraph nodes={traditionalNodes} tangled />
+            </div>
+            <div className="rounded-[var(--radius)] bg-[var(--navy-soft)] p-6 shadow-xl shadow-black/20">
+              <h3 className="text-center font-display text-lg font-semibold text-[#7ee4b6]">FreshlyForward</h3>
+              <ul className="mt-5 space-y-2.5">
+                {freshlyForwardItems.map((item) => (
+                  <li key={item} className="flex items-start gap-2.5 text-sm text-white">
+                    <Check size={16} className="mt-0.5 flex-shrink-0 text-[#7ee4b6]" aria-hidden="true" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <NodeGraph nodes={connectedNodes} tangled={false} />
+            </div>
+            <span
+              className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[color:var(--color-primary-600)] px-4 py-2 text-sm font-bold text-white shadow-xl md:flex"
+              aria-hidden="true"
+            >
+              VS
+            </span>
           </div>
-          <div>
-            <h3 className="text-center font-display text-lg font-semibold text-[color:var(--color-primary-600)]">FreshlyForward</h3>
-            <NodeGraph nodes={connectedNodes} tangled={false} />
-          </div>
-          <span
-            className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[var(--navy)] px-4 py-2 text-sm font-bold text-white shadow-[var(--shadow)] md:flex"
-            aria-hidden="true"
-          >
-            VS
-          </span>
         </div>
       </section>
 
@@ -355,35 +470,60 @@ export function LandingPage() {
           new hook). */}
       <PricingTeaser />
 
-      {/* Homepage Redesign Phase 1 / Task 9: FAQ teaser, reusing FaqPage's
-          existing .faq-list accordion styling (Q.01 counter, + toggle) so
-          this doesn't invent a second FAQ visual language. */}
+      {/* Homepage Redesign Phase 1 / Task 9 (extended for North Star
+          fidelity): FAQ teaser, reusing FaqPage's existing .faq-list
+          accordion styling (Q.01 counter, + toggle) so this doesn't invent
+          a second FAQ visual language. Split into two plain-div columns
+          (not a CSS grid auto-flow) so the counter -- which increments in
+          DOM source order regardless of visual position -- numbers
+          question 1-3 down the left column, then 4-6 down the right,
+          matching the reference's two-column reading order. */}
       <section className="faq-list shell" aria-labelledby="faq-title">
         <SectionHeading eyebrow="Straightforward by design" title="Frequently asked questions" id="faq-title" />
-        {faqTeaserQuestions.map(([question, answer], index) => (
-          <details key={question} open={index === 0}>
-            <summary>{question}<span>+</span></summary>
-            <p>{answer}</p>
-          </details>
-        ))}
+        <div className="md:grid md:grid-cols-2 md:gap-x-10">
+          <div>
+            {faqTeaserQuestions.slice(0, 3).map(([question, answer], index) => (
+              <details key={question} open={index === 0}>
+                <summary>{question}<span>+</span></summary>
+                <p>{answer}</p>
+              </details>
+            ))}
+          </div>
+          <div>
+            {faqTeaserQuestions.slice(3).map(([question, answer]) => (
+              <details key={question}>
+                <summary>{question}<span>+</span></summary>
+                <p>{answer}</p>
+              </details>
+            ))}
+          </div>
+        </div>
         <div className="mt-8 flex justify-center">
           <LinkButton to="/faq" variant="secondary">See all FAQs</LinkButton>
         </div>
       </section>
 
-      {/* Homepage Redesign Phase 1 / Task 9: Final CTA band -- bookends the
-          hero with the same navy/green treatment and the same primary CTA
-          (Career Compass), plus a secondary path to a human strategist for
-          visitors who'd rather talk than take an assessment first. */}
-      <section className="bg-[var(--navy)] py-20 text-center text-white" aria-labelledby="final-cta-title">
-        <div className="shell">
-          <h2 id="final-cta-title" className="font-display text-3xl font-semibold sm:text-4xl">Ready to move your career forward?</h2>
-          <p className="mx-auto mt-4 max-w-xl text-[#bac8d6]">Start with Career Compass to see where you stand, or reach out to talk with a human strategist first.</p>
+      {/* Homepage Redesign Phase 1 / Task 9, corrected during the North
+          Star fidelity pass: Final CTA band. The approved spec's structure
+          section (docs/superpowers/specs/2026-09-02-homepage-design-north-
+          star.md) locks this exact headline and both CTA labels --
+          "Your next move starts here." / "Take Career Compass" / "See How
+          It Works" -- so this now matches that verbatim instead of the
+          drifted copy from the original Task 9 pass. Decorative footer
+          path echoes the hero's career-path graphic at a much smaller
+          scale, bookending the page. */}
+      <section className="relative overflow-hidden bg-[var(--navy)] py-20 text-center text-white" aria-labelledby="final-cta-title">
+        <FooterCareerPath className="pointer-events-none absolute inset-x-0 bottom-0 h-16 w-full opacity-70" />
+        <div className="shell relative">
+          <h2 id="final-cta-title" className="font-display text-3xl font-semibold sm:text-4xl">Your next move starts here.</h2>
+          <p className="mx-auto mt-4 max-w-xl text-[#bac8d6]">Get clarity, discover better-fit opportunities, track your search, and move forward with a connected system built around you.</p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <LinkButton to="/career-compass">
               Take Career Compass <ArrowRight size={18} />
             </LinkButton>
-            <LinkButton to="/contact" variant="secondary">Talk to a Strategist</LinkButton>
+            <LinkButton to="/how-it-works" variant="secondary">
+              <PlayCircle size={18} /> See How It Works
+            </LinkButton>
           </div>
         </div>
       </section>
