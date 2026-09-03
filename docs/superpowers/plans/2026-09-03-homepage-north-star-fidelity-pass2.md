@@ -30,6 +30,13 @@ Section 1a for the exact scope of this pass -- Career Vault and Pricing are expl
   rendering. All homepage-only visual changes are additive classes/props, never edits to shared
   selectors' existing declarations.
 - Every task ends with `npx vitest run <its own test file>` passing before moving on.
+- **Hard verification gate (superpowers:verification-before-completion applies without exception):**
+  no task, and no overall report of this pass, may be described as "complete" or "done" without
+  having actually run the objective visual verification described in Task 8 -- a subjective
+  eyeball pass or a passing test suite alone is never sufficient to close this out. Every visual
+  task (3, 4, 5, 6) captures a checkpoint screenshot for reviewer sign-off before its own commit;
+  deviations from this plan or the spec are surfaced immediately in that checkpoint, never quietly
+  papered over in a later task.
 
 ---
 
@@ -327,10 +334,17 @@ Run: `npx vitest run src/pages/LandingPage.test.tsx`
 Expected: PASS -- no test asserts on exact position classes or the internal centerpiece markup, so
 this is a pure regression check confirming nothing else broke.
 
-- [ ] **Step 6: Commit**
+- [ ] **Step 6: Capture a checkpoint screenshot for reviewer sign-off**
+
+Run `visual_review_capture.py` (or equivalent Playwright capture, animations disabled) against `/`
+at desktop width and save it as `docs/superpowers/visual-review/2026-09-03-homepage-fidelity-pass2/task3-hero-checkpoint.png`.
+This is a per-task review artifact, not the final objective diff -- that happens once, in Task 8,
+against the full assembled page.
+
+- [ ] **Step 7: Commit**
 
 ```bash
-git add src/components/homepage/HeroFreshFitCenterpiece.tsx src/components/homepage/HeroCareerPath.tsx src/pages/LandingPage.tsx
+git add src/components/homepage/HeroFreshFitCenterpiece.tsx src/components/homepage/HeroCareerPath.tsx src/pages/LandingPage.tsx docs/superpowers/visual-review/2026-09-03-homepage-fidelity-pass2/task3-hero-checkpoint.png
 git commit -m "Hero rebuild: unboxed FreshFit ring, path continues to an arrow, integrated figure, tighter card clustering (Task 3)"
 ```
 
@@ -381,10 +395,14 @@ Expected: same single usage as before this task, no diff to that line or to
 Run: `npx vitest run src/pages/LandingPage.test.tsx`
 Expected: PASS, including the existing "labels Career Vault as Coming Soon" test unmodified.
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 5: Capture a checkpoint screenshot for reviewer sign-off**
+
+Save to `docs/superpowers/visual-review/2026-09-03-homepage-fidelity-pass2/task4-tools-checkpoint.png`.
+
+- [ ] **Step 6: Commit**
 
 ```bash
-git add src/pages/LandingPage.tsx
+git add src/pages/LandingPage.tsx docs/superpowers/visual-review/2026-09-03-homepage-fidelity-pass2/task4-tools-checkpoint.png
 git commit -m "Powerful Tools: light/cream outer section, dark cards only, matching North Star (Task 4)"
 ```
 
@@ -455,10 +473,14 @@ Run: `npx vitest run src/pages/LandingPage.test.tsx`
 Expected: PASS, including the existing "never shows a testimonial-shaped quote attributed to a
 named person" test -- the new overlay card has no name/quote/rating, only a capability label.
 
-- [ ] **Step 3: Commit**
+- [ ] **Step 3: Capture a checkpoint screenshot for reviewer sign-off**
+
+Save to `docs/superpowers/visual-review/2026-09-03-homepage-fidelity-pass2/task5-human-support-checkpoint.png`.
+
+- [ ] **Step 4: Commit**
 
 ```bash
-git add src/pages/LandingPage.tsx
+git add src/pages/LandingPage.tsx docs/superpowers/visual-review/2026-09-03-homepage-fidelity-pass2/task5-human-support-checkpoint.png
 git commit -m "Human Support: text-left/image-right layout with truthful overlay card, matching North Star geometry (Task 5)"
 ```
 
@@ -520,10 +542,14 @@ Run: `npx vitest run src/pages/LandingPage.test.tsx`
 Expected: PASS -- no test asserts on this section's DOM nesting depth, only text content, which is
 unchanged.
 
-- [ ] **Step 3: Commit**
+- [ ] **Step 3: Capture a checkpoint screenshot for reviewer sign-off**
+
+Save to `docs/superpowers/visual-review/2026-09-03-homepage-fidelity-pass2/task6-why-checkpoint.png`.
+
+- [ ] **Step 4: Commit**
 
 ```bash
-git add src/pages/LandingPage.tsx
+git add src/pages/LandingPage.tsx docs/superpowers/visual-review/2026-09-03-homepage-fidelity-pass2/task6-why-checkpoint.png
 git commit -m "Why FreshlyForward: inset rounded navy panel on a light page background instead of full-bleed (Task 6)"
 ```
 
@@ -584,9 +610,11 @@ git commit -m "FAQ: homepage-only density tightening, FaqPage.tsx unaffected (Ta
 
 ---
 
-### Task 8: Verification pass
+### Task 8: Verification pass (hard gate -- do not report completion without this)
 
-**Files:** none (verification only).
+**Files:**
+- Create: `scripts/visual_diff.py` (throwaway-but-committed verification tool, not part of the
+  app bundle)
 
 - [ ] **Step 1: Run every focused test file touched by this plan**
 
@@ -610,37 +638,99 @@ Expected: clean build, no new errors (existing chunk-size warning is expected/pr
 
 Use the existing `visual_review_capture.py` helper (or equivalent Playwright script) to capture
 `/` at desktop, tablet, and mobile widths with animations disabled, same convention as every prior
-screenshot round in this project.
+screenshot round in this project. Save as
+`docs/superpowers/visual-review/2026-09-03-homepage-fidelity-pass2/final-desktop.png` (+ tablet/
+mobile).
 
-- [ ] **Step 5: Build the North Star vs. implementation side-by-side**
+- [ ] **Step 5: Write the objective pixel-diff script**
 
-Compose a single comparison image (reference image alongside the new desktop screenshot) using
-PIL, same technique used earlier in this session for the section-boundary crops.
+Create `scripts/visual_diff.py`:
 
-- [ ] **Step 6: Second visual-difference audit**
+```python
+"""Objective visual-diff check against the North Star reference.
+Resizes the new screenshot to the reference's width, computes a
+per-pixel absolute difference, writes a diff heatmap, and prints the
+percentage of pixels that differ beyond a small tolerance (anti-aliasing
+noise). This is the pixelmatch-equivalent gate required before this pass
+can be reported complete -- no new npm/pip dependency needed since PIL
+is already used throughout this repo's visual-review tooling.
+"""
+import sys
+from PIL import Image, ImageChops
 
-Compare the new screenshots against the reference exactly as the Phase 1 audit did (edge-pixel
-background-band sampling for geometry/section-height, plus visual inspection for spacing,
-typography, colors, card sizing, composition, graphical treatment). Write up specific remaining
-mismatches, if any -- do not report completion solely because tests/build passed.
+REFERENCE = 'public/images/A63B5E0B-0AE1-4D9A-B05D-9C52403721C7.png'
+TOLERANCE = 12  # per-channel value difference below this counts as "same"
 
-- [ ] **Step 7: Fix any material mismatches found, then repeat Steps 4-6**
 
-If the second audit finds material mismatches, fix them and re-capture/re-audit before reporting
-completion. A single implementation pass is not treated as sufficient on its own.
+def diff(reference_path: str, implementation_path: str, out_heatmap: str) -> float:
+    ref = Image.open(reference_path).convert('RGB')
+    impl = Image.open(implementation_path).convert('RGB')
+    impl_resized = impl.resize(ref.size)
 
-- [ ] **Step 8: Final commit (if any fixes were made in Step 7)**
+    delta = ImageChops.difference(ref, impl_resized)
+    pixels = list(delta.getdata())
+    differing = sum(1 for r, g, b in pixels if max(r, g, b) > TOLERANCE)
+    percent = 100 * differing / len(pixels)
+
+    delta.save(out_heatmap)
+    return percent
+
+
+if __name__ == '__main__':
+    implementation_path = sys.argv[1]
+    out_heatmap = sys.argv[2]
+    percent = diff(REFERENCE, implementation_path, out_heatmap)
+    print(f'{percent:.2f}% of pixels differ beyond tolerance (heatmap: {out_heatmap})')
+```
+
+- [ ] **Step 6: Run the pixel-diff against the final desktop screenshot**
+
+Run:
+```bash
+python scripts/visual_diff.py docs/superpowers/visual-review/2026-09-03-homepage-fidelity-pass2/final-desktop.png docs/superpowers/visual-review/2026-09-03-homepage-fidelity-pass2/diff-heatmap.png
+```
+
+Expected: a printed percentage. This number is **reported verbatim** in the completion summary --
+it is not a pass/fail gate on its own (truthful content substitutions guarantee some real
+percentage of difference, per the spec's "95%+ preserved, not 100%" framing), but it must be
+generated and looked at, not skipped. Open the heatmap image and visually confirm the brightest
+(most-different) regions correspond only to expected content differences (the Human Support
+overlay card, Career Vault/Pricing content, real member data) and not to structural drift
+(wrong section present/missing, wrong proportions).
+
+- [ ] **Step 7: Build the North Star vs. implementation side-by-side**
+
+Compose a single comparison image (reference image alongside the new desktop screenshot, plus the
+diff heatmap as a third panel) using PIL, saved as
+`docs/superpowers/visual-review/2026-09-03-homepage-fidelity-pass2/side-by-side.png`.
+
+- [ ] **Step 8: Second visual-difference audit**
+
+Using the side-by-side image and the heatmap, repeat the Phase 1 audit method (edge-pixel
+background-band sampling for geometry/section-height, visual inspection for spacing, typography,
+colors, card sizing, composition, graphical treatment) against the reference. Write up specific
+remaining mismatches in a short report -- do not report completion solely because tests/build
+passed or because a pixel-diff script ran; the report must name concrete findings (or explicitly
+state "no material mismatches found" backed by the heatmap).
+
+- [ ] **Step 9: Fix any material mismatches found, then repeat Steps 4-8**
+
+If the second audit finds material mismatches, fix them and re-capture/re-diff/re-audit before
+reporting completion. A single implementation pass is not treated as sufficient on its own.
+
+- [ ] **Step 10: Final commit and push**
 
 ```bash
 git add -A
-git commit -m "Address remaining mismatches from second visual-difference audit (Task 8)"
+git commit -m "Task 8: verification pass -- tests, build, screenshots, objective pixel-diff, second audit"
 git push origin homepage-redesign-phase1
 ```
 
-If no fixes were needed, push whatever is pending from Tasks 1-7 instead:
+Then, separately (chained pushes have silently failed to land earlier in this project -- always
+verify):
 
 ```bash
-git push origin homepage-redesign-phase1
+git fetch origin --quiet && git rev-parse HEAD && git rev-parse origin/homepage-redesign-phase1
 ```
 
-Do not merge into `main`.
+Expected: both SHAs match. Do not merge into `main`.
