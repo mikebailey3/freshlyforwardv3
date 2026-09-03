@@ -4,7 +4,7 @@ import { ForwardFeedWidget } from '@/components/ForwardFeedWidget'
 import { useScrollReveal } from '@/hooks/useScrollReveal'
 import { HeroFreshFitCenterpiece } from '@/components/homepage/HeroFreshFitCenterpiece'
 import { HeroFloatingCard } from '@/components/homepage/HeroFloatingCard'
-import { HeroCareerPath, HeroFigureSilhouette } from '@/components/homepage/HeroCareerPath'
+import { HeroCareerPath } from '@/components/homepage/HeroCareerPath'
 
 const manifest = [
   { icon: ShieldCheck, title: '100% Human-Led Service', copy: 'No bots, no shortcuts. Every decision is made by a real career professional.' },
@@ -37,8 +37,8 @@ export function LandingPage() {
       <section className="bg-[var(--navy)] py-14 text-white lg:py-24">
         <div className="shell grid items-center gap-12 lg:grid-cols-2">
           <div>
-            <h1 className="font-display text-4xl font-semibold leading-[1.1] sm:text-5xl lg:text-6xl">
-              Your Career <span className="text-[#7ee4b6]">Operating System</span> for What's Next.
+            <h1 className="font-display text-4xl font-semibold leading-[1.1] sm:text-5xl lg:text-5xl xl:text-6xl">
+              Your Career <span className="text-[#7ee4b6] lg:whitespace-nowrap">Operating System</span> for What's Next.
             </h1>
             <p className="mt-6 max-w-lg text-lg leading-relaxed text-[#bac8d6]">
               One connected system for your career search: Career Compass points you in the right
@@ -63,29 +63,43 @@ export function LandingPage() {
             </div>
           </div>
 
-          {/* Homepage Redesign Phase 1 / Task 3: FreshFit centerpiece +
-              career-path graphic + floating cards + human figure. All
+          {/* Homepage Redesign Phase 1 / Task 3 (owner checkpoint round 1):
+              FreshFit centerpiece + career-path graphic (path now includes
+              node emphasis, glow, upward-flow animation, and the human
+              figure composed directly onto it) + floating cards. All
               floating-card content is hand-authored sample/marketing data
               grounded in real capabilities (Opportunity Engine tier
               language, real Dashboard stat categories) -- never live
-              member data. Hidden below `lg` per the plan rather than
-              attempting the full composition on narrow screens. */}
-          <div className="relative hidden lg:block" style={{ minHeight: 420 }}>
-            <HeroCareerPath className="absolute inset-0 h-full w-full" />
-            <HeroFigureSilhouette className="reveal absolute bottom-6 left-6 h-20 w-12" style={{ animationDelay: '.1s' }} />
-            <div className="reveal mx-auto w-fit" style={{ animationDelay: '.2s' }}>
+              member data.
+
+              Visible from `md` up per the owner's requirement that tablet
+              keep a simplified version of the graphic rather than hiding it
+              entirely -- only mobile collapses to text-only. Each piece
+              renders two variants (simplified md-only, full lg+) toggled
+              with Tailwind's `md:block lg:hidden` / `hidden lg:block` pairs
+              rather than a JS media-query hook, matching this codebase's
+              existing responsive-nav pattern. */}
+          <div className="relative hidden min-h-[300px] md:block lg:min-h-[420px]">
+            <HeroCareerPath simplified className="absolute inset-0 h-full w-full lg:hidden" />
+            <HeroCareerPath className="absolute inset-0 hidden h-full w-full lg:block" />
+
+            <div className="reveal mx-auto w-fit lg:hidden" style={{ animationDelay: '.2s' }}>
+              <HeroFreshFitCenterpiece size={120} />
+            </div>
+            <div className="reveal mx-auto hidden w-fit lg:block" style={{ animationDelay: '.2s' }}>
               <HeroFreshFitCenterpiece />
             </div>
+
             <HeroFloatingCard className="reveal right-0 top-2" style={{ animationDelay: '.35s' }}>
               <p className="text-[10px] font-semibold uppercase tracking-wide text-[#7ee4b6]">Top Opportunity</p>
               <p className="mt-1 text-sm font-semibold text-white">Senior Product Manager</p>
               <p className="text-xs text-[#bac8d6]">92 FreshFit -- Highest Fit</p>
             </HeroFloatingCard>
-            <HeroFloatingCard className="reveal left-0 top-32" style={{ animationDelay: '.5s' }}>
+            <HeroFloatingCard className="reveal left-0 top-32 hidden lg:block" style={{ animationDelay: '.5s' }}>
               <p className="text-[10px] font-semibold uppercase tracking-wide text-[#7ee4b6]">Search Readiness</p>
               <p className="mt-1 text-lg font-bold text-white">78<span className="text-xs font-normal text-[#bac8d6]">/100</span></p>
             </HeroFloatingCard>
-            <HeroFloatingCard className="reveal bottom-24 right-4" style={{ animationDelay: '.65s' }}>
+            <HeroFloatingCard className="reveal bottom-24 right-4 hidden lg:block" style={{ animationDelay: '.65s' }}>
               <p className="text-[10px] font-semibold uppercase tracking-wide text-[#7ee4b6]">Applications</p>
               <p className="mt-1 text-lg font-bold text-white">6 <span className="text-xs font-normal text-[#bac8d6]">this month</span></p>
             </HeroFloatingCard>

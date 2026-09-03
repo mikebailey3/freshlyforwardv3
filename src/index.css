@@ -161,6 +161,8 @@ svg { flex: 0 0 auto; }
 .reveal { animation: reveal .75s both ease-out; }
 .reveal-delay { animation-delay: .14s; }
 @keyframes reveal { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes hero-path-flow { from { stroke-dashoffset: 28; } to { stroke-dashoffset: 0; } }
+.hero-path-line { animation: hero-path-flow 2.8s linear infinite; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
 
 .cs-manifest-section { padding: 90px 0; border-block: 1px solid var(--line); background: var(--cream); }
