@@ -432,10 +432,13 @@ export function LandingPage() {
           list. Every FreshlyForward item names a real capability already
           referenced elsewhere on this page; nothing on the traditional
           side names a real competitor or product. Heading text color
-          comes from the section's `text-white`, same inherited-color
-          pattern the flagship section above already relies on. */}
-      <section className="bg-[var(--navy)] py-20 text-white" aria-labelledby="why-title">
+          comes from the inner navy panel's `text-white` (moved off the
+          section itself so the outer section can go light per the North
+          Star fidelity pass), same inherited-color pattern the flagship
+          section above already relies on. */}
+      <section className="bg-[var(--cream)] py-20" aria-labelledby="why-title">
         <div className="shell">
+          <div className="rounded-[calc(var(--radius)*1.5)] bg-[var(--navy)] px-6 py-14 text-white sm:px-10">
           <SectionHeading
             title="One connected system for your entire career move."
             copy="Traditional job searching means juggling disconnected tools. FreshlyForward connects every piece."
@@ -473,6 +476,7 @@ export function LandingPage() {
             >
               VS
             </span>
+          </div>
           </div>
         </div>
       </section>
