@@ -314,7 +314,7 @@ export function LandingPage() {
           navy/green treatment; Career Vault's card carries a visible
           "Coming Soon" badge and has no href, matching the locked spec
           decision and the test in LandingPage.test.tsx enforcing it. */}
-      <section className="bg-[var(--navy)] py-20 text-white" aria-labelledby="flagship-title">
+      <section className="bg-[var(--cream)] py-20" aria-labelledby="flagship-title">
         <div className="shell">
           <SectionHeading
             title="Powerful tools. One connected system."
@@ -330,7 +330,7 @@ export function LandingPage() {
                     <Icon size={22} aria-hidden="true" />
                   </span>
                   <div className="mt-4 flex items-center gap-2">
-                    <h3 className="font-display text-xl font-semibold">{title}</h3>
+                    <h3 className="font-display text-xl font-semibold text-white">{title}</h3>
                     {comingSoon && (
                       <span className="rounded-full bg-white/10 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[#bac8d6]">Coming Soon</span>
                     )}
@@ -349,13 +349,13 @@ export function LandingPage() {
 
           <div className="mt-8 grid gap-6 sm:grid-cols-3">
             {supportingCapabilities.map(({ icon: Icon, title, copy, to, visual }) => {
-              const cardClassName = "rounded-[var(--radius)] border border-white/10 bg-white/[0.03] p-6 shadow-lg shadow-black/10"
+              const cardClassName = "rounded-[var(--radius)] border border-white/10 bg-[var(--navy-soft)] p-6 shadow-lg shadow-black/10 text-white"
               const inner = (
                 <>
                   <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-[#7ee4b6]">
                     <Icon size={18} aria-hidden="true" />
                   </span>
-                  <h4 className="font-display mt-3 text-base font-semibold">{title}</h4>
+                  <h4 className="font-display mt-3 text-base font-semibold text-white">{title}</h4>
                   <p className="mt-2 text-sm leading-relaxed text-[#bac8d6]">{copy}</p>
                   {visual}
                 </>
