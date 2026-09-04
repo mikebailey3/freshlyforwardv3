@@ -17,6 +17,26 @@ density, backgrounds, composition, or graphical treatment.
 This is **not** a rebuild "inspired by" the reference. It is a high-fidelity design-to-code pass
 against a fixed image target.
 
+## 1a. Pass 2 scope narrowing (owner correction, post-approval)
+
+After this spec was approved, the owner scoped the *first implementation pass* down to a fixed
+list, explicitly carving out two areas:
+
+- **Career Vault: do not touch.** No behavior change, no content change. Section 3.4's light-outer
+  fix must not alter `FlagshipVaultPreview.tsx` or its Coming Soon treatment in any way.
+- **Pricing: do not investigate or modify at all.** Section 3.7 (Kickstarter removal) is deferred
+  out of this pass entirely -- not implemented now, not audited now.
+
+This pass also does **not** include Section 3.3 (How It Works spacing tightening) or Section 3.9
+(Final CTA multi-milestone rebuild) -- those remain approved for a later pass but are not part of
+the current work.
+
+**This pass covers exactly:** Header (3.1), Hero (3.2), Powerful Tools outer background only (3.4,
+excluding Career Vault card content), Human Support (3.5), Why FreshlyForward (3.6), FAQ density
+only (3.8, page background stays light -- no structural change), plus a new **Typography**
+verification item: confirm the actual font family actually loading on `/` matches the North Star
+reference and correct any drift found.
+
 ## 2. Measured baseline (Phase 1 audit findings)
 
 Reference canvas: 864x1821px (height = 2.11x width). Current homepage at matching width: ~4.46x
