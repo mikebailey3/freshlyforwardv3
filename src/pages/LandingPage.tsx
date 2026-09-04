@@ -379,13 +379,6 @@ export function LandingPage() {
       <section className="bg-[var(--cream)] py-20" aria-labelledby="human-support-title">
         <div className="shell grid items-center gap-12 lg:grid-cols-2">
           <div>
-            <img
-              src="/images/headshot.png?v=2"
-              alt="Mike Bailey, founder of FreshlyForward"
-              className="w-full max-w-md rounded-[var(--radius)] object-cover shadow-[var(--shadow)]"
-            />
-          </div>
-          <div>
             <SectionHeading
               title="Technology gets you the data. A person helps you use it."
               copy="Every FreshlyForward plan includes real human support -- not a chatbot, not a template."
@@ -405,6 +398,26 @@ export function LandingPage() {
               <LinkButton to="/why-freshlyforward" variant="secondary">
                 See How Human Support Works <ArrowRight size={18} />
               </LinkButton>
+            </div>
+          </div>
+          <div className="relative lg:ml-auto lg:max-w-md">
+            <img
+              src="/images/headshot.png?v=2"
+              alt="Mike Bailey, founder of FreshlyForward"
+              className="w-full max-w-md rounded-[var(--radius)] object-cover shadow-[var(--shadow)]"
+            />
+            {/* Truthful overlay card in place of the North Star's fabricated
+                testimonial -- same geometry/overlap treatment, honest content.
+                Smaller negative offset on mobile (where .shell's own outer
+                margin is only 12-14px) so the card can't bleed past the
+                viewport edge; the wrapper above now shares the image's own
+                max-width so the offset anchors to the photo's real corner
+                instead of drifting in unused grid-column space. */}
+            <div className="absolute -bottom-3 -left-3 max-w-[240px] rounded-[var(--radius)] bg-white p-5 shadow-xl sm:-bottom-6 sm:-left-6">
+              <p className="text-sm font-semibold text-[var(--navy)]">Human strategist support</p>
+              <p className="mt-1.5 text-xs leading-relaxed text-neutral-600">
+                A real person -- not a chatbot -- available whenever you need direction.
+              </p>
             </div>
           </div>
         </div>
