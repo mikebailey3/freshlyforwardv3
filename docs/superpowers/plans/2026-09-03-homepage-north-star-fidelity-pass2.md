@@ -20,10 +20,21 @@ Section 1a for the exact scope of this pass -- Career Vault and Pricing are expl
 
 ## Global Constraints
 
-- No changes to routes, authentication, Supabase queries, plan gating, Opportunity Engine
-  behavior, FreshFit behavior, or real pricing data flow.
+- **Career Vault and Pricing are out of scope for this entire correction pass.** No changes to
+  routes, authentication, Supabase queries, plan gating, Opportunity Engine behavior, FreshFit
+  behavior, or real pricing data flow.
 - Do not touch `FlagshipVaultPreview.tsx` or any Career Vault content/behavior.
 - Do not touch `PricingTeaser.tsx`, `PricingPage.tsx`, or any pricing logic.
+- **Objective visual verification is a hard gate, not optional.** Task 8 requires an actual
+  pixel-diff comparison (script provided in Task 8, PIL/numpy-based -- this repo has no
+  pixelmatch/Playwright-node install, so this is the equivalent using tooling already proven
+  working in this environment) against the North Star reference, not just human eyeballing. No
+  task, and no report of the plan as a whole, may claim "complete" or "done" without that script
+  having actually been run and its numeric output included in the report.
+- **Surface deviations immediately.** If implementing a task reveals the spec/plan doesn't match
+  reality (a class doesn't exist, a described element isn't where the plan says, a step's
+  before/after diff doesn't apply cleanly), stop and report the deviation rather than silently
+  improvising a different fix. This applies to every task and every subagent executing it.
 - Do not modify the shared `h1, h2, h3 { font-family: 'Fraunces' }` global rule or the
   `--font-display` token's meaning -- ~15 other already-migrated pages depend on it.
 - Do not modify `.faq-list` or `.site-header` base rules in a way that changes any other page's
