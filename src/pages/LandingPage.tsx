@@ -495,7 +495,7 @@ export function LandingPage() {
           DOM source order regardless of visual position -- numbers
           question 1-3 down the left column, then 4-6 down the right,
           matching the reference's two-column reading order. */}
-      <section className="faq-list shell" aria-labelledby="faq-title">
+      <section className="home-faq faq-list shell" aria-labelledby="faq-title">
         <SectionHeading eyebrow="Straightforward by design" title="Frequently asked questions" id="faq-title" />
         <div className="md:grid md:grid-cols-2 md:gap-x-10">
           <div>

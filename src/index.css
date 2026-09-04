@@ -526,3 +526,10 @@ pricing-section { padding-bottom: 100px; }
    everywhere else. Scoped to this one class so the other ~15 already-
    migrated pages are completely unaffected. */
 .font-hero-sans { font-family: 'Manrope', sans-serif; }
+
+/* Homepage-only FAQ density tightening. Scoped under .home-faq (applied
+   on the SAME <section> element as .faq-list, not an ancestor -- hence
+   the compound selector, no space) so FaqPage.tsx's full accordion
+   (which shares the base .faq-list rules) is completely unaffected. */
+.faq-list.home-faq summary { padding: 14px 4px; }
+.faq-list.home-faq details p { padding: 0 24px 14px 40px; }
