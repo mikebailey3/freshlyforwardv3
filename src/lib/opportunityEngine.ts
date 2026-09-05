@@ -1,11 +1,13 @@
 import { supabase } from '@/lib/supabase'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { createOpportunity } from '@/lib/operations'
-import { computeFreshFitScore } from '@/lib/freshFitScore'
+import { computeFreshFitScore, toScoreBreakdownPayload, FRESHFIT_TIER_LABELS } from '@/lib/freshFitScore'
 import { getSkillStates } from '@/lib/forwardDna/skills'
 import { getAllScopeForUser } from '@/lib/forwardDna/scope'
 import type { JobMatchWithJob, JobMatchScoreBreakdown, MemberProfile, ScrapedJob } from '@/types'
 import type { JobSubmissionInput } from '@/lib/jobSubmission'
+
+const ENGINE_VERSION = 2
 
 // ============================================================
 // JOB MATCHES (read-side; scores are computed by scripts/syncFreshFitScores.ts)
@@ -39,11 +41,23 @@ export async function dismissJobMatch(matchId: string): Promise<void> {
 /**
  * Pure text-builder for the promoted Opportunity's why_it_matches field.
  * Extracted so Forward-DNA-aware copy is unit-testable without mocking
- * Supabase or createOpportunity.
+ * Supabase or createOpportunity. Backward compatible: a `score_breakdown`
+ * without a `v2` key (any match scored by the pre-2.0 engine) gets the
+ * exact same legacy copy as before; only v2-scored matches (which always
+ * carry `breakdown.v2`, see toScoreBreakdownPayload) get the richer text.
  */
 export function buildWhyItMatches(match: JobMatchWithJob): string {
   const breakdown = match.score_breakdown as JobMatchScoreBreakdown
   const skillsNote = `Matched skills: ${match.matched_skills.join(', ') || 'none detected'}.`
+
+  if (breakdown?.v2) {
+    const { v2 } = breakdown
+    const gapCount = v2.dimensions.reduce((sum, d) => sum + d.gaps.length, 0)
+    const gapsNote = gapCount > 0 ? ` ${gapCount} confirmed gap(s).` : ''
+    const unknownsNote = v2.unknowns.length > 0 ? ` ${v2.unknowns.length} area(s) unclear given your current profile.` : ''
+    return `FreshFit score ${match.fresh_fit_score}/100 (${FRESHFIT_TIER_LABELS[v2.tier]}). ${v2.recommendation.headline}. ${skillsNote}${gapsNote}${unknownsNote}`
+  }
+
   if (!breakdown?.dnaSkillEvidence) {
     return `FreshFit score ${match.fresh_fit_score}/100. ${skillsNote}`
   }
@@ -86,11 +100,20 @@ export async function submitMemberJob(
   }
 
   const job = jobRow as ScrapedJob
-  const [{ skills }, { scope }] = await Promise.all([
+  const [{ skills }, { scope }, compassResult] = await Promise.all([
     getSkillStates(profile.user_id, client),
     getAllScopeForUser(profile.user_id, client),
+    client
+      .from('career_compass_results')
+      .select('readiness_scores')
+      .eq('user_id', profile.user_id)
+      .eq('is_current', true)
+      .maybeSingle(),
   ])
-  const result = computeFreshFitScore(profile, job, { skills, scope })
+  const careerDirectionScore =
+    (compassResult.data as { readiness_scores?: { careerDirection?: number | null } } | null)?.readiness_scores
+      ?.careerDirection ?? null
+  const result = computeFreshFitScore(profile, job, { skills, scope }, careerDirectionScore)
 
   const { data: matchRow, error: matchError } = await client
     .from('job_matches')
@@ -100,7 +123,8 @@ export async function submitMemberJob(
       fresh_fit_score: result.score,
       matched_skills: result.matchedSkills,
       missing_skills: result.missingSkills,
-      score_breakdown: result.breakdown,
+      score_breakdown: toScoreBreakdownPayload(result),
+      engine_version: ENGINE_VERSION,
     })
     .select()
     .single()

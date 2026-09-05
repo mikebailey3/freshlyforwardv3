@@ -1,18 +1,14 @@
 import { useEffect, useState } from 'react'
 import { StrategistLayout } from '@/components/StrategistLayout'
+import { FreshFitBadge } from '@/components/freshFit/FreshFitBadge'
+import { FreshFitDetails } from '@/components/freshFit/FreshFitDetails'
 import { useAuth } from '@/context/AuthContext'
 import { supabase } from '@/lib/supabase'
 import { getAssignedMembers } from '@/lib/operations'
 import { getJobMatchesForStrategist, promoteMatchToOpportunity } from '@/lib/opportunityEngine'
 import { isSafeHttpUrl } from '@/lib/url'
 import { Loader2, MapPin, DollarSign, ExternalLink, ArrowUpRight, Sparkles } from 'lucide-react'
-import type { JobMatchWithJob, MemberProfile } from '@/types'
-
-function scoreColor(score: number): string {
-  if (score >= 75) return 'border-success-300 text-success-700'
-  if (score >= 50) return 'border-primary-300 text-primary-700'
-  return 'border-neutral-300 text-neutral-600'
-}
+import type { JobMatchScoreBreakdown, JobMatchWithJob, MemberProfile } from '@/types'
 
 export function StrategistOpportunityEnginePage() {
   const { user, role } = useAuth()
@@ -95,9 +91,7 @@ export function StrategistOpportunityEnginePage() {
           {matches.map((match) => (
             <div key={match.id} className="border border-neutral-200 border-l-4 border-l-primary-600 bg-white p-4 transition-colors hover:border-l-primary-700">
               <div className="mb-2 flex items-center justify-between gap-2">
-                <span className={`border px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wide ${scoreColor(match.fresh_fit_score)}`}>
-                  FreshFit {match.fresh_fit_score}
-                </span>
+                <FreshFitBadge score={match.fresh_fit_score} />
                 <span className="truncate text-xs text-neutral-500">{memberNames[match.member_id] || 'Member'}</span>
               </div>
 
@@ -128,6 +122,8 @@ export function StrategistOpportunityEnginePage() {
                   ))}
                 </div>
               )}
+
+              <FreshFitDetails breakdown={match.score_breakdown as JobMatchScoreBreakdown} />
 
               <div className="mt-3 flex items-center justify-between border-t border-neutral-100 pt-3">
                 {isSafeHttpUrl(match.scraped_job.posting_url) ? (

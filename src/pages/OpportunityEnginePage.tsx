@@ -1,17 +1,13 @@
 import { useEffect, useState } from 'react'
 import { MemberLayout } from '@/components/MemberLayout'
 import { SubmitJobModal } from '@/components/SubmitJobModal'
+import { FreshFitBadge } from '@/components/freshFit/FreshFitBadge'
+import { FreshFitDetails } from '@/components/freshFit/FreshFitDetails'
 import { useAuth } from '@/context/AuthContext'
 import { getJobMatches, dismissJobMatch } from '@/lib/opportunityEngine'
 import { isSafeHttpUrl } from '@/lib/url'
 import { Loader2, MapPin, DollarSign, ExternalLink, X, Sparkles, PlusCircle } from 'lucide-react'
-import type { JobMatchWithJob } from '@/types'
-
-function scoreColor(score: number): string {
-  if (score >= 75) return 'border-success-300 text-success-700'
-  if (score >= 50) return 'border-primary-300 text-primary-700'
-  return 'border-neutral-300 text-neutral-600'
-}
+import type { JobMatchScoreBreakdown, JobMatchWithJob } from '@/types'
 
 export function OpportunityEnginePage() {
   const { user, profile } = useAuth()
@@ -76,9 +72,7 @@ export function OpportunityEnginePage() {
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
-                    <span className={`border px-2.5 py-0.5 font-mono text-[11px] font-bold uppercase tracking-wide ${scoreColor(match.fresh_fit_score)}`}>
-                      FreshFit {match.fresh_fit_score}
-                    </span>
+                    <FreshFitBadge score={match.fresh_fit_score} />
                     {match.promoted_opportunity_id && (
                       <span className="border border-accent-300 px-2.5 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide text-accent-700">
                         Sent to Strategist
@@ -124,6 +118,8 @@ export function OpportunityEnginePage() {
                       View Posting
                     </a>
                   )}
+
+                  <FreshFitDetails breakdown={match.score_breakdown as JobMatchScoreBreakdown} />
                 </div>
 
                 <button

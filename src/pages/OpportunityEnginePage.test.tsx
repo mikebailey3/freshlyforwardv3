@@ -19,7 +19,7 @@ function makeMatch(id: string, postingUrl: string): JobMatchWithJob {
   return {
     id, member_id: 'user-1', scraped_job_id: `job-${id}`, fresh_fit_score: 60,
     matched_skills: [], missing_skills: [], score_breakdown: {}, dismissed_at: null,
-    promoted_opportunity_id: null, computed_at: '2026-01-01',
+    promoted_opportunity_id: null, computed_at: '2026-01-01', engine_version: 2,
     scraped_job: {
       id: `job-${id}`, source: 'member-submitted', external_id: id, title: `Job ${id}`, company: 'Acme',
       location: null, description: '', salary_text: null, employment_type: null, posting_url: postingUrl,
