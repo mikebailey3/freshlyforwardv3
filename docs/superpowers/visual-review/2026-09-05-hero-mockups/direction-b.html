@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Hero Direction B — Full-Width Intelligence Pipeline</title>
+<style>
+  :root { --navy:#071a31; --navy-soft:#102a46; --green:#078a58; --green-dark:#046b45; --mint:#7ee4b6; --body:#bac8d6; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: 'DM Sans', Arial, sans-serif; background:#fff; }
+  .font-hero { font-family: 'Manrope', Arial, sans-serif; }
+  header { border-bottom:1px solid #dbe4e0; background:#fff; }
+  .header-inner { max-width:1180px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; padding:16px 20px; }
+  .header-inner img { height:36px; width:auto; display:block; }
+  nav { display:flex; align-items:center; gap:24px; font-size:14px; font-weight:700; color:var(--navy); }
+  .nav-signin { border:1px solid var(--green); border-radius:8px; padding:9px 12px; color:var(--green-dark); }
+  .btn { min-height:48px; display:inline-flex; align-items:center; justify-content:center; gap:9px; border-radius:9999px; padding:0 22px; font-family:'Manrope',Arial,sans-serif; font-size:14px; font-weight:800; text-decoration:none; border:none; cursor:pointer; }
+  .btn-primary { color:#fff; background:var(--green-dark); }
+  .btn-secondary { color:var(--green-dark); border:2px solid var(--green); background:#fff; }
+  .hero { background:var(--navy); color:#fff; padding:64px 0 96px; }
+  .copy-col { max-width:820px; margin:0 auto; padding:0 20px; text-align:center; }
+  h1 { font-size:44px; font-weight:800; line-height:1.1; margin:0; }
+  h1 .accent { color: var(--mint); }
+  .copy { margin:24px auto 0; max-width:520px; font-size:18px; line-height:1.6; color:var(--body); }
+  .cta-row { margin-top:32px; display:flex; flex-wrap:wrap; justify-content:center; gap:12px; }
+  .trust-row { margin-top:28px; display:flex; flex-wrap:wrap; justify-content:center; gap:20px 20px; font-size:14px; font-weight:600; color:var(--body); }
+  .trust-row span { color: var(--mint); margin-right:4px; }
+
+  .pipeline { max-width:1100px; margin:56px auto 0; padding:0 20px; display:flex; align-items:stretch; gap:12px; }
+  @media (max-width: 767px) { .pipeline { flex-direction:column; } }
+  .node { flex:1; border-radius:16px; border:1px solid rgba(255,255,255,0.15); background:linear-gradient(to bottom,#16324f,#0b2440); padding:20px; }
+  .node.center { border:1px solid rgba(126,228,182,0.3); background:linear-gradient(to bottom,#173a2c,#0d2a20); text-align:center; }
+  .node-eyebrow { font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:.06em; color:var(--mint); margin:0; }
+  .node-title { margin-top:6px; font-size:16px; font-weight:800; color:#fff; }
+  .node-sub { font-size:14px; color:var(--body); margin:0; }
+  .node-score { font-family:'Manrope',Arial,sans-serif; margin:4px 0 0; font-size:30px; font-weight:800; color:var(--mint); }
+  .connector { display:flex; align-items:center; justify-content:center; color:var(--mint); font-size:22px; width:32px; flex-shrink:0; }
+  @media (max-width: 767px) { .connector { width:auto; height:24px; } }
+
+  .footnote { max-width:1100px; margin:24px auto 0; padding:0 20px; text-align:center; font-size:14px; color:#7a8ba0; display:flex; align-items:center; justify-content:center; gap:8px; }
+  .dot { width:6px; height:6px; border-radius:50%; background:var(--mint); display:inline-block; }
+</style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <img src="http://localhost:5175/images/c1d368c4-ef41-494f-9a54-f5303e6f864d.png?v=2" />
+      <nav>
+        <span>Product</span><span>How It Works</span><span>Pricing</span><span>Resources</span>
+        <span class="nav-signin">Sign In</span>
+        <span class="btn btn-primary">Take Career Compass</span>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="copy-col">
+      <h1 class="font-hero">Your Career <span class="accent">Operating System</span> for What's Next.</h1>
+      <p class="copy">
+        One connected system for your career search: Career Compass points you in the right
+        direction, the Opportunity Engine and FreshFit surface and score the roles worth your
+        time, Applications keeps everything moving, and a real human strategist is there when
+        you need one.
+      </p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="#">Take Career Compass &rarr;</a>
+        <a class="btn btn-secondary" href="#">&#9654; See How It Works</a>
+      </div>
+      <div class="trust-row">
+        <span><span>&check;</span>Personalized</span>
+        <span><span>&check;</span>AI-powered career intelligence</span>
+        <span><span>&check;</span>Human experts</span>
+      </div>
+    </div>
+
+    <div class="pipeline">
+      <div class="node">
+        <p class="node-eyebrow">Where you are</p>
+        <p class="node-title">Senior Product Manager</p>
+        <p class="node-sub">$120K&ndash;$130K &middot; Remote</p>
+      </div>
+      <div class="connector">&rarr;</div>
+      <div class="node center">
+        <p class="node-eyebrow">FreshFit Intelligence</p>
+        <p class="node-score">82</p>
+        <p class="node-sub">Strong Match</p>
+      </div>
+      <div class="connector">&rarr;</div>
+      <div class="node">
+        <p class="node-eyebrow">Your next action</p>
+        <p class="node-title">Interview Practice</p>
+        <p class="node-sub">Today &middot; 2:00 PM</p>
+      </div>
+    </div>
+
+    <p class="footnote"><span class="dot"></span> Illustrative preview &mdash; a human strategist reviews every recommendation.</p>
+  </section>
+</body>
+</html>

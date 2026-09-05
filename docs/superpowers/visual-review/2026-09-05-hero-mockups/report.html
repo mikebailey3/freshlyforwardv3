@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>FreshlyForward Hero — 3 New Directions</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans">
+  <div class="max-w-6xl mx-auto px-6 py-10">
+    <header class="mb-10">
+      <h1 class="text-3xl font-bold text-slate-900">Hero Redesign — 3 New Directions</h1>
+      <p class="mt-2 text-slate-600">Planning only, per your instruction. <strong>Zero production code touched.</strong> These are throwaway static mockup files for review, not wired into the app.</p>
+    </header>
+
+    <section class="mb-12 bg-white border border-slate-300 rounded-lg p-6">
+      <h2 class="text-xl font-bold text-slate-900 mb-3">Why the current hero has been hard to maintain (the diagnosis you asked for)</h2>
+      <p class="text-sm mb-3">The right side of the hero is built from <strong>three independent, hand-tuned coordinate systems</strong> that all have to agree with each other and with the container's aspect ratio at every breakpoint:</p>
+      <ol class="list-decimal pl-6 space-y-1.5 text-sm">
+        <li>An SVG path (<code>HeroCareerPath.tsx</code>) drawn in a 0&ndash;100 viewBox with hand-picked waypoints for the glowing line, the walking figure, and the arrowhead.</li>
+        <li>Eight separately-absolutely-positioned <code>HeroFloatingCard</code> elements, each pinned by a <code>left%</code>/<code>top%</code> pair in a second, parallel coordinate object (<code>desktopJourneyNodes</code>) that has no relationship to #1 except by manual eyeballing.</li>
+        <li>A <em>third</em>, entirely separate, hand-built component (<code>HeroMobileJourney.tsx</code>) that re-implements a miniature version of the same idea from scratch for mobile, because the desktop composition fundamentally cannot reflow &mdash; percentage-based absolute positioning doesn't know about text wrapping, so it can't push a card down or over when its content is longer than assumed.</li>
+      </ol>
+      <p class="text-sm mt-3">The practical failure mode we hit repeatedly in the last round alone: a card's text wrapped to an extra line (because 8 cards were fixed to one shared width), which silently grew that card a few pixels taller, which silently made it overlap a neighboring absolutely-positioned element that had no idea the card had grown. Nothing in the layout system detects or prevents this &mdash; it only surfaces empirically, in a screenshot, after the fact. That's a structural problem, not a tuning problem, and it's why round 10 of the same approach was the wrong next move.</p>
+      <p class="text-sm mt-3 font-semibold">Worth preserving: the navy/mint palette, the card surface language (opaque gradient + border + shadow), the FreshFit ring's visual identity (segmented dial, mint accent), the headline/copy/CTAs verbatim, the trust row, the nav and buttons untouched.</p>
+      <p class="text-sm mt-1 font-semibold">Worth removing: all three coordinate systems, the winding path, the walking figure, and the requirement for a bespoke mobile-only component &mdash; replaced below with layouts that use normal CSS flow (grid/flexbox) so one set of markup serves every breakpoint.</p>
+    </section>
+
+    <!-- Direction A -->
+    <section class="mb-14">
+      <h2 class="text-2xl font-bold text-slate-900 mb-1">Direction A &mdash; Single ForwardOS Snapshot Card</h2>
+      <p class="text-sm text-slate-600 mb-4">Left-copy / right-product split (same fundamental structure as today), but the right side is <strong>one</strong> polished card instead of eight scattered ones.</p>
+      <div class="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-4 mb-4">
+        <img src="direction-a-desktop.png" class="w-full rounded border border-slate-300" />
+        <img src="direction-a-mobile.png" class="w-full rounded border border-slate-300 justify-self-center max-w-[280px]" />
+      </div>
+      <div class="grid md:grid-cols-2 gap-4 text-sm">
+        <div class="bg-white border border-slate-300 rounded-lg p-4">
+          <p class="font-semibold mb-1">What the visualization contains</p>
+          <p>One card: FreshFit ring + score, one Top Opportunity line, a highlighted "Recommended Next Action" row, one quiet strategist line. That's the whole hierarchy: <strong>career info &rarr; intelligence &rarr; next action</strong>, all inside one frame.</p>
+        </div>
+        <div class="bg-white border border-slate-300 rounded-lg p-4">
+          <p class="font-semibold mb-1">Why it's easier to make responsive</p>
+          <p>It's one component in normal CSS Grid flow. Mobile is <code>grid-template-columns: 1fr</code> instead of two columns &mdash; the card just drops below the text. No absolute positioning, no separate mobile component, no coordinate math anywhere.</p>
+        </div>
+        <div class="bg-white border border-slate-300 rounded-lg p-4">
+          <p class="font-semibold mb-1">Strengths</p>
+          <ul class="list-disc pl-5"><li>Closest to today's overall shape &mdash; lowest risk, most familiar to stakeholders</li><li>Reads instantly as "a real product screenshot," not an abstract diagram</li><li>Scales trivially to more/fewer stat rows later without touching layout math</li></ul>
+        </div>
+        <div class="bg-white border border-slate-300 rounded-lg p-4">
+          <p class="font-semibold mb-1">Weaknesses</p>
+          <ul class="list-disc pl-5"><li>Most "conventional SaaS dashboard card" of the three &mdash; least distinctive</li><li>Still needs disciplined copy-length limits inside the card to avoid re-introducing wrap problems (though a single card, not eight, is far easier to police)</li></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Direction B -->
+    <section class="mb-14">
+      <h2 class="text-2xl font-bold text-slate-900 mb-1">Direction B &mdash; Full-Width Intelligence Pipeline</h2>
+      <p class="text-sm text-slate-600 mb-4">Structurally different from today: <strong>no left/right split at all.</strong> Headline+copy+CTAs run full-width and centered; the product visualization is a horizontal 3-step strip underneath, not beside the text.</p>
+      <div class="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-4 mb-4">
+        <img src="direction-b-desktop.png" class="w-full rounded border border-slate-300" />
+        <img src="direction-b-mobile.png" class="w-full rounded border border-slate-300 justify-self-center max-w-[280px]" />
+      </div>
+      <div class="grid md:grid-cols-2 gap-4 text-sm">
+        <div class="bg-white border border-slate-300 rounded-lg p-4">
+          <p class="font-semibold mb-1">What the visualization contains</p>
+          <p>Three equal nodes joined by arrows: <strong>Where you are &rarr; FreshFit Intelligence &rarr; Your next action.</strong> The system's reasoning IS the composition &mdash; comprehension over feature count, made completely literal.</p>
+        </div>
+        <div class="bg-white border border-slate-300 rounded-lg p-4">
+          <p class="font-semibold mb-1">Why it's easier to make responsive</p>
+          <p>One flex row, one Tailwind breakpoint (<code>flex-col md:flex-row</code>). The exact same three nodes and the exact same markup serve desktop and mobile &mdash; the arrows just switch from horizontal to vertical. No second component, ever.</p>
+        </div>
+        <div class="bg-white border border-slate-300 rounded-lg p-4">
+          <p class="font-semibold mb-1">Strengths</p>
+          <ul class="list-disc pl-5"><li>The single clearest "this system understands where I am and tells me what to do next" read of the three</li><li>Most robust to content-length changes &mdash; each node is independent, nothing can silently collide with a neighbor</li><li>Feels the most "operating system," matching the headline's own language</li></ul>
+        </div>
+        <div class="bg-white border border-slate-300 rounded-lg p-4">
+          <p class="font-semibold mb-1">Weaknesses</p>
+          <ul class="list-disc pl-5"><li>Biggest structural departure from today &mdash; loses the familiar "text left, visual right" hero shape entirely</li><li>Centered full-width copy reads slightly more generic-landing-page than a strong left-aligned block</li><li>Vertical space cost on mobile (three stacked nodes) is real, though each is compact</li></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Direction C -->
+    <section class="mb-10">
+      <h2 class="text-2xl font-bold text-slate-900 mb-1">Direction C &mdash; Career Compass (my creative-freedom pick)</h2>
+      <p class="text-sm text-slate-600 mb-4">Left-copy / right-visual split like today's shape, but the right side is <strong>not a dashboard at all</strong> &mdash; one large, confident compass-dial graphic (literally dramatizing "Career Compass," the product's own first step and namesake), plus one action pill and one human-trust line.</p>
+      <div class="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-4 mb-4">
+        <img src="direction-c-desktop.png" class="w-full rounded border border-slate-300" />
+        <img src="direction-c-mobile.png" class="w-full rounded border border-slate-300 justify-self-center max-w-[280px]" />
+      </div>
+      <div class="grid md:grid-cols-2 gap-4 text-sm">
+        <div class="bg-white border border-slate-300 rounded-lg p-4">
+          <p class="font-semibold mb-1">What the visualization contains</p>
+          <p>One SVG compass/dial (mint arc = fit signal, needle pointing into it), the score inside it, one small "Next: Interview Practice" pill below, one small strategist-trust line below that. No card chrome, no dashboard vocabulary at all.</p>
+        </div>
+        <div class="bg-white border border-slate-300 rounded-lg p-4">
+          <p class="font-semibold mb-1">Why it's easier to make responsive</p>
+          <p>It's a single SVG with intrinsic aspect ratio inside normal flow, plus two short text elements stacked under it. Shrinks as one unit on mobile &mdash; no repositioning logic of any kind, because there's only one visual element to place.</p>
+        </div>
+        <div class="bg-white border border-slate-300 rounded-lg p-4">
+          <p class="font-semibold mb-1">Why it feels like FreshlyForward specifically</p>
+          <p>PRODUCT.md's own evidence is that this is a <strong>human-led</strong> concierge service ("no bots, no shortcuts," a named strategist, a real founder photo elsewhere) &mdash; not a generic SaaS analytics product. Every dashboard-card direction (including A and every one of the last 9 rounds) reaches for "simulate the software." This one reaches for the product's own metaphor and namesake instead: finding direction. It also naturally maximizes negative space, which the brief calls out as a desktop requirement.</p>
+        </div>
+        <div class="bg-white border border-slate-300 rounded-lg p-4">
+          <p class="font-semibold mb-1">Strengths &amp; weaknesses</p>
+          <ul class="list-disc pl-5"><li class="text-emerald-700">Most distinctive and premium-feeling of the three; least "generic SaaS template"</li><li class="text-emerald-700">Simplest possible mobile story &mdash; one asset, not a system</li><li class="text-rose-700">Shows the least product surface area (no Top Opportunity detail) &mdash; a deliberate trade, not an oversight, but worth naming</li><li class="text-rose-700">The needle/compass metaphor needs to earn its keep &mdash; if it reads as decorative rather than meaningful, it undercuts the "shows real product intelligence" goal</li></ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="mb-10 bg-emerald-50 border border-emerald-300 rounded-lg p-6">
+      <h2 class="text-lg font-bold text-emerald-900 mb-2">Recommendation</h2>
+      <p class="text-sm text-emerald-900"><strong>Direction B</strong>, with Direction A as the safer fallback.</p>
+      <p class="text-sm text-emerald-900 mt-2">B is the only one of the three that makes "this system understands where I am and tells me what I should do next" the composition itself, rather than something you have to infer from a dashboard screenshot. It's also the most structurally bulletproof against exactly the failure mode that broke the last 9 rounds: every node is independent, so a longer job title or a different next-action label can never silently collide with anything else on the page &mdash; there is nothing else for it to collide with. The trade-off is real (it gives up the familiar left/right hero shape), but given that shape is precisely what's been fighting us for 9 rounds, I think that's the right trade to make.</p>
+      <p class="text-sm text-emerald-900 mt-2">If you'd rather keep the classic split-hero silhouette for brand-consistency reasons, <strong>A</strong> is the pragmatic choice &mdash; same shape as today, all the fragility removed. <strong>C</strong> is offered as the boldest option if you want the hero to feel less like every other SaaS landing page and more distinctly FreshlyForward.</p>
+    </section>
+
+    <section class="text-sm text-slate-500">
+      <p>Standalone mockup files (not part of the app build): <code>docs/superpowers/visual-review/2026-09-05-hero-mockups/direction-{a,b,c}.html</code>. Nothing in <code>src/</code> has been modified. Waiting on your pick before writing any implementation code.</p>
+    </section>
+  </div>
+</body>
+</html>

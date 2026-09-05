@@ -67,13 +67,13 @@ describe('LandingPage - no fabricated/unsupported content (Homepage Redesign Pha
     expect(screen.getAllByText(/Applications/).length).toBeGreaterThan(0)
   })
 
-  // Round 9: Career Vault is confirmed live for the homepage launch
-  // (owner sign-off) -- the old blanket "Coming Soon" requirement is
-  // gone. It still can't link to /career-vault though: that route simply
-  // doesn't exist anywhere in this repo today (see DashboardPage.tsx's
-  // own comment confirming that) regardless of the real launch status
-  // elsewhere, so linking to it here would 404 inside this same app.
-  it('mentions Career Vault as a live capability and never links to the not-yet-built /career-vault route', () => {
+  // Hero Redesign round 10 (Direction A): Career Vault left the hero
+  // entirely as part of the approved simplification (owner sign-off) --
+  // the snapshot card shows exactly two product signals (FreshFit/Top
+  // Opportunity, Search Readiness), neither of which is Career Vault.
+  // It's still represented in the Powerful Tools section further down
+  // the page (flagshipFeatures), which is what this test now covers.
+  it('mentions Career Vault as a live capability elsewhere on the page and never links to the not-yet-built /career-vault route', () => {
     renderLandingPage()
     const vaultMentions = screen.getAllByText(/Career Vault/i)
     expect(vaultMentions.length).toBeGreaterThan(0)
@@ -83,16 +83,47 @@ describe('LandingPage - no fabricated/unsupported content (Homepage Redesign Pha
     expect(allLinks.some((a) => a.getAttribute('href') === '/career-vault')).toBe(false)
   })
 
-  // Hero Redesign round 6 (literal North Star fidelity pass): the owner
-  // explicitly authorized an illustrative asset-count style on the hero's
-  // Career Vault card (matching the reference's density). Round 9 dropped
-  // the "Coming Soon" pairing requirement (Career Vault is confirmed live
-  // now) -- what's still checked is that the illustrative count renders
-  // and the card still isn't a real link anywhere.
-  it('shows the hero Career Vault card\'s illustrative asset count', () => {
+  // Hero Redesign round 10 (Direction A): the entire round 6-9 hero
+  // composition (8 floating cards including a Career Vault one, the
+  // winding path, the walking figure) is gone, replaced by one
+  // ForwardOSSnapshotCard. This tripwire replaces the old hero-Career-
+  // Vault-card test -- that testid no longer exists by design.
+  it('renders exactly one ForwardOS snapshot card in the hero, not a collection of floating cards', () => {
     renderLandingPage()
-    const heroVaultCard = screen.getByTestId('hero-career-vault-card')
-    expect(within(heroVaultCard).getByText(/23 Assets/i)).toBeInTheDocument()
+    expect(screen.getByTestId('forwardos-snapshot-card')).toBeInTheDocument()
+    expect(screen.queryByTestId('hero-career-vault-card')).not.toBeInTheDocument()
+  })
+
+  // Hero Redesign round 10 (Direction A): the snapshot card's exact
+  // approved content -- primary proof (FreshFit/Top Opportunity), the one
+  // secondary signal (Search Readiness -- the real product term, not the
+  // owner's originally-suggested "Resume Strength", which doesn't exist
+  // anywhere else in this codebase), the Next Action payoff, and the
+  // quiet strategist line. Scoped with `within` since "Search Readiness"
+  // etc. could plausibly appear elsewhere on the page.
+  it('shows the ForwardOS snapshot card\'s exact approved content', () => {
+    renderLandingPage()
+    const card = within(screen.getByTestId('forwardos-snapshot-card'))
+    expect(card.getByText('82')).toBeInTheDocument()
+    expect(card.getByText('Strong Match')).toBeInTheDocument()
+    expect(card.getByText('Senior Product Manager')).toBeInTheDocument()
+    expect(card.getByText('Search Readiness')).toBeInTheDocument()
+    expect(card.getByText('78')).toBeInTheDocument()
+    expect(card.getByText(/Interview Practice/i)).toBeInTheDocument()
+    expect(card.getByText(/strategist is here/i)).toBeInTheDocument()
+    expect(card.getByText(/Illustrative preview/i)).toBeInTheDocument()
+  })
+
+  // Hero Redesign round 10 (Direction A): the owner was explicit that the
+  // simplified card must not regrow into a feature collection -- Resume
+  // Strength (an invented term, never used anywhere else in this
+  // codebase) and Goal Progress (the other option offered) were both
+  // decided against in favor of the real Search Readiness term.
+  it('never reintroduces Resume Strength or Goal Progress into the hero', () => {
+    renderLandingPage()
+    const card = within(screen.getByTestId('forwardos-snapshot-card'))
+    expect(card.queryByText(/Resume Strength/i)).not.toBeInTheDocument()
+    expect(card.queryByText(/Goal Progress/i)).not.toBeInTheDocument()
   })
 
   it('never shows the reference image\'s literal fabricated pricing (this task does not touch pricing yet)', () => {

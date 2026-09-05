@@ -1,11 +1,8 @@
 import type { ReactNode } from 'react'
-import { ArrowRight, ArrowUpRight, Award, Check, Compass, FileStack, FileText, FolderOpen, HelpCircle, LayoutGrid, Link2, MessageCircleMore, MessageCircleOff, MessagesSquare, PenLine, PlayCircle, Rocket, Search, Target, TrendingUp, User, UserX, X } from 'lucide-react'
+import { ArrowRight, ArrowUpRight, Check, Compass, FileStack, FileText, FolderOpen, HelpCircle, LayoutGrid, MessageCircleMore, MessageCircleOff, MessagesSquare, PenLine, PlayCircle, Rocket, Search, Target, TrendingUp, UserX, X } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { LinkButton, SectionHeading } from '@/components/ui'
-import { HeroFreshFitCenterpiece } from '@/components/homepage/HeroFreshFitCenterpiece'
-import { HeroFloatingCard } from '@/components/homepage/HeroFloatingCard'
-import { HeroCareerPath, desktopJourneyNodes, tabletJourneyNodes } from '@/components/homepage/HeroCareerPath'
-import { HeroMobileJourney } from '@/components/homepage/HeroMobileJourney'
+import { ForwardOSSnapshotCard } from '@/components/homepage/ForwardOSSnapshotCard'
 import { NodeGraph, type GraphNode } from '@/components/homepage/NodeGraph'
 import { PricingTeaser } from '@/components/homepage/PricingTeaser'
 import { CareerCompassRadar } from '@/components/homepage/CareerCompassRadar'
@@ -184,8 +181,34 @@ const freshlyForwardItems = [
 export function LandingPage() {
   return (
     <main className="callsheet">
+      {/* Homepage Hero Redesign round 10: full replacement of the round
+          6-9 hero-graphics lineage (winding SVG career path, walking
+          figure, 8 absolutely-positioned floating cards, and a parallel
+          hand-tuned mobile-only component) with the owner-approved
+          "Direction A" composition -- one polished ForwardOSSnapshotCard
+          instead of a composite illustration. See
+          docs/superpowers/visual-review/2026-09-05-hero-mockups/ for the
+          3 explored directions and
+          docs/superpowers/specs/2026-09-05-hero-direction-a-implementation-design.md
+          for the locked implementation design this section follows.
+
+          Why the old approach was replaced rather than re-tuned again: it
+          relied on 3 independent hand-coordinated positioning systems (the
+          path's SVG viewBox coordinates, the 8 cards' percentage left/top
+          anchors, and a wholly separate mobile-only component) with no way
+          to detect when one grew and silently overlapped another -- which
+          is exactly what kept happening release after release. This
+          section has none of that: one card, normal CSS Grid/flex flow, a
+          single `lg` breakpoint shared with this codebase's own existing
+          convention (the same breakpoint the rest of this page already
+          uses for its 2-column sections).
+
+          Grid ratio is 0.9fr/1.1fr (owner-approved "roughly 15-20% more
+          card prominence") instead of an even split -- the copy column
+          gives up a little width so the snapshot card, the primary product
+          proof per the owner's brief, gets more of it. */}
       <section className="relative bg-[var(--navy)] py-14 text-white lg:py-24">
-        <div className="shell grid items-center gap-12 lg:grid-cols-2">
+        <div className="shell grid items-center gap-12 lg:grid-cols-[0.9fr_1.1fr]">
           <div>
             <h1 className="font-hero-sans text-4xl font-bold leading-[1.1] sm:text-5xl lg:text-5xl xl:text-5xl">
               Your Career <span className="text-[#7ee4b6] lg:whitespace-nowrap">Operating System</span> for What's Next.
@@ -211,229 +234,17 @@ export function LandingPage() {
                 </span>
               ))}
             </div>
-            <HeroMobileJourney />
           </div>
 
-          {/* Homepage Hero Redesign round 6: FOCUSED literal fidelity
-              rebuild against the North Star reference
-              (public/images/A63B5E0B-0AE1-4D9A-B05D-9C52403721C7.png).
-              The owner called round 5's result a "wireframe/constellation"
-              despite the density/position improvements -- the card
-              treatment (translucent color-mix pills, see the pre-round-6
-              HeroFloatingCard.tsx) and the dashed card-to-card connector
-              network both read as diagram chrome instead of a polished
-              product composition. Round 6 fixes both:
-
-              1. Cards are now solid, opaque `--navy-soft` surfaces with a
-                 real border and shadow (see HeroFloatingCard.tsx) instead
-                 of a partial white-mix that let the background bleed
-                 through -- "finished card," not "outline pill."
-              2. The dashed connector-stub network is gone entirely. There
-                 is now exactly ONE path: a 6-point Catmull-Rom spline
-                 (HeroCareerPath.tsx) with visible intermediate milestone
-                 dots and an arrowhead at the end, matching the reference's
-                 single winding glowing journey line instead of a network
-                 diagram.
-              3. Card count grew from 7 to the reference's 8 -- Top
-                 Opportunity, Career Vault, Search Readiness, Skill Gap,
-                 Goal Progress, Applications, Next Milestone, and
-                 Strategist Support -- each at the reference's own measured
-                 slot (see `desktopJourneyNodes` in HeroCareerPath.tsx).
-                 Top Opportunity, Career Vault, and Applications are the 3
-                 larger "anchor" cards; the other 5 use a smaller/quieter
-                 treatment.
-              4. Career Vault is back with an illustrative "23 Assets"
-                 count (the owner explicitly authorized this style this
-                 round, on the condition it's always paired with a visible
-                 "Coming Soon" tag on the same card and never links to
-                 /career-vault -- see the regression test in
-                 LandingPage.test.tsx and the `data-testid` below it relies
-                 on). Strategist Support stays a generic icon avatar, never
-                 a named/"online" real person, per this codebase's existing
-                 anti-fabrication convention.
-              5. The walking figure's SVG scale grew again (0.22 -> 0.24)
-                 and the ring grew slightly (260 -> 280) per the owner's
-                 "should feel embedded, not isolated" note.
-
-              Tablet gets only the minimum touch needed to avoid a
-              regression from the HeroCareerPath.tsx rewrite (this round is
-              explicitly desktop-fidelity-first); mobile
-              (HeroMobileJourney.tsx) is untouched.
-
-              Round 8 (bounded visual-refinement pass, geometry/positions
-              unchanged): per-card copy tightened toward the reference's
-              own hierarchy -- Top Opportunity now shows an illustrative
-              salary range instead of vague text (still no real employer),
-              Applications became "Application in Review" with a real
-              stage line, Next Milestone lost its repeated "Illustrative"
-              prefix, Search Readiness and Goal Progress now lead with a
-              large focal number instead of an inline "/100" fraction, and
-              Strategist Support warmed up to "Your strategist is here"
-              with a larger avatar. The repeated per-card "Illustrative"
-              wording is now ONE small dashboard-level "Illustrative
-              preview" tag (bottom-left of the composition) instead of
-              cluttering every card -- see HeroFloatingCard.tsx for the
-              deeper card-surface pass and HeroCareerPath.tsx for the path/
-              glow refinement, both from this same round.
-
-              Round 9 (layout-only pass): card positions recomputed as true
-              left/right mirror pairs (HeroCareerPath.tsx) with a shared
-              fixed card width (HeroFloatingCard.tsx, w-40) so the set
-              reads as one aligned system instead of a mismatched collage;
-              the FreshFit ring became a purpose-built segmented dial
-              (HeroFreshFitRing.tsx) without moving its position; the
-              walking figure gained distinct front/back limbs and a
-              dimensional gradient fill; the headline's xl breakpoint
-              stepped down one size so the dashboard reads with slightly
-              more relative weight; and Career Vault's "Coming Soon" is
-              gone everywhere on this page (confirmed live for the
-              homepage launch) -- see flagshipFeatures and
-              howItWorksSteps' Build copy below. */}
-          <div className="relative hidden md:block md:min-h-[380px] lg:min-h-[640px]">
-            <HeroCareerPath simplified className="absolute inset-0 h-full w-full lg:hidden" />
-            <HeroCareerPath className="absolute inset-0 hidden h-full w-full lg:block" />
-
-            <div
-              className="reveal absolute z-10 -translate-x-1/2 -translate-y-1/2 lg:hidden"
-              style={{ left: `${tabletJourneyNodes.freshFit.x}%`, top: `${tabletJourneyNodes.freshFit.y}%`, animationDelay: '.2s' }}
-            >
-              <HeroFreshFitCenterpiece size={200} />
-            </div>
-            <div
-              className="reveal absolute z-10 hidden -translate-x-1/2 -translate-y-1/2 lg:block"
-              style={{ left: `${desktopJourneyNodes.freshFit.x}%`, top: `${desktopJourneyNodes.freshFit.y}%`, animationDelay: '.2s' }}
-            >
-              <HeroFreshFitCenterpiece size={280} />
-            </div>
-
-            {/* Tablet: 3 cards, kept from the prior round with terminology
-                updated to match the new 8-card set (Career Vault replaces
-                the round-5-only "Career Direction" concept, which no
-                longer exists on desktop either) -- minimum touch per this
-                round's desktop-first scope. */}
-            <HeroFloatingCard className="reveal z-10 lg:hidden" style={{ left: '58%', top: '4%', animationDelay: '.35s' }}>
-              <p className="text-[10px] font-semibold uppercase tracking-wide text-[#7ee4b6]">Top Opportunity</p>
-              <p className="mt-1 text-sm font-semibold text-white">Senior Product Manager</p>
-            </HeroFloatingCard>
-            <HeroFloatingCard className="reveal z-10 lg:hidden" style={{ left: '2%', top: '30%', animationDelay: '.45s' }}>
-              <p className="text-[10px] font-semibold uppercase tracking-wide text-[#7ee4b6]">Career Vault</p>
-              <p className="mt-1 text-sm font-semibold text-white">23 Assets</p>
-            </HeroFloatingCard>
-            <HeroFloatingCard className="reveal z-10 lg:hidden" style={{ left: '58%', top: '72%', animationDelay: '.5s' }}>
-              <p className="text-[10px] font-semibold uppercase tracking-wide text-[#7ee4b6]">Search Readiness</p>
-              <p className="mt-1 text-lg font-bold text-white">78<span className="text-xs font-normal text-[#bac8d6]">/100</span></p>
-            </HeroFloatingCard>
-
-            {/* Desktop: 8 cards at the reference's own measured layout
-                slots. Top Opportunity, Career Vault, and Applications are
-                the 3 larger anchor cards; the other 5 use a smaller/
-                quieter treatment. */}
-            <HeroFloatingCard
-              className="reveal z-10 hidden lg:block"
-              style={{ left: `${desktopJourneyNodes.topOpportunity.x}%`, top: `${desktopJourneyNodes.topOpportunity.y}%`, animationDelay: '.35s' }}
-            >
-              <p className="text-[10px] font-semibold uppercase leading-tight tracking-wide text-[#7ee4b6]">Top Opportunity</p>
-              <p className="mt-0.5 text-sm font-semibold leading-tight text-white">Senior Product Manager</p>
-              <p className="mt-0.5 text-[11px] leading-tight text-[#bac8d6]">$120K-$130K &middot; Remote</p>
-              <span className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-[#7ee4b6]/15 px-2 py-0.5 text-[9px] font-bold text-[#7ee4b6]">
-                <span className="h-1.5 w-1.5 rounded-full bg-[#7ee4b6]" aria-hidden="true" /> 89 FreshFit
-              </span>
-            </HeroFloatingCard>
-            <HeroFloatingCard
-              data-testid="hero-career-vault-card"
-              className="reveal z-10 hidden lg:block"
-              style={{ left: `${desktopJourneyNodes.careerVault.x}%`, top: `${desktopJourneyNodes.careerVault.y}%`, animationDelay: '.4s' }}
-            >
-              <p className="text-[10px] font-semibold uppercase tracking-wide text-[#7ee4b6]">Career Vault</p>
-              <p className="mt-1 text-lg font-bold text-white">23 Assets</p>
-              <div className="mt-2 flex items-center gap-1.5" aria-hidden="true">
-                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#7ee4b6]/15 text-[#7ee4b6]"><FileText size={11} /></span>
-                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#5b8cb8]/25 text-[#a8c8e8]"><PenLine size={11} /></span>
-                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#e4c07e]/20 text-[#e4c07e]"><Award size={11} /></span>
-                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white/10 text-[#bac8d6]"><Link2 size={11} /></span>
-              </div>
-            </HeroFloatingCard>
-            <HeroFloatingCard
-              className="reveal z-10 hidden !px-3.5 !py-2.5 lg:block"
-              style={{ left: `${desktopJourneyNodes.searchReadiness.x}%`, top: `${desktopJourneyNodes.searchReadiness.y}%`, animationDelay: '.45s' }}
-            >
-              <p className="text-[9px] font-semibold uppercase tracking-wide text-[#7ee4b6]">Search Readiness</p>
-              <p className="mt-0.5 text-2xl font-bold text-white">78</p>
-              <p className="text-[10px] text-[#bac8d6]">Good</p>
-              <div className="mt-1.5 h-1 w-16 overflow-hidden rounded-full bg-white/10">
-                <div className="h-full w-[78%] rounded-full bg-[#7ee4b6]" />
-              </div>
-            </HeroFloatingCard>
-            <HeroFloatingCard
-              className="reveal z-10 hidden !px-3.5 !py-2.5 lg:block"
-              style={{ left: `${desktopJourneyNodes.skillGap.x}%`, top: `${desktopJourneyNodes.skillGap.y}%`, animationDelay: '.5s' }}
-            >
-              <p className="text-[9px] font-semibold uppercase tracking-wide text-[#7ee4b6]">Skill Gap</p>
-              <p className="mt-0.5 text-2xl font-bold text-white">3</p>
-              <p className="text-[10px] text-[#bac8d6]">Focus areas</p>
-            </HeroFloatingCard>
-            <HeroFloatingCard
-              className="reveal z-10 hidden !px-3.5 !py-2.5 lg:block"
-              style={{ left: `${desktopJourneyNodes.goalProgress.x}%`, top: `${desktopJourneyNodes.goalProgress.y}%`, animationDelay: '.55s' }}
-            >
-              <p className="text-[9px] font-semibold uppercase tracking-wide text-[#7ee4b6]">Goal Progress</p>
-              <p className="mt-0.5 text-2xl font-bold text-[#7ee4b6]">75%</p>
-              <p className="text-[10px] text-[#bac8d6]">On track</p>
-              <div className="mt-1.5 h-1 w-16 overflow-hidden rounded-full bg-white/10">
-                <div className="h-full w-[75%] rounded-full bg-[#7ee4b6]" />
-              </div>
-            </HeroFloatingCard>
-            <HeroFloatingCard
-              className="reveal z-10 hidden lg:block"
-              style={{ left: `${desktopJourneyNodes.applications.x}%`, top: `${desktopJourneyNodes.applications.y}%`, animationDelay: '.6s' }}
-            >
-              <p className="text-[10px] font-semibold uppercase tracking-wide text-[#7ee4b6]">Application in Review</p>
-              <p className="mt-1 text-sm font-semibold text-white">Product Manager</p>
-              <p className="text-xs text-[#bac8d6]">Interview &middot; Round 2</p>
-            </HeroFloatingCard>
-            <HeroFloatingCard
-              className="reveal z-10 hidden !px-3.5 !py-2.5 lg:block"
-              style={{ left: `${desktopJourneyNodes.nextMilestone.x}%`, top: `${desktopJourneyNodes.nextMilestone.y}%`, animationDelay: '.63s' }}
-            >
-              <p className="text-[9px] font-semibold uppercase tracking-wide text-[#7ee4b6]">Next Milestone</p>
-              <p className="mt-0.5 text-xs font-semibold text-white">Interview Practice</p>
-              <p className="text-[10px] text-[#bac8d6]">Today &middot; 2:00 PM</p>
-            </HeroFloatingCard>
-            <HeroFloatingCard
-              className="reveal z-10 hidden !px-3.5 !py-2.5 lg:flex lg:items-center lg:gap-2"
-              style={{ left: `${desktopJourneyNodes.strategistSupport.x}%`, top: `${desktopJourneyNodes.strategistSupport.y}%`, animationDelay: '.65s' }}
-            >
-              <span className="relative flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-[#7ee4b6]/15 ring-1 ring-[#7ee4b6]/25">
-                <User size={13} className="text-[#7ee4b6]" aria-hidden="true" />
-                <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-[#7ee4b6] ring-2 ring-[var(--navy-soft)]" aria-hidden="true" />
-              </span>
-              <span>
-                <p className="text-[9px] font-semibold uppercase tracking-wide text-[#7ee4b6]">Strategist Support</p>
-                <p className="text-[10px] text-[#bac8d6]">Your strategist is here</p>
-              </span>
-            </HeroFloatingCard>
-
-            {/* Hero fidelity round 8: ONE dashboard-level truth label
-                instead of repeating "Illustrative" inside every individual
-                card (which cluttered the North Star-style card copy and
-                didn't match the reference's cleaner card text). This single
-                small, muted tag covers the whole composition's
-                truthfulness the same way the flagship preview cards
-                further down the page use their own "Sample" captions --
-                visible enough to read, deliberately secondary in weight/
-                position so it doesn't compete with the dashboard itself.
-                Anchored bottom-right (not bottom-left) -- that's the one
-                pocket of the composition with no card or path geometry
-                nearby, so it can't visually collide with Goal Progress or
-                the figure. */}
-            <div
-              className="reveal absolute bottom-2 right-2 z-10 flex items-center gap-1.5 lg:bottom-3 lg:right-3"
-              style={{ animationDelay: '.7s' }}
-            >
-              <span className="h-1.5 w-1.5 rounded-full bg-[#7ee4b6]/50" aria-hidden="true" />
-              <span className="font-mono text-[9px] uppercase tracking-wide text-[#bac8d6]/70">Illustrative preview</span>
-            </div>
-          </div>
+          {/* Mobile hierarchy requirement: headline -> copy -> primary CTA
+              -> secondary CTA -> trust row -> full-width snapshot card.
+              That's exactly the DOM order above followed by this single
+              card -- no separate mobile component and no reordering
+              utility classes needed, because there's no absolute
+              positioning left to fight with. Below `lg` this is simply the
+              second block in a 1-column grid; at `lg`+ it's the second
+              grid column. */}
+          <ForwardOSSnapshotCard />
         </div>
       </section>
 
