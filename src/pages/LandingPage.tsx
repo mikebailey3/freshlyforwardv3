@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { ArrowRight, Check, Compass, FileStack, FileText, FolderOpen, HelpCircle, LayoutGrid, MessageCircleMore, MessageCircleOff, MessagesSquare, PenLine, PlayCircle, Rocket, Search, Target, TrendingUp, User, UserX, X } from 'lucide-react'
+import { ArrowRight, ArrowUpRight, Check, Compass, FileStack, FileText, FolderOpen, HelpCircle, LayoutGrid, MessageCircleMore, MessageCircleOff, MessagesSquare, PenLine, PlayCircle, Rocket, Search, Target, TrendingUp, User, UserX, X } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { LinkButton, SectionHeading } from '@/components/ui'
 import { HeroFreshFitCenterpiece } from '@/components/homepage/HeroFreshFitCenterpiece'
@@ -526,11 +526,16 @@ export function LandingPage() {
           star.md) locks this exact headline and both CTA labels --
           "Your next move starts here." / "Take Career Compass" / "See How
           It Works" -- so this now matches that verbatim instead of the
-          drifted copy from the original Task 9 pass. Decorative footer
-          path echoes the hero's career-path graphic at a much smaller
-          scale, bookending the page. */}
+          drifted copy from the original Task 9 pass. Below the CTAs, a
+          multi-milestone journey recap echoes the hero's career-path/glow
+          language without duplicating its composition (no ring, no walking
+          figure, no floating cards) -- reuses the exact same 5 truthful
+          stage names from howItWorksSteps above (single source of truth,
+          not a second invented label set) so the closing moment reads as
+          "here's the path you just read about, and where it leads," not a
+          new claim. Final stop intentionally reads "Move Forward," not an
+          outcome/guarantee word like "Offers." */}
       <section className="relative overflow-hidden bg-[var(--navy)] py-20 text-center text-white" aria-labelledby="final-cta-title">
-        <FooterCareerPath className="pointer-events-none absolute inset-x-0 bottom-0 h-16 w-full opacity-70" />
         <div className="shell relative">
           <h2 id="final-cta-title" className="font-display text-3xl font-semibold sm:text-4xl">Your next move starts here.</h2>
           <p className="mx-auto mt-4 max-w-xl text-[#bac8d6]">Get clarity, discover better-fit opportunities, track your search, and move forward with a connected system built around you.</p>
@@ -541,6 +546,39 @@ export function LandingPage() {
             <LinkButton to="/how-it-works" variant="secondary">
               <PlayCircle size={18} /> See How It Works
             </LinkButton>
+          </div>
+
+          <div className="mx-auto mt-14 flex max-w-3xl items-center justify-center gap-3">
+            <div className="relative flex-1">
+              <FooterCareerPath className="pointer-events-none absolute inset-x-0 top-0 hidden h-3 w-full lg:block" />
+              <ol className="relative grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 lg:grid-cols-5 lg:gap-x-2">
+                {howItWorksSteps.map(({ title }, index) => {
+                  const isFinal = index === howItWorksSteps.length - 1
+                  return (
+                    <li key={title} className="flex flex-col items-center gap-2">
+                      {/* h-3 w-3 must stay in sync with FooterCareerPath's
+                          own wrapper height (also h-3) -- that's what makes
+                          the connecting line pass through these dots
+                          instead of floating above/below them. See the
+                          alignment note in FooterCareerPath.tsx. */}
+                      <span
+                        className={`h-3 w-3 rounded-full ring-4 ring-[var(--navy)] ${isFinal ? 'bg-[#7ee4b6]' : 'bg-[#7ee4b6]/50'}`}
+                        aria-hidden="true"
+                      />
+                      <span className={`text-xs font-semibold uppercase tracking-wide ${isFinal ? 'text-[#7ee4b6]' : 'text-[#bac8d6]'}`}>
+                        {title}
+                      </span>
+                    </li>
+                  )
+                })}
+              </ol>
+            </div>
+            {/* Small closing flourish echoing the hero's forward-momentum
+                arrow motif -- a real icon, not hand-drawn SVG coordinates,
+                so there's no viewBox-clipping risk. Hidden below lg since
+                the row wraps to 2/3 columns there and this reads oddly
+                floating outside a wrapped grid. */}
+            <ArrowUpRight className="hidden shrink-0 self-start text-[#7ee4b6] lg:block" size={20} aria-hidden="true" />
           </div>
         </div>
       </section>

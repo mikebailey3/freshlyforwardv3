@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { LandingPage } from './LandingPage'
 import type { MembershipPlan } from '@/types'
@@ -151,12 +151,51 @@ describe('LandingPage - no fabricated/unsupported content (Homepage Redesign Pha
   // How It Works density pass (spacing/sizing only): tripwire so a future
   // "just a padding tweak" can't silently drop a step or repoint the CTA
   // without a failing test -- these 5 steps and this route are locked.
+  // Uses getAllByText (not getByText) because the Final CTA's journey
+  // recap intentionally reuses these same 5 truthful labels a second time
+  // further down the page (see the final-CTA milestone test below) --
+  // this assertion only cares that each step still appears at least once.
   it('keeps all 5 How It Works steps and the Career Compass CTA link', () => {
     renderLandingPage()
     for (const step of ['Discover', 'Build', 'Find', 'Understand', 'Move Forward']) {
-      expect(screen.getByText(step)).toBeInTheDocument()
+      expect(screen.getAllByText(step).length).toBeGreaterThan(0)
     }
     const journeyLink = screen.getByRole('link', { name: /Start Your Career Journey/i })
     expect(journeyLink).toHaveAttribute('href', '/career-compass')
+  })
+
+  // Final CTA multi-milestone path rebuild: tripwire so the closing
+  // section can't silently lose its journey recap, invent a different
+  // label set, or drift its CTA routes. Scoped with `within` to the Final
+  // CTA <section> specifically -- "Discover", "Take Career Compass", and
+  // "See How It Works" all also appear elsewhere on the page (How It Works
+  // and the hero), so an unscoped query here would pass even if this
+  // section's own copy of them were deleted or repointed. Reuses the exact
+  // same 5 truthful stage names as How It Works (single source of truth in
+  // LandingPage.tsx, not duplicated content) and ends on "Move Forward" --
+  // never a guarantee-shaped word like "Offers" or "Hired".
+  it('final CTA shows the 5-stage journey recap and both CTA routes, with no guarantee-shaped final label', () => {
+    renderLandingPage()
+    const finalCta = within(screen.getByRole('region', { name: /your next move starts here/i }))
+    for (const step of ['Discover', 'Build', 'Find', 'Understand', 'Move Forward']) {
+      expect(finalCta.getAllByText(step)).toHaveLength(1)
+    }
+    expect(finalCta.queryByText(/^Offers$/i)).not.toBeInTheDocument()
+    expect(finalCta.queryByText(/^Hired$/i)).not.toBeInTheDocument()
+    const compassLink = finalCta.getByRole('link', { name: /Take Career Compass/i })
+    expect(compassLink).toHaveAttribute('href', '/career-compass')
+    const howItWorksLink = finalCta.getByRole('link', { name: /See How It Works/i })
+    expect(howItWorksLink).toHaveAttribute('href', '/how-it-works')
+  })
+
+  // Guard against a silent layout break: the Final CTA's milestone row is
+  // hardcoded to a 5-column grid (lg:grid-cols-5) built around exactly 5
+  // stops. If a future edit adds/removes a howItWorksSteps entry for the
+  // *other* section, this catches the mismatch before it silently wraps
+  // the Final CTA's row to 2 lines and misaligns FooterCareerPath's line.
+  it('howItWorksSteps has exactly 5 entries (Final CTA milestone grid assumes this)', () => {
+    renderLandingPage()
+    const finalCta = within(screen.getByRole('region', { name: /your next move starts here/i }))
+    expect(finalCta.getAllByRole('listitem')).toHaveLength(5)
   })
 })
