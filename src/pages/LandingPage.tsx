@@ -64,8 +64,16 @@ const flagshipFeatures: { icon: typeof Search; title: string; copy: string; to: 
     icon: FolderOpen,
     title: 'Career Vault',
     copy: 'Your resume versions, wins, and career story, organized in one place.',
+    // Round 9: confirmed live for the homepage launch (owner sign-off,
+    // ships via a route landing separately outside this repo/PR) -- the
+    // "Coming Soon" badge is gone. `to` stays `null` for a narrower
+    // reason than product status: this codebase itself has no
+    // `/career-vault` route today (see DashboardPage.tsx's own comment
+    // confirming that), so linking to it here would 404 inside this same
+    // app regardless of the real launch status elsewhere. Restore a real
+    // `to` once the route lands in this repo.
     to: null,
-    comingSoon: true,
+    comingSoon: false,
     preview: <FlagshipVaultPreview />,
   },
 ]
@@ -119,13 +127,13 @@ const humanSupportBullets = [
 ]
 
 // Homepage Redesign Phase 1 / Task 4: "How FreshlyForward Works" -- 5 steps
-// grounded in real, currently-shipped (or explicitly Coming Soon) product
-// capabilities, per the approved North Star structure. Build/Career Vault
-// is marked Coming Soon here too, matching the locked spec decision and the
-// Task 4 plan step's explicit instruction to do so wherever it's mentioned.
+// grounded in real, currently-shipped product capabilities, per the
+// approved North Star structure. Round 9: Build/Career Vault is confirmed
+// live for the homepage launch, so its "Coming Soon" qualifier was removed
+// from this copy along with every other Career Vault mention on the page.
 const howItWorksSteps = [
   { icon: Compass, title: 'Discover', copy: 'Career Compass points you toward roles and directions that actually fit your goals.' },
-  { icon: FolderOpen, title: 'Build', copy: 'Career Vault keeps your wins, resume assets, and story organized in one place. Coming Soon.' },
+  { icon: FolderOpen, title: 'Build', copy: 'Career Vault keeps your wins, resume assets, and story organized in one place.' },
   { icon: Search, title: 'Find', copy: 'The Opportunity Engine surfaces real roles worth your time, not another endless job board.' },
   { icon: Target, title: 'Understand', copy: 'FreshFit scores how well each role actually fits you, so you know where to focus first.' },
   { icon: Rocket, title: 'Move Forward', copy: 'Applications keeps everything moving, with a real human strategist there when you need one.' },
@@ -179,7 +187,7 @@ export function LandingPage() {
       <section className="relative bg-[var(--navy)] py-14 text-white lg:py-24">
         <div className="shell grid items-center gap-12 lg:grid-cols-2">
           <div>
-            <h1 className="font-hero-sans text-4xl font-bold leading-[1.1] sm:text-5xl lg:text-5xl xl:text-6xl">
+            <h1 className="font-hero-sans text-4xl font-bold leading-[1.1] sm:text-5xl lg:text-5xl xl:text-5xl">
               Your Career <span className="text-[#7ee4b6] lg:whitespace-nowrap">Operating System</span> for What's Next.
             </h1>
             <p className="mt-6 max-w-lg text-lg leading-relaxed text-[#bac8d6]">
@@ -266,7 +274,21 @@ export function LandingPage() {
               preview" tag (bottom-left of the composition) instead of
               cluttering every card -- see HeroFloatingCard.tsx for the
               deeper card-surface pass and HeroCareerPath.tsx for the path/
-              glow refinement, both from this same round. */}
+              glow refinement, both from this same round.
+
+              Round 9 (layout-only pass): card positions recomputed as true
+              left/right mirror pairs (HeroCareerPath.tsx) with a shared
+              fixed card width (HeroFloatingCard.tsx, w-40) so the set
+              reads as one aligned system instead of a mismatched collage;
+              the FreshFit ring became a purpose-built segmented dial
+              (HeroFreshFitRing.tsx) without moving its position; the
+              walking figure gained distinct front/back limbs and a
+              dimensional gradient fill; the headline's xl breakpoint
+              stepped down one size so the dashboard reads with slightly
+              more relative weight; and Career Vault's "Coming Soon" is
+              gone everywhere on this page (confirmed live for the
+              homepage launch) -- see flagshipFeatures and
+              howItWorksSteps' Build copy below. */}
           <div className="relative hidden md:block md:min-h-[380px] lg:min-h-[640px]">
             <HeroCareerPath simplified className="absolute inset-0 h-full w-full lg:hidden" />
             <HeroCareerPath className="absolute inset-0 hidden h-full w-full lg:block" />
@@ -296,7 +318,6 @@ export function LandingPage() {
             <HeroFloatingCard className="reveal z-10 lg:hidden" style={{ left: '2%', top: '30%', animationDelay: '.45s' }}>
               <p className="text-[10px] font-semibold uppercase tracking-wide text-[#7ee4b6]">Career Vault</p>
               <p className="mt-1 text-sm font-semibold text-white">23 Assets</p>
-              <p className="mt-1 text-[10px] font-semibold uppercase tracking-wide text-[#bac8d6]">Coming Soon</p>
             </HeroFloatingCard>
             <HeroFloatingCard className="reveal z-10 lg:hidden" style={{ left: '58%', top: '72%', animationDelay: '.5s' }}>
               <p className="text-[10px] font-semibold uppercase tracking-wide text-[#7ee4b6]">Search Readiness</p>
@@ -311,10 +332,10 @@ export function LandingPage() {
               className="reveal z-10 hidden lg:block"
               style={{ left: `${desktopJourneyNodes.topOpportunity.x}%`, top: `${desktopJourneyNodes.topOpportunity.y}%`, animationDelay: '.35s' }}
             >
-              <p className="text-[10px] font-semibold uppercase tracking-wide text-[#7ee4b6]">Top Opportunity</p>
-              <p className="mt-1 text-sm font-semibold text-white">Senior Product Manager</p>
-              <p className="mt-1 text-xs text-[#bac8d6]">$120K-$130K -- Remote</p>
-              <span className="mt-2 inline-flex items-center gap-1 rounded-full bg-[#7ee4b6]/15 px-2 py-0.5 text-[9px] font-bold text-[#7ee4b6]">
+              <p className="text-[10px] font-semibold uppercase leading-tight tracking-wide text-[#7ee4b6]">Top Opportunity</p>
+              <p className="mt-0.5 text-sm font-semibold leading-tight text-white">Senior Product Manager</p>
+              <p className="mt-0.5 text-[11px] leading-tight text-[#bac8d6]">$120K-$130K &middot; Remote</p>
+              <span className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-[#7ee4b6]/15 px-2 py-0.5 text-[9px] font-bold text-[#7ee4b6]">
                 <span className="h-1.5 w-1.5 rounded-full bg-[#7ee4b6]" aria-hidden="true" /> 89 FreshFit
               </span>
             </HeroFloatingCard>
@@ -325,7 +346,6 @@ export function LandingPage() {
             >
               <p className="text-[10px] font-semibold uppercase tracking-wide text-[#7ee4b6]">Career Vault</p>
               <p className="mt-1 text-lg font-bold text-white">23 Assets</p>
-              <span className="mt-1.5 inline-block rounded-full bg-white/10 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-[#bac8d6]">Coming Soon</span>
               <div className="mt-2 flex items-center gap-1.5" aria-hidden="true">
                 <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#7ee4b6]/15 text-[#7ee4b6]"><FileText size={11} /></span>
                 <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#5b8cb8]/25 text-[#a8c8e8]"><PenLine size={11} /></span>
@@ -338,7 +358,7 @@ export function LandingPage() {
               style={{ left: `${desktopJourneyNodes.searchReadiness.x}%`, top: `${desktopJourneyNodes.searchReadiness.y}%`, animationDelay: '.45s' }}
             >
               <p className="text-[9px] font-semibold uppercase tracking-wide text-[#7ee4b6]">Search Readiness</p>
-              <p className="mt-0.5 text-xl font-bold text-white">78</p>
+              <p className="mt-0.5 text-2xl font-bold text-white">78</p>
               <p className="text-[10px] text-[#bac8d6]">Good</p>
               <div className="mt-1.5 h-1 w-16 overflow-hidden rounded-full bg-white/10">
                 <div className="h-full w-[78%] rounded-full bg-[#7ee4b6]" />
@@ -349,7 +369,7 @@ export function LandingPage() {
               style={{ left: `${desktopJourneyNodes.skillGap.x}%`, top: `${desktopJourneyNodes.skillGap.y}%`, animationDelay: '.5s' }}
             >
               <p className="text-[9px] font-semibold uppercase tracking-wide text-[#7ee4b6]">Skill Gap</p>
-              <p className="mt-0.5 text-xl font-bold text-white">3</p>
+              <p className="mt-0.5 text-2xl font-bold text-white">3</p>
               <p className="text-[10px] text-[#bac8d6]">Focus areas</p>
             </HeroFloatingCard>
             <HeroFloatingCard
@@ -357,7 +377,7 @@ export function LandingPage() {
               style={{ left: `${desktopJourneyNodes.goalProgress.x}%`, top: `${desktopJourneyNodes.goalProgress.y}%`, animationDelay: '.55s' }}
             >
               <p className="text-[9px] font-semibold uppercase tracking-wide text-[#7ee4b6]">Goal Progress</p>
-              <p className="mt-0.5 text-xl font-bold text-[#7ee4b6]">75%</p>
+              <p className="mt-0.5 text-2xl font-bold text-[#7ee4b6]">75%</p>
               <p className="text-[10px] text-[#bac8d6]">On track</p>
               <div className="mt-1.5 h-1 w-16 overflow-hidden rounded-full bg-white/10">
                 <div className="h-full w-[75%] rounded-full bg-[#7ee4b6]" />

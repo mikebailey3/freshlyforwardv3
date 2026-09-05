@@ -1,14 +1,9 @@
-import { CircularProgress } from '@/components/CircularProgress'
-import { DEFAULT_PRESENTATION_TIERS } from '@/lib/opportunityEngineTiers'
+import { HeroFreshFitRing } from '@/components/homepage/HeroFreshFitRing'
 
 // Homepage Redesign Phase 1 / Task 3: the hero's FreshFit centerpiece.
 //
 // SAMPLE DATA ONLY -- this is a hand-authored marketing score, never wired
-// to any real member's data. Reuses the real CircularProgress component
-// (scaled via its `size` prop) and the real Opportunity Engine tier
-// *thresholds* (opportunityEngineTiers.ts, via `tierThresholds` below) so
-// the ring's color banding never diverges from the actual feature's
-// success/warning cutoffs.
+// to any real member's data.
 //
 // Hard requirement carried over from ForwardScoreWidget.tsx's same
 // constraint: never caption this with "hiring probability", "salary
@@ -17,19 +12,27 @@ import { DEFAULT_PRESENTATION_TIERS } from '@/lib/opportunityEngineTiers'
 // the real Forward Score and FreshFit.
 //
 // Hero fidelity round 7 (North Star ring typography pass): the caption
-// under the score is now the literal marketing copy "Strong Match" (this
+// under the score is the literal marketing copy "Strong Match" (this
 // component always displays the same hardcoded 82 sample, so it's a fixed
-// string here rather than a `PRESENTATION_TIER_LABELS` lookup -- that
-// lookup produces "Highest Fit", which is the real Opportunity Engine's
-// own tier language used on actual match cards elsewhere in the product;
-// this hero ring is a separate illustrative marketing display and isn't
-// changing that real feature's terminology). The bottom "Sample" watermark
-// is removed -- the component's own SAMPLE DATA ONLY comment (and the
-// still-labeled "Sample" captions on the flagship preview cards further
-// down the page) already establish this is illustrative, so a third
-// repeated disclaimer directly under the ring was redundant clutter the
-// North Star reference doesn't have. Vertical rhythm tightened to match
-// the reference's caption / ring / sub-label stack.
+// string here, not a `PRESENTATION_TIER_LABELS` lookup -- that lookup
+// produces "Highest Fit", which is the real Opportunity Engine's own tier
+// language used on actual match cards elsewhere in the product; this hero
+// ring is a separate illustrative marketing display and isn't changing
+// that real feature's terminology). No "Sample" watermark -- the
+// component's own SAMPLE DATA ONLY comment (and the still-labeled
+// "Sample" captions on the flagship preview cards further down the page)
+// already establish this is illustrative.
+//
+// Hero fidelity round 9 (layout-only pass, this is the one exception):
+// swapped the shared `CircularProgress` component for a hero-only
+// `HeroFreshFitRing` -- a segmented dial with muted inactive ticks and
+// green active ones, plus a subtle drop shadow for depth -- per the
+// owner's explicit ask for "segmented outer ring... subtle depth/shadow."
+// `CircularProgress` itself is untouched (it still renders every real
+// Dashboard/Opportunity Engine progress ring exactly as before); this is
+// a purpose-built hero visual, not a shared-component change. Position,
+// size, and all three text lines (caption / 82 / Strong Match) are
+// unchanged from round 7.
 //
 // `size`: owner checkpoint round 1 added this so the tablet composition
 // can reuse the same component at a smaller footprint instead of a
@@ -40,6 +43,7 @@ const SAMPLE_LABEL = 'Strong Match'
 
 export function HeroFreshFitCenterpiece({ size = 168 }: { size?: number }) {
   const compact = size < 150
+  const strokeWidth = compact ? 9 : 12
 
   return (
     <div className="relative flex flex-col items-center gap-2">
@@ -53,14 +57,15 @@ export function HeroFreshFitCenterpiece({ size = 168 }: { size?: number }) {
       <p className={`font-mono font-semibold uppercase tracking-widest text-[#7ee4b6] ${compact ? 'text-[10px]' : 'text-xs'}`}>
         FreshFit Score
       </p>
-      <CircularProgress
-        value={SAMPLE_SCORE}
-        size={size}
-        strokeWidth={compact ? 9 : 12}
-        suffix=""
-        label={SAMPLE_LABEL}
-        tierThresholds={{ success: DEFAULT_PRESENTATION_TIERS.highest, warning: DEFAULT_PRESENTATION_TIERS.stronger }}
-      />
+      <div className="relative" style={{ height: size, width: size }}>
+        <HeroFreshFitRing value={SAMPLE_SCORE} size={size} strokeWidth={strokeWidth} />
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <span className="font-mono font-bold text-[#7ee4b6]" style={{ fontSize: size * 0.22 }}>
+            {SAMPLE_SCORE}
+          </span>
+          <span className="text-[#bac8d6]" style={{ fontSize: size * 0.09 }}>{SAMPLE_LABEL}</span>
+        </div>
+      </div>
     </div>
   )
 }

@@ -12,29 +12,25 @@
 // replaces the single-bezier-through-4-points path with a proper
 // multi-point Catmull-Rom spline through 6 waypoints, giving it the
 // reference's genuine winding/switchback quality without hand-tuning six
-// pairs of bezier control points by feel. Coordinates were measured
-// directly from the reference image (its hero graphic cluster treated as
-// its own 0-100% coordinate box):
-//   - FreshFit ring center ~(38, 44) -- center-left of the cluster.
-//   - The path starts at the person's feet (~34, 92), winds up past the
-//     ring's right side, and exits top-right with an arrowhead (~90, 8).
-//   - 8 card slots, matching the reference's own layout roles (see
-//     `desktopJourneyNodes`' named anchors below) -- LandingPage.tsx
-//     renders the actual card content at these coordinates.
+// pairs of bezier control points by feel.
 //
-// Round 8 (bounded visual-refinement pass, coordinates/positions from
-// round 6 are UNCHANGED -- only stroke/fill treatment below is new): the
-// owner's side-by-side audit called the path "still too thin/simple."
-// Turned out the "crisp foreground" line still carried a leftover
-// strokeDasharray from an earlier iteration, making the whole path read
-// as dotted/thin no matter how bright the glow layer under it was.
-// Rebuilt the rendering as three solid layers -- a wide soft outer glow,
-// a tighter mid glow, and a solid (non-dashed) bright core -- all sharing
-// one gradient that runs white/pale-blue at the person's feet through the
-// brand green and into a warm yellow-green near the arrow, so the path
-// visibly brightens toward the upper-right exactly like the reference.
-// Waypoint dots grew and picked up their own small glow; the arrowhead
-// grew and now uses the gradient's warm end color instead of flat green.
+// Round 8 (bounded visual-refinement pass): rebuilt the path rendering as
+// three solid layers -- a wide soft outer glow, a tighter mid glow, and a
+// solid (non-dashed) bright core -- all sharing one gradient that runs
+// white/pale-blue at the person's feet through the brand green and into a
+// warm yellow-green near the arrow.
+//
+// Round 9 (layout-only pass): the owner's audit called the card
+// *positions* asymmetric -- 4 cards hugging the far-left edge, 4 cards
+// spread further right with a lot of empty space past them, rather than a
+// balanced spread on both sides of the ring. `freshFit` and `person` stay
+// exactly where round 6 put them (not touched, per the owner's explicit
+// "do not move the ring" instruction) -- only the 8 card anchors below
+// were recomputed as genuine left/right mirror pairs (using the
+// composition's own horizontal center as the mirror axis, accounting for
+// every card now sharing one fixed width -- see HeroFloatingCard.tsx),
+// with matching row heights on both sides for an even top-to-bottom
+// rhythm instead of the old staggered values.
 export interface JourneyPoint {
   x: number
   y: number
@@ -43,20 +39,24 @@ export interface JourneyPoint {
 export const desktopJourneyNodes = {
   freshFit: { x: 38, y: 44 } as JourneyPoint,
   person: { x: 34, y: 92 } as JourneyPoint,
-  // Card anchor points -- measured from the reference's own layout slots.
-  topOpportunity: { x: 1, y: 2 } as JourneyPoint,
-  careerVault: { x: 53, y: 2 } as JourneyPoint,
-  searchReadiness: { x: 0, y: 36 } as JourneyPoint,
+  // Card anchor points -- round 9 mirror pairs (left column x + right
+  // column x sum to ~74, accounting for the shared 160px/~26%-of-container
+  // card width, so left and right cards sit equidistant from the
+  // composition's own center rather than from the off-center ring).
+  topOpportunity: { x: -1, y: 1 } as JourneyPoint,
+  careerVault: { x: 75, y: 1 } as JourneyPoint,
+  searchReadiness: { x: 1, y: 34 } as JourneyPoint,
+  applications: { x: 73, y: 34 } as JourneyPoint,
   skillGap: { x: 1, y: 58 } as JourneyPoint,
-  goalProgress: { x: 12, y: 83 } as JourneyPoint,
-  applications: { x: 68, y: 28 } as JourneyPoint,
-  nextMilestone: { x: 68, y: 55 } as JourneyPoint,
-  strategistSupport: { x: 53, y: 78 } as JourneyPoint,
+  nextMilestone: { x: 73, y: 58 } as JourneyPoint,
+  goalProgress: { x: 0, y: 78 } as JourneyPoint,
+  strategistSupport: { x: 63, y: 81 } as JourneyPoint,
 }
 
 // The path's own waypoints -- deliberately more numerous/winding than the
 // card anchors above (the reference's path visibly changes direction
-// several times, independent of exactly where each card sits).
+// several times, independent of exactly where each card sits). Unchanged
+// from round 6/8 -- round 9 is a card-layout-only pass.
 const desktopPathPoints: JourneyPoint[] = [
   { x: 34, y: 92 },
   { x: 44, y: 76 },
@@ -97,26 +97,37 @@ function splineD(points: JourneyPoint[]): string {
   return d.join(' ')
 }
 
-// Stylized "person moving forward" pictogram -- a leaning torso + a
-// mid-stride leg split + one forward-swinging arm reads as motion, not a
-// generic avatar icon. Large enough to matter in the composition (per the
-// owner's explicit round-6 requirement) while staying secondary to the
-// dashboard cards, not dominating them.
-// Round 8: bulked up torso/limb widths (a "flat vector pictogram" reads
-// as thinner than the reference's more illustrated figure) and added a
-// soft glow filter behind it so it visually integrates with the path's
-// own glow treatment instead of sitting as a flat white cutout.
-function WalkingFigure({ at, scale, glowId }: { at: JourneyPoint; scale: number; glowId: string }) {
+// Stylized "person moving forward" pictogram -- lightweight SVG shapes,
+// never a stock photo. Round 9: the owner's audit still called this "an
+// icon" even after round 8's width bump -- a single silhouette outline
+// reads flat regardless of limb thickness. Rebuilt with clearly separate
+// front/back arms and front/back legs (a real walking gait has one of
+// each visible on both sides, not a single central leg-split), a
+// distinct neck, a tapered chest-to-waist torso for actual proportions,
+// and a two-stop diagonal gradient fill instead of flat white so the
+// surface reads as dimensional/lit rather than a flat cutout.
+function WalkingFigure({ at, scale, glowId, fillId }: { at: JourneyPoint; scale: number; glowId: string; fillId: string }) {
+  const fill = `url(#${fillId})`
   return (
     <g transform={`translate(${at.x}, ${at.y}) scale(${scale})`} filter={`url(#${glowId})`}>
-      <circle cx="0" cy="-35" r="9.5" fill="#eef4fa" />
-      <path
-        d="M -9 -25 C -11.5 -9, -10 4, -5 12 L 5 12 C 7.5 1, 9 -13, 11 -25 C 5 -30, -4 -30, -9 -25 Z"
-        fill="#eef4fa"
-      />
-      <path d="M -5 10 L -16 32 L -8 36 L 1 12 Z" fill="#eef4fa" />
-      <path d="M 5 10 L 16 26 L 10 30 L 1 12 Z" fill="#eef4fa" />
-      <path d="M 7 -21 L 18 -10 L 14 -5 L 4 -17 Z" fill="#eef4fa" opacity="0.92" />
+      {/* Head */}
+      <circle cx="0" cy="-39" r="9" fill={fill} />
+      {/* Neck */}
+      <rect x="-3.5" y="-31" width="7" height="5" rx="1.5" fill={fill} />
+      {/* Torso -- broader shoulders tapering to waist for real proportions */}
+      <path d="M -12 -26 C -14 -15, -12 -3, -7 8 L 7 8 C 12 -3, 14 -15, 12 -26 C 6 -30, -6 -30, -12 -26 Z" fill={fill} />
+      {/* Back arm (trailing behind the body) */}
+      <path d="M -9 -23 L -20 -9 L -15 -4 L -6 -18 Z" fill={fill} opacity="0.82" />
+      {/* Front arm (swinging forward) */}
+      <path d="M 8 -21 L 20 -8 L 16 -3 L 5 -16 Z" fill={fill} />
+      {/* Back leg (trailing, straighter) */}
+      <path d="M -6 6 L -13 30 L -6 34 L 0 8 Z" fill={fill} opacity="0.88" />
+      {/* Front leg (stepping forward) -- a simple non-self-intersecting
+          quad (a 6-point bent-knee version tried earlier self-intersected
+          into a bowtie/shard shape instead of a leg -- see git history --
+          so this stays a clean tapered quad like the back leg, just
+          reaching further forward for the walking stance). */}
+      <path d="M 5 6 L 18 26 L 12 30 L 1 10 Z" fill={fill} />
     </g>
   )
 }
@@ -132,6 +143,7 @@ export function HeroCareerPath({ className = '', simplified = false }: { classNa
   const softGlowId = `hero-path-soft-glow-${suffix}`
   const nodeGlowId = `hero-node-glow-${suffix}`
   const figureGlowId = `hero-figure-glow-${suffix}`
+  const figureFillId = `hero-figure-fill-${suffix}`
 
   // Arrowhead direction -- derived from the last two waypoints so it
   // points along the path's actual final heading rather than a fixed
@@ -162,6 +174,12 @@ export function HeroCareerPath({ className = '', simplified = false }: { classNa
           <stop offset="0.45" stopColor="#7ee4b6" />
           <stop offset="1" stopColor="#e8f28c" />
         </linearGradient>
+        {/* Round 9: subtle dimensional fill for the walking figure --
+            near-white catching the light, soft blue-gray in shadow. */}
+        <linearGradient id={figureFillId} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#ffffff" />
+          <stop offset="1" stopColor="#c7d6e6" />
+        </linearGradient>
         <filter id={glowId} x="-80%" y="-80%" width="260%" height="260%">
           <feGaussianBlur stdDeviation="3.2" result="blur" />
           <feMerge>
@@ -187,9 +205,7 @@ export function HeroCareerPath({ className = '', simplified = false }: { classNa
       {/* Three solid layers -- wide soft glow, tighter glow, bright solid
           core -- ONE cohesive glowing journey illustration, no separate
           dashed card-to-card connector network and no dashing on the
-          core line itself (round 6 had accidentally left a
-          strokeDasharray on the "crisp" layer, which read as thin/dotted
-          no matter how strong the glow underneath was). */}
+          core line itself. */}
       <path d={d} stroke={`url(#${gradientId})`} strokeWidth="5.5" strokeLinecap="round" opacity="0.35" filter={`url(#${softGlowId})`} vectorEffect="non-scaling-stroke" />
       <path d={d} stroke={`url(#${gradientId})`} strokeWidth="3.2" strokeLinecap="round" opacity="0.6" filter={`url(#${glowId})`} vectorEffect="non-scaling-stroke" />
       <path className="hero-path-line" d={d} stroke={`url(#${gradientId})`} strokeWidth="1.5" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
@@ -209,7 +225,7 @@ export function HeroCareerPath({ className = '', simplified = false }: { classNa
         ))}
       <path d={`M ${left.x} ${left.y} L ${tip.x} ${tip.y} L ${right.x} ${right.y}`} stroke="#e8f28c" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" filter={`url(#${glowId})`} vectorEffect="non-scaling-stroke" />
 
-      <WalkingFigure at={person} scale={simplified ? 0.16 : 0.24} glowId={figureGlowId} />
+      <WalkingFigure at={person} scale={simplified ? 0.16 : 0.24} glowId={figureGlowId} fillId={figureFillId} />
     </svg>
   )
 }

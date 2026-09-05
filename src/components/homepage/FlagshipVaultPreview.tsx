@@ -1,31 +1,29 @@
-// Homepage Redesign Phase 1 / North Star fidelity pass: miniature product
-// preview for the Career Vault flagship card. Unlike the Opportunity Engine
-// and FreshFit previews, this must NOT look like a populated, currently-
-// working feature -- Career Vault has no real table/route yet (see the
-// locked spec decision #1). So the row shell is real UI language (matches
-// what a vault list would look like) but every row is dimmed/greyed with no
-// specific fake dates or counts, and a clear "Coming Soon" overlay sits on
-// top -- reproducing the reference's visual density without claiming the
-// feature is live today.
-import { FileText, Award, Link2, Lock } from 'lucide-react'
+// Homepage Redesign Phase 1 / North Star fidelity pass, updated round 9:
+// miniature product preview for the Career Vault flagship card. Career
+// Vault is confirmed live for the homepage launch (owner sign-off, round
+// 9) -- the earlier dimmed/blurred/locked "Coming Soon" overlay treatment
+// is gone. Follows the same pattern as FlagshipOpportunityPreview.tsx: a
+// small "Sample" caption plus real-UI-shaped rows, using generic asset
+// labels rather than inventing specific fake dates or counts.
+import { FileText, Award, Link2 } from 'lucide-react'
 
-const VAULT_ROW_ICONS = [FileText, FileText, Link2, Award]
+const VAULT_ROWS = [
+  { icon: FileText, label: 'Resume -- Product Manager' },
+  { icon: FileText, label: 'Cover Letter -- Draft' },
+  { icon: Award, label: 'Career Win -- Q3 Launch' },
+  { icon: Link2, label: 'LinkedIn Profile' },
+]
 
 export function FlagshipVaultPreview() {
   return (
-    <div className="relative mt-4 overflow-hidden rounded-lg bg-white/5 p-3">
-      <div className="space-y-2 opacity-35 blur-[1px]" aria-hidden="true">
-        {VAULT_ROW_ICONS.map((Icon, index) => (
-          <div key={index} className="flex items-center gap-2 rounded bg-white/5 px-2 py-1.5">
-            <Icon size={14} className="text-[#bac8d6]" />
-            <div className="h-2 flex-1 rounded-full bg-white/15" />
-          </div>
-        ))}
-      </div>
-      <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 bg-[var(--navy-soft)]/70">
-        <Lock size={18} className="text-[#7ee4b6]" aria-hidden="true" />
-        <p className="font-mono text-[10px] font-semibold uppercase tracking-wide text-[#7ee4b6]">Coming Soon</p>
-      </div>
+    <div className="mt-4 space-y-2">
+      <p className="font-mono text-[10px] uppercase tracking-wide text-[#7ee4b6]/70">Sample assets</p>
+      {VAULT_ROWS.map(({ icon: Icon, label }) => (
+        <div key={label} className="flex items-center gap-2 rounded-lg bg-white/5 px-2.5 py-2">
+          <Icon size={14} className="flex-shrink-0 text-[#7ee4b6]" aria-hidden="true" />
+          <p className="truncate text-xs text-[#bac8d6]">{label}</p>
+        </div>
+      ))}
     </div>
   )
 }

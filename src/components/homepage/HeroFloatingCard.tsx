@@ -42,6 +42,14 @@ import type { CSSProperties, ReactNode } from 'react'
 // internal padding, and a subtle green-tinted outer glow alongside the
 // existing black drop shadow so the cards pick up a little of the path's
 // own accent color instead of sitting as neutral navy boxes.
+// Round 9 (layout-only pass): the owner's audit called the card *set*
+// inconsistent-width "a mismatched collage" even though each card's own
+// surface treatment had improved. Fixed-width every card at `w-40`
+// (160px) -- the narrowest cards' own natural size -- so text now wraps
+// inside a shared width instead of every card sizing to its own content;
+// pushed the depth treatment further (stronger border, richer padding,
+// slightly more contrast on the gradient) per the same audit's card-depth
+// notes.
 export function HeroFloatingCard({
   className = '',
   style,
@@ -55,7 +63,7 @@ export function HeroFloatingCard({
 }) {
   return (
     <div
-      className={`absolute rounded-2xl border border-white/15 bg-gradient-to-b from-[color-mix(in_srgb,var(--navy-soft),white_6%)] to-[color-mix(in_srgb,var(--navy-soft),black_18%)] px-4 py-3.5 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08),0_0_0_1px_rgba(126,228,182,0.06),0_20px_35px_-12px_rgba(0,0,0,0.65)] ring-1 ring-white/10 ${className}`}
+      className={`absolute w-40 rounded-2xl border border-white/20 bg-gradient-to-b from-[color-mix(in_srgb,var(--navy-soft),white_9%)] to-[color-mix(in_srgb,var(--navy-soft),black_22%)] px-4 py-4 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1),0_0_0_1px_rgba(126,228,182,0.08),0_22px_38px_-12px_rgba(0,0,0,0.7)] ring-1 ring-white/10 ${className}`}
       style={style}
       {...rest}
     >
