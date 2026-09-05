@@ -96,7 +96,7 @@ export function ForwardOSSnapshotCard() {
         </span>
         <div className="min-w-0">
           <p className="text-[10px] font-bold uppercase tracking-wide text-[#7ee4b6]">Recommended Next Action</p>
-          <p className="text-sm font-semibold text-white">Interview Practice &middot; Today, 2:00 PM</p>
+          <p className="text-sm font-semibold text-white">Interview Practice &middot; Today, 2:00&nbsp;PM</p>
         </div>
       </div>
 
