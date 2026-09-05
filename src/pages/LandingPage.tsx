@@ -204,61 +204,85 @@ export function LandingPage() {
             </div>
           </div>
 
-          {/* Homepage Redesign Phase 1 / Task 3 + North Star fidelity pass:
-              FreshFit centerpiece + career-path graphic + floating cards.
-              All floating-card content is hand-authored sample/marketing
-              data grounded in real capabilities (Opportunity Engine tier
-              language, real Dashboard stat categories, real Forward Score
-              pillars, real APPLICATION_STATUSES groupings) -- never live
-              member data, and never a named/status-implied real person (see
-              the generic `User` icon avatar on Strategist Support below,
-              matching the ChatPreviewCard.tsx convention already used
-              elsewhere in this codebase).
+          {/* Homepage Redesign Phase 1 / Task 3, rebuilt in the Hero
+              Redesign clarity pass (round 2) after owner feedback that the
+              graphic read as "an abstract cluster of elements" rather than
+              an obvious career-journey illustration. Diagnosed from an
+              actual close-up screenshot: 7 floating cards were crowding and
+              overlapping each other, the connecting path was thin/faint
+              with a confusing branch, and the human figure was a tiny
+              disconnected blob floating well below everything else.
 
-              Visible from `md` up per the owner's requirement that tablet
-              keep a simplified version of the graphic rather than hiding it
-              entirely -- only mobile collapses to text-only. The 4 extra
-              cards added for North Star density (Career Vault, Skill Gap,
-              Goal Progress, Strategist Support) are `lg`-only, same as the
-              original Search Readiness/Applications cards, so tablet stays
-              exactly as uncrowded as before. */}
+              Round 2 tells one clear story, left-to-right and bottom-to-
+              top: a person (bottom-left, now visibly anchored to the
+              path's start) walks a bold, high-contrast path that rises
+              past the FreshFit ring (the centerpiece -- "your fit gets
+              evaluated along the way") and arrives at a clearly-marked
+              destination node where the Top Opportunity card sits ("this
+              is where the path leads"). Down to exactly 3 supporting
+              cards -- Top Opportunity, Career Compass, Search Readiness,
+              Applications, and Strategist Support.
+
+              Round 3 (density restoration): the owner reviewed round 2's
+              3-card version against a real screenshot and correctly called
+              it a regression -- not a dimensional one (verified via
+              computed-style measurements: hero section height, shell grid,
+              and H1 font-size were byte-identical before/after round 2;
+              nothing about the hero's actual size, grid, or typography
+              ever changed), but a content-density one. Cutting from 7
+              cards to 3 left the same fixed 566x460 graphic column looking
+              empty and secondary next to the headline, even though the
+              column itself never shrank. This round restores 2 more cards
+              (Search Readiness, Applications) and swaps Skill Gap for a
+              Career Compass card (matching the owner's exact requested
+              5-card list), while deliberately NOT bringing back Career
+              Vault (still Coming Soon, and was part of the original
+              overlap/crowding problem) and NOT reverting any of round 2's
+              genuine clarity fixes: the single bold path, the human figure
+              anchored to it, and the higher-contrast card treatment all
+              carry forward unchanged onto these 5 cards. Positions are
+              deliberately placed in the two open corners and two open mid-
+              sides left empty by round 2, well clear of the ring and the
+              path's diagonal corridor, confirmed via a fresh screenshot
+              (not just math) after implementing. All floating-card content
+              remains hand-authored sample/marketing data grounded in real
+              capabilities, never live member data, never a named/status-
+              implied real person (generic `User` icon avatar on Strategist
+              Support, matching ChatPreviewCard.tsx's existing convention).
+
+              Visible from `md` up per the owner's tablet-keeps-a-
+              simplified-graphic requirement -- only Top Opportunity shows
+              at `md`, the other four join at `lg`; only mobile collapses to
+              text-only. */}
           <div className="relative hidden min-h-[300px] md:block lg:min-h-[460px]">
             <HeroCareerPath simplified className="absolute inset-0 h-full w-full lg:hidden" />
             <HeroCareerPath className="absolute inset-0 hidden h-full w-full lg:block" />
 
             <div className="reveal relative z-10 mx-auto w-fit lg:hidden" style={{ animationDelay: '.2s' }}>
-              <HeroFreshFitCenterpiece size={120} />
+              <HeroFreshFitCenterpiece size={140} />
             </div>
             <div className="reveal relative z-10 mx-auto hidden w-fit lg:block" style={{ animationDelay: '.2s' }}>
               <HeroFreshFitCenterpiece size={196} />
             </div>
 
-            <HeroFloatingCard className="reveal right-4 top-6" style={{ animationDelay: '.35s' }}>
+            <HeroFloatingCard className="reveal right-0 top-2" style={{ animationDelay: '.35s' }}>
               <p className="text-[10px] font-semibold uppercase tracking-wide text-[#7ee4b6]">Top Opportunity</p>
               <p className="mt-1 text-sm font-semibold text-white">Senior Product Manager</p>
               <p className="text-xs text-[#bac8d6]">92 FreshFit -- Highest Fit</p>
             </HeroFloatingCard>
-            <HeroFloatingCard className="reveal left-6 top-28 hidden lg:block" style={{ animationDelay: '.5s' }}>
+            <HeroFloatingCard className="reveal left-14 top-4 hidden lg:block" style={{ animationDelay: '.4s' }}>
+              <p className="text-[10px] font-semibold uppercase tracking-wide text-[#7ee4b6]">Career Compass</p>
+              <p className="mt-1 text-sm font-semibold text-white">Your Direction</p>
+            </HeroFloatingCard>
+            <HeroFloatingCard className="reveal left-2 top-48 hidden lg:block" style={{ animationDelay: '.5s' }}>
               <p className="text-[10px] font-semibold uppercase tracking-wide text-[#7ee4b6]">Search Readiness</p>
               <p className="mt-1 text-lg font-bold text-white">78<span className="text-xs font-normal text-[#bac8d6]">/100</span></p>
             </HeroFloatingCard>
-            <HeroFloatingCard className="reveal bottom-20 right-10 hidden lg:block" style={{ animationDelay: '.65s' }}>
+            <HeroFloatingCard className="reveal right-4 top-56 hidden lg:block" style={{ animationDelay: '.6s' }}>
               <p className="text-[10px] font-semibold uppercase tracking-wide text-[#7ee4b6]">Applications</p>
               <p className="mt-1 text-lg font-bold text-white">6 <span className="text-xs font-normal text-[#bac8d6]">this month</span></p>
             </HeroFloatingCard>
-            <HeroFloatingCard className="reveal left-14 top-4 hidden lg:block" style={{ animationDelay: '.4s' }}>
-              <p className="text-[10px] font-semibold uppercase tracking-wide text-[#7ee4b6]">Career Vault</p>
-              <p className="mt-1 text-sm font-semibold text-white">Coming Soon</p>
-            </HeroFloatingCard>
-            <HeroFloatingCard className="reveal right-6 top-48 hidden lg:block" style={{ animationDelay: '.55s' }}>
-              <p className="text-[10px] font-semibold uppercase tracking-wide text-[#7ee4b6]">Skill Gap</p>
-              <p className="mt-1 text-lg font-bold text-white">3 <span className="text-xs font-normal text-[#bac8d6]">focus areas</span></p>
-            </HeroFloatingCard>
-            <HeroFloatingCard className="reveal left-16 bottom-16 hidden lg:block" style={{ animationDelay: '.7s' }}>
-              <p className="text-[10px] font-semibold uppercase tracking-wide text-[#7ee4b6]">Goal Progress</p>
-              <p className="mt-1 text-lg font-bold text-white">75%<span className="text-xs font-normal text-[#bac8d6]"> on track</span></p>
-            </HeroFloatingCard>
-            <HeroFloatingCard className="reveal right-20 bottom-4 hidden lg:flex lg:items-center lg:gap-2" style={{ animationDelay: '.8s' }}>
+            <HeroFloatingCard className="reveal left-2 bottom-32 hidden lg:flex lg:items-center lg:gap-2" style={{ animationDelay: '.7s' }}>
               <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-white/10">
                 <User size={14} className="text-[#7ee4b6]" aria-hidden="true" />
               </span>

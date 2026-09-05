@@ -27,7 +27,7 @@ export function HeroFreshFitCenterpiece({ size = 168 }: { size?: number }) {
   const compact = size < 150
 
   return (
-    <div className="relative flex flex-col items-center gap-3">
+    <div className="relative flex flex-col items-center gap-1.5">
       {/* Soft radial glow behind the ring instead of a boxed card -- matches
           the North Star's floating centerpiece treatment. */}
       <div
@@ -46,8 +46,8 @@ export function HeroFreshFitCenterpiece({ size = 168 }: { size?: number }) {
         label={tierLabel}
         tierThresholds={{ success: DEFAULT_PRESENTATION_TIERS.highest, warning: DEFAULT_PRESENTATION_TIERS.stronger }}
       />
-      <p className={`text-center text-[#bac8d6] ${compact ? 'max-w-[160px] text-[11px]' : 'max-w-[220px] text-xs'}`}>
-        A directional snapshot of how well a role fits you right now -- illustrative sample, not live data.
+      <p className={`text-center font-mono uppercase tracking-wide text-[#7ee4b6]/70 ${compact ? 'text-[9px]' : 'text-[10px]'}`}>
+        Sample
       </p>
     </div>
   )
