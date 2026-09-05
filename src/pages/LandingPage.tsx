@@ -281,28 +281,28 @@ export function LandingPage() {
           section-by-section across Tasks 4-9, not an addition alongside the
           old copy. Sections 4-10 of the approved structure land here in
           later tasks. */}
-      <section className="shell py-20" aria-labelledby="how-it-works-title">
+      <section className="shell py-14" aria-labelledby="how-it-works-title">
         <SectionHeading
           title="How FreshlyForward Works"
           copy="One connected path from where you are now to your next role -- not five disconnected tools."
           id="how-it-works-title"
         />
-        <ol className="relative mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-5">
-          <HowItWorksConnector className="pointer-events-none absolute left-0 top-8 hidden h-8 w-full text-[color:var(--color-primary-600)]/25 lg:block" />
+        <ol className="relative mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
+          <HowItWorksConnector className="pointer-events-none absolute left-0 top-3 hidden h-8 w-full text-[color:var(--color-primary-600)]/25 lg:block" />
           {howItWorksSteps.map(({ icon: Icon, title, copy }, index) => (
             <li key={title} className="relative flex flex-col items-center text-center">
-              <span className="relative z-10 flex h-16 w-16 items-center justify-center rounded-full bg-[var(--navy)] text-[#7ee4b6] shadow-[var(--shadow)]">
-                <Icon size={26} aria-hidden="true" />
+              <span className="relative z-10 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--navy)] text-[#7ee4b6] shadow-[var(--shadow)]">
+                <Icon size={22} aria-hidden="true" />
                 <span className="absolute -right-1 -top-1 flex h-6 w-6 items-center justify-center rounded-full bg-[color:var(--color-primary-600)] text-xs font-bold text-white ring-2 ring-white">
                   {index + 1}
                 </span>
               </span>
-              <h3 className="font-display mt-4 text-lg font-semibold">{title}</h3>
+              <h3 className="font-display mt-3 text-lg font-semibold">{title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-neutral-600">{copy}</p>
             </li>
           ))}
         </ol>
-        <div className="mt-12 flex justify-center">
+        <div className="mt-8 flex justify-center">
           <LinkButton to="/career-compass">
             Start Your Career Journey <ArrowRight size={18} />
           </LinkButton>

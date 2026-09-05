@@ -147,4 +147,16 @@ describe('LandingPage - no fabricated/unsupported content (Homepage Redesign Pha
     expect(screen.getByText('Do you apply without my permission?')).toBeInTheDocument()
     expect(screen.getByText('Do you help with interviews?')).toBeInTheDocument()
   })
+
+  // How It Works density pass (spacing/sizing only): tripwire so a future
+  // "just a padding tweak" can't silently drop a step or repoint the CTA
+  // without a failing test -- these 5 steps and this route are locked.
+  it('keeps all 5 How It Works steps and the Career Compass CTA link', () => {
+    renderLandingPage()
+    for (const step of ['Discover', 'Build', 'Find', 'Understand', 'Move Forward']) {
+      expect(screen.getByText(step)).toBeInTheDocument()
+    }
+    const journeyLink = screen.getByRole('link', { name: /Start Your Career Journey/i })
+    expect(journeyLink).toHaveAttribute('href', '/career-compass')
+  })
 })
