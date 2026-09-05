@@ -21,6 +21,20 @@
 //   - 8 card slots, matching the reference's own layout roles (see
 //     `desktopJourneyNodes`' named anchors below) -- LandingPage.tsx
 //     renders the actual card content at these coordinates.
+//
+// Round 8 (bounded visual-refinement pass, coordinates/positions from
+// round 6 are UNCHANGED -- only stroke/fill treatment below is new): the
+// owner's side-by-side audit called the path "still too thin/simple."
+// Turned out the "crisp foreground" line still carried a leftover
+// strokeDasharray from an earlier iteration, making the whole path read
+// as dotted/thin no matter how bright the glow layer under it was.
+// Rebuilt the rendering as three solid layers -- a wide soft outer glow,
+// a tighter mid glow, and a solid (non-dashed) bright core -- all sharing
+// one gradient that runs white/pale-blue at the person's feet through the
+// brand green and into a warm yellow-green near the arrow, so the path
+// visibly brightens toward the upper-right exactly like the reference.
+// Waypoint dots grew and picked up their own small glow; the arrowhead
+// grew and now uses the gradient's warm end color instead of flat green.
 export interface JourneyPoint {
   x: number
   y: number
@@ -88,17 +102,21 @@ function splineD(points: JourneyPoint[]): string {
 // generic avatar icon. Large enough to matter in the composition (per the
 // owner's explicit round-6 requirement) while staying secondary to the
 // dashboard cards, not dominating them.
-function WalkingFigure({ at, scale }: { at: JourneyPoint; scale: number }) {
+// Round 8: bulked up torso/limb widths (a "flat vector pictogram" reads
+// as thinner than the reference's more illustrated figure) and added a
+// soft glow filter behind it so it visually integrates with the path's
+// own glow treatment instead of sitting as a flat white cutout.
+function WalkingFigure({ at, scale, glowId }: { at: JourneyPoint; scale: number; glowId: string }) {
   return (
-    <g transform={`translate(${at.x}, ${at.y}) scale(${scale})`}>
-      <circle cx="0" cy="-34" r="8" fill="#e4ecf3" />
+    <g transform={`translate(${at.x}, ${at.y}) scale(${scale})`} filter={`url(#${glowId})`}>
+      <circle cx="0" cy="-35" r="9.5" fill="#eef4fa" />
       <path
-        d="M -7 -24 C -9 -10, -8 2, -4 10 L 4 10 C 6 0, 7 -12, 9 -24 C 4 -28, -3 -28, -7 -24 Z"
-        fill="#e4ecf3"
+        d="M -9 -25 C -11.5 -9, -10 4, -5 12 L 5 12 C 7.5 1, 9 -13, 11 -25 C 5 -30, -4 -30, -9 -25 Z"
+        fill="#eef4fa"
       />
-      <path d="M -4 8 L -14 30 L -8 33 L 0 10 Z" fill="#e4ecf3" />
-      <path d="M 4 8 L 14 24 L 9 28 L 0 10 Z" fill="#e4ecf3" />
-      <path d="M 6 -20 L 16 -10 L 13 -6 L 4 -16 Z" fill="#e4ecf3" opacity="0.9" />
+      <path d="M -5 10 L -16 32 L -8 36 L 1 12 Z" fill="#eef4fa" />
+      <path d="M 5 10 L 16 26 L 10 30 L 1 12 Z" fill="#eef4fa" />
+      <path d="M 7 -21 L 18 -10 L 14 -5 L 4 -17 Z" fill="#eef4fa" opacity="0.92" />
     </g>
   )
 }
@@ -111,13 +129,16 @@ export function HeroCareerPath({ className = '', simplified = false }: { classNa
   const suffix = simplified ? 'simplified' : 'full'
   const gradientId = `hero-path-gradient-${suffix}`
   const glowId = `hero-path-glow-${suffix}`
+  const softGlowId = `hero-path-soft-glow-${suffix}`
+  const nodeGlowId = `hero-node-glow-${suffix}`
+  const figureGlowId = `hero-figure-glow-${suffix}`
 
   // Arrowhead direction -- derived from the last two waypoints so it
   // points along the path's actual final heading rather than a fixed
   // angle.
   const prev = points[points.length - 2] ?? destination
   const angle = Math.atan2(destination.y - prev.y, destination.x - prev.x)
-  const arrowLength = 4.5
+  const arrowLength = 5.5
   const arrowSpread = 0.5
   const tip = { x: destination.x + Math.cos(angle) * 1.5, y: destination.y + Math.sin(angle) * 1.5 }
   const left = {
@@ -132,14 +153,30 @@ export function HeroCareerPath({ className = '', simplified = false }: { classNa
   return (
     <svg className={className} viewBox="0 0 100 100" preserveAspectRatio="none" fill="none" aria-hidden="true">
       <defs>
+        {/* White/pale-blue at the person's feet, warming through the
+            brand green and into a warm yellow-green near the arrow --
+            "stronger brightness toward the upper-right" per the North
+            Star reference. */}
         <linearGradient id={gradientId} x1={person.x} y1={person.y} x2={destination.x} y2={destination.y} gradientUnits="userSpaceOnUse">
-          <stop offset="0" stopColor="#5b8cb8" />
-          <stop offset="1" stopColor="#7ee4b6" />
+          <stop offset="0" stopColor="#dbe9f7" />
+          <stop offset="0.45" stopColor="#7ee4b6" />
+          <stop offset="1" stopColor="#e8f28c" />
         </linearGradient>
-        {/* Restrained but obvious glow -- the reference's path is one of
-            the hero's dominant visual elements, not a faint connector. */}
-        <filter id={glowId} x="-70%" y="-70%" width="240%" height="240%">
-          <feGaussianBlur stdDeviation="2.4" result="blur" />
+        <filter id={glowId} x="-80%" y="-80%" width="260%" height="260%">
+          <feGaussianBlur stdDeviation="3.2" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+        <filter id={softGlowId} x="-120%" y="-120%" width="340%" height="340%">
+          <feGaussianBlur stdDeviation="1.6" />
+        </filter>
+        <filter id={nodeGlowId} x="-200%" y="-200%" width="500%" height="500%">
+          <feGaussianBlur stdDeviation="1.2" />
+        </filter>
+        <filter id={figureGlowId} x="-60%" y="-60%" width="220%" height="220%">
+          <feGaussianBlur stdDeviation="1.8" result="blur" />
           <feMerge>
             <feMergeNode in="blur" />
             <feMergeNode in="SourceGraphic" />
@@ -147,24 +184,32 @@ export function HeroCareerPath({ className = '', simplified = false }: { classNa
         </filter>
       </defs>
 
-      {/* Glow layer, then the crisp foreground line -- ONE cohesive
-          journey illustration, no separate dashed card-to-card connector
-          network. */}
-      <path d={d} stroke={`url(#${gradientId})`} strokeWidth="2.6" strokeLinecap="round" opacity="0.5" filter={`url(#${glowId})`} vectorEffect="non-scaling-stroke" />
-      <path className="hero-path-line" d={d} stroke={`url(#${gradientId})`} strokeWidth="1.1" strokeLinecap="round" strokeDasharray="0.6 2.2" vectorEffect="non-scaling-stroke" />
+      {/* Three solid layers -- wide soft glow, tighter glow, bright solid
+          core -- ONE cohesive glowing journey illustration, no separate
+          dashed card-to-card connector network and no dashing on the
+          core line itself (round 6 had accidentally left a
+          strokeDasharray on the "crisp" layer, which read as thin/dotted
+          no matter how strong the glow underneath was). */}
+      <path d={d} stroke={`url(#${gradientId})`} strokeWidth="5.5" strokeLinecap="round" opacity="0.35" filter={`url(#${softGlowId})`} vectorEffect="non-scaling-stroke" />
+      <path d={d} stroke={`url(#${gradientId})`} strokeWidth="3.2" strokeLinecap="round" opacity="0.6" filter={`url(#${glowId})`} vectorEffect="non-scaling-stroke" />
+      <path className="hero-path-line" d={d} stroke={`url(#${gradientId})`} strokeWidth="1.5" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
 
       {/* Milestone nodes along the path (4-6 visible per the owner's spec,
           counting the person and the arrow as the first/last): the person
           marks the start, FreshFit (rendered by LandingPage.tsx on top of
-          this SVG) is embedded mid-path, and small dots mark 2-3 more
-          waypoints, ending in an upward arrowhead instead of a plain dot. */}
+          this SVG) is embedded mid-path, and larger glowing dots mark 2-3
+          more waypoints, ending in an upward arrowhead instead of a plain
+          dot. */}
       {!simplified &&
         points.slice(1, -1).map((point, i) => (
-          <circle key={i} cx={point.x} cy={point.y} r="1.4" fill="#7ee4b6" />
+          <g key={i}>
+            <circle cx={point.x} cy={point.y} r="2.6" fill="#7ee4b6" opacity="0.45" filter={`url(#${nodeGlowId})`} />
+            <circle cx={point.x} cy={point.y} r="1.7" fill="#eef9f1" />
+          </g>
         ))}
-      <path d={`M ${left.x} ${left.y} L ${tip.x} ${tip.y} L ${right.x} ${right.y}`} stroke="#7ee4b6" strokeWidth="1.1" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
+      <path d={`M ${left.x} ${left.y} L ${tip.x} ${tip.y} L ${right.x} ${right.y}`} stroke="#e8f28c" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" filter={`url(#${glowId})`} vectorEffect="non-scaling-stroke" />
 
-      <WalkingFigure at={person} scale={simplified ? 0.16 : 0.24} />
+      <WalkingFigure at={person} scale={simplified ? 0.16 : 0.24} glowId={figureGlowId} />
     </svg>
   )
 }

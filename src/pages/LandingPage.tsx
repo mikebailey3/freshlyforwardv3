@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { ArrowRight, ArrowUpRight, Check, Compass, FileStack, FileText, FolderOpen, HelpCircle, LayoutGrid, MessageCircleMore, MessageCircleOff, MessagesSquare, PenLine, PlayCircle, Rocket, Search, Target, TrendingUp, User, UserX, X } from 'lucide-react'
+import { ArrowRight, ArrowUpRight, Award, Check, Compass, FileStack, FileText, FolderOpen, HelpCircle, LayoutGrid, Link2, MessageCircleMore, MessageCircleOff, MessagesSquare, PenLine, PlayCircle, Rocket, Search, Target, TrendingUp, User, UserX, X } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { LinkButton, SectionHeading } from '@/components/ui'
 import { HeroFreshFitCenterpiece } from '@/components/homepage/HeroFreshFitCenterpiece'
@@ -250,7 +250,23 @@ export function LandingPage() {
               Tablet gets only the minimum touch needed to avoid a
               regression from the HeroCareerPath.tsx rewrite (this round is
               explicitly desktop-fidelity-first); mobile
-              (HeroMobileJourney.tsx) is untouched. */}
+              (HeroMobileJourney.tsx) is untouched.
+
+              Round 8 (bounded visual-refinement pass, geometry/positions
+              unchanged): per-card copy tightened toward the reference's
+              own hierarchy -- Top Opportunity now shows an illustrative
+              salary range instead of vague text (still no real employer),
+              Applications became "Application in Review" with a real
+              stage line, Next Milestone lost its repeated "Illustrative"
+              prefix, Search Readiness and Goal Progress now lead with a
+              large focal number instead of an inline "/100" fraction, and
+              Strategist Support warmed up to "Your strategist is here"
+              with a larger avatar. The repeated per-card "Illustrative"
+              wording is now ONE small dashboard-level "Illustrative
+              preview" tag (bottom-left of the composition) instead of
+              cluttering every card -- see HeroFloatingCard.tsx for the
+              deeper card-surface pass and HeroCareerPath.tsx for the path/
+              glow refinement, both from this same round. */}
           <div className="relative hidden md:block md:min-h-[380px] lg:min-h-[640px]">
             <HeroCareerPath simplified className="absolute inset-0 h-full w-full lg:hidden" />
             <HeroCareerPath className="absolute inset-0 hidden h-full w-full lg:block" />
@@ -297,8 +313,10 @@ export function LandingPage() {
             >
               <p className="text-[10px] font-semibold uppercase tracking-wide text-[#7ee4b6]">Top Opportunity</p>
               <p className="mt-1 text-sm font-semibold text-white">Senior Product Manager</p>
-              <p className="mt-1 text-xs text-[#bac8d6]">Illustrative range -- Remote</p>
-              <span className="mt-2 inline-block rounded-full bg-white/10 px-2 py-0.5 text-[9px] font-semibold text-[#7ee4b6]">89 FreshFit</span>
+              <p className="mt-1 text-xs text-[#bac8d6]">$120K-$130K -- Remote</p>
+              <span className="mt-2 inline-flex items-center gap-1 rounded-full bg-[#7ee4b6]/15 px-2 py-0.5 text-[9px] font-bold text-[#7ee4b6]">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#7ee4b6]" aria-hidden="true" /> 89 FreshFit
+              </span>
             </HeroFloatingCard>
             <HeroFloatingCard
               data-testid="hero-career-vault-card"
@@ -308,31 +326,40 @@ export function LandingPage() {
               <p className="text-[10px] font-semibold uppercase tracking-wide text-[#7ee4b6]">Career Vault</p>
               <p className="mt-1 text-lg font-bold text-white">23 Assets</p>
               <span className="mt-1.5 inline-block rounded-full bg-white/10 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-[#bac8d6]">Coming Soon</span>
+              <div className="mt-2 flex items-center gap-1.5" aria-hidden="true">
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#7ee4b6]/15 text-[#7ee4b6]"><FileText size={11} /></span>
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#5b8cb8]/25 text-[#a8c8e8]"><PenLine size={11} /></span>
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#e4c07e]/20 text-[#e4c07e]"><Award size={11} /></span>
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white/10 text-[#bac8d6]"><Link2 size={11} /></span>
+              </div>
             </HeroFloatingCard>
             <HeroFloatingCard
-              className="reveal z-10 hidden !px-3 !py-2 lg:block"
+              className="reveal z-10 hidden !px-3.5 !py-2.5 lg:block"
               style={{ left: `${desktopJourneyNodes.searchReadiness.x}%`, top: `${desktopJourneyNodes.searchReadiness.y}%`, animationDelay: '.45s' }}
             >
               <p className="text-[9px] font-semibold uppercase tracking-wide text-[#7ee4b6]">Search Readiness</p>
-              <p className="mt-0.5 text-base font-bold text-white">78<span className="text-[10px] font-normal text-[#bac8d6]">/100</span></p>
-              <div className="mt-1 h-1 w-16 overflow-hidden rounded-full bg-white/10">
+              <p className="mt-0.5 text-xl font-bold text-white">78</p>
+              <p className="text-[10px] text-[#bac8d6]">Good</p>
+              <div className="mt-1.5 h-1 w-16 overflow-hidden rounded-full bg-white/10">
                 <div className="h-full w-[78%] rounded-full bg-[#7ee4b6]" />
               </div>
             </HeroFloatingCard>
             <HeroFloatingCard
-              className="reveal z-10 hidden !px-3 !py-2 lg:block"
+              className="reveal z-10 hidden !px-3.5 !py-2.5 lg:block"
               style={{ left: `${desktopJourneyNodes.skillGap.x}%`, top: `${desktopJourneyNodes.skillGap.y}%`, animationDelay: '.5s' }}
             >
               <p className="text-[9px] font-semibold uppercase tracking-wide text-[#7ee4b6]">Skill Gap</p>
-              <p className="mt-0.5 text-xs font-semibold text-white">3 Focus Areas</p>
+              <p className="mt-0.5 text-xl font-bold text-white">3</p>
+              <p className="text-[10px] text-[#bac8d6]">Focus areas</p>
             </HeroFloatingCard>
             <HeroFloatingCard
-              className="reveal z-10 hidden !px-3 !py-2 lg:block"
+              className="reveal z-10 hidden !px-3.5 !py-2.5 lg:block"
               style={{ left: `${desktopJourneyNodes.goalProgress.x}%`, top: `${desktopJourneyNodes.goalProgress.y}%`, animationDelay: '.55s' }}
             >
               <p className="text-[9px] font-semibold uppercase tracking-wide text-[#7ee4b6]">Goal Progress</p>
-              <p className="mt-0.5 text-xs font-semibold text-white">75% On Track</p>
-              <div className="mt-1 h-1 w-16 overflow-hidden rounded-full bg-white/10">
+              <p className="mt-0.5 text-xl font-bold text-[#7ee4b6]">75%</p>
+              <p className="text-[10px] text-[#bac8d6]">On track</p>
+              <div className="mt-1.5 h-1 w-16 overflow-hidden rounded-full bg-white/10">
                 <div className="h-full w-[75%] rounded-full bg-[#7ee4b6]" />
               </div>
             </HeroFloatingCard>
@@ -340,31 +367,52 @@ export function LandingPage() {
               className="reveal z-10 hidden lg:block"
               style={{ left: `${desktopJourneyNodes.applications.x}%`, top: `${desktopJourneyNodes.applications.y}%`, animationDelay: '.6s' }}
             >
-              <p className="text-[10px] font-semibold uppercase tracking-wide text-[#7ee4b6]">Applications</p>
+              <p className="text-[10px] font-semibold uppercase tracking-wide text-[#7ee4b6]">Application in Review</p>
               <p className="mt-1 text-sm font-semibold text-white">Product Manager</p>
-              <p className="text-xs text-[#bac8d6]">Illustrative status -- Interview Round 2</p>
+              <p className="text-xs text-[#bac8d6]">Interview &middot; Round 2</p>
             </HeroFloatingCard>
             <HeroFloatingCard
-              className="reveal z-10 hidden !px-3 !py-2 lg:block"
+              className="reveal z-10 hidden !px-3.5 !py-2.5 lg:block"
               style={{ left: `${desktopJourneyNodes.nextMilestone.x}%`, top: `${desktopJourneyNodes.nextMilestone.y}%`, animationDelay: '.63s' }}
             >
               <p className="text-[9px] font-semibold uppercase tracking-wide text-[#7ee4b6]">Next Milestone</p>
               <p className="mt-0.5 text-xs font-semibold text-white">Interview Practice</p>
-              <p className="text-[10px] text-[#bac8d6]">Illustrative -- Today, 2:00 PM</p>
+              <p className="text-[10px] text-[#bac8d6]">Today &middot; 2:00 PM</p>
             </HeroFloatingCard>
             <HeroFloatingCard
-              className="reveal z-10 hidden !px-3 !py-2 lg:flex lg:items-center lg:gap-2"
+              className="reveal z-10 hidden !px-3.5 !py-2.5 lg:flex lg:items-center lg:gap-2"
               style={{ left: `${desktopJourneyNodes.strategistSupport.x}%`, top: `${desktopJourneyNodes.strategistSupport.y}%`, animationDelay: '.65s' }}
             >
-              <span className="relative flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-white/10">
-                <User size={12} className="text-[#7ee4b6]" aria-hidden="true" />
-                <span className="absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full bg-[#7ee4b6] ring-2 ring-[var(--navy-soft)]" aria-hidden="true" />
+              <span className="relative flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-[#7ee4b6]/15 ring-1 ring-[#7ee4b6]/25">
+                <User size={13} className="text-[#7ee4b6]" aria-hidden="true" />
+                <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-[#7ee4b6] ring-2 ring-[var(--navy-soft)]" aria-hidden="true" />
               </span>
               <span>
                 <p className="text-[9px] font-semibold uppercase tracking-wide text-[#7ee4b6]">Strategist Support</p>
-                <p className="text-[10px] text-[#bac8d6]">Here when you need one</p>
+                <p className="text-[10px] text-[#bac8d6]">Your strategist is here</p>
               </span>
             </HeroFloatingCard>
+
+            {/* Hero fidelity round 8: ONE dashboard-level truth label
+                instead of repeating "Illustrative" inside every individual
+                card (which cluttered the North Star-style card copy and
+                didn't match the reference's cleaner card text). This single
+                small, muted tag covers the whole composition's
+                truthfulness the same way the flagship preview cards
+                further down the page use their own "Sample" captions --
+                visible enough to read, deliberately secondary in weight/
+                position so it doesn't compete with the dashboard itself.
+                Anchored bottom-right (not bottom-left) -- that's the one
+                pocket of the composition with no card or path geometry
+                nearby, so it can't visually collide with Goal Progress or
+                the figure. */}
+            <div
+              className="reveal absolute bottom-2 right-2 z-10 flex items-center gap-1.5 lg:bottom-3 lg:right-3"
+              style={{ animationDelay: '.7s' }}
+            >
+              <span className="h-1.5 w-1.5 rounded-full bg-[#7ee4b6]/50" aria-hidden="true" />
+              <span className="font-mono text-[9px] uppercase tracking-wide text-[#bac8d6]/70">Illustrative preview</span>
+            </div>
           </div>
         </div>
       </section>

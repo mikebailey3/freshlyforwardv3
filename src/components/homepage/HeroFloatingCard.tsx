@@ -30,6 +30,18 @@ import type { CSSProperties, ReactNode } from 'react'
 // border, so each card reads as a distinct, finished UI component sitting
 // on top of the scene -- matching the reference's card language -- rather
 // than a tinted overlay of the background behind it.
+// Round 8 (bounded visual-refinement pass): the owner's side-by-side
+// audit still called cards "too thin/flat" even after round 6's opaque
+// background swap. A single flat fill reads thinner than the reference's
+// cards regardless of opacity -- what was missing was actual surface
+// depth. Added a subtle top-to-bottom tonal gradient (light navy corner
+// catching the hero's own ambient glow, darker at the base -- same
+// "finished UI panel" cue used on real elevated surfaces elsewhere in the
+// app), a soft inner top highlight (`shadow-[inset...]`) so the surface
+// reads as slightly domed/lit rather than a flat rectangle, a touch more
+// internal padding, and a subtle green-tinted outer glow alongside the
+// existing black drop shadow so the cards pick up a little of the path's
+// own accent color instead of sitting as neutral navy boxes.
 export function HeroFloatingCard({
   className = '',
   style,
@@ -43,7 +55,7 @@ export function HeroFloatingCard({
 }) {
   return (
     <div
-      className={`absolute rounded-2xl border border-white/10 bg-[var(--navy-soft)] px-4 py-3 shadow-xl shadow-black/50 ring-1 ring-white/15 ${className}`}
+      className={`absolute rounded-2xl border border-white/15 bg-gradient-to-b from-[color-mix(in_srgb,var(--navy-soft),white_6%)] to-[color-mix(in_srgb,var(--navy-soft),black_18%)] px-4 py-3.5 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08),0_0_0_1px_rgba(126,228,182,0.06),0_20px_35px_-12px_rgba(0,0,0,0.65)] ring-1 ring-white/10 ${className}`}
       style={style}
       {...rest}
     >
