@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>FreshlyForward Hero Redesign — Clarity Pass (2026-09-04)</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans">
+  <div class="max-w-6xl mx-auto px-6 py-10">
+    <header class="mb-10">
+      <h1 class="text-3xl font-bold text-slate-900">Hero Redesign — Clarity Pass</h1>
+      <p class="mt-2 text-slate-600">Branch <code class="bg-slate-200 px-1.5 py-0.5 rounded">homepage-redesign-phase1</code> · Scope: hero graphic only, per owner's request. <strong>Not pushed yet</strong> — awaiting approval.</p>
+    </header>
+
+    <section class="mb-12 bg-white border border-slate-300 rounded-lg p-6">
+      <h2 class="text-xl font-bold text-slate-900 mb-3">What was actually wrong (diagnosed from a real close-up screenshot, not guessed)</h2>
+      <ul class="list-disc pl-6 space-y-1 text-sm">
+        <li><strong>7 floating cards</strong> crowded into a small area, several overlapping (Career Vault crossing into Top Opportunity's corner, Search Readiness crossing the ring) with low-contrast backgrounds that barely separated from the navy hero background.</li>
+        <li><strong>The path had a confusing extra branch/loop</strong> and was thin/faint — hard to trace with the eye.</li>
+        <li><strong>The human figure was a tiny, featureless blob</strong> sitting in empty space well below the path's actual start point — visually disconnected from the "journey" it was supposed to represent.</li>
+      </ul>
+    </section>
+
+    <section class="mb-12">
+      <h2 class="text-2xl font-bold text-slate-900 mb-4">Before / After — Desktop</h2>
+      <div class="grid grid-cols-2 gap-4">
+        <div><p class="text-sm font-semibold text-slate-500 mb-2">Before (this session's starting point)</p><img src="hero-before-desktop.png" class="w-full rounded border border-slate-300" /></div>
+        <div><p class="text-sm font-semibold text-slate-500 mb-2">After (this pass)</p><img src="hero-after-desktop.png" class="w-full rounded border border-slate-300" /></div>
+      </div>
+    </section>
+
+    <section class="mb-12 bg-white border border-slate-300 rounded-lg p-6">
+      <h2 class="text-xl font-bold text-slate-900 mb-3">What specifically changed</h2>
+      <table class="w-full text-sm border-collapse">
+        <thead><tr class="bg-slate-800 text-white text-left"><th class="p-3">Requirement</th><th class="p-3">What changed</th></tr></thead>
+        <tbody class="bg-white">
+          <tr class="border-b"><td class="p-3 font-medium">1. Immediately understandable</td><td class="p-3">One continuous, bold, high-contrast diagonal path with a clear direction: person (bottom-left) &rarr; rises past the ring &rarr; arrives at a marked destination node feeding directly into the Top Opportunity card.</td></tr>
+          <tr class="border-b"><td class="p-3 font-medium">2. FreshFit stays centerpiece</td><td class="p-3">Ring untouched (still the largest, brightest element) — only its caption was shortened from a full sentence to a compact "Sample" tag so it stops competing with the path for space.</td></tr>
+          <tr class="border-b"><td class="p-3 font-medium">3. Human figure clarity</td><td class="p-3">Redrawn bigger with a distinct round head + shoulders + body, and literally anchored at the path's start coordinate — no gap, no ambiguity about the connection.</td></tr>
+          <tr class="border-b"><td class="p-3 font-medium">4. Readable path</td><td class="p-3">Stroke width increased, single continuous curve (old branch/loop removed), brighter gradient + glow filter, clear arrowhead + destination ring at the end.</td></tr>
+          <tr class="border-b"><td class="p-3 font-medium">5. Reduce muddiness</td><td class="p-3">Cut from 7 floating cards to 3. Removed Career Vault, Search Readiness, Applications, and Goal Progress — none of which mapped to the requested story elements.</td></tr>
+          <tr class="border-b"><td class="p-3 font-medium">6. Legible supporting cards</td><td class="p-3">Kept exactly 3, each reinforcing the story: <strong>Top Opportunity</strong> (destination), <strong>Skill Gap</strong> (focus area), <strong>Strategist Support</strong> (human backup) — FreshFit itself is the 4th concept via the ring.</td></tr>
+          <tr class="border-b"><td class="p-3 font-medium">7. Contrast &amp; shape clarity</td><td class="p-3">Card background lightened (+8% white via color-mix), ring border strengthened, real drop shadow added — cards now read as distinct floating UI, not background noise.</td></tr>
+          <tr class="border-b"><td class="p-3 font-medium">8. Responsive behavior preserved</td><td class="p-3">Desktop: full composition (ring + path + 3 cards). Tablet: simplified path/figure + ring + Top Opportunity card only (also fixed a pre-existing bug where the ring's "Highest Fit" label was cramped at the old compact size). Mobile: unchanged, text-only hero (already-approved behavior).</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="mb-12">
+      <h2 class="text-2xl font-bold text-slate-900 mb-4">Tablet &amp; Mobile — after</h2>
+      <div class="grid grid-cols-2 gap-4">
+        <div><p class="text-sm font-semibold text-slate-500 mb-2">Tablet</p><img src="hero-after-tablet.png" class="w-full rounded border border-slate-300" /></div>
+        <div><p class="text-sm font-semibold text-slate-500 mb-2">Mobile</p><img src="hero-after-mobile.png" class="w-full rounded border border-slate-300" /></div>
+      </div>
+      <p class="mt-3 text-sm text-slate-600">No horizontal overflow confirmed at either breakpoint. Mobile intentionally keeps the graphic hidden (text + CTAs only) — that behavior predates this pass and was already approved.</p>
+    </section>
+
+    <section class="mb-12 bg-white border border-slate-300 rounded-lg p-6">
+      <h2 class="text-xl font-bold text-slate-900 mb-3">Comparison against the North Star reference</h2>
+      <p class="text-sm mb-3">The reference's hero graphic is a richer, more illustrated composition than what's implemented here — that gap was already flagged in the prior full-page review and is a separate, bigger scope decision (more assets, more illustration work) than "fix the clarity problem" that was asked for in this pass. What this pass specifically fixes relative to the reference: the reference's hero <em>is</em> immediately legible as person &rarr; path &rarr; outcome, and the implementation now reads the same way at a glance, even though the reference's illustration style is more elaborate.</p>
+      <img src="north-star-reference.png" class="w-full max-w-2xl rounded border border-slate-300" />
+    </section>
+
+    <section class="bg-amber-50 border border-amber-300 rounded-lg p-5">
+      <h2 class="text-lg font-semibold text-amber-900">Stopping here for approval, per instructions</h2>
+      <p class="mt-2 text-amber-900 text-sm">Nothing pushed. Full test suite (65 files / 364 tests) and build both pass clean. No changes made outside the hero graphic (HeroCareerPath.tsx, HeroFloatingCard.tsx, HeroFreshFitCenterpiece.tsx, and the hero's floating-card block in LandingPage.tsx only).</p>
+    </section>
+  </div>
+</body>
+</html>

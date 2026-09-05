@@ -134,6 +134,16 @@ svg { flex: 0 0 auto; }
 .site-header nav > a:hover::after, .site-header nav > a.active::after { right: 0; }
 .nav-actions { display: flex; align-items: center; flex-shrink: 0; gap: 8px; margin-left: 4px; }
 .nav-login { padding: 11px 14px; border: 1px solid var(--green); border-radius: 8px; color: var(--green-dark); font-weight: 700; white-space: nowrap; }
+
+/* Homepage Redesign Phase 1 / Task 1: Product/Resources nav dropdowns.
+   Additive only -- matches the existing .site-header nav > a treatment
+   (same font-size/weight) since NavDropdown's trigger is a <button>, not
+   an <a>, so it doesn't inherit that selector automatically. */
+.nav-dropdown { position: relative; flex-shrink: 0; }
+.nav-dropdown-trigger { display: flex; align-items: center; gap: 4px; padding: 0; border: 0; background: none; font-family: inherit; font-size: .86rem; font-weight: 700; color: var(--navy); cursor: pointer; }
+.nav-dropdown-menu { position: absolute; top: calc(100% + 14px); left: 0; z-index: 60; display: flex; min-width: 180px; flex-direction: column; padding: 8px; border: 1px solid var(--line); border-radius: 10px; background: white; box-shadow: 0 20px 30px rgba(7, 26, 49, .1); }
+.nav-dropdown-menu a { padding: 9px 10px; border-radius: 6px; font-size: .86rem; font-weight: 600; color: var(--navy); }
+.nav-dropdown-menu a:hover { background: var(--mint, #eef7f2); }
 .menu-button { display: none; border: 0; background: transparent; color: var(--navy); cursor: pointer; }
 
 .button { min-height: 48px; display: inline-flex; align-items: center; justify-content: center; gap: 9px; border: 1px solid transparent; border-radius: 9999px; padding: 13px 22px; font-family: 'Manrope', sans-serif; font-size: .9rem; font-weight: 800; cursor: pointer; transition: transform .2s ease, box-shadow .2s ease, background .2s ease; }
@@ -151,6 +161,8 @@ svg { flex: 0 0 auto; }
 .reveal { animation: reveal .75s both ease-out; }
 .reveal-delay { animation-delay: .14s; }
 @keyframes reveal { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes hero-path-flow { from { stroke-dashoffset: 28; } to { stroke-dashoffset: 0; } }
+.hero-path-line { animation: hero-path-flow 2.8s linear infinite; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
 
 .cs-manifest-section { padding: 90px 0; border-block: 1px solid var(--line); background: var(--cream); }
@@ -412,6 +424,8 @@ pricing-section { padding-bottom: 100px; }
   .site-header nav.nav-open { max-height: 600px; padding: 12px 16px 22px; border-top: 1px solid var(--line); }
   .site-header nav > a { padding: 14px 8px; border-bottom: 1px solid var(--line); font-size: .9rem; }
   .site-header nav > a::after { display: none; }
+  .nav-dropdown-trigger { width: 100%; justify-content: space-between; padding: 14px 8px; border-bottom: 1px solid var(--line); font-size: .9rem; }
+  .nav-dropdown-menu { position: static; margin: 0; border: 0; box-shadow: none; padding: 0 0 0 16px; }
   .nav-actions { margin: 14px 0 0; }
   .nav-actions a { flex: 1; text-align: center; }
     .forward-feed-grid, .blog-listing-grid { grid-template-columns: 1fr; }
@@ -494,3 +508,28 @@ pricing-section { padding-bottom: 100px; }
   .footer-grid { grid-template-columns: 1fr; }
   .footer-brand { grid-column: auto; }
 }
+
+/* Homepage-only dark header variant (North Star fidelity pass 2). Additive
+   only -- .site-header's base rule above still governs every other public
+   page untouched. Absolute-positioned over the hero so there's no visible
+   seam; the hero section must have position:relative for this to overlay
+   correctly (a later task in this same pass adds that to the hero section). */
+.site-header-dark { position: absolute; top: 0; left: 0; right: 0; background: transparent; border-bottom: none; backdrop-filter: none; z-index: 40; }
+.site-header-dark .logo img { filter: brightness(0) invert(1); }
+.site-header-dark nav > a,
+.site-header-dark .nav-dropdown-trigger { color: white; }
+.site-header-dark nav > a::after { background: #7ee4b6; }
+.site-header-dark .nav-login { border-color: #7ee4b6; color: #7ee4b6; }
+
+/* Homepage-only: the North Star hero headline is a bold sans-serif, not
+   the site-wide Concierge Editorial serif (Fraunces) used by h1/h2/h3
+   everywhere else. Scoped to this one class so the other ~15 already-
+   migrated pages are completely unaffected. */
+.font-hero-sans { font-family: 'Manrope', sans-serif; }
+
+/* Homepage-only FAQ density tightening. Scoped under .home-faq (applied
+   on the SAME <section> element as .faq-list, not an ancestor -- hence
+   the compound selector, no space) so FaqPage.tsx's full accordion
+   (which shares the base .faq-list rules) is completely unaffected. */
+.faq-list.home-faq summary { padding: 14px 4px; }
+.faq-list.home-faq details p { padding: 0 24px 14px 40px; }

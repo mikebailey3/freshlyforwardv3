@@ -1,161 +1,562 @@
-import { ArrowRight, CalendarCheck, Check, ClipboardCheck, FilePenLine, Handshake, MessageCircleMore, PauseCircle, Search, ShieldCheck, Target, UserRoundCheck, X } from 'lucide-react'
+import type { ReactNode } from 'react'
+import { ArrowRight, ArrowUpRight, Check, Compass, FileStack, FileText, FolderOpen, HelpCircle, LayoutGrid, MessageCircleMore, MessageCircleOff, MessagesSquare, PenLine, PlayCircle, Rocket, Search, Target, TrendingUp, UserX, X } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import { LinkButton, SectionHeading } from '@/components/ui'
-import { ForwardFeedWidget } from '@/components/ForwardFeedWidget'
-import { FridayReportCard, type FridayReportCardData } from '@/components/FridayReportCard'
-import { useScrollReveal } from '@/hooks/useScrollReveal'
+import { ForwardOSSnapshotCard } from '@/components/homepage/ForwardOSSnapshotCard'
+import { NodeGraph, type GraphNode } from '@/components/homepage/NodeGraph'
+import { PricingTeaser } from '@/components/homepage/PricingTeaser'
+import { CareerCompassRadar } from '@/components/homepage/CareerCompassRadar'
+import { ApplicationsStatusPreview } from '@/components/homepage/ApplicationsStatusPreview'
+import { FlagshipOpportunityPreview } from '@/components/homepage/FlagshipOpportunityPreview'
+import { FlagshipFreshFitPreview } from '@/components/homepage/FlagshipFreshFitPreview'
+import { FlagshipVaultPreview } from '@/components/homepage/FlagshipVaultPreview'
+import { HowItWorksConnector } from '@/components/homepage/HowItWorksConnector'
+import { FooterCareerPath } from '@/components/homepage/FooterCareerPath'
 
-const manifest = [
-  { icon: ShieldCheck, title: '100% Human-Led Service', copy: 'No bots, no shortcuts. Every decision is made by a real career professional.' },
-  { icon: Search, title: 'Hand-Selected Opportunities', copy: 'We research roles for fit, trajectory, compensation, and your personal goals.' },
-  { icon: FilePenLine, title: 'Hand-Crafted Applications', copy: 'Every resume adjustment and cover letter is built around one specific opportunity.' },
-  { icon: CalendarCheck, title: 'Weekly Progress Every Friday', copy: 'See what we found, where we applied, and what happens next—every single week.' },
-  { icon: MessageCircleMore, title: 'Personal Strategist Support', copy: 'Your dedicated strategist stays available for questions, decisions, and momentum.' },
-  { icon: PauseCircle, title: 'No Contracts. Pause Anytime.', copy: 'A flexible month-to-month partnership designed around real life and real careers.' },
+// Homepage Redesign Phase 1 / Task 7: "Why FreshlyForward?" node-graph
+// comparison. Left side is deliberately generic/negative (no real product
+// or competitor named); right side is every real capability referenced
+// elsewhere on this page, connected in the same order as How It Works.
+const traditionalNodes: GraphNode[] = [
+  { icon: LayoutGrid, label: 'Endless job boards', x: 15, y: 20 },
+  { icon: FileStack, label: 'Generic templates', x: 75, y: 15 },
+  { icon: HelpCircle, label: 'No fit signal', x: 30, y: 65 },
+  { icon: MessageCircleOff, label: 'No feedback', x: 80, y: 70 },
+  { icon: UserX, label: "You're on your own", x: 50, y: 40 },
 ]
 
-const scenes: [string, string, string][] = [
-  ['SC. 01', 'Tell us your story', 'We learn your background, goals, preferences, strengths, and non-negotiables.'],
-  ['SC. 02', 'Build your strategy', 'Your strategist sharpens your positioning and creates a focused search plan.'],
-  ['SC. 03', 'We search and apply', 'We handpick strong-fit roles and craft each application one at a time.'],
-  ['SC. 04', 'Review Friday progress', 'You receive a clear weekly report with decisions, applications, and next steps.'],
-  ['SC. 05', 'Prepare with confidence', 'We coach your interviews, run mock sessions, and help you evaluate offers.'],
+const connectedNodes: GraphNode[] = [
+  { icon: Compass, label: 'Career Compass', x: 15, y: 75 },
+  { icon: Search, label: 'Opportunity Engine', x: 35, y: 30 },
+  { icon: Target, label: 'FreshFit', x: 60, y: 15 },
+  { icon: FolderOpen, label: 'Career Vault', x: 82, y: 35 },
+  { icon: MessageCircleMore, label: 'Human Strategist', x: 70, y: 75 },
 ]
 
-// Explicitly labeled sample data for the hero -- never implied as a real
-// member's report. See docs/superpowers/specs/2026-08-28-concierge-editorial-redesign-design.md
-// for why this reuses the real FridayReport shape instead of inventing one.
-const sampleReport: FridayReportCardData = {
-  title: 'Week 5 Progress Report',
-  report_date: '2026-05-08',
-  summary: 'Strong week. Three roles cleared review and went out with tailored materials, and one first-round interview is on the books.',
-  opportunities_reviewed: 18,
-  applications_submitted: 3,
-  interviews_scheduled: 1,
-  next_steps: 'Finalize tailored resume for the Product Ops role\nPrep talking points for Thursday\'s interview\nReview two new leads flagged this week',
-  approval_status: 'sent',
-}
+// Homepage Redesign Phase 1 / Task 5 (extended for North Star fidelity):
+// flagship feature showcase. Career Vault is included per the locked spec
+// decision (kept in the flagship slot, clearly "Coming Soon", no
+// route/link) rather than substituted with Achievement Vault or omitted.
+// Each card now carries a `preview` -- a miniature, product-realistic UI
+// matching the North Star reference's density (see the individual preview
+// components for exactly what real data/fields ground each one).
+const flagshipFeatures: { icon: typeof Search; title: string; copy: string; to: string | null; comingSoon: boolean; preview: ReactNode }[] = [
+  {
+    icon: Search,
+    title: 'Opportunity Engine',
+    copy: 'Real roles, ranked by fit -- not another feed to scroll through by hand.',
+    to: '/opportunity-engine',
+    comingSoon: false,
+    preview: <FlagshipOpportunityPreview />,
+  },
+  {
+    icon: Target,
+    title: 'FreshFit',
+    copy: 'A directional fit score for every role, so you know which ones deserve your time first.',
+    to: '/opportunity-engine',
+    comingSoon: false,
+    preview: <FlagshipFreshFitPreview />,
+  },
+  {
+    icon: FolderOpen,
+    title: 'Career Vault',
+    copy: 'Your resume versions, wins, and career story, organized in one place.',
+    // Round 9: confirmed live for the homepage launch (owner sign-off,
+    // ships via a route landing separately outside this repo/PR) -- the
+    // "Coming Soon" badge is gone. `to` stays `null` for a narrower
+    // reason than product status: this codebase itself has no
+    // `/career-vault` route today (see DashboardPage.tsx's own comment
+    // confirming that), so linking to it here would 404 inside this same
+    // app regardless of the real launch status elsewhere. Restore a real
+    // `to` once the route lands in this repo.
+    to: null,
+    comingSoon: false,
+    preview: <FlagshipVaultPreview />,
+  },
+]
+
+// Supporting capabilities. Human Strategists intentionally stays brief here
+// -- Task 6's Human Support section carries the fuller treatment, this card
+// just establishes it exists as a real capability alongside the other two.
+// `visual` adds the North Star's small illustrative graphic per card.
+const supportingCapabilities: { icon: typeof Compass; title: string; copy: string; to: string | null; visual: ReactNode }[] = [
+  {
+    icon: Compass,
+    title: 'Career Compass',
+    copy: 'A short assessment that points you toward directions worth pursuing.',
+    to: '/career-compass',
+    visual: <CareerCompassRadar />,
+  },
+  {
+    icon: FileText,
+    title: 'Applications',
+    copy: 'Every application you send, tracked in one place -- no spreadsheets required.',
+    to: '/applications',
+    visual: <ApplicationsStatusPreview />,
+  },
+  {
+    icon: MessageCircleMore,
+    title: 'Human Strategists',
+    copy: 'Real career professionals available when you need direction, not just data.',
+    to: null,
+    visual: (
+      <img
+        src="/images/headshot.png?v=2"
+        alt=""
+        aria-hidden="true"
+        className="mt-3 h-16 w-16 rounded-full object-cover ring-2 ring-white/20"
+      />
+    ),
+  },
+]
+
+// Homepage Redesign Phase 1 / Task 6: Human Support section. Bullets
+// grounded in real strategist-support capabilities (career strategy,
+// application feedback, interview prep, negotiation/next-steps) rather than
+// invented ones. Per the locked spec (decision #5), no testimonial, no
+// star rating, no invented quote -- credibility here comes from describing
+// the real capability plainly, backed by LandingPage.test.tsx.
+const humanSupportBullets = [
+  { icon: Compass, text: 'Career strategy and planning tailored to where you actually want to go.' },
+  { icon: PenLine, text: 'Resume and application feedback from a real person, not a generic checklist.' },
+  { icon: MessagesSquare, text: 'Interview preparation, so you walk in ready instead of guessing.' },
+  { icon: TrendingUp, text: 'Support through offers and negotiation, all the way to your next step.' },
+]
+
+// Homepage Redesign Phase 1 / Task 4: "How FreshlyForward Works" -- 5 steps
+// grounded in real, currently-shipped product capabilities, per the
+// approved North Star structure. Round 9: Build/Career Vault is confirmed
+// live for the homepage launch, so its "Coming Soon" qualifier was removed
+// from this copy along with every other Career Vault mention on the page.
+const howItWorksSteps = [
+  { icon: Compass, title: 'Discover', copy: 'Career Compass points you toward roles and directions that actually fit your goals.' },
+  { icon: FolderOpen, title: 'Build', copy: 'Career Vault keeps your wins, resume assets, and story organized in one place.' },
+  { icon: Search, title: 'Find', copy: 'The Opportunity Engine surfaces real roles worth your time, not another endless job board.' },
+  { icon: Target, title: 'Understand', copy: 'FreshFit scores how well each role actually fits you, so you know where to focus first.' },
+  { icon: Rocket, title: 'Move Forward', copy: 'Applications keeps everything moving, with a real human strategist there when you need one.' },
+]
+
+// Homepage Redesign Phase 1 / Task 2: three short trust bullets under the
+// hero CTAs, replacing the old "Human-led / No mass applying / Pause
+// anytime" set now that the hero itself carries the human-led/no-mass-apply
+// message in its subcopy -- kept short per the North Star reference.
+const heroFeatureBullets = ['Personalized', 'AI-powered career intelligence', 'Human experts']
+
+// Homepage Redesign Phase 1 / Task 9 (extended for North Star fidelity):
+// FAQ teaser -- 6 of the 8 real questions from FaqPage.tsx verbatim (same
+// source of truth, no rewritten or invented answers), chosen for relevance
+// to a first-time visitor, split into two columns to match the reference's
+// density (see the .faq-list wrapper markup below for how the counter
+// numbering stays correct across both columns).
+const faqTeaserQuestions: [string, string][] = [
+  ['Is FreshlyForward an AI application service?', 'No. FreshlyForward is a human-led career concierge. Technology may support organization and research, but people select opportunities, shape strategy, craft materials, and remain accountable for the work.'],
+  ['Do you apply without my permission?', 'No. Your application authorization is documented before applications begin, and you can update or withdraw it. We also follow the role preferences and boundaries established with your strategist.'],
+  ['Can you guarantee I get hired?', 'No ethical service can guarantee a hiring outcome. FreshlyForward provides the strategy, execution, preparation, and support that help you run a stronger search.'],
+  ['Can I pause or cancel?', 'Yes. Concierge service has no long-term contract and can be paused before the next monthly renewal.'],
+  ['Do you help with interviews?', 'Yes. Interview preparation can include role research, answer development, mock interviews, feedback, follow-up strategy, and offer decision support.'],
+  ['Who is this service best for?', 'FreshlyForward is designed for busy professionals, career changers, people returning to work, and job seekers who want a more personal and accountable search partner.'],
+]
+
+// Homepage Redesign Phase 1 / North Star fidelity pass: itemized lists for
+// the "Why FreshlyForward?" comparison, alongside the existing node graphs
+// (kept, not discarded -- see NodeGraph.tsx). Every FreshlyForward item
+// names a real capability already referenced elsewhere on this page;
+// nothing on the traditional side names a real competitor or product.
+const traditionalJobSearchItems = [
+  'Endless job boards',
+  'Generic resume templates',
+  'Spreadsheets and scattered notes',
+  'No fit signal before you apply',
+  "You're on your own",
+]
+
+const freshlyForwardItems = [
+  'Career Compass for direction',
+  'Opportunity Engine for discovery',
+  'FreshFit for fit intelligence',
+  'Applications for execution',
+  'Human strategists when you need them',
+]
 
 export function LandingPage() {
-  const [verdictRef, verdictVisible] = useScrollReveal<HTMLElement>(0.4)
-
   return (
     <main className="callsheet">
-      <section className="bg-[var(--cream)] py-14 lg:py-24">
-        <div className="shell grid items-center gap-12 lg:grid-cols-2">
+      {/* Homepage Hero Redesign round 10: full replacement of the round
+          6-9 hero-graphics lineage (winding SVG career path, walking
+          figure, 8 absolutely-positioned floating cards, and a parallel
+          hand-tuned mobile-only component) with the owner-approved
+          "Direction A" composition -- one polished ForwardOSSnapshotCard
+          instead of a composite illustration. See
+          docs/superpowers/visual-review/2026-09-05-hero-mockups/ for the
+          3 explored directions and
+          docs/superpowers/specs/2026-09-05-hero-direction-a-implementation-design.md
+          for the locked implementation design this section follows.
+
+          Why the old approach was replaced rather than re-tuned again: it
+          relied on 3 independent hand-coordinated positioning systems (the
+          path's SVG viewBox coordinates, the 8 cards' percentage left/top
+          anchors, and a wholly separate mobile-only component) with no way
+          to detect when one grew and silently overlapped another -- which
+          is exactly what kept happening release after release. This
+          section has none of that: one card, normal CSS Grid/flex flow, a
+          single `lg` breakpoint shared with this codebase's own existing
+          convention (the same breakpoint the rest of this page already
+          uses for its 2-column sections).
+
+          Grid ratio is 0.9fr/1.1fr (owner-approved "roughly 15-20% more
+          card prominence") instead of an even split -- the copy column
+          gives up a little width so the snapshot card, the primary product
+          proof per the owner's brief, gets more of it. */}
+      <section className="relative bg-[var(--navy)] py-14 text-white lg:py-24">
+        <div className="shell grid items-center gap-12 lg:grid-cols-[0.9fr_1.1fr]">
           <div>
-            <h1 className="font-display text-4xl font-semibold leading-[1.1] text-[var(--navy)] sm:text-5xl lg:text-6xl">
-              A better search needs better judgment.
+            <h1 className="font-hero-sans text-4xl font-bold leading-[1.1] sm:text-5xl lg:text-5xl xl:text-5xl">
+              Your Career <span className="text-[#7ee4b6] lg:whitespace-nowrap">Operating System</span> for What's Next.
             </h1>
-            <p className="mt-6 max-w-lg text-lg leading-relaxed text-neutral-600">
-              FreshlyForward is a human-led career concierge. One real strategist searches,
-              applies, and reports back — so you're never doing this alone, and never
-              guessing what's happening behind the scenes.
+            <p className="mt-6 max-w-lg text-lg leading-relaxed text-[#bac8d6]">
+              One connected system for your career search: Career Compass points you in the right
+              direction, the Opportunity Engine and FreshFit surface and score the roles worth your
+              time, Applications keeps everything moving, and a real human strategist is there when
+              you need one.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <LinkButton to="/signup">
-                Get started <ArrowRight size={18} />
+              <LinkButton to="/career-compass">
+                Take Career Compass <ArrowRight size={18} />
               </LinkButton>
               <LinkButton to="/how-it-works" variant="secondary">
-                See how it works
+                <PlayCircle size={18} /> See How It Works
               </LinkButton>
             </div>
             <div className="mt-7 flex flex-wrap gap-x-5 gap-y-2" aria-label="Service assurances">
-              <span className="flex items-center gap-1.5 text-sm font-medium text-neutral-600">
-                <Check size={16} className="text-primary-600" /> Human-led
-              </span>
-              <span className="flex items-center gap-1.5 text-sm font-medium text-neutral-600">
-                <Check size={16} className="text-primary-600" /> No mass applying
-              </span>
-              <span className="flex items-center gap-1.5 text-sm font-medium text-neutral-600">
-                <Check size={16} className="text-primary-600" /> Pause anytime
-              </span>
+              {heroFeatureBullets.map((bullet) => (
+                <span key={bullet} className="flex items-center gap-1.5 text-sm font-medium text-[#bac8d6]">
+                  <Check size={16} className="text-[#7ee4b6]" /> {bullet}
+                </span>
+              ))}
             </div>
           </div>
-          <div className="mx-auto w-full max-w-md lg:max-w-none">
-            <FridayReportCard report={sampleReport} isSample />
+
+          {/* Mobile hierarchy requirement: headline -> copy -> primary CTA
+              -> secondary CTA -> trust row -> full-width snapshot card.
+              That's exactly the DOM order above followed by this single
+              card -- no separate mobile component and no reordering
+              utility classes needed, because there's no absolute
+              positioning left to fight with. Below `lg` this is simply the
+              second block in a 1-column grid; at `lg`+ it's the second
+              grid column. */}
+          <ForwardOSSnapshotCard />
+        </div>
+      </section>
+
+      {/* Homepage Redesign Phase 1 / Task 4: "How FreshlyForward Works".
+          Replaces the old Concierge Editorial "manifest" / "concierge
+          process" / "service preview" / ForwardFeedWidget / closing-CTA
+          sections below the hero -- those told a different product story
+          (a white-glove application-submission service) than the approved
+          North Star's "Career Operating System" positioning, so this is a
+          full replacement of the page below the hero, built out
+          section-by-section across Tasks 4-9, not an addition alongside the
+          old copy. Sections 4-10 of the approved structure land here in
+          later tasks. */}
+      <section className="shell py-14" aria-labelledby="how-it-works-title">
+        <SectionHeading
+          title="How FreshlyForward Works"
+          copy="One connected path from where you are now to your next role -- not five disconnected tools."
+          id="how-it-works-title"
+        />
+        <ol className="relative mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
+          <HowItWorksConnector className="pointer-events-none absolute left-0 top-3 hidden h-8 w-full text-[color:var(--color-primary-600)]/25 lg:block" />
+          {howItWorksSteps.map(({ icon: Icon, title, copy }, index) => (
+            <li key={title} className="relative flex flex-col items-center text-center">
+              <span className="relative z-10 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--navy)] text-[#7ee4b6] shadow-[var(--shadow)]">
+                <Icon size={22} aria-hidden="true" />
+                <span className="absolute -right-1 -top-1 flex h-6 w-6 items-center justify-center rounded-full bg-[color:var(--color-primary-600)] text-xs font-bold text-white ring-2 ring-white">
+                  {index + 1}
+                </span>
+              </span>
+              <h3 className="font-display mt-3 text-lg font-semibold">{title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-neutral-600">{copy}</p>
+            </li>
+          ))}
+        </ol>
+        <div className="mt-8 flex justify-center">
+          <LinkButton to="/career-compass">
+            Start Your Career Journey <ArrowRight size={18} />
+          </LinkButton>
+        </div>
+      </section>
+
+      {/* Homepage Redesign Phase 1 / Task 5: flagship feature showcase +
+          supporting capabilities. Flagship cards match the hero's dark
+          navy/green treatment; Career Vault's card carries a visible
+          "Coming Soon" badge and has no href, matching the locked spec
+          decision and the test in LandingPage.test.tsx enforcing it. */}
+      <section className="bg-[var(--cream)] py-20" aria-labelledby="flagship-title">
+        <div className="shell">
+          <SectionHeading
+            title="Powerful tools. One connected system."
+            copy="Not six separate apps -- one system where each part makes the others better."
+            id="flagship-title"
+          />
+          <div className="mt-12 grid gap-6 lg:grid-cols-3">
+            {flagshipFeatures.map(({ icon: Icon, title, copy, to, comingSoon, preview }) => {
+              const cardClassName = "flex flex-col rounded-[var(--radius)] bg-[var(--navy-soft)] p-8 shadow-xl shadow-black/20 ring-1 ring-white/5 transition hover:bg-[color-mix(in_srgb,var(--navy-soft),white_6%)]"
+              const inner = (
+                <>
+                  <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-[#7ee4b6]">
+                    <Icon size={22} aria-hidden="true" />
+                  </span>
+                  <div className="mt-4 flex items-center gap-2">
+                    <h3 className="font-display text-xl font-semibold text-white">{title}</h3>
+                    {comingSoon && (
+                      <span className="rounded-full bg-white/10 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[#bac8d6]">Coming Soon</span>
+                    )}
+                  </div>
+                  <p className="mt-3 text-sm leading-relaxed text-[#bac8d6]">{copy}</p>
+                  {preview}
+                </>
+              )
+              return to ? (
+                <Link key={title} to={to} className={cardClassName}>{inner}</Link>
+              ) : (
+                <div key={title} className={cardClassName}>{inner}</div>
+              )
+            })}
+          </div>
+
+          <div className="mt-8 grid gap-6 sm:grid-cols-3">
+            {supportingCapabilities.map(({ icon: Icon, title, copy, to, visual }) => {
+              const cardClassName = "rounded-[var(--radius)] border border-white/10 bg-[var(--navy-soft)] p-6 shadow-lg shadow-black/10 text-white"
+              const inner = (
+                <>
+                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-[#7ee4b6]">
+                    <Icon size={18} aria-hidden="true" />
+                  </span>
+                  <h4 className="font-display mt-3 text-base font-semibold text-white">{title}</h4>
+                  <p className="mt-2 text-sm leading-relaxed text-[#bac8d6]">{copy}</p>
+                  {visual}
+                </>
+              )
+              return to ? (
+                <Link key={title} to={to} className={`${cardClassName} block transition hover:border-white/25`}>{inner}</Link>
+              ) : (
+                <div key={title} className={cardClassName}>{inner}</div>
+              )
+            })}
           </div>
         </div>
       </section>
 
-      <section className="cs-manifest-section" aria-labelledby="promise-title">
+      {/* Homepage Redesign Phase 1 / Task 6: Human Support section --
+          warmer visual treatment (cream background, matching this
+          codebase's existing --cream token) contrasting with the navy
+          sections above/below. Real founder photo (also used on AboutPage),
+          not a stock scene. No testimonial, no star rating -- see the
+          Task 6 tests in LandingPage.test.tsx. */}
+      <section className="bg-[var(--cream)] py-20" aria-labelledby="human-support-title">
+        <div className="shell grid items-center gap-12 lg:grid-cols-2">
+          <div>
+            <SectionHeading
+              title="Technology gets you the data. A person helps you use it."
+              copy="Every FreshlyForward plan includes real human support -- not a chatbot, not a template."
+              id="human-support-title"
+            />
+            <ul className="mt-8 space-y-5">
+              {humanSupportBullets.map(({ icon: Icon, text }) => (
+                <li key={text} className="flex items-start gap-3">
+                  <span className="mt-0.5 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-white text-[color:var(--color-primary-600)] shadow-[var(--shadow)]">
+                    <Icon size={18} aria-hidden="true" />
+                  </span>
+                  <p className="text-neutral-700">{text}</p>
+                </li>
+              ))}
+            </ul>
+            <div className="mt-8">
+              <LinkButton to="/why-freshlyforward" variant="secondary">
+                See How Human Support Works <ArrowRight size={18} />
+              </LinkButton>
+            </div>
+          </div>
+          <div className="relative lg:ml-auto lg:max-w-md">
+            <img
+              src="/images/headshot.png?v=2"
+              alt="Mike Bailey, founder of FreshlyForward"
+              className="w-full max-w-md rounded-[var(--radius)] object-cover shadow-[var(--shadow)]"
+            />
+            {/* Truthful overlay card in place of the North Star's fabricated
+                testimonial -- same geometry/overlap treatment, honest content.
+                Smaller negative offset on mobile (where .shell's own outer
+                margin is only 12-14px) so the card can't bleed past the
+                viewport edge; the wrapper above now shares the image's own
+                max-width so the offset anchors to the photo's real corner
+                instead of drifting in unused grid-column space. */}
+            <div className="absolute -bottom-3 -left-3 max-w-[240px] rounded-[var(--radius)] bg-white p-5 shadow-xl sm:-bottom-6 sm:-left-6">
+              <p className="text-sm font-semibold text-[var(--navy)]">Human strategist support</p>
+              <p className="mt-1.5 text-xs leading-relaxed text-neutral-600">
+                A real person -- not a chatbot -- available whenever you need direction.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Homepage Redesign Phase 1 / Task 7 (extended for North Star
+          fidelity): "Why FreshlyForward?" comparison. Switched to a navy
+          section per the reference, with an itemized red-X / green-check
+          list layered above the existing node-graph illustration -- the
+          graph is retained as the decorative comparison graphic (per
+          explicit instruction not to discard it), not replaced by the
+          list. Every FreshlyForward item names a real capability already
+          referenced elsewhere on this page; nothing on the traditional
+          side names a real competitor or product. Heading text color
+          comes from the inner navy panel's `text-white` (moved off the
+          section itself so the outer section can go light per the North
+          Star fidelity pass), same inherited-color pattern the flagship
+          section above already relies on. */}
+      <section className="bg-[var(--cream)] py-20" aria-labelledby="why-title">
         <div className="shell">
-          <SectionHeading title="High-touch help for a high-stakes moment." id="promise-title" />
-          <div className="cs-manifest-table" role="table" aria-label="What's included">
-            {manifest.map(({ icon: Icon, title, copy }) => (
-              <div className="cs-manifest-row" role="row" key={title}>
-                <Icon aria-hidden="true" className="cs-manifest-icon" />
-                <div role="cell">
-                  <h3>{title}</h3>
-                  <p>{copy}</p>
-                </div>
-                <Check aria-hidden="true" className="cs-manifest-check" />
-              </div>
+          <div className="rounded-[calc(var(--radius)*1.5)] bg-[var(--navy)] px-6 py-14 text-white sm:px-10">
+          <SectionHeading
+            title="One connected system for your entire career move."
+            copy="Traditional job searching means juggling disconnected tools. FreshlyForward connects every piece."
+            id="why-title"
+            centered
+          />
+          <div className="relative mt-12 grid gap-10 md:grid-cols-2 md:gap-8">
+            <div className="rounded-[var(--radius)] bg-[var(--navy-soft)] p-6 shadow-xl shadow-black/20">
+              <h3 className="text-center font-display text-lg font-semibold text-[#bac8d6]">Traditional Job Search</h3>
+              <ul className="mt-5 space-y-2.5">
+                {traditionalJobSearchItems.map((item) => (
+                  <li key={item} className="flex items-start gap-2.5 text-sm text-[#bac8d6]">
+                    <X size={16} className="mt-0.5 flex-shrink-0 text-red-400" aria-hidden="true" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <NodeGraph nodes={traditionalNodes} tangled />
+            </div>
+            <div className="rounded-[var(--radius)] bg-[var(--navy-soft)] p-6 shadow-xl shadow-black/20">
+              <h3 className="text-center font-display text-lg font-semibold text-[#7ee4b6]">FreshlyForward</h3>
+              <ul className="mt-5 space-y-2.5">
+                {freshlyForwardItems.map((item) => (
+                  <li key={item} className="flex items-start gap-2.5 text-sm text-white">
+                    <Check size={16} className="mt-0.5 flex-shrink-0 text-[#7ee4b6]" aria-hidden="true" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <NodeGraph nodes={connectedNodes} tangled={false} />
+            </div>
+            <span
+              className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[color:var(--color-primary-600)] px-4 py-2 text-sm font-bold text-white shadow-xl md:flex"
+              aria-hidden="true"
+            >
+              VS
+            </span>
+          </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Homepage Redesign Phase 1 / Task 8: Pricing section -- real
+          membership_plans data only, via PricingTeaser (see that component
+          for why it duplicates PricingPage's fetch rather than sharing a
+          new hook). */}
+      <PricingTeaser />
+
+      {/* Homepage Redesign Phase 1 / Task 9 (extended for North Star
+          fidelity): FAQ teaser, reusing FaqPage's existing .faq-list
+          accordion styling (Q.01 counter, + toggle) so this doesn't invent
+          a second FAQ visual language. Split into two plain-div columns
+          (not a CSS grid auto-flow) so the counter -- which increments in
+          DOM source order regardless of visual position -- numbers
+          question 1-3 down the left column, then 4-6 down the right,
+          matching the reference's two-column reading order. */}
+      <section className="home-faq faq-list shell" aria-labelledby="faq-title">
+        <SectionHeading eyebrow="Straightforward by design" title="Frequently asked questions" id="faq-title" />
+        <div className="md:grid md:grid-cols-2 md:gap-x-10">
+          <div>
+            {faqTeaserQuestions.slice(0, 3).map(([question, answer], index) => (
+              <details key={question} open={index === 0}>
+                <summary>{question}<span>+</span></summary>
+                <p>{answer}</p>
+              </details>
+            ))}
+          </div>
+          <div>
+            {faqTeaserQuestions.slice(3).map(([question, answer]) => (
+              <details key={question}>
+                <summary>{question}<span>+</span></summary>
+                <p>{answer}</p>
+              </details>
             ))}
           </div>
         </div>
-      </section>
-
-      <section ref={verdictRef} className={`contrast-section shell${verdictVisible ? ' cs-verdict-visible' : ''}`}>
-        <div className="contrast-intro">
-          <h2>No AI mass applications. No spray-and-pray search.</h2>
-          <p>One carefully chosen opportunity is worth more than a hundred generic submissions. We use technology as a tool—not as a substitute for judgment, care, or accountability.</p>
-        </div>
-        <div className="contrast-card contrast-muted cs-redline">
-          <span>Mass application services</span>
-          {['Hundreds of generic submissions', 'Template-based materials', 'Little context on role selection', 'No person accountable to you'].map((item) => <p key={item}><X size={16} /> {item}</p>)}
-        </div>
-        <div className="contrast-card contrast-positive cs-stamped">
-          <span className="cs-stamp" aria-hidden="true">APPROVED</span>
-          <span>The FreshlyForward standard</span>
-          {['Opportunities selected for fit', 'Materials tailored by hand', 'A reason behind every application', 'A strategist who knows your story'].map((item) => <p key={item}><Check size={16} /> {item}</p>)}
+        <div className="mt-8 flex justify-center">
+          <LinkButton to="/faq" variant="secondary">See all FAQs</LinkButton>
         </div>
       </section>
 
-      <section className="cs-schedule-section shell">
-        <SectionHeading title="Your concierge process" copy="You stay focused on your life and your future. We keep the search moving with care and consistency." />
-        <div className="cs-schedule">
-          {scenes.map(([scene, title, copy]) => (
-            <article className="cs-scene" key={scene}>
-              <span className="cs-scene-tag">{scene}</span>
-              <h3>{title}</h3>
-              <p>{copy}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="service-preview shell">
-        <div className="service-preview-copy">
-          <h2>Strategy, execution, and support—working together.</h2>
-          <p>FreshlyForward closes the gap between knowing you need a better role and having enough time, energy, and expertise to pursue it well.</p>
-          <LinkButton to="/services" variant="secondary">Explore services <ArrowRight size={18} /></LinkButton>
-        </div>
-        <div className="service-stack">
-          <div><Target /><span><strong>Search strategy</strong>Define the right roles, companies, and story.</span></div>
-          <div><ClipboardCheck /><span><strong>Application execution</strong>Research, tailor, review, and submit.</span></div>
-          <div><UserRoundCheck /><span><strong>Interview readiness</strong>Practice, refine, and build confidence.</span></div>
-          <div><Handshake /><span><strong>Ongoing coaching</strong>Navigate decisions, offers, and next moves.</span></div>
-        </div>
-      </section>
-
-      <ForwardFeedWidget />
-
-      {/* TODO(social-proof): homepage currently has zero third-party validation.
-          The hero used to carry a founder testimonial/photo as its only human
-          trust signal; the Concierge Editorial hero rebuild (2026-08-28) replaced
-          it with a sample Friday Report artifact instead, so as of that change
-          this page has no human-face or third-party proof at all above the fold.
-          Before the next marketing push, add 2-3 real client quotes/outcomes here
-          (name + result, with permission) or a placement/client-count stat.
-          Do not fill this with placeholder/fabricated quotes. */}
-
-      <section className="closing-cta cs-final-call">
-        <div className="shell closing-inner">
-          <div>
-            <span className="cs-stamp cs-stamp-light" aria-hidden="true">FINAL CALL</span>
-            <h2>Let's make your job search feel lighter—and work harder.</h2>
+      {/* Homepage Redesign Phase 1 / Task 9, corrected during the North
+          Star fidelity pass: Final CTA band. The approved spec's structure
+          section (docs/superpowers/specs/2026-09-02-homepage-design-north-
+          star.md) locks this exact headline and both CTA labels --
+          "Your next move starts here." / "Take Career Compass" / "See How
+          It Works" -- so this now matches that verbatim instead of the
+          drifted copy from the original Task 9 pass. Below the CTAs, a
+          multi-milestone journey recap echoes the hero's career-path/glow
+          language without duplicating its composition (no ring, no walking
+          figure, no floating cards) -- reuses the exact same 5 truthful
+          stage names from howItWorksSteps above (single source of truth,
+          not a second invented label set) so the closing moment reads as
+          "here's the path you just read about, and where it leads," not a
+          new claim. Final stop intentionally reads "Move Forward," not an
+          outcome/guarantee word like "Offers." */}
+      <section className="relative overflow-hidden bg-[var(--navy)] py-20 text-center text-white" aria-labelledby="final-cta-title">
+        <div className="shell relative">
+          <h2 id="final-cta-title" className="font-display text-3xl font-semibold sm:text-4xl">Your next move starts here.</h2>
+          <p className="mx-auto mt-4 max-w-xl text-[#bac8d6]">Get clarity, discover better-fit opportunities, track your search, and move forward with a connected system built around you.</p>
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
+            <LinkButton to="/career-compass">
+              Take Career Compass <ArrowRight size={18} />
+            </LinkButton>
+            <LinkButton to="/how-it-works" variant="secondary">
+              <PlayCircle size={18} /> See How It Works
+            </LinkButton>
           </div>
-          <LinkButton to="/signup" variant="light">Get started <ArrowRight size={18} /></LinkButton>
+
+          <div className="mx-auto mt-14 flex max-w-3xl items-center justify-center gap-3">
+            <div className="relative flex-1">
+              <FooterCareerPath className="pointer-events-none absolute inset-x-0 top-0 hidden h-3 w-full lg:block" />
+              <ol className="relative grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 lg:grid-cols-5 lg:gap-x-2">
+                {howItWorksSteps.map(({ title }, index) => {
+                  const isFinal = index === howItWorksSteps.length - 1
+                  return (
+                    <li key={title} className="flex flex-col items-center gap-2">
+                      {/* h-3 w-3 must stay in sync with FooterCareerPath's
+                          own wrapper height (also h-3) -- that's what makes
+                          the connecting line pass through these dots
+                          instead of floating above/below them. See the
+                          alignment note in FooterCareerPath.tsx. */}
+                      <span
+                        className={`h-3 w-3 rounded-full ring-4 ring-[var(--navy)] ${isFinal ? 'bg-[#7ee4b6]' : 'bg-[#7ee4b6]/50'}`}
+                        aria-hidden="true"
+                      />
+                      <span className={`text-xs font-semibold uppercase tracking-wide ${isFinal ? 'text-[#7ee4b6]' : 'text-[#bac8d6]'}`}>
+                        {title}
+                      </span>
+                    </li>
+                  )
+                })}
+              </ol>
+            </div>
+            {/* Small closing flourish echoing the hero's forward-momentum
+                arrow motif -- a real icon, not hand-drawn SVG coordinates,
+                so there's no viewBox-clipping risk. Hidden below lg since
+                the row wraps to 2/3 columns there and this reads oddly
+                floating outside a wrapped grid. */}
+            <ArrowUpRight className="hidden shrink-0 self-start text-[#7ee4b6] lg:block" size={20} aria-hidden="true" />
+          </div>
         </div>
       </section>
     </main>

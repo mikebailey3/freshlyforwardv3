@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Hero Direction A — Single ForwardOS Snapshot Card</title>
+<style>
+  :root { --navy:#071a31; --navy-soft:#102a46; --green:#078a58; --green-dark:#046b45; --mint:#7ee4b6; --body:#bac8d6; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: 'DM Sans', Arial, sans-serif; background:#fff; }
+  .font-hero { font-family: 'Manrope', Arial, sans-serif; }
+  header { border-bottom:1px solid #dbe4e0; background:#fff; }
+  .header-inner { max-width:1180px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; padding:16px 20px; }
+  .header-inner img { height:36px; width:auto; display:block; }
+  nav { display:flex; align-items:center; gap:24px; font-size:14px; font-weight:700; color:var(--navy); }
+  .nav-signin { border:1px solid var(--green); border-radius:8px; padding:9px 12px; color:var(--green-dark); }
+  .btn { min-height:48px; display:inline-flex; align-items:center; justify-content:center; gap:9px; border-radius:9999px; padding:0 22px; font-family:'Manrope',Arial,sans-serif; font-size:14px; font-weight:800; text-decoration:none; border:none; cursor:pointer; }
+  .btn-primary { color:#fff; background:var(--green-dark); }
+  .btn-secondary { color:var(--green-dark); border:2px solid var(--green); background:#fff; }
+  .hero { background:var(--navy); color:#fff; padding:64px 0 96px; }
+  .hero-inner { max-width:1180px; margin:0 auto; padding:0 20px; display:grid; grid-template-columns: 1.05fr 0.95fr; gap:56px; align-items:center; }
+  @media (max-width: 1023px) { .hero-inner { grid-template-columns: 1fr; } }
+  h1 { font-size:44px; font-weight:800; line-height:1.1; margin:0; }
+  h1 .accent { color: var(--mint); }
+  .copy { margin-top:24px; max-width:520px; font-size:18px; line-height:1.6; color:var(--body); }
+  .cta-row { margin-top:32px; display:flex; flex-wrap:wrap; gap:12px; }
+  .trust-row { margin-top:28px; display:flex; flex-wrap:wrap; gap:20px 20px; font-size:14px; font-weight:600; color:var(--body); }
+  .trust-row span { color: var(--mint); margin-right: 4px; }
+
+  .card { position:relative; border-radius:28px; border:1px solid rgba(255,255,255,0.15); background:linear-gradient(to bottom,#16324f,#0b2440); padding:32px; box-shadow:0 30px 60px -15px rgba(0,0,0,0.6); }
+  .card-top { display:flex; align-items:center; justify-content:space-between; }
+  .eyebrow { font-family:'Manrope',Arial,sans-serif; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:var(--mint); margin:0; }
+  .preview-tag { display:flex; align-items:center; gap:6px; font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:#7a8ba0; }
+  .dot { width:6px; height:6px; border-radius:50%; background:var(--mint); display:inline-block; }
+  .ring-row { margin-top:24px; display:flex; align-items:center; gap:24px; }
+  .ring-wrap { position:relative; width:132px; height:132px; flex-shrink:0; }
+  .ring-center { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  .ring-score { font-family:'Manrope',Arial,sans-serif; font-size:30px; font-weight:800; color:var(--mint); }
+  .ring-label { font-size:10px; font-weight:600; color:var(--body); }
+  .opp-eyebrow { font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.04em; color:var(--mint); margin:0; }
+  .opp-title { margin-top:4px; font-size:16px; font-weight:800; color:#fff; }
+  .opp-sub { font-size:14px; color:var(--body); margin:0; }
+  .divider { margin-top:24px; height:1px; width:100%; background:rgba(255,255,255,0.1); }
+  .action-row { margin-top:24px; display:flex; align-items:center; gap:12px; border-radius:16px; border:1px solid rgba(126,228,182,0.25); background:rgba(126,228,182,0.1); padding:14px 16px; }
+  .action-icon { flex-shrink:0; width:36px; height:36px; border-radius:50%; background:rgba(126,228,182,0.2); color:var(--mint); display:flex; align-items:center; justify-content:center; font-size:16px; }
+  .action-label { font-size:10px; font-weight:800; text-transform:uppercase; color:var(--mint); margin:0; }
+  .action-title { font-size:14px; font-weight:700; color:#fff; margin:2px 0 0; }
+  .strategist-row { margin-top:20px; display:flex; align-items:center; gap:10px; font-size:14px; color:var(--body); }
+  .strategist-icon { width:28px; height:28px; border-radius:50%; background:rgba(255,255,255,0.1); color:var(--mint); display:flex; align-items:center; justify-content:center; font-size:13px; }
+</style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <img src="http://localhost:5175/images/c1d368c4-ef41-494f-9a54-f5303e6f864d.png?v=2" />
+      <nav>
+        <span>Product</span><span>How It Works</span><span>Pricing</span><span>Resources</span>
+        <span class="nav-signin">Sign In</span>
+        <span class="btn btn-primary">Take Career Compass</span>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-inner">
+      <div>
+        <h1 class="font-hero">Your Career <span class="accent">Operating System</span> for What's Next.</h1>
+        <p class="copy">
+          One connected system for your career search: Career Compass points you in the right
+          direction, the Opportunity Engine and FreshFit surface and score the roles worth your
+          time, Applications keeps everything moving, and a real human strategist is there when
+          you need one.
+        </p>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="#">Take Career Compass &rarr;</a>
+          <a class="btn btn-secondary" href="#">&#9654; See How It Works</a>
+        </div>
+        <div class="trust-row">
+          <span><span>&check;</span>Personalized</span>
+          <span><span>&check;</span>AI-powered career intelligence</span>
+          <span><span>&check;</span>Human experts</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-top">
+          <p class="eyebrow">Your ForwardOS Snapshot</p>
+          <span class="preview-tag"><span class="dot"></span> Illustrative preview</span>
+        </div>
+
+        <div class="ring-row">
+          <div class="ring-wrap">
+            <svg viewBox="0 0 132 132" width="132" height="132" style="position:absolute;inset:0;">
+              <circle cx="66" cy="66" r="56" fill="none" stroke="rgba(148,163,184,0.22)" stroke-width="10" />
+              <circle cx="66" cy="66" r="56" fill="none" stroke="#7ee4b6" stroke-width="10" stroke-linecap="round"
+                stroke-dasharray="351.9" stroke-dashoffset="63.3" transform="rotate(-90 66 66)" />
+            </svg>
+            <div class="ring-center">
+              <span class="ring-score">82</span>
+              <span class="ring-label">Strong Match</span>
+            </div>
+          </div>
+          <div>
+            <p class="opp-eyebrow">Top Opportunity</p>
+            <p class="opp-title">Senior Product Manager</p>
+            <p class="opp-sub">$120K&ndash;$130K &middot; Remote</p>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="action-row">
+          <span class="action-icon">&#8594;</span>
+          <div>
+            <p class="action-label">Recommended Next Action</p>
+            <p class="action-title">Interview Practice &middot; Today, 2:00 PM</p>
+          </div>
+        </div>
+
+        <div class="strategist-row">
+          <span class="strategist-icon">&#9787;</span>
+          Your strategist is here if you need a second opinion.
+        </div>
+      </div>
+    </div>
+  </section>
+</body>
+</html>

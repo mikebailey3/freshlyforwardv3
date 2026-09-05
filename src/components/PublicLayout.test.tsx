@@ -1,0 +1,156 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { render, screen, fireEvent } from '@testing-library/react'
+import { MemoryRouter } from 'react-router-dom'
+import { SiteHeader, SiteFooter } from './PublicLayout'
+
+// Task 1 (Homepage Redesign Phase 1): the public nav is restructured from a
+// flat link list to the owner-approved structure -- Product (dropdown) /
+// How It Works / Career Compass / Pricing / Resources (dropdown) / Sign In
+// -- per docs/superpowers/specs/2026-09-02-homepage-design-north-star.md's
+// locked decision #3. Every real route the old flat nav exposed must still
+// be reachable somewhere (header or footer), logged out or in.
+//
+// Hero Redesign round 6: the North Star reference's nav has no standalone
+// "Career Compass" link -- it's Product | How It Works | Pricing |
+// Resources | Sign In | Take Career Compass, with the green CTA itself
+// routing to /career-compass. /career-compass is still covered by the
+// route-coverage test below via the CTA's href.
+
+const mockSignOut = vi.fn().mockResolvedValue(undefined)
+
+vi.mock('@/context/AuthContext', () => ({
+  useAuth: vi.fn(),
+}))
+
+import { useAuth } from '@/context/AuthContext'
+
+beforeEach(() => {
+  vi.mocked(useAuth).mockReturnValue({
+    user: null,
+    signOut: mockSignOut,
+  } as unknown as ReturnType<typeof useAuth>)
+})
+
+function renderHeader() {
+  return render(
+    <MemoryRouter>
+      <SiteHeader />
+    </MemoryRouter>,
+  )
+}
+
+function renderFooter() {
+  return render(
+    <MemoryRouter>
+      <SiteFooter />
+    </MemoryRouter>,
+  )
+}
+
+const REAL_ROUTES = [
+  '/how-it-works',
+  '/career-compass',
+  '/services',
+  '/why-freshlyforward',
+  '/pricing',
+  '/forward-feed',
+  '/about',
+  '/signin',
+  '/signup',
+]
+
+describe('SiteHeader - Product/Resources dropdown restructure (logged out)', () => {
+  it('renders exactly the approved top-level items: Product, How It Works, Pricing, Resources, Sign In, Take Career Compass', () => {
+    renderHeader()
+
+    expect(screen.getByRole('button', { name: /product/i })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'How It Works' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Pricing' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /resources/i })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /sign in|log in/i })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Take Career Compass' })).toHaveAttribute('href', '/career-compass')
+    expect(screen.queryByRole('link', { name: 'Career Compass' })).not.toBeInTheDocument()
+  })
+
+  it('opens the Product dropdown to reveal Services and Why FreshlyForward links', () => {
+    renderHeader()
+
+    fireEvent.click(screen.getByRole('button', { name: /product/i }))
+
+    expect(screen.getByRole('link', { name: 'Services' })).toHaveAttribute('href', '/services')
+    expect(screen.getByRole('link', { name: 'Why FreshlyForward' })).toHaveAttribute('href', '/why-freshlyforward')
+  })
+
+  it('opens the Resources dropdown to reveal The Forward Feed and About links', () => {
+    renderHeader()
+
+    fireEvent.click(screen.getByRole('button', { name: /resources/i }))
+
+    expect(screen.getByRole('link', { name: 'The Forward Feed' })).toHaveAttribute('href', '/forward-feed')
+    expect(screen.getByRole('link', { name: 'About' })).toHaveAttribute('href', '/about')
+  })
+
+  it('the Product and Resources dropdown triggers have proper ARIA affordances', () => {
+    renderHeader()
+
+    const productButton = screen.getByRole('button', { name: /product/i })
+    expect(productButton).toHaveAttribute('aria-haspopup', 'true')
+    expect(productButton).toHaveAttribute('aria-expanded', 'false')
+
+    fireEvent.click(productButton)
+    expect(productButton).toHaveAttribute('aria-expanded', 'true')
+  })
+})
+
+describe('SiteHeader - logged-in state unchanged', () => {
+  it('shows Dashboard + Sign Out instead of Sign In when a user is present', () => {
+    vi.mocked(useAuth).mockReturnValue({
+      user: { id: 'user-1' },
+      signOut: mockSignOut,
+    } as unknown as ReturnType<typeof useAuth>)
+
+    renderHeader()
+
+    expect(screen.getByRole('link', { name: 'Dashboard' })).toHaveAttribute('href', '/dashboard')
+    expect(screen.getByRole('button', { name: /sign out/i })).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: /sign in|log in/i })).not.toBeInTheDocument()
+  })
+})
+
+describe('Route coverage - nothing orphaned by the restructure', () => {
+  it('every real route from the old flat nav is reachable somewhere in the header (open) or footer', () => {
+    const { container: headerContainer } = renderHeader()
+    fireEvent.click(screen.getByRole('button', { name: /product/i }))
+    fireEvent.click(screen.getByRole('button', { name: /resources/i }))
+    renderFooter()
+
+    const allHrefs = new Set(
+      Array.from(document.querySelectorAll('a')).map((a) => a.getAttribute('href')),
+    )
+
+    for (const route of REAL_ROUTES) {
+      expect(allHrefs.has(route)).toBe(true)
+    }
+    void headerContainer
+  })
+})
+
+describe('SiteHeader - variant prop', () => {
+  it('defaults to the light variant (no dark class) when variant is omitted', () => {
+    render(
+      <MemoryRouter>
+        <SiteHeader />
+      </MemoryRouter>
+    )
+    expect(document.querySelector('.site-header')).not.toHaveClass('site-header-dark')
+  })
+
+  it('applies the dark variant class when variant="dark" is passed', () => {
+    render(
+      <MemoryRouter>
+        <SiteHeader variant="dark" />
+      </MemoryRouter>
+    )
+    expect(document.querySelector('.site-header')).toHaveClass('site-header-dark')
+  })
+})

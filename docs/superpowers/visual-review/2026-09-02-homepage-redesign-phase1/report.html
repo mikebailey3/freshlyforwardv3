@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>FreshlyForward — Homepage Redesign Phase 1 — Visual Review</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+  <header class="bg-slate-900 text-white">
+    <div class="max-w-6xl mx-auto px-6 py-10">
+      <p class="text-emerald-400 font-semibold tracking-wide uppercase text-sm">Visual Review · Not Merged</p>
+      <h1 class="text-3xl md:text-4xl font-bold mt-2">Homepage Redesign — North Star Fidelity Pass</h1>
+      <p class="text-slate-300 mt-3 max-w-3xl">
+        Branch <code class="bg-slate-800 px-2 py-0.5 rounded">homepage-redesign-phase1</code> only —
+        <code class="bg-slate-800 px-2 py-0.5 rounded">main</code> has not been touched.
+        This pass brought the live implementation closer to the approved North Star reference image:
+        a denser hero, richer flagship product previews, a wavy How It Works connector, a two-column FAQ,
+        and the spec-locked Final CTA copy.
+      </p>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-6 py-10 space-y-12">
+
+    <!-- Executive summary -->
+    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+      <h2 class="text-xl font-bold mb-4">Executive Summary</h2>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
+        <div class="bg-emerald-50 rounded-xl p-4">
+          <p class="text-3xl font-bold text-emerald-700">359/359</p>
+          <p class="text-sm text-slate-600 mt-1">tests passing</p>
+        </div>
+        <div class="bg-emerald-50 rounded-xl p-4">
+          <p class="text-3xl font-bold text-emerald-700">65/65</p>
+          <p class="text-sm text-slate-600 mt-1">test files</p>
+        </div>
+        <div class="bg-emerald-50 rounded-xl p-4">
+          <p class="text-3xl font-bold text-emerald-700">PASS</p>
+          <p class="text-sm text-slate-600 mt-1">clean production build</p>
+        </div>
+        <div class="bg-amber-50 rounded-xl p-4">
+          <p class="text-3xl font-bold text-amber-700">0</p>
+          <p class="text-sm text-slate-600 mt-1">changes to main</p>
+        </div>
+      </div>
+      <p class="mt-4 text-slate-600 text-sm">
+        No fabricated testimonials, ratings, metrics, live statuses, named strategists, or invented pricing plans
+        were introduced. All illustrative preview data is explicitly labeled "Sample." Career Vault remains
+        clearly marked "Coming Soon." Pricing continues to render only real <code>membership_plans</code> data.
+      </p>
+    </section>
+
+    <!-- Screenshots -->
+    <section>
+      <h2 class="text-xl font-bold mb-4">Final Screenshots</h2>
+      <div class="space-y-8">
+
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+          <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+            <h3 class="font-semibold">Desktop</h3>
+            <span class="text-xs text-slate-400">task10-final-desktop.png</span>
+          </div>
+          <img src="task10-final-desktop.png" alt="Desktop homepage screenshot" class="w-full" />
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+              <h3 class="font-semibold">Tablet</h3>
+              <span class="text-xs text-slate-400">task10-final-tablet.png</span>
+            </div>
+            <img src="task10-final-tablet.png" alt="Tablet homepage screenshot" class="w-full" />
+          </div>
+          <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+              <h3 class="font-semibold">Mobile</h3>
+              <span class="text-xs text-slate-400">task10-final-mobile.png</span>
+            </div>
+            <img src="task10-final-mobile.png" alt="Mobile homepage screenshot" class="w-full" />
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Changed files -->
+    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+      <h2 class="text-xl font-bold mb-4">What Changed (commit <code>bdab3b9</code>)</h2>
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="text-left text-slate-500 border-b border-slate-200">
+            <th class="py-2 pr-4">File</th>
+            <th class="py-2">Change</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          <tr><td class="py-2 pr-4 font-mono text-xs">src/pages/LandingPage.tsx</td><td class="py-2">Denser hero, richer flagship/support previews, wavy connector, 2-col FAQ, spec-locked Final CTA, z-index fix</td></tr>
+          <tr><td class="py-2 pr-4 font-mono text-xs">src/pages/LandingPage.test.tsx</td><td class="py-2">+8 guardrail tests (no named strategist, no fake vault counts, Sample labeling, CTA copy, 6 FAQ questions)</td></tr>
+          <tr><td class="py-2 pr-4 font-mono text-xs">src/components/homepage/CareerCompassRadar.tsx</td><td class="py-2">New — decorative radar, no data/claims</td></tr>
+          <tr><td class="py-2 pr-4 font-mono text-xs">src/components/homepage/ApplicationsStatusPreview.tsx</td><td class="py-2">New — sample status pills, labeled "Sample"</td></tr>
+          <tr><td class="py-2 pr-4 font-mono text-xs">src/components/homepage/FlagshipOpportunityPreview.tsx</td><td class="py-2">New — mini preview modeled on real MatchCard</td></tr>
+          <tr><td class="py-2 pr-4 font-mono text-xs">src/components/homepage/FlagshipFreshFitPreview.tsx</td><td class="py-2">New — reuses real CircularProgress + real score dimensions</td></tr>
+          <tr><td class="py-2 pr-4 font-mono text-xs">src/components/homepage/FlagshipVaultPreview.tsx</td><td class="py-2">New — dimmed placeholder rows, lock icon, Coming Soon</td></tr>
+          <tr><td class="py-2 pr-4 font-mono text-xs">src/components/homepage/FooterCareerPath.tsx</td><td class="py-2">New — decorative SVG path for Final CTA</td></tr>
+          <tr><td class="py-2 pr-4 font-mono text-xs">src/components/homepage/HowItWorksConnector.tsx</td><td class="py-2">New — wavy connector with numbered badges</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Guardrails -->
+    <section class="bg-slate-900 text-white rounded-2xl p-6">
+      <h2 class="text-xl font-bold mb-4">Truthfulness Guardrails Held</h2>
+      <ul class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 text-sm text-slate-200 list-disc list-inside">
+        <li>Career Vault stays visibly "Coming Soon"</li>
+        <li>No fake asset counts, dates, or live statuses</li>
+        <li>No named or "online" strategist presence</li>
+        <li>No testimonials, ratings, or customer proof</li>
+        <li>No invented pricing plans — real membership_plans data only</li>
+        <li>FAQ questions are verbatim from FaqPage.tsx</li>
+        <li>Illustrative preview data explicitly labeled "Sample"</li>
+        <li>Final CTA copy matches the approved spec exactly</li>
+      </ul>
+    </section>
+
+    <!-- Bottom line -->
+    <section class="text-center py-6">
+      <p class="text-slate-500 text-sm">
+        Compare on GitHub:
+        <a class="text-emerald-700 underline" href="https://github.com/mikebailey3/freshlyforwardv3/compare/main...homepage-redesign-phase1" target="_blank">
+          main...homepage-redesign-phase1
+        </a>
+      </p>
+      <p class="text-slate-400 text-xs mt-2">main is untouched. Awaiting sign-off before any merge.</p>
+    </section>
+
+  </main>
+</body>
+</html>
