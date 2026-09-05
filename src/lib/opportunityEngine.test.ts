@@ -94,7 +94,7 @@ function makeFakeClient(opts: {
     throw new Error(`Unexpected table: ${table}`)
   })
 
-  return { client: { from: fromMock } as unknown as SupabaseClient, dnaSelect, dnaEq }
+  return { client: { from: fromMock } as unknown as SupabaseClient, dnaSelect, dnaEq, jobMatchesInsert }
 }
 
 const submissionProfile = { user_id: 'member-1', skills: ['sql'] } as unknown as MemberProfile
@@ -108,7 +108,7 @@ describe('submitMemberJob', () => {
       posting_url: '', posted_at: null, search_query: 'member-submitted', is_active: true, scraped_at: '', created_at: '',
     }
     const matchRow = { id: 'match-1', member_id: 'member-1', scraped_job_id: 'job-1' }
-    const { client, dnaSelect, dnaEq } = makeFakeClient({ jobRow, matchRow })
+    const { client, dnaSelect, dnaEq, jobMatchesInsert } = makeFakeClient({ jobRow, matchRow })
 
     const { match, error } = await submitMemberJob(submissionProfile, submissionInput, client)
 
@@ -117,6 +117,13 @@ describe('submitMemberJob', () => {
     expect(match?.scraped_job).toEqual(jobRow)
     expect(dnaSelect).toHaveBeenCalledTimes(2)
     expect(dnaEq).toHaveBeenCalledWith('user_id', 'member-1')
+
+    // engine_version must always be 2 (the v2 engine) for every member submission --
+    // engine_version 1 is reserved exclusively for rows that predate the
+    // 20260905000000_freshfit_engine_v2 migration and are never produced by new code.
+    expect(jobMatchesInsert).toHaveBeenCalledWith(
+      expect.objectContaining({ engine_version: 2 })
+    )
   })
 
   it('returns an error when the scraped_jobs insert fails', async () => {
