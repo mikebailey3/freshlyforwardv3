@@ -9,6 +9,12 @@ import { SiteHeader, SiteFooter } from './PublicLayout'
 // -- per docs/superpowers/specs/2026-09-02-homepage-design-north-star.md's
 // locked decision #3. Every real route the old flat nav exposed must still
 // be reachable somewhere (header or footer), logged out or in.
+//
+// Hero Redesign round 6: the North Star reference's nav has no standalone
+// "Career Compass" link -- it's Product | How It Works | Pricing |
+// Resources | Sign In | Take Career Compass, with the green CTA itself
+// routing to /career-compass. /career-compass is still covered by the
+// route-coverage test below via the CTA's href.
 
 const mockSignOut = vi.fn().mockResolvedValue(undefined)
 
@@ -54,15 +60,16 @@ const REAL_ROUTES = [
 ]
 
 describe('SiteHeader - Product/Resources dropdown restructure (logged out)', () => {
-  it('renders exactly the approved top-level items: Product, How It Works, Career Compass, Pricing, Resources, Sign In', () => {
+  it('renders exactly the approved top-level items: Product, How It Works, Pricing, Resources, Sign In, Take Career Compass', () => {
     renderHeader()
 
     expect(screen.getByRole('button', { name: /product/i })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'How It Works' })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Career Compass' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Pricing' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /resources/i })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /sign in|log in/i })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Take Career Compass' })).toHaveAttribute('href', '/career-compass')
+    expect(screen.queryByRole('link', { name: 'Career Compass' })).not.toBeInTheDocument()
   })
 
   it('opens the Product dropdown to reveal Services and Why FreshlyForward links', () => {

@@ -12,6 +12,17 @@ import { useAuth } from '@/context/AuthContext'
 // FreshlyForward moved into the Product dropdown; The Forward Feed and
 // About moved into the Resources dropdown) -- see PublicLayout.test.tsx's
 // route-coverage test.
+//
+// Hero Redesign round 6 (literal North Star fidelity pass): the reference
+// image's nav is Product | How It Works | Pricing | Resources | Sign In |
+// Take Career Compass -- no standalone "Career Compass" link, and the
+// primary green CTA is relabeled from "Get started" to "Take Career
+// Compass" and now routes to /career-compass instead of /signup. The
+// route itself is untouched and stays reachable -- it just moved from a
+// dedicated nav link onto the CTA button, matching the reference exactly.
+// /signup remains reachable via the footer's existing "Get started" link,
+// so nothing is orphaned (see PublicLayout.test.tsx's route-coverage
+// test).
 const productLinks = [
   ['/services', 'Services'],
   ['/why-freshlyforward', 'Why FreshlyForward'],
@@ -19,7 +30,6 @@ const productLinks = [
 
 const primaryNav = [
   ['/how-it-works', 'How It Works'],
-  ['/career-compass', 'Career Compass'],
   ['/pricing', 'Pricing'],
 ] as const
 
@@ -140,8 +150,8 @@ export function SiteHeader({ variant = 'light' }: { variant?: 'light' | 'dark' }
                 <Link to="/signin" className="nav-login" onClick={() => setOpen(false)}>
                   Sign In
                 </Link>
-                <Link to="/signup" className="button button-primary button-small" onClick={() => setOpen(false)}>
-                  Get started
+                <Link to="/career-compass" className="button button-primary button-small" onClick={() => setOpen(false)}>
+                  Take Career Compass
                 </Link>
               </>
             )}

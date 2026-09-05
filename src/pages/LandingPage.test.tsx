@@ -77,6 +77,21 @@ describe('LandingPage - no fabricated/unsupported content (Homepage Redesign Pha
     expect(allLinks.some((a) => a.getAttribute('href') === '/career-vault')).toBe(false)
   })
 
+  // Hero Redesign round 6 (literal North Star fidelity pass): the owner
+  // explicitly authorized an illustrative asset-count style on the hero's
+  // Career Vault card (matching the reference's density), on the explicit
+  // condition that it's paired with a clear "Coming Soon" marker on that
+  // same card so it never implies live click access. This replaces the
+  // earlier blanket "never shows 23 Assets" rule -- the number itself is
+  // fine now; what's still forbidden is showing it WITHOUT the Coming Soon
+  // pairing, or as a real link.
+  it('shows the hero Career Vault card\'s illustrative asset count only alongside its own Coming Soon marker', () => {
+    renderLandingPage()
+    const heroVaultCard = screen.getByTestId('hero-career-vault-card')
+    expect(within(heroVaultCard).getByText(/23 Assets/i)).toBeInTheDocument()
+    expect(within(heroVaultCard).getByText(/Coming Soon/i)).toBeInTheDocument()
+  })
+
   it('never shows the reference image\'s literal fabricated pricing (this task does not touch pricing yet)', () => {
     renderLandingPage()
     for (const fake of ['Starter', 'Strategist+', '$19', '$39', '$99', 'Kickstarter Special']) {
@@ -117,11 +132,6 @@ describe('LandingPage - no fabricated/unsupported content (Homepage Redesign Pha
     renderLandingPage()
     expect(screen.queryByText(/is online/i)).not.toBeInTheDocument()
     expect(screen.queryByText(/Monica/i)).not.toBeInTheDocument()
-  })
-
-  it('never shows a specific fabricated Career Vault asset count like "23 Assets"', () => {
-    renderLandingPage()
-    expect(screen.queryByText(/23 Assets/i)).not.toBeInTheDocument()
   })
 
   it('marks illustrative preview data (FreshFit breakdown, matches, application counts) as Sample', () => {

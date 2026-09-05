@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>FreshlyForward Hero — Round 4 Composition Rebuild</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans">
+  <div class="max-w-6xl mx-auto px-6 py-10">
+    <header class="mb-10">
+      <h1 class="text-3xl font-bold text-slate-900">Hero — Round 4: Full Composition Rebuild</h1>
+      <p class="mt-2 text-slate-600">Branch <code class="bg-slate-200 px-1.5 py-0.5 rounded">homepage-redesign-phase1</code> · <strong>Uncommitted, not pushed.</strong> This is a screenshot checkpoint for visual review before committing.</p>
+    </header>
+
+    <section class="mb-10 bg-white border border-slate-300 rounded-lg p-6">
+      <h2 class="text-lg font-bold text-slate-900 mb-2">What changed this round (composition, not positioning)</h2>
+      <ul class="list-disc pl-6 space-y-1 text-sm">
+        <li>FreshFit ring is now absolutely positioned exactly where the path is drawn through it, with a higher z-index -- the path visually runs into the ring and continues out the other side.</li>
+        <li>Ring is significantly larger: 240px desktop (was 196), 180px tablet (was 140).</li>
+        <li>Graphic column grows from 460px to 600px min-height on desktop -- uses vertical space already present in the row (left column is naturally ~618px tall), so the section itself did not grow.</li>
+        <li>Human figure replaced: a stylized "walking forward" pictogram (leaning torso, mid-stride legs, swinging arm) instead of the old static bust silhouette.</li>
+        <li>Down to 3 desktop cards -- Career Direction, Top Opportunity, Strategist Support -- each attached to the journey by a thin connector stub, not scattered independently.</li>
+        <li>Tablet is a separate, deliberately-composed layout (own node coordinates, not a shrunk desktop copy): bigger ring, 2 cards, centered.</li>
+        <li>Mobile gets a brand new compact horizontal journey (person → path → FreshFit → one card) instead of hiding the graphic entirely.</li>
+        <li>Card contrast bumped again (+14% white tint, stronger ring/shadow) per "still too faint" feedback.</li>
+      </ul>
+    </section>
+
+    <section class="mb-12">
+      <h2 class="text-2xl font-bold text-slate-900 mb-4">Desktop — 1440px</h2>
+      <img src="hero-round4-desktop.png" class="w-full rounded border border-slate-300" />
+    </section>
+
+    <section class="mb-12 grid grid-cols-2 gap-6">
+      <div>
+        <h2 class="text-xl font-bold text-slate-900 mb-3">Tablet — 834px</h2>
+        <img src="hero-round4-tablet.png" class="w-full rounded border border-slate-300" />
+      </div>
+      <div>
+        <h2 class="text-xl font-bold text-slate-900 mb-3">Mobile — 390px</h2>
+        <img src="hero-round4-mobile.png" class="w-full rounded border border-slate-300" />
+      </div>
+    </section>
+
+    <section class="mb-12 bg-white border border-slate-300 rounded-lg p-6">
+      <h2 class="text-lg font-bold text-slate-900 mb-3">Validation</h2>
+      <ul class="list-disc pl-6 space-y-1 text-sm">
+        <li>Focused hero test suite: 14/14 passed.</li>
+        <li>Full suite: 65 files / 364 tests passed.</li>
+        <li>Build: clean (only the pre-existing bundle-size warning).</li>
+        <li>No horizontal overflow at tablet or mobile.</li>
+        <li>No card/ring/path overlaps found in the final render at any breakpoint.</li>
+      </ul>
+    </section>
+
+    <section class="bg-amber-50 border border-amber-300 rounded-lg p-5">
+      <p class="text-amber-900 text-sm">Not committed, not pushed. Stopping here per instructions for visual review before any further action.</p>
+    </section>
+  </div>
+</body>
+</html>

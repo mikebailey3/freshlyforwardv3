@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>FreshlyForward Hero — Round 5 Literal Fidelity Pass</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans">
+  <div class="max-w-6xl mx-auto px-6 py-10">
+    <header class="mb-10">
+      <h1 class="text-3xl font-bold text-slate-900">Hero — Round 5: Literal Fidelity Pass vs. North Star</h1>
+      <p class="mt-2 text-slate-600">Branch <code class="bg-slate-200 px-1.5 py-0.5 rounded">homepage-redesign-phase1</code> · <strong>Uncommitted, not pushed.</strong> Coordinates were measured directly from the reference image, not re-invented.</p>
+    </header>
+
+    <section class="mb-12">
+      <h2 class="text-2xl font-bold text-slate-900 mb-4">Side-by-side — Desktop</h2>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <p class="text-sm font-semibold text-slate-700 mb-2">North Star reference (hero crop)</p>
+          <img src="north-star-hero-crop.png" class="w-full rounded border border-slate-300" />
+        </div>
+        <div>
+          <p class="text-sm font-semibold text-slate-700 mb-2">Current implementation (1440px)</p>
+          <img src="hero-round5-desktop.png" class="w-full rounded border border-slate-300" />
+        </div>
+      </div>
+    </section>
+
+    <section class="mb-10 bg-white border border-slate-300 rounded-lg p-6">
+      <h2 class="text-lg font-bold text-slate-900 mb-2">What changed this round (measured, not guessed)</h2>
+      <ul class="list-disc pl-6 space-y-1 text-sm">
+        <li>Every card/path/ring coordinate was measured from the reference's own hero-cluster bounding box (treated as its own 0-100% coordinate space) -- see the header comment in <code>HeroCareerPath.tsx</code>.</li>
+        <li>FreshFit moved from x=52% to x=40% (center-left of the cluster, matching the reference) instead of sitting isolated at the far right.</li>
+        <li>Path rebuilt as a 4-point winding curve (person → past the ring → a mid-right node → destination) with 2 visible milestone dots, restrained-but-obvious glow, and a destination marker -- not a single thin arc.</li>
+        <li>Figure's SVG scale grew from 0.13 to 0.22 -- now reads immediately as a person, not an icon-sized mark.</li>
+        <li>Card count grew from 3 to 7, matching the reference's density: Top Opportunity, Career Direction, Search Readiness, Skill Gap, Goal Progress, Applications, Strategist Support -- each at the reference's own layout slot. 2 (Top Opportunity, Applications) stay full-size as primary; the other 5 use a smaller/quieter treatment so it reads as layered, not 7 equally-loud widgets.</li>
+        <li>Two reference slots got truthful substitutions instead of literal copies: "Career Vault — 23 Assets" → Career Direction (Career Vault is still Coming Soon in this product); the named/photo'd "Monica is online" strategist → a generic icon avatar (matching this codebase's existing anti-fabrication convention).</li>
+        <li>Tablet got its own denser pass: bigger ring (200px), 3 cards instead of 2, tightened container height to cut dead space. Fixed a bug along the way where the walking figure was rendering hidden behind a card.</li>
+        <li>Mobile is unchanged this round -- round 4 feedback called it "better," and this round's requested changes were desktop/tablet only.</li>
+      </ul>
+    </section>
+
+    <section class="mb-12 grid grid-cols-2 gap-6">
+      <div>
+        <h2 class="text-xl font-bold text-slate-900 mb-3">Tablet — 834px</h2>
+        <img src="hero-round5-tablet.png" class="w-full rounded border border-slate-300" />
+      </div>
+      <div>
+        <h2 class="text-xl font-bold text-slate-900 mb-3">Mobile — 390px (unchanged)</h2>
+        <img src="hero-round5-mobile.png" class="w-full rounded border border-slate-300" />
+      </div>
+    </section>
+
+    <section class="mb-12 bg-white border border-slate-300 rounded-lg p-6">
+      <h2 class="text-lg font-bold text-slate-900 mb-3">Validation</h2>
+      <ul class="list-disc pl-6 space-y-1 text-sm">
+        <li>Focused hero test suite: 14/14 passed.</li>
+        <li>Full suite: 65 files / 364 tests passed.</li>
+        <li>Build: clean (only the pre-existing bundle-size warning).</li>
+        <li>No horizontal overflow at tablet or mobile.</li>
+        <li>Two bugs caught and fixed mid-pass via screenshots: a card overlapping the walking figure on desktop, and the figure rendering hidden behind a card on tablet.</li>
+      </ul>
+    </section>
+
+    <section class="bg-amber-50 border border-amber-300 rounded-lg p-5">
+      <p class="text-amber-900 text-sm">Not committed, not pushed. Please compare the side-by-side above against your own read of the reference and flag anything that still needs another iteration.</p>
+    </section>
+  </div>
+</body>
+</html>
