@@ -417,6 +417,24 @@ export interface ScrapedJob {
   created_at: string
 }
 
+/** FreshFit 2.0's richer explainable payload -- additive to the jsonb
+ * `score_breakdown` column, no migration required for this shape (see
+ * docs/superpowers/specs/2026-09-05-freshfit-2.0-explainable-scoring-design.md).
+ * Imported from src/lib/freshFitScore/types.ts deliberately one-directionally
+ * -- that file must never import back from here, or the two would cycle. */
+import type {
+  FreshFitDimensionResult, FreshFitHardConstraint, FreshFitConfidence, FreshFitTier, FreshFitRecommendation,
+} from '@/lib/freshFitScore/types'
+
+export interface FreshFitV2Breakdown {
+  tier: FreshFitTier
+  confidence: FreshFitConfidence
+  dimensions: FreshFitDimensionResult[]
+  hardConstraints: FreshFitHardConstraint[]
+  unknowns: string[]
+  recommendation: FreshFitRecommendation
+}
+
 export interface JobMatchScoreBreakdown {
   skillsCoverage: number
   roleRelevance: number
@@ -424,6 +442,8 @@ export interface JobMatchScoreBreakdown {
   keywordDensity: number
   dnaSkillEvidence?: number
   scopeFit?: number
+  /** Present on every match computed by the v2 engine (engine_version = 2). */
+  v2?: FreshFitV2Breakdown
 }
 
 export interface JobMatch {
@@ -437,6 +457,8 @@ export interface JobMatch {
   dismissed_at: string | null
   promoted_opportunity_id: string | null
   computed_at: string
+  /** 1 = original heuristic engine, 2 = FreshFit 2.0 explainable engine. Defaults to 1 for pre-existing rows via the migration's column default. */
+  engine_version: number
 }
 
 export interface JobMatchWithJob extends JobMatch {

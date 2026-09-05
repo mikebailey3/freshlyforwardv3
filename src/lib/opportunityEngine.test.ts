@@ -7,7 +7,7 @@ function makeMatch(overrides: Partial<JobMatchWithJob> = {}): JobMatchWithJob {
   return {
     id: 'm1', member_id: 'u1', scraped_job_id: 'j1', fresh_fit_score: 72,
     matched_skills: ['sql', 'excel'], missing_skills: [], score_breakdown: {},
-    dismissed_at: null, promoted_opportunity_id: null, computed_at: '2026-01-01',
+    dismissed_at: null, promoted_opportunity_id: null, computed_at: '2026-01-01', engine_version: 2,
     scraped_job: {
       id: 'j1', source: 'greenhouse', external_id: '1', title: 'Analyst', company: 'Acme',
       location: null, description: '', salary_text: null, employment_type: null, posting_url: '',
@@ -35,6 +35,29 @@ describe('buildWhyItMatches', () => {
     )
     expect(text).toContain('partial fit')
   })
+
+  it('uses the richer v2 recommendation copy when score_breakdown.v2 is present', () => {
+    const text = buildWhyItMatches(
+      makeMatch({
+        score_breakdown: {
+          skillsCoverage: 40, roleRelevance: 10, locationFit: 10, keywordDensity: 5,
+          v2: {
+            tier: 'good', confidence: 'high',
+            dimensions: [
+              { key: 'skillsEvidence', label: 'Skills & Evidence', score: 80, weight: 0.4, status: 'strong', explanation: '', evidence: [], gaps: ['python'], unknowns: [], improvementLink: null },
+            ],
+            hardConstraints: [],
+            unknowns: ['whether pay meets your expectations'],
+            recommendation: { key: 'worth_a_look', headline: 'Worth a look', detail: '' },
+          },
+        },
+      })
+    )
+    expect(text).toContain('Good Match')
+    expect(text).toContain('Worth a look')
+    expect(text).toContain('1 confirmed gap(s)')
+    expect(text).toContain('1 area(s) unclear')
+  })
 })
 
 function makeFakeClient(opts: {
@@ -58,10 +81,16 @@ function makeFakeClient(opts: {
   const dnaEq = vi.fn().mockResolvedValue({ data: [], error: null })
   const dnaSelect = vi.fn().mockReturnValue({ eq: dnaEq })
 
+  const compassMaybeSingle = vi.fn().mockResolvedValue({ data: null, error: null })
+  const compassEq2 = vi.fn().mockReturnValue({ maybeSingle: compassMaybeSingle })
+  const compassEq1 = vi.fn().mockReturnValue({ eq: compassEq2 })
+  const compassSelect = vi.fn().mockReturnValue({ eq: compassEq1 })
+
   const fromMock = vi.fn((table: string) => {
     if (table === 'scraped_jobs') return { insert: scrapedJobsInsert }
     if (table === 'job_matches') return { insert: jobMatchesInsert }
     if (table === 'career_skills' || table === 'career_scope') return { select: dnaSelect }
+    if (table === 'career_compass_results') return { select: compassSelect }
     throw new Error(`Unexpected table: ${table}`)
   })
 

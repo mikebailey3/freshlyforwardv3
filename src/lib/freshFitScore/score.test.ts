@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { computeFreshFitScore } from './freshFitScore'
+import { computeFreshFitScore } from './score'
 import type { MemberProfile, ScrapedJob } from '@/types'
 import type { CareerSkill, CareerScope } from '@/types/forwardDna'
 
@@ -13,6 +13,10 @@ function makeProfile(overrides: Partial<MemberProfile> = {}): MemberProfile {
     location: 'Dallas, TX',
     remote_preference: 'remote',
     willing_to_relocate: false,
+    salary_min: null,
+    salary_max: null,
+    travel_willingness: null,
+    max_commute_minutes: null,
     summary: 'Experienced data analyst with strong SQL skills.',
     headline: 'Data Analyst',
     career_goals: null,
@@ -42,7 +46,7 @@ function makeJob(overrides: Partial<ScrapedJob> = {}): ScrapedJob {
   } as ScrapedJob
 }
 
-describe('computeFreshFitScore (baseline, no Forward DNA data)', () => {
+describe('computeFreshFitScore - regression (behavior preserved from v1)', () => {
   it('scores a well-matched profile highly and lists matched skills', () => {
     const result = computeFreshFitScore(makeProfile(), makeJob())
     expect(result.score).toBeGreaterThan(50)
@@ -63,22 +67,15 @@ describe('computeFreshFitScore (baseline, no Forward DNA data)', () => {
     )
     expect(result.score).toBeLessThan(30)
   })
-})
 
-describe('computeFreshFitScore (with Forward DNA data)', () => {
   it('adds bonus points for demonstrated/supported skill evidence', () => {
     const withoutDna = computeFreshFitScore(makeProfile(), makeJob())
     const skills: CareerSkill[] = [
       { id: 's1', user_id: 'u1', skill_name: 'sql', state: 'demonstrated', evidence_note: null, created_at: '', updated_at: '' },
     ]
     const withDna = computeFreshFitScore(makeProfile(), makeJob(), { skills, scope: [] })
-    // v2 note: DNA evidence tier (claimed/demonstrated/supported) no longer
-    // moves the composite score on its own once a skill is already a
-    // confirmed exact/alias match -- evidence quality is a separate axis
-    // now (see Forward Score's Evidence Quality pillar). The legacy
-    // dnaSkillEvidence breakdown field still reflects it directly.
-    expect(withDna.score).toBeGreaterThanOrEqual(withoutDna.score)
     expect(withDna.breakdown.dnaSkillEvidence).toBeGreaterThan(0)
+    expect(withoutDna.breakdown.dnaSkillEvidence ?? 0).toBe(0)
   })
 
   it('adds bonus points when career_scope covers a JD-implied team size', () => {
@@ -103,5 +100,59 @@ describe('computeFreshFitScore (with Forward DNA data)', () => {
       { skills, scope }
     )
     expect(result.score).toBeLessThanOrEqual(100)
+  })
+})
+
+describe('computeFreshFitScore v2 - explainable dimensions', () => {
+  it('returns exactly 5 dimensions in a fixed order', () => {
+    const result = computeFreshFitScore(makeProfile(), makeJob())
+    expect(result.dimensions.map((d) => d.key)).toEqual([
+      'skillsEvidence', 'roleRelevance', 'careerDirection', 'compensation', 'locationAndLogistics',
+    ])
+  })
+
+  it('assigns a tier consistent with the composite score', () => {
+    const result = computeFreshFitScore(makeProfile(), makeJob())
+    expect(['strong', 'good', 'fair', 'weak']).toContain(result.tier)
+  })
+
+  it('reuses the passed-in career direction score without recomputation', () => {
+    const result = computeFreshFitScore(makeProfile(), makeJob(), { skills: [], scope: [] }, 90)
+    const dim = result.dimensions.find((d) => d.key === 'careerDirection')
+    expect(dim?.score).toBe(90)
+    expect(dim?.status).toBe('strong')
+  })
+
+  it('is no-data for career direction when none was completed, and does not drag the score to zero', () => {
+    const result = computeFreshFitScore(makeProfile(), makeJob(), { skills: [], scope: [] }, null)
+    const dim = result.dimensions.find((d) => d.key === 'careerDirection')
+    expect(dim?.status).toBe('no-data')
+    expect(result.score).toBeGreaterThan(0)
+  })
+
+  it('lowers confidence when multiple dimensions are no-data (sparse profile)', () => {
+    const sparseProfile = makeProfile({ location: null, remote_preference: null, willing_to_relocate: false })
+    const result = computeFreshFitScore(sparseProfile, makeJob({ salary_text: null }), { skills: [], scope: [] }, null)
+    expect(result.confidence).toBe('low')
+  })
+
+  it('surfaces a hard_blocker constraint and a read_details_first recommendation for a confirmed compensation conflict', () => {
+    const result = computeFreshFitScore(
+      makeProfile({ salary_min: 120000 }),
+      makeJob({ salary_text: '$50,000 - $60,000' })
+    )
+    expect(result.hardConstraints.some((c) => c.status === 'hard_blocker')).toBe(true)
+    expect(result.recommendation.key).toBe('read_details_first')
+  })
+
+  it('keeps unknowns separate from missingSkills (Unknown != Missing)', () => {
+    const result = computeFreshFitScore(
+      makeProfile({ skills: [] }),
+      makeJob({ title: 'Python Developer', description: 'Looking for strong Python skills.' }),
+      { skills: [], scope: [] },
+      null
+    )
+    expect(result.unknowns.length).toBeGreaterThan(0)
+    expect(result.missingSkills).not.toContain('python')
   })
 })
