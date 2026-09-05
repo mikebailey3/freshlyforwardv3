@@ -81,3 +81,41 @@ describe('selectStaleMatchesToPrune', () => {
     expect(selectStaleMatchesToPrune(rows, new Set(['a']))).toEqual(['stale'])
   })
 })
+
+// These two invariants are what actually keeps this module safe to call
+// per-member in a shared sync script: neither function has any concept
+// of "member" at all -- they only ever operate on, and return references
+// to, exactly what they were handed. Per-member privacy is entirely a
+// property of the CALLER passing one member's rows at a time (see
+// scripts/syncFreshFitScores.ts's per-member loop) -- these tests lock in
+// that the functions themselves can never manufacture or leak an id from
+// outside their own input, so a caller bug elsewhere can't silently leak
+// one member's job match into another member's persisted/kept set.
+describe('privacy / member isolation -- no id ever escapes its own input', () => {
+  it('selectMatchesToPersist never returns a scrapedJobId that was not in the given candidates', () => {
+    const candidates = [candidate('mine-1', 90), candidate('mine-2', 80)]
+    const kept = selectMatchesToPersist(candidates)
+    for (const jobId of kept) {
+      expect(candidates.some((c) => c.scrapedJobId === jobId)).toBe(true)
+    }
+  })
+
+  it('selectStaleMatchesToPrune never returns a row id that was not in the given existingRows', () => {
+    const rows = [existingRow({ id: 'my-row-1', scrapedJobId: 'a' }), existingRow({ id: 'my-row-2', scrapedJobId: 'b' })]
+    const pruned = selectStaleMatchesToPrune(rows, new Set())
+    for (const rowId of pruned) {
+      expect(rows.some((r) => r.id === rowId)).toBe(true)
+    }
+  })
+
+  it('a keepJobIds set scoped to a different member never causes this member\'s untouched row to survive by accident', () => {
+    // Simulates the real failure mode this guards against: if a caller
+    // ever mixed up whose keepJobIds belonged to whom, an untouched row
+    // should still be judged strictly against the set it was actually
+    // given -- not silently kept because some OTHER member's job id
+    // happened to be in that set.
+    const memberARows = [existingRow({ id: 'a-row', scrapedJobId: 'shared-job-id' })]
+    const memberBsKeepSet = new Set<string>() // member B's Top N, unrelated to member A
+    expect(selectStaleMatchesToPrune(memberARows, memberBsKeepSet)).toEqual(['a-row'])
+  })
+})

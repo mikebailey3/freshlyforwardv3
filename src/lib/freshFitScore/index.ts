@@ -5,6 +5,8 @@
 // site resolves identically with zero changes required there.
 export { computeFreshFitScore, toScoreBreakdownPayload } from './score'
 export { SKILL_KEYWORDS, findSkillsInText } from './skillMatching'
+export { inferSeniorityLevel, getMemberCurrentSeniority } from './seniority'
+export type { SeniorityLevel } from './seniority'
 export { getFreshFitTier, FRESHFIT_TIER_LABELS, FRESHFIT_TIER_STYLES } from './tiers'
 export {
   selectMatchesToPersist,
