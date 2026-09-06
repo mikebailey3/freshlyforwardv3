@@ -166,17 +166,17 @@ export function OnboardingQuestionnaire({ onNext, onBack, user }: OnboardingStep
 
   return (
     <div>
-      <h1 className="font-serif text-3xl font-semibold text-neutral-900 sm:text-4xl">
+      <h1 className="font-serif text-3xl font-semibold text-ink sm:text-4xl">
         Career Questionnaire
       </h1>
-      <p className="mt-4 text-lg text-neutral-600">
+      <p className="mt-4 text-lg text-ink-muted">
         Help us understand your career so your Strategist can build a personalized plan.
       </p>
 
       {/* Autosave indicator */}
       <div className="mt-4 flex items-center gap-2 text-xs">
         {saving ? (
-          <span className="flex items-center gap-1.5 text-neutral-500">
+          <span className="flex items-center gap-1.5 text-ink-muted">
             <Loader2 className="h-3 w-3 animate-spin" />
             Saving…
           </span>
@@ -186,17 +186,17 @@ export function OnboardingQuestionnaire({ onNext, onBack, user }: OnboardingStep
             Autosaved
           </span>
         ) : (
-          <span className="text-neutral-400">Changes are saved automatically</span>
+          <span className="text-ink-muted">Changes are saved automatically</span>
         )}
       </div>
 
       {/* Section progress */}
       <div className="mt-6">
-        <div className="flex items-center justify-between text-xs text-neutral-500">
+        <div className="flex items-center justify-between text-xs text-ink-muted">
           <span>Section {sectionIndex + 1} of {totalSections}</span>
           <span>{Math.round(progress)}% complete</span>
         </div>
-        <div className="mt-1.5 h-1.5 w-full border border-neutral-300 bg-neutral-100">
+        <div className="mt-1.5 h-1.5 w-full border border-border bg-surface-elevated">
           <div
             className="h-full bg-primary-600 transition-all duration-500"
             style={{ width: `${progress}%` }}
@@ -219,7 +219,7 @@ export function OnboardingQuestionnaire({ onNext, onBack, user }: OnboardingStep
                 ? 'bg-primary-600 w-6'
                 : completedSections.has(s.key)
                   ? 'bg-success-500'
-                  : 'bg-neutral-300'
+                  : 'bg-border'
             }`}
             aria-label={`Go to section ${i + 1}: ${s.title}`}
           />
@@ -228,12 +228,12 @@ export function OnboardingQuestionnaire({ onNext, onBack, user }: OnboardingStep
 
       {/* Error summary */}
       {errors.length > 0 && (
-        <div className="mt-6 border border-error-300 border-l-4 border-l-error-600 bg-error-50 p-4" role="alert">
+        <div className="mt-6 border border-error-700 border-l-4 border-l-error-600 bg-error-950 p-4" role="alert">
           <div className="flex items-start gap-2">
-            <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-error-600" />
+            <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-error-400" />
             <div>
-              <h3 className="text-sm font-semibold text-error-600">Please fix the following:</h3>
-              <ul className="mt-2 space-y-1 text-sm text-error-600">
+              <h3 className="text-sm font-semibold text-error-300">Please fix the following:</h3>
+              <ul className="mt-2 space-y-1 text-sm text-error-300">
                 {errors.map((err, i) => (
                   <li key={i}>• {err}</li>
                 ))}
@@ -244,12 +244,12 @@ export function OnboardingQuestionnaire({ onNext, onBack, user }: OnboardingStep
       )}
 
       {/* Section content */}
-      <div key={section.key} className="mt-8 animate-fade-in border border-neutral-200 bg-white p-6 sm:p-8">
+      <div key={section.key} className="mt-8 animate-fade-in border border-border bg-surface-card p-6 sm:p-8">
         <div className="mb-6 flex items-center gap-3">
           <Icon className="h-8 w-8 text-primary-600" />
           <div>
-            <h2 className="font-serif text-xl font-semibold text-neutral-900">{section.title}</h2>
-            <p className="text-sm text-neutral-600">{section.description}</p>
+            <h2 className="font-serif text-xl font-semibold text-ink">{section.title}</h2>
+            <p className="text-sm text-ink-muted">{section.description}</p>
           </div>
         </div>
 
@@ -273,7 +273,7 @@ export function OnboardingQuestionnaire({ onNext, onBack, user }: OnboardingStep
       <div className="mt-6 flex items-center justify-between">
         <button
           onClick={handlePrevSection}
-          className="flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-100"
+          className="flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium text-ink-muted transition-colors hover:bg-surface-hover"
         >
           <ChevronLeft className="h-4 w-4" />
           {sectionIndex === 0 ? 'Back' : 'Previous'}
@@ -300,8 +300,8 @@ function ReviewSection({ responses }: { responses: Record<string, Record<string,
 
   return (
     <div>
-      <h3 className="font-serif text-lg font-semibold text-neutral-900">Review Your Responses</h3>
-      <p className="mt-2 text-sm text-neutral-600">
+      <h3 className="font-serif text-lg font-semibold text-ink">Review Your Responses</h3>
+      <p className="mt-2 text-sm text-ink-muted">
         You have filled in {filledFields.length} fields. Please review your responses before submitting.
         You can go back to any section using the dots above.
       </p>
@@ -318,14 +318,14 @@ function ReviewSection({ responses }: { responses: Record<string, Record<string,
             <div
               key={sec.key}
               className={`flex items-center justify-between border p-3 ${
-                hasData ? 'border-success-200 bg-success-50' : 'border-neutral-200 bg-neutral-50'
+                hasData ? 'border-success-700 bg-success-950' : 'border-border bg-surface-subtle'
               }`}
             >
-              <span className="text-sm font-medium text-neutral-700">{sec.title}</span>
+              <span className="text-sm font-medium text-ink-muted">{sec.title}</span>
               {hasData ? (
                 <Check className="h-4 w-4 text-success-600" />
               ) : (
-                <span className="text-xs text-neutral-400">Not started</span>
+                <span className="text-xs text-ink-muted">Not started</span>
               )}
             </div>
           )

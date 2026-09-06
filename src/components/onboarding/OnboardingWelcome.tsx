@@ -8,13 +8,13 @@ interface OnboardingStepProps {
 export function OnboardingWelcome({ onNext }: OnboardingStepProps) {
   return (
     <div className="text-center">
-      <div className="mx-auto mb-8 flex h-20 w-20 items-center justify-center rounded-full bg-primary-100">
+      <div className="mx-auto mb-8 flex h-20 w-20 items-center justify-center rounded-full bg-primary-950">
         <Compass className="h-10 w-10 text-primary-600" />
       </div>
-      <h1 className="font-serif text-3xl font-semibold text-neutral-900 sm:text-4xl">
+      <h1 className="font-serif text-3xl font-semibold text-ink sm:text-4xl">
         Welcome to FreshlyForward
       </h1>
-      <p className="mx-auto mt-6 max-w-2xl text-lg text-neutral-600">
+      <p className="mx-auto mt-6 max-w-2xl text-lg text-ink-muted">
         We are so glad you are here. Over the next few minutes, we will walk you through everything you need to get
         started with your personal Career Strategist.
       </p>
@@ -24,17 +24,17 @@ export function OnboardingWelcome({ onNext }: OnboardingStepProps) {
           { icon: Sparkles, title: 'Personalized from day one', desc: 'Your Career Strategist will get to know you, your goals, and your preferences.' },
           { icon: Compass, title: 'Human-led, not automated', desc: 'Every step is guided by a real person who cares about your career success.' },
         ].map((item) => (
-          <div key={item.title} className="flex items-start gap-4 border border-neutral-200 border-l-4 border-l-primary-600 bg-white p-5">
+          <div key={item.title} className="flex items-start gap-4 border border-border border-l-4 border-l-primary-600 bg-surface-card p-5">
             <item.icon className="h-6 w-6 flex-shrink-0 text-primary-600" />
             <div>
-              <h3 className="font-serif text-base font-semibold text-neutral-900">{item.title}</h3>
-              <p className="mt-1 text-sm text-neutral-600">{item.desc}</p>
+              <h3 className="font-serif text-base font-semibold text-ink">{item.title}</h3>
+              <p className="mt-1 text-sm text-ink-muted">{item.desc}</p>
             </div>
           </div>
         ))}
       </div>
 
-      <p className="mt-8 text-sm text-neutral-500">
+      <p className="mt-8 text-sm text-ink-muted">
         This should take about 10-15 minutes. You can save and come back anytime.
       </p>
     </div>

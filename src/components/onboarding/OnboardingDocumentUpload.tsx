@@ -75,15 +75,15 @@ export function OnboardingDocumentUpload({ onNext, user }: OnboardingStepProps) 
 
   return (
     <div>
-      <h1 className="font-serif text-3xl font-semibold text-neutral-900 sm:text-4xl">
+      <h1 className="font-serif text-3xl font-semibold text-ink sm:text-4xl">
         Document Upload
       </h1>
-      <p className="mt-4 text-lg text-neutral-600">
+      <p className="mt-4 text-lg text-ink-muted">
         Upload your resume and any other documents you would like your Career Strategist to review.
       </p>
 
       {error && (
-        <div className="mt-6 flex items-start gap-2 border border-error-300 border-l-4 border-l-error-600 bg-error-50 px-4 py-3 text-sm text-error-600">
+        <div className="mt-6 flex items-start gap-2 border border-error-700 border-l-4 border-l-error-600 bg-error-950 px-4 py-3 text-sm text-error-300">
           <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
           <span>{error}</span>
         </div>
@@ -98,7 +98,7 @@ export function OnboardingDocumentUpload({ onNext, user }: OnboardingStepProps) 
           if (e.dataTransfer.files.length > 0) handleUpload(e.dataTransfer.files)
         }}
         className={`mt-8 border-2 border-dashed p-8 text-center transition-all ${
-          dragOver ? 'border-primary-500 bg-primary-50' : 'border-neutral-300 bg-neutral-50'
+          dragOver ? 'border-primary-500 bg-primary-950' : 'border-border bg-surface-elevated'
         }`}
       >
         <input
@@ -110,17 +110,17 @@ export function OnboardingDocumentUpload({ onNext, user }: OnboardingStepProps) 
           onChange={(e) => e.target.files && handleUpload(e.target.files)}
         />
         <label htmlFor="document-upload" className="cursor-pointer">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary-100">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary-950">
             {uploading ? (
               <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
             ) : (
               <Upload className="h-8 w-8 text-primary-600" />
             )}
           </div>
-          <p className="text-sm font-medium text-neutral-900">
+          <p className="text-sm font-medium text-ink">
             {uploading ? 'Uploading…' : 'Click to upload or drag and drop'}
           </p>
-          <p className="mt-1 text-xs text-neutral-500">
+          <p className="mt-1 text-xs text-ink-muted">
             PDF, DOC, DOCX, TXT, RTF — up to 10MB each
           </p>
         </label>
@@ -128,13 +128,13 @@ export function OnboardingDocumentUpload({ onNext, user }: OnboardingStepProps) 
 
       {uploadedFiles.length > 0 && (
         <div className="mt-6 space-y-2">
-          <h3 className="text-sm font-semibold text-neutral-700">Uploaded Files</h3>
+          <h3 className="text-sm font-semibold text-ink-muted">Uploaded Files</h3>
           {uploadedFiles.map((file, i) => (
-            <div key={i} className="flex items-center gap-3 border border-neutral-200 bg-white p-3">
+            <div key={i} className="flex items-center gap-3 border border-border bg-surface-card p-3">
               <FileText className="h-6 w-6 flex-shrink-0 text-primary-600" />
               <div className="flex-1">
-                <p className="text-sm font-medium text-neutral-900">{file.name}</p>
-                <p className="text-xs text-neutral-500">
+                <p className="text-sm font-medium text-ink">{file.name}</p>
+                <p className="text-xs text-ink-muted">
                   {(file.size / 1024).toFixed(0)} KB — {file.type.replace('_', ' ')}
                 </p>
               </div>
@@ -144,8 +144,8 @@ export function OnboardingDocumentUpload({ onNext, user }: OnboardingStepProps) 
         </div>
       )}
 
-      <div className="mt-8 border border-neutral-200 bg-neutral-50 p-4">
-        <p className="text-sm text-neutral-600">
+      <div className="mt-8 border border-border bg-surface-subtle p-4">
+        <p className="text-sm text-ink-muted">
           <strong>Prefer to skip this step?</strong> You can upload documents anytime from your dashboard.
           Your Career Strategist can also help you create or refine your resume.
         </p>
