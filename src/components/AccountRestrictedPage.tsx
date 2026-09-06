@@ -16,31 +16,31 @@ export function AccountRestrictedPage({ status, reason }: AccountRestrictedPageP
       : 'Your access to FreshlyForward has been temporarily paused.'
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-neutral-50 px-4">
-      <div className="w-full max-w-md border border-neutral-200 border-l-4 border-l-error-600 bg-white p-8 text-center">
+    <div className="flex min-h-screen items-center justify-center bg-surface-subtle px-4">
+      <div className="w-full max-w-md border border-border border-l-4 border-l-error-600 bg-surface-card p-8 text-center">
         <ShieldAlert className="mx-auto h-10 w-10 text-error-600" />
-        <h1 className="mt-4 font-serif text-xl font-semibold text-neutral-900">{title}</h1>
-        <p className="mt-2 text-sm text-neutral-600">{body}</p>
+        <h1 className="mt-4 font-serif text-xl font-semibold text-ink">{title}</h1>
+        <p className="mt-2 text-sm text-ink-muted">{body}</p>
         {reason && (
-          <div className="mt-4 border border-neutral-200 bg-neutral-50 p-3 text-left text-sm text-neutral-700">
-            <p className="text-xs font-semibold text-neutral-500">Reason provided</p>
+          <div className="mt-4 border border-border bg-surface-subtle p-3 text-left text-sm text-ink-muted">
+            <p className="text-xs font-semibold text-ink-muted">Reason provided</p>
             <p className="mt-1">{reason}</p>
           </div>
         )}
-        <p className="mt-4 text-xs text-neutral-500">
+        <p className="mt-4 text-xs text-ink-muted">
           If you believe this is a mistake, please reach out to our support team for assistance.
         </p>
         <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-center">
           <a
             href="mailto:support@freshlyforward.com"
-            className="flex items-center justify-center gap-1.5 border border-neutral-300 px-4 py-2.5 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50"
+            className="flex items-center justify-center gap-1.5 border border-border px-4 py-2.5 text-sm font-medium text-ink-muted transition-colors hover:bg-surface-hover"
           >
             <Mail className="h-4 w-4" />
             Contact Support
           </a>
           <button
             onClick={() => signOut()}
-            className="flex items-center justify-center gap-1.5 rounded-full bg-neutral-900 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-neutral-800"
+            className="flex items-center justify-center gap-1.5 rounded-full bg-primary-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-700"
           >
             <LogOut className="h-4 w-4" />
             Sign Out

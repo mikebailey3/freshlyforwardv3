@@ -30,13 +30,13 @@ export function FieldRenderer({
   onChange: (val: unknown) => void
 }) {
   const baseInput =
-    'mt-1 block w-full border border-neutral-300 px-3 py-2.5 text-sm text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500'
+    'mt-1 block w-full border border-border bg-surface-elevated px-3 py-2.5 text-sm text-ink placeholder:text-ink-muted focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500'
 
   switch (field.type) {
     case 'text':
       return (
         <div>
-          <label htmlFor={field.key} className="block text-sm font-medium text-neutral-700">
+          <label htmlFor={field.key} className="block text-sm font-medium text-ink-muted">
             {field.label}
             {field.required && <span className="ml-1 text-error-500">*</span>}
           </label>
@@ -49,14 +49,14 @@ export function FieldRenderer({
             className={baseInput}
             aria-required={field.required}
           />
-          {field.helpText && <p className="mt-1 text-xs text-neutral-500">{field.helpText}</p>}
+          {field.helpText && <p className="mt-1 text-xs text-ink-muted">{field.helpText}</p>}
         </div>
       )
 
     case 'textarea':
       return (
         <div>
-          <label htmlFor={field.key} className="block text-sm font-medium text-neutral-700">
+          <label htmlFor={field.key} className="block text-sm font-medium text-ink-muted">
             {field.label}
             {field.required && <span className="ml-1 text-error-500">*</span>}
           </label>
@@ -69,14 +69,14 @@ export function FieldRenderer({
             className={baseInput}
             aria-required={field.required}
           />
-          {field.helpText && <p className="mt-1 text-xs text-neutral-500">{field.helpText}</p>}
+          {field.helpText && <p className="mt-1 text-xs text-ink-muted">{field.helpText}</p>}
         </div>
       )
 
     case 'number':
       return (
         <div>
-          <label htmlFor={field.key} className="block text-sm font-medium text-neutral-700">
+          <label htmlFor={field.key} className="block text-sm font-medium text-ink-muted">
             {field.label}
             {field.required && <span className="ml-1 text-error-500">*</span>}
           </label>
@@ -91,14 +91,14 @@ export function FieldRenderer({
             className={baseInput}
             aria-required={field.required}
           />
-          {field.helpText && <p className="mt-1 text-xs text-neutral-500">{field.helpText}</p>}
+          {field.helpText && <p className="mt-1 text-xs text-ink-muted">{field.helpText}</p>}
         </div>
       )
 
     case 'select':
       return (
         <div>
-          <label htmlFor={field.key} className="block text-sm font-medium text-neutral-700">
+          <label htmlFor={field.key} className="block text-sm font-medium text-ink-muted">
             {field.label}
             {field.required && <span className="ml-1 text-error-500">*</span>}
           </label>
@@ -122,7 +122,7 @@ export function FieldRenderer({
     case 'multiselect':
       return (
         <div>
-          <label className="block text-sm font-medium text-neutral-700">
+          <label className="block text-sm font-medium text-ink-muted">
             {field.label}
             {field.required && <span className="ml-1 text-error-500">*</span>}
           </label>
@@ -140,7 +140,7 @@ export function FieldRenderer({
                   className={`border-2 px-4 py-2 text-sm font-medium transition-all ${
                     selected
                       ? 'rounded-full bg-primary-600 text-white'
-                      : 'border-neutral-300 bg-white text-neutral-700 hover:bg-neutral-100'
+                      : 'border-border bg-surface-elevated text-ink-muted hover:bg-surface-hover'
                   }`}
                   aria-pressed={selected}
                 >
@@ -149,7 +149,7 @@ export function FieldRenderer({
               )
             })}
           </div>
-          {field.helpText && <p className="mt-1 text-xs text-neutral-500">{field.helpText}</p>}
+          {field.helpText && <p className="mt-1 text-xs text-ink-muted">{field.helpText}</p>}
         </div>
       )
 
@@ -161,15 +161,15 @@ export function FieldRenderer({
               type="checkbox"
               checked={(value as boolean) || false}
               onChange={(e) => onChange(e.target.checked)}
-              className="mt-1 h-5 w-5 border-neutral-300 text-primary-600 focus:ring-primary-500"
+              className="mt-1 h-5 w-5 border-border text-primary-600 focus:ring-primary-500"
               aria-required={field.required}
             />
             <div>
-              <span className="text-sm font-medium text-neutral-700">
+              <span className="text-sm font-medium text-ink-muted">
                 {field.label}
                 {field.required && <span className="ml-1 text-error-500">*</span>}
               </span>
-              {field.helpText && <p className="mt-1 text-xs text-neutral-500">{field.helpText}</p>}
+              {field.helpText && <p className="mt-1 text-xs text-ink-muted">{field.helpText}</p>}
             </div>
           </label>
         </div>
@@ -214,7 +214,7 @@ function TagsInput({
 
   return (
     <div>
-      <label htmlFor={field.key} className="block text-sm font-medium text-neutral-700">
+      <label htmlFor={field.key} className="block text-sm font-medium text-ink-muted">
         {field.label}
         {field.required && <span className="ml-1 text-error-500">*</span>}
       </label>
@@ -225,28 +225,28 @@ function TagsInput({
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder={field.placeholder}
-          className="block w-full border border-neutral-300 px-3 py-2.5 text-sm text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+          className="block w-full border border-border bg-surface-elevated px-3 py-2.5 text-sm text-ink placeholder:text-ink-muted focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
         />
         <button
           type="submit"
-          className="flex items-center gap-1 border border-neutral-300 px-4 py-2.5 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50"
+          className="flex items-center gap-1 border border-border px-4 py-2.5 text-sm font-medium text-ink-muted transition-colors hover:bg-surface-hover"
         >
           <Plus className="h-4 w-4" />
           Add
         </button>
       </form>
-      {field.helpText && <p className="mt-1 text-xs text-neutral-500">{field.helpText}</p>}
+      {field.helpText && <p className="mt-1 text-xs text-ink-muted">{field.helpText}</p>}
       {value.length > 0 && (
         <div className="mt-3 flex flex-wrap gap-2">
           {value.map((tag) => (
             <span
               key={tag}
-              className="flex items-center gap-1 border border-primary-300 px-3 py-1.5 font-mono text-sm font-medium text-primary-700"
+              className="flex items-center gap-1 border border-primary-700 px-3 py-1.5 font-mono text-sm font-medium text-primary-300"
             >
               {tag}
               <button
                 onClick={() => onChange(value.filter((t) => t !== tag))}
-                className="ml-0.5 p-0.5 hover:bg-primary-200"
+                className="ml-0.5 p-0.5 hover:bg-primary-900"
                 aria-label={`Remove ${tag}`}
               >
                 <X className="h-3 w-3" />
@@ -295,18 +295,18 @@ function EmploymentInput({
 
   return (
     <div>
-      <label className="block text-sm font-medium text-neutral-700">
+      <label className="block text-sm font-medium text-ink-muted">
         Employment History
         <span className="ml-1 text-error-500">*</span>
       </label>
       <div className="mt-2 space-y-4">
         {items.map((item, i) => (
-          <div key={i} className="border border-neutral-200 bg-neutral-50 p-4">
+          <div key={i} className="border border-border bg-surface-subtle p-4">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-neutral-500">Role {i + 1}</span>
+              <span className="text-xs font-medium text-ink-muted">Role {i + 1}</span>
               <button
                 onClick={() => remove(i)}
-                className="text-neutral-400 hover:text-error-600"
+                className="text-ink-muted hover:text-error-400"
                 aria-label="Remove role"
               >
                 <Trash2 className="h-4 w-4" />
@@ -318,21 +318,21 @@ function EmploymentInput({
                 placeholder="Job Title"
                 value={item.title}
                 onChange={(e) => update(i, 'title', e.target.value)}
-                className="border border-neutral-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="border border-border bg-surface-elevated px-3 py-2 text-sm text-ink placeholder:text-ink-muted focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
               />
               <input
                 type="text"
                 placeholder="Company"
                 value={item.company}
                 onChange={(e) => update(i, 'company', e.target.value)}
-                className="border border-neutral-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="border border-border bg-surface-elevated px-3 py-2 text-sm text-ink placeholder:text-ink-muted focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
               />
               <input
                 type="text"
                 placeholder="Start Date (e.g., Jan 2022)"
                 value={item.start_date}
                 onChange={(e) => update(i, 'start_date', e.target.value)}
-                className="border border-neutral-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="border border-border bg-surface-elevated px-3 py-2 text-sm text-ink placeholder:text-ink-muted focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
               />
               <div className="flex items-center gap-2">
                 <input
@@ -341,16 +341,16 @@ function EmploymentInput({
                   value={item.current ? 'Present' : item.end_date || ''}
                   disabled={item.current}
                   onChange={(e) => update(i, 'end_date', e.target.value)}
-                  className="flex-1 border border-neutral-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 disabled:bg-neutral-100"
+                  className="flex-1 border border-border bg-surface-elevated px-3 py-2 text-sm text-ink placeholder:text-ink-muted focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 disabled:bg-surface-subtle"
                 />
               </div>
             </div>
-            <label className="mt-3 flex items-center gap-2 text-sm text-neutral-600">
+            <label className="mt-3 flex items-center gap-2 text-sm text-ink-muted">
               <input
                 type="checkbox"
                 checked={item.current}
                 onChange={(e) => update(i, 'current', e.target.checked)}
-                className="h-4 w-4 border-neutral-300 text-primary-600 focus:ring-primary-500"
+                className="h-4 w-4 border-border text-primary-600 focus:ring-primary-500"
               />
               I currently work here
             </label>
@@ -359,14 +359,14 @@ function EmploymentInput({
               value={item.description}
               onChange={(e) => update(i, 'description', e.target.value)}
               rows={2}
-              className="mt-3 w-full border border-neutral-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+              className="mt-3 w-full border border-border bg-surface-elevated px-3 py-2 text-sm text-ink placeholder:text-ink-muted focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
             />
           </div>
         ))}
       </div>
       <button
         onClick={add}
-        className="mt-3 flex items-center gap-1.5 border border-dashed border-neutral-300 px-4 py-2.5 text-sm font-medium text-neutral-600 transition-colors hover:border-primary-400 hover:text-primary-600"
+        className="mt-3 flex items-center gap-1.5 border border-dashed border-border px-4 py-2.5 text-sm font-medium text-ink-muted transition-colors hover:border-primary-400 hover:text-primary-600"
       >
         <Plus className="h-4 w-4" />
         Add Role
@@ -405,13 +405,13 @@ function EducationInput({
 
   return (
     <div>
-      <label className="block text-sm font-medium text-neutral-700">Education</label>
+      <label className="block text-sm font-medium text-ink-muted">Education</label>
       <div className="mt-2 space-y-4">
         {items.map((item, i) => (
-          <div key={i} className="border border-neutral-200 bg-neutral-50 p-4">
+          <div key={i} className="border border-border bg-surface-subtle p-4">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-neutral-500">Entry {i + 1}</span>
-              <button onClick={() => remove(i)} className="text-neutral-400 hover:text-error-600" aria-label="Remove">
+              <span className="text-xs font-medium text-ink-muted">Entry {i + 1}</span>
+              <button onClick={() => remove(i)} className="text-ink-muted hover:text-error-400" aria-label="Remove">
                 <Trash2 className="h-4 w-4" />
               </button>
             </div>
@@ -421,28 +421,28 @@ function EducationInput({
                 placeholder="Institution"
                 value={item.institution}
                 onChange={(e) => update(i, 'institution', e.target.value)}
-                className="border border-neutral-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="border border-border bg-surface-elevated px-3 py-2 text-sm text-ink placeholder:text-ink-muted focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
               />
               <input
                 type="text"
                 placeholder="Degree"
                 value={item.degree}
                 onChange={(e) => update(i, 'degree', e.target.value)}
-                className="border border-neutral-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="border border-border bg-surface-elevated px-3 py-2 text-sm text-ink placeholder:text-ink-muted focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
               />
               <input
                 type="text"
                 placeholder="Field of Study"
                 value={item.field}
                 onChange={(e) => update(i, 'field', e.target.value)}
-                className="border border-neutral-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="border border-border bg-surface-elevated px-3 py-2 text-sm text-ink placeholder:text-ink-muted focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
               />
               <input
                 type="text"
                 placeholder="Graduation Year"
                 value={item.graduation_year || ''}
                 onChange={(e) => update(i, 'graduation_year', e.target.value)}
-                className="border border-neutral-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="border border-border bg-surface-elevated px-3 py-2 text-sm text-ink placeholder:text-ink-muted focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
               />
             </div>
           </div>
@@ -450,7 +450,7 @@ function EducationInput({
       </div>
       <button
         onClick={add}
-        className="mt-3 flex items-center gap-1.5 border border-dashed border-neutral-300 px-4 py-2.5 text-sm font-medium text-neutral-600 transition-colors hover:border-primary-400 hover:text-primary-600"
+        className="mt-3 flex items-center gap-1.5 border border-dashed border-border px-4 py-2.5 text-sm font-medium text-ink-muted transition-colors hover:border-primary-400 hover:text-primary-600"
       >
         <Plus className="h-4 w-4" />
         Add Education
@@ -489,13 +489,13 @@ function CertificationsInput({
 
   return (
     <div>
-      <label className="block text-sm font-medium text-neutral-700">Certifications</label>
+      <label className="block text-sm font-medium text-ink-muted">Certifications</label>
       <div className="mt-2 space-y-4">
         {items.map((item, i) => (
-          <div key={i} className="border border-neutral-200 bg-neutral-50 p-4">
+          <div key={i} className="border border-border bg-surface-subtle p-4">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-neutral-500">Certification {i + 1}</span>
-              <button onClick={() => remove(i)} className="text-neutral-400 hover:text-error-600" aria-label="Remove">
+              <span className="text-xs font-medium text-ink-muted">Certification {i + 1}</span>
+              <button onClick={() => remove(i)} className="text-ink-muted hover:text-error-400" aria-label="Remove">
                 <Trash2 className="h-4 w-4" />
               </button>
             </div>
@@ -505,28 +505,28 @@ function CertificationsInput({
                 placeholder="Certification Name"
                 value={item.name}
                 onChange={(e) => update(i, 'name', e.target.value)}
-                className="border border-neutral-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="border border-border bg-surface-elevated px-3 py-2 text-sm text-ink placeholder:text-ink-muted focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
               />
               <input
                 type="text"
                 placeholder="Issuing Organization"
                 value={item.issuer}
                 onChange={(e) => update(i, 'issuer', e.target.value)}
-                className="border border-neutral-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="border border-border bg-surface-elevated px-3 py-2 text-sm text-ink placeholder:text-ink-muted focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
               />
               <input
                 type="text"
                 placeholder="Date Obtained"
                 value={item.date || ''}
                 onChange={(e) => update(i, 'date', e.target.value)}
-                className="border border-neutral-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="border border-border bg-surface-elevated px-3 py-2 text-sm text-ink placeholder:text-ink-muted focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
               />
               <input
                 type="text"
                 placeholder="Expiration Date (if applicable)"
                 value={item.expiry || ''}
                 onChange={(e) => update(i, 'expiry', e.target.value)}
-                className="border border-neutral-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="border border-border bg-surface-elevated px-3 py-2 text-sm text-ink placeholder:text-ink-muted focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
               />
             </div>
           </div>
@@ -534,7 +534,7 @@ function CertificationsInput({
       </div>
       <button
         onClick={add}
-        className="mt-3 flex items-center gap-1.5 border border-dashed border-neutral-300 px-4 py-2.5 text-sm font-medium text-neutral-600 transition-colors hover:border-primary-400 hover:text-primary-600"
+        className="mt-3 flex items-center gap-1.5 border border-dashed border-border px-4 py-2.5 text-sm font-medium text-ink-muted transition-colors hover:border-primary-400 hover:text-primary-600"
       >
         <Plus className="h-4 w-4" />
         Add Certification

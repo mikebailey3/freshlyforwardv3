@@ -55,12 +55,12 @@ export function UpgradeModal({
       aria-labelledby="upgrade-modal-title"
     >
       <div
-        className="relative w-full max-w-md rounded-2xl border border-neutral-200 bg-white p-6 shadow-xl animate-slide-up"
+        className="relative w-full max-w-md rounded-2xl border border-border bg-surface-card p-6 shadow-xl animate-slide-up"
         onClick={(e) => e.stopPropagation()}
       >
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 text-neutral-400 hover:text-neutral-600"
+          className="absolute right-4 top-4 text-ink-muted hover:text-ink"
           aria-label="Close"
         >
           <X className="h-5 w-5" />
@@ -68,17 +68,17 @@ export function UpgradeModal({
 
         <Lock className="h-8 w-8 text-primary-600" />
 
-        <h2 id="upgrade-modal-title" className="mt-4 font-serif text-xl font-semibold text-neutral-900">
+        <h2 id="upgrade-modal-title" className="mt-4 font-serif text-xl font-semibold text-ink">
           {title}
         </h2>
-        <p className="mt-2 text-sm text-neutral-600">{body}</p>
+        <p className="mt-2 text-sm text-ink-muted">{body}</p>
 
         {requiredPlan && (
-          <div className="mt-4 border border-neutral-200 bg-neutral-50 p-4">
-            <p className="text-xs font-semibold text-neutral-500 uppercase tracking-wide">
+          <div className="mt-4 border border-border bg-surface-subtle p-4">
+            <p className="text-xs font-semibold text-ink-muted uppercase tracking-wide">
               Included with
             </p>
-            <p className="mt-1 font-serif text-lg font-semibold text-neutral-900">
+            <p className="mt-1 font-serif text-lg font-semibold text-ink">
               {getPlanDisplayName(requiredPlan)}
             </p>
           </div>
@@ -94,7 +94,7 @@ export function UpgradeModal({
           </Link>
           <Link
             to="/pricing"
-            className="flex flex-1 items-center justify-center gap-2 border border-neutral-300 px-5 py-3 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50"
+            className="flex flex-1 items-center justify-center gap-2 border border-border px-5 py-3 text-sm font-medium text-ink-muted transition-colors hover:bg-surface-hover"
           >
             View Plans
           </Link>
@@ -102,7 +102,7 @@ export function UpgradeModal({
 
         <button
           onClick={onClose}
-          className="mt-3 w-full text-center text-sm text-neutral-500 hover:text-neutral-700"
+          className="mt-3 w-full text-center text-sm text-ink-muted hover:text-ink"
         >
           Maybe Later
         </button>
@@ -134,7 +134,7 @@ export function FeatureGate({
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary-200 border-t-primary-600" />
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-surface-elevated border-t-primary-600" />
       </div>
     )
   }
@@ -207,17 +207,17 @@ export function LockedFeatureCard({
 
   return (
     <div
-      className="relative border border-dashed border-neutral-300 bg-white p-6 transition-colors hover:border-primary-400 cursor-pointer"
+      className="relative border border-dashed border-border bg-surface-card p-6 transition-colors hover:border-primary-400 cursor-pointer"
       onClick={onUpgrade}
     >
       <div className="flex items-start gap-4">
-        {icon || <Lock className="h-8 w-8 flex-shrink-0 text-neutral-400" />}
+        {icon || <Lock className="h-8 w-8 flex-shrink-0 text-ink-muted" />}
         <div className="flex-1">
           <div className="flex items-center gap-2">
-            <h3 className="font-serif text-lg font-semibold text-neutral-900">{displayName}</h3>
-            <Lock className="h-4 w-4 text-neutral-400" />
+            <h3 className="font-serif text-lg font-semibold text-ink">{displayName}</h3>
+            <Lock className="h-4 w-4 text-ink-muted" />
           </div>
-          {desc && <p className="mt-1 text-sm text-neutral-600">{desc}</p>}
+          {desc && <p className="mt-1 text-sm text-ink-muted">{desc}</p>}
           {planLabel && (
             <div className="mt-3">
               <span className="inline-block border border-primary-300 px-3 py-1 font-mono text-[11px] font-semibold uppercase tracking-wide text-primary-700">
@@ -249,20 +249,20 @@ export function UpgradeRequiredPage({ featureKey, requiredPlan }: UpgradeRequire
   return (
     <div className="flex min-h-[60vh] items-center justify-center">
       <div className="max-w-md text-center">
-        <Lock className="mx-auto h-10 w-10 text-neutral-400" />
-        <h1 className="mt-6 font-serif text-2xl font-semibold text-neutral-900">
+        <Lock className="mx-auto h-10 w-10 text-ink-muted" />
+        <h1 className="mt-6 font-serif text-2xl font-semibold text-ink">
           {displayName} requires an upgrade
         </h1>
-        <p className="mt-2 text-sm text-neutral-600">
+        <p className="mt-2 text-sm text-ink-muted">
           {feature?.upgrade_body ||
             `This feature is not included in your current plan. Upgrade to access ${displayName}.`}
         </p>
         {requiredPlan && (
-          <div className="mt-4 inline-block border border-neutral-200 bg-neutral-50 px-6 py-3">
-            <p className="text-xs font-semibold text-neutral-500 uppercase tracking-wide">
+          <div className="mt-4 inline-block border border-border bg-surface-subtle px-6 py-3">
+            <p className="text-xs font-semibold text-ink-muted uppercase tracking-wide">
               Included with
             </p>
-            <p className="mt-1 font-serif text-lg font-semibold text-neutral-900">
+            <p className="mt-1 font-serif text-lg font-semibold text-ink">
               {getPlanDisplayName(requiredPlan)}
             </p>
           </div>
@@ -277,14 +277,14 @@ export function UpgradeRequiredPage({ featureKey, requiredPlan }: UpgradeRequire
           </Link>
           <Link
             to="/pricing"
-            className="flex items-center justify-center gap-2 border border-neutral-300 px-6 py-3 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50"
+            className="flex items-center justify-center gap-2 border border-border px-6 py-3 text-sm font-medium text-ink-muted transition-colors hover:bg-surface-hover"
           >
             View Plans
           </Link>
         </div>
         <button
           onClick={() => setModalOpen(false)}
-          className="mt-4 text-sm text-neutral-500 hover:text-neutral-700"
+          className="mt-4 text-sm text-ink-muted hover:text-ink"
         >
           Maybe Later
         </button>
