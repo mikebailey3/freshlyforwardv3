@@ -16,7 +16,7 @@ const navigation = [
 export function Logo() {
   return (
     <Link to="/" className="logo" aria-label="FreshlyForward home">
-      <img src="/images/c1d368c4-ef41-494f-9a54-f5303e6f864d.png?v=2" alt="" />
+      <img src="/images/freshlyforward-logo.png" alt="" />
     </Link>
   )
 }
