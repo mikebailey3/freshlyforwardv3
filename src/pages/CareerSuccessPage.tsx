@@ -62,9 +62,9 @@ export function CareerSuccessPage() {
       <div className="mb-6">
         <div className="flex items-center gap-2">
           <Sparkles className="h-6 w-6 text-primary-600" />
-          <h1 className="font-serif text-2xl font-semibold text-neutral-900 sm:text-3xl">Career Success</h1>
+          <h1 className="font-serif text-2xl font-semibold text-ink sm:text-3xl">Career Success</h1>
         </div>
-        <p className="mt-2 text-sm text-neutral-600">
+        <p className="mt-2 text-sm text-ink-muted">
           FreshlyForward continues helping you long after you secure employment. These tools support your
           long-term career growth and professional development.
         </p>
@@ -97,11 +97,11 @@ export function CareerSuccessPage() {
             return (
               <div
                 key={item.id}
-                className="relative border border-neutral-200 bg-white p-6 transition-colors hover:border-primary-300"
+                className="relative border border-border bg-surface-card p-6 transition-colors hover:border-primary-700"
               >
                 {item.is_coming_soon && (
                   <div className="absolute right-3 top-3">
-                    <span className="border border-accent-300 px-2.5 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide text-accent-700">
+                    <span className="border border-accent-700 px-2.5 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide text-accent-300">
                       Coming Soon
                     </span>
                   </div>
@@ -109,12 +109,12 @@ export function CareerSuccessPage() {
                 <div className="mb-4 text-2xl">
                   {iconMap[item.icon] || <Sparkles className="h-6 w-6 text-primary-600" />}
                 </div>
-                <h3 className="font-serif text-lg font-semibold text-neutral-900">{item.title}</h3>
-                <p className="mt-2 text-sm text-neutral-600">{item.description}</p>
+                <h3 className="font-serif text-lg font-semibold text-ink">{item.title}</h3>
+                <p className="mt-2 text-sm text-ink-muted">{item.description}</p>
 
                 {item.is_coming_soon && (
-                  <div className="mt-4 border border-neutral-200 bg-neutral-50 p-3">
-                    <p className="text-xs text-neutral-500">
+                  <div className="mt-4 border border-border bg-surface-subtle p-3">
+                    <p className="text-xs text-ink-muted">
                       This feature is in development. You will be the first to know when it launches.
                     </p>
                   </div>
@@ -125,11 +125,11 @@ export function CareerSuccessPage() {
         </div>
       )}
 
-      <div className="mt-12 border border-dashed border-primary-400 bg-[var(--cream)] p-8 text-center">
-        <h2 className="font-serif text-xl font-semibold text-neutral-900">
+      <div className="mt-12 border border-dashed border-primary-700 bg-surface-subtle p-8 text-center">
+        <h2 className="font-serif text-xl font-semibold text-ink">
           Your career does not stop at your next job.
         </h2>
-        <p className="mt-3 text-sm text-neutral-600">
+        <p className="mt-3 text-sm text-ink-muted">
           FreshlyForward is built for long-term career success. From your first application to your last promotion,
           your Career Strategist is with you every step of the way.
         </p>

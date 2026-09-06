@@ -26,15 +26,15 @@ const activityIcons: Record<string, typeof User> = {
 }
 
 const activityColors: Record<string, string> = {
-  resume_updated: 'bg-primary-100 text-primary-600',
-  questionnaire_completed: 'bg-success-100 text-success-600',
-  opportunity_added: 'bg-accent-100 text-accent-600',
-  opportunity_approved: 'bg-success-100 text-success-600',
+  resume_updated: 'bg-primary-950 text-primary-400',
+  questionnaire_completed: 'bg-success-950 text-success-400',
+  opportunity_added: 'bg-accent-950 text-accent-400',
+  opportunity_approved: 'bg-success-950 text-success-400',
   application_submitted: 'bg-primary-600 text-white',
-  interview_scheduled: 'bg-primary-100 text-primary-600',
-  friday_report_delivered: 'bg-accent-100 text-accent-600',
-  mock_interview_completed: 'bg-secondary-100 text-secondary-600',
-  feedback_received: 'bg-primary-100 text-primary-600',
+  interview_scheduled: 'bg-primary-950 text-primary-400',
+  friday_report_delivered: 'bg-accent-950 text-accent-400',
+  mock_interview_completed: 'bg-secondary-950 text-secondary-400',
+  feedback_received: 'bg-primary-950 text-primary-400',
   joined: 'bg-primary-600 text-white',
   offer_received: 'bg-success-600 text-white',
 }
@@ -55,8 +55,8 @@ export function ActivityFeedPage() {
   return (
     <MemberLayout>
       <div className="mb-6">
-        <h1 className="font-serif text-2xl font-semibold text-neutral-900 sm:text-3xl">Activity Feed</h1>
-        <p className="mt-1 text-sm text-neutral-600">Everything that has happened in your career journey.</p>
+        <h1 className="font-serif text-2xl font-semibold text-ink sm:text-3xl">Activity Feed</h1>
+        <p className="mt-1 text-sm text-ink-muted">Everything that has happened in your career journey.</p>
       </div>
 
       {loading ? (
@@ -64,26 +64,26 @@ export function ActivityFeedPage() {
           <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
         </div>
       ) : activities.length === 0 ? (
-        <div className="border border-neutral-200 bg-white p-12 text-center">
-          <Compass className="mx-auto h-12 w-12 text-neutral-300" />
-          <p className="mt-4 text-sm text-neutral-500">No activity yet. Your feed will populate as your career journey progresses.</p>
+        <div className="border border-border bg-surface-card p-12 text-center">
+          <Compass className="mx-auto h-12 w-12 text-ink-muted" />
+          <p className="mt-4 text-sm text-ink-muted">No activity yet. Your feed will populate as your career journey progresses.</p>
         </div>
       ) : (
         <div className="relative">
-          <div className="absolute left-5 top-0 h-full w-0.5 bg-neutral-100" aria-hidden="true" />
+          <div className="absolute left-5 top-0 h-full w-0.5 bg-border" aria-hidden="true" />
           <ul className="space-y-4" aria-label="Activity feed">
             {activities.map((item) => {
               const Icon = activityIcons[item.activity_type] ?? CheckCircle2
-              const colorClass = activityColors[item.activity_type] ?? 'bg-neutral-100 text-neutral-600'
+              const colorClass = activityColors[item.activity_type] ?? 'bg-surface-subtle text-ink-muted'
               return (
                 <li key={item.id} className="relative flex items-start gap-4">
-                  <div className={`relative z-10 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full ${colorClass} ring-4 ring-neutral-50`}>
+                  <div className={`relative z-10 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full ${colorClass} ring-4 ring-surface-elevated`}>
                     <Icon className="h-5 w-5" aria-hidden="true" />
                   </div>
-                  <div className="flex-1 border border-neutral-200 border-l-4 border-l-primary-600 bg-white p-4">
-                    <p className="text-sm font-semibold text-neutral-900">{item.title}</p>
-                    {item.description && <p className="mt-0.5 text-sm text-neutral-600">{item.description}</p>}
-                    <time className="mt-1 block font-mono text-xs text-neutral-400" dateTime={item.created_at}>{timeAgo(item.created_at)}</time>
+                  <div className="flex-1 border border-border border-l-4 border-l-primary-600 bg-surface-card p-4">
+                    <p className="text-sm font-semibold text-ink">{item.title}</p>
+                    {item.description && <p className="mt-0.5 text-sm text-ink-muted">{item.description}</p>}
+                    <time className="mt-1 block font-mono text-xs text-ink-muted" dateTime={item.created_at}>{timeAgo(item.created_at)}</time>
                   </div>
                 </li>
               )

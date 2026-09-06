@@ -92,8 +92,8 @@ export function CareerProfilePage() {
       <MemberLayout>
         <div className="mb-6 flex items-center justify-between">
           <div>
-            <h1 className="font-serif text-2xl font-semibold text-neutral-900 sm:text-3xl">Edit Career Profile</h1>
-            <p className="mt-1 text-sm text-neutral-600">Update any section below, then save your changes.</p>
+            <h1 className="font-serif text-2xl font-semibold text-ink sm:text-3xl">Edit Career Profile</h1>
+            <p className="mt-1 text-sm text-ink-muted">Update any section below, then save your changes.</p>
           </div>
         </div>
         <ProfileEditForm
@@ -110,8 +110,8 @@ export function CareerProfilePage() {
     <MemberLayout>
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="font-serif text-2xl font-semibold text-neutral-900 sm:text-3xl">Career Profile</h1>
-          <p className="mt-1 text-sm text-neutral-600">Your complete career profile, built from your questionnaire.</p>
+          <h1 className="font-serif text-2xl font-semibold text-ink sm:text-3xl">Career Profile</h1>
+          <p className="mt-1 text-sm text-ink-muted">Your complete career profile, built from your questionnaire.</p>
         </div>
         <button
           onClick={startEditing}
@@ -134,8 +134,8 @@ export function CareerProfilePage() {
               <ProfileField label="LinkedIn" value={p?.linkedin_url} link />
               <ProfileField label="Portfolio" value={p?.portfolio_url} link />
               <div>
-                <p className="text-xs font-semibold text-neutral-500">Summary</p>
-                <p className="mt-1 text-sm text-neutral-700">{p?.summary || 'Not provided yet.'}</p>
+                <p className="text-xs font-semibold text-ink-muted">Summary</p>
+                <p className="mt-1 text-sm text-ink-muted">{p?.summary || 'Not provided yet.'}</p>
               </div>
             </div>
           </ProfileCard>
@@ -145,13 +145,13 @@ export function CareerProfilePage() {
             {p?.employment_history && p.employment_history.length > 0 ? (
               <div className="space-y-4">
                 {p.employment_history.map((job, i) => (
-                  <div key={i} className="border-l-2 border-primary-200 pl-4">
-                    <p className="text-sm font-semibold text-neutral-900">{job.title}</p>
-                    <p className="text-sm text-neutral-600">{job.company}</p>
-                    <p className="text-xs text-neutral-500">
+                  <div key={i} className="border-l-2 border-primary-800 pl-4">
+                    <p className="text-sm font-semibold text-ink">{job.title}</p>
+                    <p className="text-sm text-ink-muted">{job.company}</p>
+                    <p className="text-xs text-ink-muted">
                       {job.start_date} — {job.current ? 'Present' : job.end_date || 'N/A'}
                     </p>
-                    {job.description && <p className="mt-1 text-sm text-neutral-600">{job.description}</p>}
+                    {job.description && <p className="mt-1 text-sm text-ink-muted">{job.description}</p>}
                   </div>
                 ))}
               </div>
@@ -166,9 +166,9 @@ export function CareerProfilePage() {
               <div className="space-y-3">
                 {p.education.map((edu, i) => (
                   <div key={i}>
-                    <p className="text-sm font-semibold text-neutral-900">{edu.degree}{edu.field ? `, ${edu.field}` : ''}</p>
-                    <p className="text-sm text-neutral-600">{edu.institution}</p>
-                    {edu.graduation_year && <p className="text-xs text-neutral-500">Graduated: {edu.graduation_year}</p>}
+                    <p className="text-sm font-semibold text-ink">{edu.degree}{edu.field ? `, ${edu.field}` : ''}</p>
+                    <p className="text-sm text-ink-muted">{edu.institution}</p>
+                    {edu.graduation_year && <p className="text-xs text-ink-muted">Graduated: {edu.graduation_year}</p>}
                   </div>
                 ))}
               </div>
@@ -185,8 +185,8 @@ export function CareerProfilePage() {
                   <div key={i} className="flex items-start gap-2">
                     <Award className="mt-0.5 h-4 w-4 text-primary-600" />
                     <div>
-                      <p className="text-sm font-medium text-neutral-900">{cert.name}</p>
-                      <p className="text-xs text-neutral-600">{cert.issuer}{cert.date ? ` — ${cert.date}` : ''}</p>
+                      <p className="text-sm font-medium text-ink">{cert.name}</p>
+                      <p className="text-xs text-ink-muted">{cert.issuer}{cert.date ? ` — ${cert.date}` : ''}</p>
                     </div>
                   </div>
                 ))}
@@ -201,7 +201,7 @@ export function CareerProfilePage() {
             {p?.skills && p.skills.length > 0 ? (
               <div className="flex flex-wrap gap-2">
                 {p.skills.map((skill, i) => (
-                  <span key={i} className="border border-primary-300 px-3 py-1.5 font-mono text-sm font-medium text-primary-700">
+                  <span key={i} className="border border-primary-700 px-3 py-1.5 font-mono text-sm font-medium text-primary-300">
                     {skill}
                   </span>
                 ))}
@@ -258,12 +258,12 @@ export function CareerProfilePage() {
           <ProfileCard icon={FileCheck} title="Authorization">
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <div className={`h-2 w-2 rounded-full ${p?.application_authorized ? 'bg-success-500' : 'bg-neutral-300'}`} />
-                <span className="text-sm text-neutral-700">Application Authorization {p?.application_authorized ? '✓' : 'Not given'}</span>
+                <div className={`h-2 w-2 rounded-full ${p?.application_authorized ? 'bg-success-500' : 'bg-border'}`} />
+                <span className="text-sm text-ink-muted">Application Authorization {p?.application_authorized ? '\u2713' : 'Not given'}</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className={`h-2 w-2 rounded-full ${p?.electronic_consent ? 'bg-success-500' : 'bg-neutral-300'}`} />
-                <span className="text-sm text-neutral-700">Electronic Consent {p?.electronic_consent ? '✓' : 'Not given'}</span>
+                <div className={`h-2 w-2 rounded-full ${p?.electronic_consent ? 'bg-success-500' : 'bg-border'}`} />
+                <span className="text-sm text-ink-muted">Electronic Consent {p?.electronic_consent ? '\u2713' : 'Not given'}</span>
               </div>
             </div>
           </ProfileCard>
@@ -273,11 +273,11 @@ export function CareerProfilePage() {
             {documents.length > 0 ? (
               <div className="space-y-2">
                 {documents.map((doc) => (
-                  <div key={doc.id} className="flex items-center gap-3 border border-neutral-200 p-3">
-                    <FileText className="h-4 w-4 text-neutral-400" />
+                  <div key={doc.id} className="flex items-center gap-3 border border-border p-3">
+                    <FileText className="h-4 w-4 text-ink-muted" />
                     <div className="flex-1">
-                      <p className="text-sm font-medium text-neutral-900">{doc.file_name}</p>
-                      <p className="text-xs text-neutral-500">{doc.document_type.replace('_', ' ')}</p>
+                      <p className="text-sm font-medium text-ink">{doc.file_name}</p>
+                      <p className="text-xs text-ink-muted">{doc.document_type.replace('_', ' ')}</p>
                     </div>
                   </div>
                 ))}
@@ -285,7 +285,7 @@ export function CareerProfilePage() {
             ) : (
               <EmptyState text="No documents uploaded yet." />
             )}
-            <label className="mt-4 flex cursor-pointer items-center justify-center gap-2 border border-dashed border-neutral-300 px-4 py-3 text-sm font-medium text-neutral-600 transition-colors hover:border-primary-400 hover:text-primary-600">
+            <label className="mt-4 flex cursor-pointer items-center justify-center gap-2 border border-dashed border-border px-4 py-3 text-sm font-medium text-ink-muted transition-colors hover:border-primary-400 hover:text-primary-600">
               {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
               {uploading ? 'Uploading…' : 'Upload Document'}
               <input
@@ -309,10 +309,10 @@ export function CareerProfilePage() {
 
 function ProfileCard({ icon: Icon, title, children }: { icon: typeof User; title: string; children: React.ReactNode }) {
   return (
-    <div className="border border-neutral-200 bg-white p-6">
-      <div className="mb-4 flex items-center gap-3 border-b border-neutral-100 pb-3">
+    <div className="border border-border bg-surface-card p-6">
+      <div className="mb-4 flex items-center gap-3 border-b border-border pb-3">
         <Icon className="h-5 w-5 text-primary-600" />
-        <h3 className="font-serif text-base font-semibold text-neutral-900">{title}</h3>
+        <h3 className="font-serif text-base font-semibold text-ink">{title}</h3>
       </div>
       {children}
     </div>
@@ -323,27 +323,27 @@ function ProfileField({ label, value, link, multiline }: { label: string; value?
   if (!value) {
     return (
       <div>
-        <p className="text-xs font-semibold text-neutral-500">{label}</p>
-        <p className="mt-1 text-sm text-neutral-400">Not provided yet</p>
+        <p className="text-xs font-semibold text-ink-muted">{label}</p>
+        <p className="mt-1 text-sm text-ink-muted">Not provided yet</p>
       </div>
     )
   }
   return (
     <div>
-      <p className="text-xs font-semibold text-neutral-500">{label}</p>
+      <p className="text-xs font-semibold text-ink-muted">{label}</p>
       {link ? (
         <a href={value} target="_blank" rel="noopener noreferrer" className="mt-1 block text-sm text-primary-600 hover:underline">
           {value}
         </a>
       ) : multiline ? (
-        <p className="mt-1 text-sm text-neutral-700">{value}</p>
+        <p className="mt-1 text-sm text-ink-muted">{value}</p>
       ) : (
-        <p className="mt-1 text-sm text-neutral-700">{value}</p>
+        <p className="mt-1 text-sm text-ink-muted">{value}</p>
       )}
     </div>
   )
 }
 
 function EmptyState({ text }: { text: string }) {
-  return <p className="text-sm text-neutral-400">{text}</p>
+  return <p className="text-sm text-ink-muted">{text}</p>
 }

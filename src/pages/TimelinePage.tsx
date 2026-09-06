@@ -40,8 +40,8 @@ export function TimelinePage() {
   return (
     <MemberLayout>
       <div className="mb-6">
-        <h1 className="font-serif text-2xl font-semibold text-neutral-900 sm:text-3xl">Career Timeline</h1>
-        <p className="mt-1 text-sm text-neutral-600">
+        <h1 className="font-serif text-2xl font-semibold text-ink sm:text-3xl">Career Timeline</h1>
+        <p className="mt-1 text-sm text-ink-muted">
           Every milestone in your FreshlyForward journey, from start to success.
         </p>
       </div>
@@ -53,7 +53,7 @@ export function TimelinePage() {
       ) : events.length > 0 ? (
         <div className="relative">
           {/* Vertical line */}
-          <div className="absolute left-4 top-0 h-full w-0.5 bg-neutral-200 sm:left-1/2" />
+          <div className="absolute left-4 top-0 h-full w-0.5 bg-border sm:left-1/2" />
 
           <div className="space-y-6">
             {events.map((event, i) => {
@@ -67,17 +67,17 @@ export function TimelinePage() {
                   }`}
                 >
                   {/* Dot */}
-                  <div className="relative z-10 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-primary-600 ring-4 ring-primary-100 sm:absolute sm:left-1/2 sm:-translate-x-1/2">
+                  <div className="relative z-10 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-primary-600 ring-4 ring-primary-950 sm:absolute sm:left-1/2 sm:-translate-x-1/2">
                     <Icon className="h-4 w-4 text-white" />
                   </div>
 
                   {/* Card */}
                   <div className={`flex-1 sm:w-1/2 ${isLeft ? 'sm:pr-8' : 'sm:pl-8'}`}>
-                    <div className="border border-neutral-200 border-l-4 border-l-primary-600 bg-white p-4 transition-colors">
-                      <p className="font-mono text-xs text-neutral-400">{formatDate(event.event_date)}</p>
-                      <p className="mt-1 font-serif text-sm font-semibold text-neutral-900">{event.event_title}</p>
+                    <div className="border border-border border-l-4 border-l-primary-600 bg-surface-card p-4 transition-colors">
+                      <p className="font-mono text-xs text-ink-muted">{formatDate(event.event_date)}</p>
+                      <p className="mt-1 font-serif text-sm font-semibold text-ink">{event.event_title}</p>
                       {event.event_description && (
-                        <p className="mt-1 text-sm text-neutral-600">{event.event_description}</p>
+                        <p className="mt-1 text-sm text-ink-muted">{event.event_description}</p>
                       )}
                     </div>
                   </div>
@@ -87,9 +87,9 @@ export function TimelinePage() {
           </div>
         </div>
       ) : (
-        <div className="border border-neutral-200 bg-white p-12 text-center">
-          <Compass className="mx-auto h-12 w-12 text-neutral-300" />
-          <p className="mt-4 text-sm text-neutral-500">
+        <div className="border border-border bg-surface-card p-12 text-center">
+          <Compass className="mx-auto h-12 w-12 text-ink-muted" />
+          <p className="mt-4 text-sm text-ink-muted">
             Your timeline will populate as your career journey progresses. Complete onboarding to get started!
           </p>
         </div>
