@@ -128,7 +128,7 @@ export function MembershipBadgeShield({
         <Icon className={`${ICON_SIZES[size]} text-white`} strokeWidth={2.25} />
       </div>
       {showLabel && (
-        <span className="text-center text-[10px] font-semibold uppercase tracking-wide text-neutral-600">
+        <span className="text-center text-[10px] font-semibold uppercase tracking-wide text-ink-muted">
           {badge.name}
         </span>
       )}
@@ -157,13 +157,13 @@ export function AchievementBadgeCircle({
     <div className="inline-flex flex-col items-center gap-1.5" title={badge.description}>
       <div
         className={`flex items-center justify-center rounded-full ${CIRCLE_SIZES[size]} ${
-          locked ? 'bg-neutral-100' : style.iconBg
+          locked ? 'bg-surface-subtle' : style.iconBg
         }`}
       >
-        <Icon className={`${ICON_SIZES[size]} ${locked ? 'text-neutral-300' : style.iconText}`} strokeWidth={2} />
+        <Icon className={`${ICON_SIZES[size]} ${locked ? 'text-ink-muted' : style.iconText}`} strokeWidth={2} />
       </div>
       {showLabel && (
-        <span className={`text-center text-xs font-medium ${locked ? 'text-neutral-400' : 'text-neutral-700'}`}>
+        <span className={`text-center text-xs font-medium ${locked ? 'text-ink-muted' : 'text-ink'}`}>
           {badge.name}
         </span>
       )}

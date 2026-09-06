@@ -7,10 +7,10 @@ import type { MemberProfile } from '@/types'
 const USERNAME_PATTERN = /^[a-z0-9_]{3,20}$/i
 
 const SUBSCRIPTION_STYLES: Record<string, string> = {
-  active: 'border-success-500 text-success-700',
-  paused: 'border-warning-500 text-warning-700',
-  canceled: 'border-neutral-300 text-neutral-500',
-  none: 'border-neutral-300 text-neutral-500',
+  active: 'border-success-600 text-success-300',
+  paused: 'border-warning-600 text-warning-300',
+  canceled: 'border-border text-ink-muted',
+  none: 'border-border text-ink-muted',
 }
 
 const SUBSCRIPTION_LABELS: Record<string, string> = {
@@ -98,10 +98,10 @@ export function ProfileCard({ userId, profile, onUpdated }: ProfileCardProps) {
   }
 
   return (
-    <div className="border border-neutral-200 bg-white p-6">
+    <div className="border border-border bg-surface-card p-6">
       <div className="flex items-center gap-4">
         <div className="relative">
-          <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-primary-100 text-xl font-semibold text-primary-700">
+          <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-primary-950 text-xl font-semibold text-primary-300">
             {profile.avatar_url ? (
               <img src={profile.avatar_url} alt="" className="h-full w-full object-cover" />
             ) : (
@@ -112,7 +112,7 @@ export function ProfileCard({ userId, profile, onUpdated }: ProfileCardProps) {
             onClick={() => fileInputRef.current?.click()}
             disabled={uploading}
             aria-label="Upload profile photo"
-            className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full border-2 border-white bg-primary-600 text-white shadow-sm hover:bg-primary-700 disabled:opacity-60"
+            className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full border-2 border-surface-card bg-primary-600 text-white shadow-sm hover:bg-primary-700 disabled:opacity-60"
           >
             {uploading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Camera className="h-3 w-3" />}
           </button>
@@ -126,31 +126,31 @@ export function ProfileCard({ userId, profile, onUpdated }: ProfileCardProps) {
         </div>
 
         <div className="min-w-0 flex-1">
-          <p className="truncate font-serif text-lg font-semibold text-neutral-900">
+          <p className="truncate font-serif text-lg font-semibold text-ink">
             {profile.full_name || 'Your Name'}
           </p>
 
           {editingUsername ? (
             <div className="mt-1 flex items-center gap-1.5">
-              <span className="text-sm text-neutral-400">@</span>
+              <span className="text-sm text-ink-muted">@</span>
               <input
                 type="text"
                 value={usernameDraft}
                 onChange={(e) => setUsernameDraft(e.target.value)}
                 autoFocus
-                className="w-32 border border-neutral-300 px-2 py-1 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="w-32 border border-border px-2 py-1 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
               />
-              <button onClick={handleSaveUsername} disabled={savingUsername} className="p-1 text-primary-600 hover:bg-primary-50">
+              <button onClick={handleSaveUsername} disabled={savingUsername} className="p-1 text-primary-600 hover:bg-surface-hover">
                 {savingUsername ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />}
               </button>
-              <button onClick={() => { setEditingUsername(false); setUsernameDraft(profile.username || '') }} className="p-1 text-neutral-400 hover:bg-neutral-50">
+              <button onClick={() => { setEditingUsername(false); setUsernameDraft(profile.username || '') }} className="p-1 text-ink-muted hover:bg-surface-hover">
                 <X className="h-3.5 w-3.5" />
               </button>
             </div>
           ) : (
             <button
               onClick={() => setEditingUsername(true)}
-              className="mt-0.5 flex items-center gap-1 text-sm text-neutral-500 hover:text-primary-700"
+              className="mt-0.5 flex items-center gap-1 text-sm text-ink-muted hover:text-primary-400"
             >
               {profile.username ? `@${profile.username}` : 'Set a username'}
               <Pencil className="h-3 w-3" />
@@ -165,7 +165,7 @@ export function ProfileCard({ userId, profile, onUpdated }: ProfileCardProps) {
       </div>
 
       {error && (
-        <p className="mt-3 border border-error-200 bg-error-50 px-3 py-2 text-xs text-error-700">{error}</p>
+        <p className="mt-3 border border-error-600 bg-error-950 px-3 py-2 text-xs text-error-300">{error}</p>
       )}
     </div>
   )

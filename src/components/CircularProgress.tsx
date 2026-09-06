@@ -19,7 +19,7 @@ export function CircularProgress({ value, size = 80, strokeWidth = 8, label = 'C
         <circle
           cx={size / 2} cy={size / 2} r={radius}
           fill="none" stroke="currentColor" strokeWidth={strokeWidth}
-          className="text-neutral-100"
+          className="text-surface-subtle"
         />
         <circle
           cx={size / 2} cy={size / 2} r={radius}
@@ -33,7 +33,7 @@ export function CircularProgress({ value, size = 80, strokeWidth = 8, label = 'C
         <span className={`font-mono font-bold ${textColorClass}`} style={{ fontSize: size * 0.22 }}>
           {clamped}%
         </span>
-        {label && <span className="text-neutral-500" style={{ fontSize: size * 0.09 }}>{label}</span>}
+        {label && <span className="text-ink-muted" style={{ fontSize: size * 0.09 }}>{label}</span>}
       </div>
     </div>
   )

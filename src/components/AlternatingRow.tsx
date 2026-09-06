@@ -26,8 +26,8 @@ export function AlternatingRow({ eyebrow, title, copy, visual, reversed = false 
     >
       <div className={reversed ? 'lg:order-2' : ''}>
         <span className="font-mono text-xs font-bold uppercase tracking-wide text-primary-600">{eyebrow}</span>
-        <h3 className="mt-3 font-display text-3xl font-semibold leading-tight text-[var(--navy)]">{title}</h3>
-        <p className="mt-4 max-w-md text-base leading-relaxed text-neutral-600">{copy}</p>
+        <h3 className="mt-3 font-display text-3xl font-semibold leading-tight text-ink">{title}</h3>
+        <p className="mt-4 max-w-md text-base leading-relaxed text-ink-muted">{copy}</p>
       </div>
       <div className={reversed ? 'lg:order-1' : ''}>{visual}</div>
     </div>

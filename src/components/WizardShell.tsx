@@ -54,17 +54,17 @@ export function WizardShell({
   const progress = ((currentStep + 1) / steps.length) * 100
 
   return (
-    <div className="min-h-screen bg-neutral-50">
+    <div className="min-h-screen bg-surface-subtle">
       {/* Header */}
-      <header className="sticky top-0 z-40 border-b border-neutral-200 bg-white/90 backdrop-blur-md">
+      <header className="sticky top-0 z-40 border-b border-border bg-surface-card/90 backdrop-blur-md">
         <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-4">
           <div className="flex items-center gap-2">
             <Compass className="h-6 w-6 text-primary-600" />
-            <span className="font-serif text-lg font-semibold text-neutral-900">{brandLabel}</span>
+            <span className="font-serif text-lg font-semibold text-ink">{brandLabel}</span>
           </div>
           <div className="flex items-center gap-3">
             {saving && (
-              <span className="flex items-center gap-1.5 text-xs text-neutral-500">
+              <span className="flex items-center gap-1.5 text-xs text-ink-muted">
                 <Loader2 className="h-3 w-3 animate-spin" />
                 Saving…
               </span>
@@ -79,7 +79,7 @@ export function WizardShell({
         </div>
 
         {/* Progress Bar */}
-        <div className="h-1.5 w-full bg-neutral-100">
+        <div className="h-1.5 w-full bg-surface-subtle">
           <div
             className="h-full bg-primary-600 transition-all duration-500 ease-out"
             style={{ width: `${progress}%` }}
@@ -105,7 +105,7 @@ export function WizardShell({
                     ? 'text-primary-600'
                     : completedSteps.includes(step.key)
                       ? 'text-success-600'
-                      : 'text-neutral-400'
+                      : 'text-ink-muted'
                 } ${!onStepClick ? 'cursor-default' : ''}`}
               >
                 <span
@@ -113,8 +113,8 @@ export function WizardShell({
                     i === currentStep
                       ? 'bg-primary-600 text-white'
                       : completedSteps.includes(step.key)
-                        ? 'bg-success-100 text-success-600'
-                        : 'bg-neutral-200 text-neutral-500'
+                        ? 'bg-success-950 text-success-300'
+                        : 'bg-surface-subtle text-ink-muted'
                   }`}
                 >
                   {completedSteps.includes(step.key) ? <Check className="h-3 w-3" /> : i + 1}
@@ -127,7 +127,7 @@ export function WizardShell({
             <span className="text-xs font-medium text-primary-600">
               Step {currentStep + 1} of {steps.length}
             </span>
-            <span className="text-xs text-neutral-500">{steps[currentStep].label}</span>
+            <span className="text-xs text-ink-muted">{steps[currentStep].label}</span>
           </div>
         </div>
       </header>
@@ -140,19 +140,19 @@ export function WizardShell({
       </main>
 
       {/* Sticky Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-neutral-200 bg-white/95 backdrop-blur-md">
+      <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-surface-card/95 backdrop-blur-md">
         <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-4 sm:px-6">
           <button
             onClick={onBack}
             disabled={backDisabled}
-            className="flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-100 disabled:opacity-40"
+            className="flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium text-ink-muted transition-colors hover:bg-surface-hover disabled:opacity-40"
           >
             <ChevronLeft className="h-4 w-4" />
             Back
           </button>
           <div className="flex items-center gap-3">
             {nextDisabled && nextHint && (
-              <span className="text-xs font-medium text-neutral-500">{nextHint}</span>
+              <span className="text-xs font-medium text-ink-muted">{nextHint}</span>
             )}
             <button
               onClick={onNext}

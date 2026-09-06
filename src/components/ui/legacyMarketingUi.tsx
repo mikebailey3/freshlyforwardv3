@@ -6,9 +6,12 @@ import { Link } from 'react-router-dom'
 // module-resolution path -- `@/components/ui` can only resolve to one of
 // them). Re-exported from ui/index.ts so none of the 11 existing consumers
 // (LandingPage, PricingPage, AboutPage, etc.) needed to change their imports.
-// Still uses the legacy marketing CSS-class system / literal Tailwind
-// neutrals -- migrating that is out of scope for Sub-project 1 Task 12 and
-// belongs to the later component-migration batches (Tasks 15-22).
+// LinkButton/SectionHeading route through the legacy `.button`/
+// `.section-heading` CSS classes, already migrated to dark semantic roles in
+// Task 2. PillLinkButton's secondary variant was the one literal-Tailwind-
+// neutral holdout here (border-neutral-900/text-neutral-900, invisible on a
+// dark page) -- migrated to the SecondaryButton primitive's own
+// border-border/text-ink/hover:bg-surface-hover convention in Task 15.
 
 type LinkButtonProps = {
   to: string
@@ -48,7 +51,7 @@ export function PillLinkButton({ to, children, variant = 'primary' }: PillLinkBu
   const styles =
     variant === 'primary'
       ? 'bg-primary-600 text-white hover:bg-primary-700'
-      : 'border-2 border-neutral-900 text-neutral-900 hover:bg-neutral-900 hover:text-white'
+      : 'border-2 border-border text-ink hover:bg-surface-hover'
   return (
     <Link
       to={to}
