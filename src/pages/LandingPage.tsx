@@ -13,21 +13,25 @@ export function LandingPage() {
             Desktop: a single full-width layer spanning the *entire* section (not a
             boxed sub-container starting at a fixed x-position) with a soft readability
             scrim layered on top of it -- "artwork underneath, gradient over the left,
-            real content on top" rather than "left panel | right panel". This is
-            deliberate: an earlier version confined the wallpaper to its own container
-            with a hard left edge, which combined with a separate ambient-glow layer to
-            produce a visible vertical seam at that boundary. Removing the boundary
-            (rather than covering it with another layer) removes the seam. scale-150 +
-            object-position keep the dashboard at least as prominent as the previous,
-            narrower-container version now that the image spans the full hero width. */}
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0 hidden lg:block">
-          <img
-            src="/images/freshlyforward-hero-wallpaper.png"
-            alt=""
-            width={1672}
-            height={941}
-            className="h-full w-full scale-150 object-cover object-[58%_44%]"
-          />
+            real content on top" rather than "left panel | right panel". Removing the
+            container boundary (rather than covering it with another layer) is what
+            eliminated an earlier visible seam.
+
+            Uses background-image + background-size + background-position (not <img> +
+            object-fit + a CSS transform) for the pan/zoom into the dashboard:
+            transform:scale() always zooms from the element's own center regardless of
+            object-position, which silently defeated earlier attempts to reposition the
+            crop toward the left nav / Forward Score. background-position gives direct,
+            predictable control over exactly which part of the artwork is framed. */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 hidden bg-no-repeat lg:block"
+          style={{
+            backgroundImage: "url('/images/freshlyforward-hero-wallpaper.png')",
+            backgroundSize: '148% auto',
+            backgroundPosition: '30% 45%',
+          }}
+        >
           <div className="absolute inset-0 bg-[linear-gradient(to_right,var(--color-bg)_0%,var(--color-bg)_53%,transparent_76%),linear-gradient(to_bottom,transparent_52%,var(--color-bg)_100%),linear-gradient(to_top,transparent_88%,var(--color-bg)_100%)]" />
         </div>
 
