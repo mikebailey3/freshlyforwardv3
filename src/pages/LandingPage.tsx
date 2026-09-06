@@ -6,35 +6,29 @@ export function LandingPage() {
     <main className="callsheet">
       {/* Layer 1: Career Operating System (identity) */}
       <section className="relative overflow-hidden bg-bg py-14 lg:py-28">
-        {/* Ambient glow tying the wallpaper into the section background -- built from the
-            existing semantic palette only (--color-primary-900 via color-mix), not a new
-            color system, per owner direction. */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_65%_at_78%_45%,color-mix(in_srgb,var(--color-primary-900)_40%,transparent),transparent_72%)]"
-        />
-
         {/* Approved North Star hero wallpaper (owner-supplied art direction,
             docs/superpowers/visual-review/81F4884C-BF73-440A-8E44-2ED0776F6C70.png,
             promoted to public/images/freshlyforward-hero-wallpaper.png).
 
-            Desktop: positioned against the *section* itself (not the text grid) so it
-            bleeds to the viewport edge and reads as background scenery rather than a
-            boxed illustration next to the copy. object-position + scale zoom into the
-            dashboard so the Forward Score and Top Opportunity card stay readable at
-            normal viewing distance -- cropping outer scenery is intentional, per owner
-            direction. A solid-bg-bg gradient overlay (CSS, not image editing) fades the
-            left and bottom edges into the page so there's no visible rectangular
-            boundary; the ambient glow above shows through where it fades. */}
-        <div aria-hidden="true" className="pointer-events-none absolute inset-y-0 left-[48%] right-0 hidden lg:block">
+            Desktop: a single full-width layer spanning the *entire* section (not a
+            boxed sub-container starting at a fixed x-position) with a soft readability
+            scrim layered on top of it -- "artwork underneath, gradient over the left,
+            real content on top" rather than "left panel | right panel". This is
+            deliberate: an earlier version confined the wallpaper to its own container
+            with a hard left edge, which combined with a separate ambient-glow layer to
+            produce a visible vertical seam at that boundary. Removing the boundary
+            (rather than covering it with another layer) removes the seam. scale-150 +
+            object-position keep the dashboard at least as prominent as the previous,
+            narrower-container version now that the image spans the full hero width. */}
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 hidden lg:block">
           <img
             src="/images/freshlyforward-hero-wallpaper.png"
             alt=""
             width={1672}
             height={941}
-            className="h-full w-full scale-110 object-cover object-[60%_46%]"
+            className="h-full w-full scale-150 object-cover object-[58%_44%]"
           />
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,var(--color-bg)_0%,var(--color-bg)_10%,transparent_62%),linear-gradient(to_bottom,transparent_50%,var(--color-bg)_100%),linear-gradient(to_top,transparent_88%,var(--color-bg)_100%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,var(--color-bg)_0%,var(--color-bg)_53%,transparent_76%),linear-gradient(to_bottom,transparent_52%,var(--color-bg)_100%),linear-gradient(to_top,transparent_88%,var(--color-bg)_100%)]" />
         </div>
 
         <div className="shell relative z-10">
