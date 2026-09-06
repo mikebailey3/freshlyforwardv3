@@ -10,6 +10,12 @@ export default mergeConfig(
       environment: 'jsdom',
       globals: true,
       setupFiles: './src/vitest.setup.ts',
+      // .worktrees/ holds stale copies of the repo from past parallel work
+      // sessions, each with its own node_modules (including its own React
+      // copy). Running their tests alongside the real tree causes dual-React
+      // hook errors unrelated to any current change. Excluded so the test
+      // suite reflects only the actual working tree.
+      exclude: ['**/node_modules/**', '.worktrees/**'],
     },
   })
 )

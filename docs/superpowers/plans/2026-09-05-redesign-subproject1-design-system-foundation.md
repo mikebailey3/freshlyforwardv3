@@ -50,11 +50,25 @@ Accent-scale pairings tuned for light backgrounds (light-tuned text+border pair 
 
 ```ts
 // src/index.css.tokens.test.ts
-import { readFileSync } from 'node:fs'
+/// <reference types="node" />
+import { readFileSync } from 'fs'
+import { dirname, join } from 'path'
+import { fileURLToPath } from 'url'
 import { describe, expect, it } from 'vitest'
 
+// Note: @types/node is already a devDependency but isn't auto-discovered for
+// files under the main tsconfig's `include: ["src"]` (it lives nested in
+// node_modules, not the top-level node_modules/@types TS scans by default).
+// The triple-slash reference above resolves it for this file only, without
+// changing the global tsconfig (which would expose Node globals across the
+// whole browser-side app -- not desired). Bare (non `node:`-prefixed)
+// specifiers are used for the same reason: `node:fs` reads as a bare name
+// under this project's TS setup and fails the same way `fs` would without
+// the reference directive.
+const cssPath = join(dirname(fileURLToPath(import.meta.url)), 'index.css')
+
 describe('semantic design tokens', () => {
-  const css = readFileSync(new URL('./index.css', import.meta.url), 'utf-8')
+  const css = readFileSync(cssPath, 'utf-8')
 
   it('defines the new surface and ink tokens', () => {
     expect(css).toMatch(/--color-bg:\s*#031421/)
