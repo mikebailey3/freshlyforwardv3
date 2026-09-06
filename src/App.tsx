@@ -27,6 +27,7 @@ import { ForwardDnaPage } from '@/pages/ForwardDnaPage'
 import { MembershipPage } from '@/pages/MembershipPage'
 import { CareerSuccessPage } from '@/pages/CareerSuccessPage'
 import { TimelinePage } from '@/pages/TimelinePage'
+import { DesignSystemShowcasePage } from '@/pages/internal/DesignSystemShowcasePage'
 import { MessagesPage } from '@/pages/MessagesPage'
 import { MemberOpportunitiesPage } from '@/pages/MemberOpportunitiesPage'
 import { OpportunityEnginePage } from '@/pages/OpportunityEnginePage'
@@ -438,6 +439,7 @@ function App() {
           }
         />
 
+        <Route path="/internal/design-system" element={<DesignSystemShowcasePage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       {isPublicRoute && <SiteFooter />}

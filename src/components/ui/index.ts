@@ -1,3 +1,5 @@
+export { LinkButton, SectionHeading, PillLinkButton } from './legacyMarketingUi'
+
 export { SectionEyebrow } from './SectionEyebrow'
 export { SectionHeader } from './SectionHeader'
 export { CTAButton } from './CTAButton'

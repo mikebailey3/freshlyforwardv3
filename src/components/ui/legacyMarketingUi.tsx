@@ -1,6 +1,15 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 
+// Pre-existing marketing-site components, relocated here unchanged from the
+// old src/components/ui.tsx (which collided with this ui/ directory's own
+// module-resolution path -- `@/components/ui` can only resolve to one of
+// them). Re-exported from ui/index.ts so none of the 11 existing consumers
+// (LandingPage, PricingPage, AboutPage, etc.) needed to change their imports.
+// Still uses the legacy marketing CSS-class system / literal Tailwind
+// neutrals -- migrating that is out of scope for Sub-project 1 Task 12 and
+// belongs to the later component-migration batches (Tasks 15-22).
+
 type LinkButtonProps = {
   to: string
   children: ReactNode
