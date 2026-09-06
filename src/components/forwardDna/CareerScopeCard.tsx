@@ -12,9 +12,9 @@ interface CareerScopeCardProps {
 
 export function CareerScopeCard({ entries, scope, onSave }: CareerScopeCardProps) {
   return (
-    <div className="border border-neutral-200 bg-white p-6">
-      <h3 className="font-serif text-base font-semibold text-neutral-900">Professional Scope</h3>
-      <p className="mt-1 text-xs text-neutral-500">The scale of what you've managed in each role.</p>
+    <div className="border border-border bg-surface-card p-6">
+      <h3 className="font-serif text-base font-semibold text-ink">Professional Scope</h3>
+      <p className="mt-1 text-xs text-ink-muted">The scale of what you've managed in each role.</p>
       <div className="mt-4 space-y-4">
         {entries.map((entry) => (
           <ScopeRow key={entry.id} entry={entry} existing={scope.find((s) => s.employment_entry_id === entry.id)} onSave={onSave} />
@@ -57,29 +57,29 @@ function ScopeRow({
   }
 
   return (
-    <div className="border-l-2 border-primary-200 pl-4">
-      <p className="text-sm font-semibold text-neutral-900">{entry.title} — {entry.company}</p>
+    <div className="border-l-2 border-primary-700 pl-4">
+      <p className="text-sm font-semibold text-ink">{entry.title} — {entry.company}</p>
       <div className="mt-2 grid grid-cols-2 gap-3">
         <label className="block">
-          <span className="text-xs font-semibold text-neutral-500">Revenue managed ($)</span>
-          <input type="text" value={revenue} onChange={(e) => setRevenue(e.target.value)} className="mt-1 w-full border border-neutral-300 px-3 py-2 text-sm" />
+          <span className="text-xs font-semibold text-ink-muted">Revenue managed ($)</span>
+          <input type="text" value={revenue} onChange={(e) => setRevenue(e.target.value)} className="mt-1 w-full border border-border bg-surface-elevated px-3 py-2 text-sm text-ink placeholder:text-ink-muted" />
         </label>
         <label className="block">
-          <span className="text-xs font-semibold text-neutral-500">Budget managed ($)</span>
-          <input type="text" value={budget} onChange={(e) => setBudget(e.target.value)} className="mt-1 w-full border border-neutral-300 px-3 py-2 text-sm" />
+          <span className="text-xs font-semibold text-ink-muted">Budget managed ($)</span>
+          <input type="text" value={budget} onChange={(e) => setBudget(e.target.value)} className="mt-1 w-full border border-border bg-surface-elevated px-3 py-2 text-sm text-ink placeholder:text-ink-muted" />
         </label>
         <label className="block">
-          <span className="text-xs font-semibold text-neutral-500">Team size</span>
-          <input type="number" min="0" value={teamSize} onChange={(e) => setTeamSize(e.target.value)} className="mt-1 w-full border border-neutral-300 px-3 py-2 text-sm" />
+          <span className="text-xs font-semibold text-ink-muted">Team size</span>
+          <input type="number" min="0" value={teamSize} onChange={(e) => setTeamSize(e.target.value)} className="mt-1 w-full border border-border bg-surface-elevated px-3 py-2 text-sm text-ink placeholder:text-ink-muted" />
         </label>
         <label className="block">
-          <span className="text-xs font-semibold text-neutral-500">Direct reports</span>
-          <input type="number" min="0" value={directReports} onChange={(e) => setDirectReports(e.target.value)} className="mt-1 w-full border border-neutral-300 px-3 py-2 text-sm" />
+          <span className="text-xs font-semibold text-ink-muted">Direct reports</span>
+          <input type="number" min="0" value={directReports} onChange={(e) => setDirectReports(e.target.value)} className="mt-1 w-full border border-border bg-surface-elevated px-3 py-2 text-sm text-ink placeholder:text-ink-muted" />
         </label>
       </div>
       <label className="mt-2 block">
-        <span className="text-xs font-semibold text-neutral-500">Notes</span>
-        <textarea value={notes} onChange={(e) => setNotes(e.target.value)} className="mt-1 w-full border border-neutral-300 px-3 py-2 text-sm" rows={2} />
+        <span className="text-xs font-semibold text-ink-muted">Notes</span>
+        <textarea value={notes} onChange={(e) => setNotes(e.target.value)} className="mt-1 w-full border border-border bg-surface-elevated px-3 py-2 text-sm text-ink placeholder:text-ink-muted" rows={2} />
       </label>
       <button onClick={handleSave} disabled={saving} className="mt-2 rounded-full bg-primary-600 px-4 py-1.5 text-xs font-semibold text-white hover:bg-primary-700 disabled:opacity-50">
         {saving ? 'Saving…' : 'Save'}

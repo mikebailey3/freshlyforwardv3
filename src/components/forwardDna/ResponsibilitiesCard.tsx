@@ -12,9 +12,9 @@ interface ResponsibilitiesCardProps {
 
 export function ResponsibilitiesCard({ entries, responsibilities, onAdd, onRemove }: ResponsibilitiesCardProps) {
   return (
-    <div className="border border-neutral-200 bg-white p-6">
-      <h3 className="font-serif text-base font-semibold text-neutral-900">Responsibilities</h3>
-      <p className="mt-1 text-xs text-neutral-500">What you were actually responsible for in each role.</p>
+    <div className="border border-border bg-surface-card p-6">
+      <h3 className="font-serif text-base font-semibold text-ink">Responsibilities</h3>
+      <p className="mt-1 text-xs text-ink-muted">What you were actually responsible for in each role.</p>
       <div className="mt-4 space-y-4">
         {entries.map((entry) => (
           <ResponsibilityRow key={entry.id} entry={entry} tags={responsibilities.filter((r) => r.employment_entry_id === entry.id)} onAdd={onAdd} onRemove={onRemove} />
@@ -48,11 +48,11 @@ function ResponsibilityRow({
   }
 
   return (
-    <div className="border-l-2 border-primary-200 pl-4">
-      <p className="text-sm font-semibold text-neutral-900">{entry.title} — {entry.company}</p>
+    <div className="border-l-2 border-primary-700 pl-4">
+      <p className="text-sm font-semibold text-ink">{entry.title} — {entry.company}</p>
       <div className="mt-2 flex flex-wrap gap-2">
         {tags.map((tag) => (
-          <span key={tag.id} className="flex items-center gap-1 border border-primary-300 px-2.5 py-1 font-mono text-xs text-primary-700">
+          <span key={tag.id} className="flex items-center gap-1 border border-primary-700 px-2.5 py-1 font-mono text-xs text-primary-300">
             {tag.tag}
             <button onClick={() => onRemove(tag.id)} aria-label={`Remove ${tag.tag}`}>
               <X className="h-3 w-3" />
@@ -61,7 +61,7 @@ function ResponsibilityRow({
         ))}
       </div>
       <div className="mt-2 flex gap-2">
-        <input type="text" value={newTag} onChange={(e) => setNewTag(e.target.value)} placeholder="Add a responsibility" className="flex-1 border border-neutral-300 px-3 py-1.5 text-sm" />
+        <input type="text" value={newTag} onChange={(e) => setNewTag(e.target.value)} placeholder="Add a responsibility" className="flex-1 border border-border bg-surface-elevated px-3 py-1.5 text-sm text-ink placeholder:text-ink-muted" />
         <button onClick={handleAdd} className="rounded-full bg-primary-600 px-4 py-1.5 text-xs font-semibold text-white hover:bg-primary-700">
           Add
         </button>
