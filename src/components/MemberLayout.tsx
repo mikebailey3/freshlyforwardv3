@@ -130,7 +130,7 @@ export function MemberLayout({ children }: { children: ReactNode }) {
 
   const renderNavIcon = (item: NavItemConfig) => {
     if (item.feature && !canAccess(item.feature)) {
-      return <Lock className="h-4 w-4 text-neutral-400" />
+      return <Lock className="h-4 w-4 text-ink-muted" />
     }
     return <item.icon className="h-5 w-5" />
   }
@@ -147,24 +147,24 @@ export function MemberLayout({ children }: { children: ReactNode }) {
         onClick={onNavigate}
         className={`flex items-center gap-3 border-l-2 px-3 py-2.5 text-sm font-medium transition-colors ${
           isActive
-            ? 'border-primary-600 bg-primary-50/60 text-primary-700'
-            : 'border-transparent text-neutral-600 hover:border-neutral-300 hover:bg-neutral-50 hover:text-neutral-900'
+            ? 'border-primary-600 bg-primary-950/60 text-primary-300'
+            : 'border-transparent text-ink-muted hover:border-border hover:bg-surface-hover hover:text-ink'
         } ${isLocked ? 'opacity-70' : ''}`}
       >
         {renderNavIcon(item)}
         {item.label}
         {item.isNew && (
-          <span className="ml-auto rounded-full border border-primary-200 px-1.5 py-0.5 font-mono text-[10px] font-semibold uppercase text-primary-700">
+          <span className="ml-auto rounded-full border border-primary-600 px-1.5 py-0.5 font-mono text-[10px] font-semibold uppercase text-primary-300">
             New
           </span>
         )}
         {!item.isNew && count > 0 && (
-          <span className="ml-auto rounded-full bg-primary-600 px-2 py-0.5 font-mono text-xs font-semibold text-white">
+          <span className="ml-auto rounded-full bg-primary-600 px-2 py-0.5 font-mono text-xs font-semibold text-ink">
             {count}
           </span>
         )}
         {isLocked && item.requiredPlan && (
-          <span className="ml-auto rounded-full border border-neutral-200 px-1.5 py-0.5 font-mono text-[10px] font-medium uppercase text-neutral-500">
+          <span className="ml-auto rounded-full border border-border px-1.5 py-0.5 font-mono text-[10px] font-medium uppercase text-ink-muted">
             {item.requiredPlan === 'career-growth' ? 'Growth' : item.requiredPlan === 'career-concierge' ? 'Concierge' : ''}
           </span>
         )}
@@ -176,7 +176,7 @@ export function MemberLayout({ children }: { children: ReactNode }) {
     <>
       {navGroups.map((group) => (
         <div key={group.label} className="mb-4">
-          <p className="mb-1 px-3 text-[11px] font-semibold uppercase tracking-wide text-neutral-400">
+          <p className="mb-1 px-3 text-[11px] font-semibold uppercase tracking-wide text-ink-muted">
             {group.label}
           </p>
           <div className="space-y-1">
@@ -188,15 +188,15 @@ export function MemberLayout({ children }: { children: ReactNode }) {
   )
 
   return (
-    <div className="min-h-screen bg-neutral-50">
+    <div className="min-h-screen bg-surface-subtle">
       {/* Desktop sidebar */}
-      <aside className="fixed left-0 top-0 z-30 hidden h-screen w-64 border-r border-neutral-200 bg-white lg:block">
+      <aside className="fixed left-0 top-0 z-30 hidden h-screen w-64 border-r border-border bg-surface-card lg:block">
         <div className="flex h-full flex-col">
-          <Link to="/dashboard" className="flex items-center gap-2 border-b border-neutral-200 px-6 py-5">
+          <Link to="/dashboard" className="flex items-center gap-2 border-b border-border px-6 py-5">
             <Compass className="h-7 w-7 text-primary-600" />
-            <span className="font-serif text-lg font-semibold text-neutral-900">FreshlyForward</span>
+            <span className="font-serif text-lg font-semibold text-ink">FreshlyForward</span>
           </Link>
-          <p className="border-b border-dashed border-neutral-200 px-6 py-2 font-mono text-[10px] font-semibold uppercase tracking-wide text-neutral-400">
+          <p className="border-b border-dashed border-border px-6 py-2 font-mono text-[10px] font-semibold uppercase tracking-wide text-ink-muted">
             Member Console
           </p>
 
@@ -204,9 +204,9 @@ export function MemberLayout({ children }: { children: ReactNode }) {
             {renderNavGroups()}
           </nav>
 
-          <div className="border-t border-neutral-200 p-3">
+          <div className="border-t border-border p-3">
             <div className="mb-2 flex items-center gap-2 px-3">
-              <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center overflow-hidden rounded-full border border-neutral-200 bg-primary-50 font-mono text-xs font-semibold text-primary-700">
+              <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center overflow-hidden rounded-full border border-border bg-primary-950 font-mono text-xs font-semibold text-primary-300">
                 {profile?.avatar_url ? (
                   <img src={profile.avatar_url} alt="" className="h-full w-full object-cover" />
                 ) : (
@@ -214,7 +214,7 @@ export function MemberLayout({ children }: { children: ReactNode }) {
                 )}
               </div>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-xs font-semibold text-neutral-800">
+                <p className="truncate text-xs font-semibold text-ink">
                   {profile?.full_name || profile?.headline || 'Member'}
                 </p>
                 <BadgeStack badges={membershipBadges} />
@@ -222,7 +222,7 @@ export function MemberLayout({ children }: { children: ReactNode }) {
             </div>
             <button
               onClick={handleSignOut}
-              className="flex w-full items-center gap-3 border-l-2 border-transparent px-3 py-2.5 text-sm font-medium text-neutral-600 transition-colors hover:border-neutral-300 hover:bg-neutral-50"
+              className="flex w-full items-center gap-3 border-l-2 border-transparent px-3 py-2.5 text-sm font-medium text-ink-muted transition-colors hover:border-border hover:bg-surface-hover"
             >
               <LogOut className="h-5 w-5" />
               Sign Out
@@ -232,43 +232,43 @@ export function MemberLayout({ children }: { children: ReactNode }) {
       </aside>
 
       {/* Desktop top header */}
-      <header className="sticky top-0 z-20 hidden border-b border-neutral-200 bg-white lg:block lg:pl-64">
+      <header className="sticky top-0 z-20 hidden border-b border-border bg-surface-card lg:block lg:pl-64">
         <div className="flex items-center justify-end gap-4 px-6 py-3">
           <div className="relative flex-1 max-w-md">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-muted" />
             <input
               type="search"
               placeholder="Search opportunities, tools, and more..."
-              className="w-full border border-neutral-200 bg-neutral-50 py-2 pl-9 pr-3 text-sm text-neutral-700 placeholder:text-neutral-400 focus:border-primary-300 focus:outline-none"
+              className="w-full border border-border bg-surface-subtle py-2 pl-9 pr-3 text-sm text-ink-muted placeholder:text-ink-muted focus:border-primary-300 focus:outline-none"
             />
           </div>
-          <Link to="/notifications" className="relative p-2 text-neutral-500 hover:bg-neutral-50">
+          <Link to="/notifications" className="relative p-2 text-ink-muted hover:bg-surface-hover">
             <Bell className="h-5 w-5" />
             {unreadNotifications > 0 && (
               <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-primary-600" />
             )}
           </Link>
           {plan && membershipBadges[0] && (
-            <div className="flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-3 py-1.5">
+            <div className="flex items-center gap-2 rounded-full border border-border bg-surface-card px-3 py-1.5">
               <MembershipBadgeShield badge={membershipBadges[0]} size="sm" />
               <div className="leading-tight">
-                <p className="text-xs font-semibold text-neutral-900">{plan.name}</p>
-                <p className="font-mono text-[10px] text-neutral-500">
+                <p className="text-xs font-semibold text-ink">{plan.name}</p>
+                <p className="font-mono text-[10px] text-ink-muted">
                   Member since {new Date(profile?.created_at || Date.now()).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
                 </p>
               </div>
-              <ChevronDown className="h-3.5 w-3.5 text-neutral-400" />
+              <ChevronDown className="h-3.5 w-3.5 text-ink-muted" />
             </div>
           )}
         </div>
       </header>
 
       {/* Mobile header */}
-      <header className="sticky top-0 z-40 border-b border-neutral-200 bg-white lg:hidden">
+      <header className="sticky top-0 z-40 border-b border-border bg-surface-card lg:hidden">
         <div className="flex items-center justify-between px-4 py-3">
           <Link to="/dashboard" className="flex items-center gap-2">
             <Compass className="h-6 w-6 text-primary-600" />
-            <span className="font-serif text-base font-semibold text-neutral-900">FreshlyForward</span>
+            <span className="font-serif text-base font-semibold text-ink">FreshlyForward</span>
           </Link>
           <button
             onClick={() => setMobileNavOpen(!mobileNavOpen)}
@@ -282,11 +282,11 @@ export function MemberLayout({ children }: { children: ReactNode }) {
 
       {/* Mobile nav */}
       {mobileNavOpen && (
-        <nav className="fixed inset-0 z-50 overflow-y-auto bg-white lg:hidden">
-          <div className="flex items-center justify-between border-b border-neutral-200 px-4 py-3">
+        <nav className="fixed inset-0 z-50 overflow-y-auto bg-surface-card lg:hidden">
+          <div className="flex items-center justify-between border-b border-border px-4 py-3">
             <Link to="/dashboard" onClick={() => setMobileNavOpen(false)} className="flex items-center gap-2">
               <Compass className="h-6 w-6 text-primary-600" />
-              <span className="font-serif text-base font-semibold text-neutral-900">FreshlyForward</span>
+              <span className="font-serif text-base font-semibold text-ink">FreshlyForward</span>
             </Link>
             <button onClick={() => setMobileNavOpen(false)} aria-label="Close navigation">
               <X className="h-6 w-6" />
@@ -296,7 +296,7 @@ export function MemberLayout({ children }: { children: ReactNode }) {
             {renderNavGroups(() => setMobileNavOpen(false))}
             <button
               onClick={handleSignOut}
-              className="flex w-full items-center gap-3 border-l-2 border-transparent px-3 py-3 text-sm font-medium text-neutral-600 transition-colors hover:border-neutral-300 hover:bg-neutral-50"
+              className="flex w-full items-center gap-3 border-l-2 border-transparent px-3 py-3 text-sm font-medium text-ink-muted transition-colors hover:border-border hover:bg-surface-hover"
             >
               <LogOut className="h-5 w-5" />
               Sign Out
@@ -313,7 +313,7 @@ export function MemberLayout({ children }: { children: ReactNode }) {
       </main>
 
       {/* Mobile bottom navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-neutral-200 bg-white lg:hidden">
+      <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-surface-card lg:hidden">
         <div className="flex items-center justify-around px-2 py-2">
           {[
             { to: '/dashboard', label: 'ForwardOS Home', icon: LayoutDashboard },
@@ -328,7 +328,7 @@ export function MemberLayout({ children }: { children: ReactNode }) {
                 key={item.to}
                 to={item.to}
                 className={`flex flex-col items-center gap-0.5 px-3 py-1.5 text-xs font-medium ${
-                  isActive ? 'text-primary-600' : 'text-neutral-500'
+                  isActive ? 'text-primary-600' : 'text-ink-muted'
                 }`}
               >
                 <item.icon className="h-5 w-5" />
