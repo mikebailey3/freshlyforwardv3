@@ -8,10 +8,10 @@ import type { ForwardScorePillarResult } from '@/types/forwardScore'
  */
 export function PillarCard({ pillar }: { pillar: ForwardScorePillarResult }) {
   return (
-    <div className="rounded-xl border border-neutral-200 p-5 shadow-sm">
-      <p className="text-sm font-semibold text-neutral-700">{pillar.label}</p>
-      <p className="mt-2 font-mono text-3xl font-bold text-neutral-900">{pillar.score}</p>
-      <p className="mt-1 text-xs text-neutral-500">{pillar.explanation}</p>
+    <div className="rounded-xl border border-border p-5 shadow-sm">
+      <p className="text-sm font-semibold text-ink-muted">{pillar.label}</p>
+      <p className="mt-2 font-mono text-3xl font-bold text-ink">{pillar.score}</p>
+      <p className="mt-1 text-xs text-ink-muted">{pillar.explanation}</p>
       {pillar.improvementLink && (
         <Link
           to={pillar.improvementLink.to}

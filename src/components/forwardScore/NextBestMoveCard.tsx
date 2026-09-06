@@ -8,12 +8,12 @@ import type { NextBestMove } from '@/types/forwardScore'
  */
 export function NextBestMoveCard({ move }: { move: NextBestMove }) {
   return (
-    <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
-      <p className="font-mono text-[10px] font-semibold uppercase tracking-wide text-neutral-500">
+    <div className="rounded-xl border border-border bg-surface-card p-5 shadow-sm">
+      <p className="font-mono text-[10px] font-semibold uppercase tracking-wide text-ink-muted">
         Next Best Move
       </p>
-      <h3 className="mt-1 font-serif text-base font-semibold text-neutral-900">{move.headline}</h3>
-      <p className="mt-1 text-sm text-neutral-600">{move.detail}</p>
+      <h3 className="mt-1 font-serif text-base font-semibold text-ink">{move.headline}</h3>
+      <p className="mt-1 text-sm text-ink-muted">{move.detail}</p>
       <Link
         to={move.cta.to}
         className="mt-3 inline-block font-mono text-xs font-medium text-primary-600 hover:text-primary-700"
