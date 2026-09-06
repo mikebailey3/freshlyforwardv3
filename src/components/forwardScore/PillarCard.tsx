@@ -15,7 +15,7 @@ export function PillarCard({ pillar }: { pillar: ForwardScorePillarResult }) {
       {pillar.improvementLink && (
         <Link
           to={pillar.improvementLink.to}
-          className="mt-3 inline-block font-mono text-xs font-medium text-primary-600 hover:text-primary-700"
+          className="mt-3 inline-block font-mono text-xs font-medium text-primary-600 hover:text-primary-400"
         >
           {pillar.improvementLink.label}
         </Link>

@@ -220,7 +220,7 @@ export function LockedFeatureCard({
           {desc && <p className="mt-1 text-sm text-ink-muted">{desc}</p>}
           {planLabel && (
             <div className="mt-3">
-              <span className="inline-block border border-primary-300 px-3 py-1 font-mono text-[11px] font-semibold uppercase tracking-wide text-primary-700">
+              <span className="inline-block border border-primary-700 px-3 py-1 font-mono text-[11px] font-semibold uppercase tracking-wide text-primary-300">
                 Available with {planLabel}
               </span>
             </div>

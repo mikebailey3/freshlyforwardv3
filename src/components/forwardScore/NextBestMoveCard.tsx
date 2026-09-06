@@ -16,7 +16,7 @@ export function NextBestMoveCard({ move }: { move: NextBestMove }) {
       <p className="mt-1 text-sm text-ink-muted">{move.detail}</p>
       <Link
         to={move.cta.to}
-        className="mt-3 inline-block font-mono text-xs font-medium text-primary-600 hover:text-primary-700"
+        className="mt-3 inline-block font-mono text-xs font-medium text-primary-600 hover:text-primary-400"
       >
         {move.cta.label}
       </Link>
