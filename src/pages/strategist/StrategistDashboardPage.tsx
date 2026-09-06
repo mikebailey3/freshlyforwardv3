@@ -159,8 +159,8 @@ export function StrategistDashboardPage() {
   return (
     <StrategistLayout isAdmin={role === 'admin'}>
       <div className="mb-6">
-        <h1 className="font-serif text-2xl font-semibold text-neutral-900 sm:text-3xl">Strategist Dashboard</h1>
-        <p className="mt-1 text-sm text-neutral-600">Your operational overview for {members.length} assigned member{members.length !== 1 ? 's' : ''}.</p>
+        <h1 className="font-serif text-2xl font-semibold text-ink sm:text-3xl">Strategist Dashboard</h1>
+        <p className="mt-1 text-sm text-ink-muted">Your operational overview for {members.length} assigned member{members.length !== 1 ? 's' : ''}.</p>
       </div>
 
       {/* Stat cards */}
@@ -179,13 +179,13 @@ export function StrategistDashboardPage() {
         {/* Left: Members awaiting review */}
         <div className="lg:col-span-2 space-y-6">
           {/* Members */}
-          <div className="border border-neutral-200 bg-white p-6">
+          <div className="border border-border bg-surface-card p-6">
             <div className="mb-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <Users className="h-6 w-6 text-primary-600" />
                 <div>
-                  <h3 className="font-serif text-base font-semibold text-neutral-900">Assigned Members</h3>
-                  <p className="text-xs text-neutral-500">{members.length} active</p>
+                  <h3 className="font-serif text-base font-semibold text-ink">Assigned Members</h3>
+                  <p className="text-xs text-ink-muted">{members.length} active</p>
                 </div>
               </div>
               <Link to="/strategist/members" className="text-sm font-medium text-primary-600 hover:text-primary-700">
@@ -193,25 +193,25 @@ export function StrategistDashboardPage() {
               </Link>
             </div>
             {members.length === 0 ? (
-              <p className="text-sm text-neutral-500">No members assigned yet.</p>
+              <p className="text-sm text-ink-muted">No members assigned yet.</p>
             ) : (
               <div className="space-y-2">
                 {members.slice(0, 5).map((m) => (
                   <Link
                     key={m.member_id}
                     to={`/strategist/members/${m.member_id}`}
-                    className="flex items-center gap-3 border border-neutral-200 border-l-4 border-l-primary-600 p-3 transition-colors hover:bg-primary-50"
+                    className="flex items-center gap-3 border border-border border-l-4 border-l-primary-600 p-3 transition-colors hover:bg-primary-950"
                   >
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-neutral-100">
-                      <User className="h-5 w-5 text-neutral-500" />
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-subtle">
+                      <User className="h-5 w-5 text-ink-muted" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-medium text-neutral-900">{m.profile?.full_name || 'Unknown'}</p>
-                      <p className="text-xs text-neutral-500">{m.profile?.headline || 'No headline set'}</p>
+                      <p className="text-sm font-medium text-ink">{m.profile?.full_name || 'Unknown'}</p>
+                      <p className="text-xs text-ink-muted">{m.profile?.headline || 'No headline set'}</p>
                     </div>
                     <div className="flex items-center gap-2">
                       {m.pending_approvals > 0 && (
-                        <span className="border border-warning-300 px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide text-warning-700">
+                        <span className="border border-warning-700 px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide text-warning-300">
                           {m.pending_approvals} pending
                         </span>
                       )}
@@ -228,28 +228,28 @@ export function StrategistDashboardPage() {
           </div>
 
           {/* Follow-ups */}
-          <div className="border border-neutral-200 bg-white p-6">
+          <div className="border border-border bg-surface-card p-6">
             <div className="mb-4 flex items-center gap-3">
               <Clock className="h-6 w-6 text-primary-600" />
               <div>
-                <h3 className="font-serif text-base font-semibold text-neutral-900">Follow-Ups</h3>
-                <p className="text-xs text-neutral-500">Scheduled reminders</p>
+                <h3 className="font-serif text-base font-semibold text-ink">Follow-Ups</h3>
+                <p className="text-xs text-ink-muted">Scheduled reminders</p>
               </div>
             </div>
 
             {followUps.length === 0 ? (
-              <p className="text-sm text-neutral-500">No follow-ups scheduled.</p>
+              <p className="text-sm text-ink-muted">No follow-ups scheduled.</p>
             ) : (
               <div className="space-y-3">
                 {overdueFollowUps.length > 0 && (
                   <div>
-                    <p className="mb-2 text-xs font-semibold text-error-600">Overdue</p>
+                    <p className="mb-2 text-xs font-semibold text-error-400">Overdue</p>
                     {overdueFollowUps.map((f) => <FollowUpCard key={f.id} followUp={f} overdue />)}
                   </div>
                 )}
                 {tomorrowFollowUps.length > 0 && (
                   <div>
-                    <p className="mb-2 text-xs font-semibold text-warning-600">Tomorrow</p>
+                    <p className="mb-2 text-xs font-semibold text-warning-400">Tomorrow</p>
                     {tomorrowFollowUps.map((f) => <FollowUpCard key={f.id} followUp={f} />)}
                   </div>
                 )}
@@ -261,7 +261,7 @@ export function StrategistDashboardPage() {
                 )}
                 {completedFollowUps.length > 0 && (
                   <div>
-                    <p className="mb-2 text-xs font-semibold text-success-600">Completed</p>
+                    <p className="mb-2 text-xs font-semibold text-success-400">Completed</p>
                     {completedFollowUps.slice(0, 3).map((f) => <FollowUpCard key={f.id} followUp={f} completed />)}
                   </div>
                 )}
@@ -272,31 +272,31 @@ export function StrategistDashboardPage() {
 
         {/* Right: Quick actions + capacity */}
         <div className="space-y-6">
-          <div className="border border-neutral-200 bg-white p-6">
+          <div className="border border-border bg-surface-card p-6">
             <div className="flex items-center gap-3">
               <Activity className="h-6 w-6 text-primary-600" />
               <div>
-                <h3 className="font-serif text-base font-semibold text-neutral-900">Quick Actions</h3>
+                <h3 className="font-serif text-base font-semibold text-ink">Quick Actions</h3>
               </div>
             </div>
             <div className="mt-4 space-y-2">
               <Link
                 to="/strategist/opportunities"
-                className="flex items-center gap-2 border border-neutral-200 px-4 py-2.5 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50"
+                className="flex items-center gap-2 border border-border px-4 py-2.5 text-sm font-medium text-ink-muted transition-colors hover:bg-surface-hover"
               >
                 <Plus className="h-4 w-4 text-primary-600" />
                 Add Opportunity
               </Link>
               <Link
                 to="/strategist/applications"
-                className="flex items-center gap-2 border border-neutral-200 px-4 py-2.5 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50"
+                className="flex items-center gap-2 border border-border px-4 py-2.5 text-sm font-medium text-ink-muted transition-colors hover:bg-surface-hover"
               >
                 <FileText className="h-4 w-4 text-primary-600" />
                 View Applications
               </Link>
               <Link
                 to="/strategist/members"
-                className="flex items-center gap-2 border border-neutral-200 px-4 py-2.5 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50"
+                className="flex items-center gap-2 border border-border px-4 py-2.5 text-sm font-medium text-ink-muted transition-colors hover:bg-surface-hover"
               >
                 <Users className="h-4 w-4 text-primary-600" />
                 Review Members
@@ -305,30 +305,30 @@ export function StrategistDashboardPage() {
           </div>
 
           {/* Strategist Capacity */}
-          <div className="border border-neutral-200 bg-white p-6">
+          <div className="border border-border bg-surface-card p-6">
             <div className="flex items-center gap-3">
               <TrendingUp className="h-6 w-6 text-primary-600" />
               <div>
-                <h3 className="font-serif text-base font-semibold text-neutral-900">Capacity</h3>
-                <p className="text-xs text-neutral-500">Active workload</p>
+                <h3 className="font-serif text-base font-semibold text-ink">Capacity</h3>
+                <p className="text-xs text-ink-muted">Active workload</p>
               </div>
             </div>
             <div className="mt-4 space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-neutral-600">Assigned Members</span>
-                <span className="font-semibold text-neutral-900">{members.length}</span>
+                <span className="text-ink-muted">Assigned Members</span>
+                <span className="font-semibold text-ink">{members.length}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-neutral-600">Active Opportunities</span>
-                <span className="font-semibold text-neutral-900">{stats.researching + stats.awaitingApproval}</span>
+                <span className="text-ink-muted">Active Opportunities</span>
+                <span className="font-semibold text-ink">{stats.researching + stats.awaitingApproval}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-neutral-600">Pending Applications</span>
-                <span className="font-semibold text-neutral-900">{stats.readyToSubmit + stats.submitted}</span>
+                <span className="text-ink-muted">Pending Applications</span>
+                <span className="font-semibold text-ink">{stats.readyToSubmit + stats.submitted}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-neutral-600">Open Follow-ups</span>
-                <span className="font-semibold text-neutral-900">{followUps.filter((f) => f.status === 'pending').length}</span>
+                <span className="text-ink-muted">Open Follow-ups</span>
+                <span className="font-semibold text-ink">{followUps.filter((f) => f.status === 'pending').length}</span>
               </div>
             </div>
           </div>
@@ -348,12 +348,12 @@ function StatCard({ icon: Icon, label, value, color }: { icon: typeof User; labe
   }
   const [borderColor, textColor] = colors[color].split(' ')
   return (
-    <div className={`border border-neutral-200 border-l-4 bg-white p-4 ${borderColor}`}>
+    <div className={`border border-border border-l-4 bg-surface-card p-4 ${borderColor}`}>
       <div className="flex items-center gap-3">
         <Icon className={`h-6 w-6 ${textColor}`} />
         <div>
-          <p className="text-2xl font-serif font-bold text-neutral-900">{value}</p>
-          <p className="text-xs text-neutral-500">{label}</p>
+          <p className="text-2xl font-serif font-bold text-ink">{value}</p>
+          <p className="text-xs text-ink-muted">{label}</p>
         </div>
       </div>
     </div>
@@ -363,12 +363,12 @@ function StatCard({ icon: Icon, label, value, color }: { icon: typeof User; labe
 function FollowUpCard({ followUp, overdue, completed }: { followUp: FollowUp; overdue?: boolean; completed?: boolean }) {
   return (
     <div className={`flex items-start gap-3 border border-l-4 p-3 ${
-      overdue ? 'border-neutral-200 border-l-error-500 bg-error-50' : completed ? 'border-neutral-200 border-l-success-500 bg-success-50' : 'border-neutral-200 border-l-neutral-400 bg-neutral-50'
+      overdue ? 'border-border border-l-error-500 bg-error-950' : completed ? 'border-border border-l-success-500 bg-success-950' : 'border-border border-l-ink-muted bg-surface-subtle'
     }`}>
       <div className="flex-1">
-        <p className="text-sm font-medium text-neutral-900">{followUp.title}</p>
-        {followUp.description && <p className="text-xs text-neutral-600">{followUp.description}</p>}
-        <p className="mt-1 text-xs text-neutral-400">Due: {formatDate(followUp.due_date)}</p>
+        <p className="text-sm font-medium text-ink">{followUp.title}</p>
+        {followUp.description && <p className="text-xs text-ink-muted">{followUp.description}</p>}
+        <p className="mt-1 text-xs text-ink-muted">Due: {formatDate(followUp.due_date)}</p>
       </div>
     </div>
   )

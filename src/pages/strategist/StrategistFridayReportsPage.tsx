@@ -17,10 +17,10 @@ const STATUS_LABELS: Record<string, string> = {
   draft: 'Draft', pending_review: 'In Review', approved: 'Approved (awaiting send)', sent: 'Sent to Member',
 }
 const STATUS_COLORS: Record<string, string> = {
-  draft: 'border-neutral-300 text-neutral-600',
-  pending_review: 'border-warning-300 text-warning-700',
-  approved: 'border-accent-300 text-accent-700',
-  sent: 'border-success-300 text-success-700',
+  draft: 'border-border text-ink-muted',
+  pending_review: 'border-warning-700 text-warning-300',
+  approved: 'border-accent-700 text-accent-300',
+  sent: 'border-success-700 text-success-300',
 }
 const STATUS_ICONS: Record<string, typeof Clock> = {
   draft: Clock, pending_review: Clock, approved: AlertCircle, sent: CheckCircle2,
@@ -150,24 +150,24 @@ export function StrategistFridayReportsPage() {
   return (
     <StrategistLayout isAdmin={role === 'admin'}>
       <div className="mb-6">
-        <h1 className="font-serif text-2xl font-semibold text-neutral-900 sm:text-3xl">Friday Reports</h1>
-        <p className="mt-1 text-sm text-neutral-600">
+        <h1 className="font-serif text-2xl font-semibold text-ink sm:text-3xl">Friday Reports</h1>
+        <p className="mt-1 text-sm text-ink-muted">
           Write weekly progress reports for your members. Reports pull real activity data but never send
           automatically — an admin reviews and sends each one.
         </p>
       </div>
 
-      <div className="mb-6 border border-neutral-200 bg-white p-4">
-        <h2 className="mb-3 font-serif text-base font-semibold text-neutral-900">Start a New Report</h2>
+      <div className="mb-6 border border-border bg-surface-card p-4">
+        <h2 className="mb-3 font-serif text-base font-semibold text-ink">Start a New Report</h2>
         {members.length === 0 ? (
-          <p className="text-sm text-neutral-500">No assigned members yet.</p>
+          <p className="text-sm text-ink-muted">No assigned members yet.</p>
         ) : (
           <div className="flex flex-wrap gap-2">
             {members.map((m) => (
               <button
                 key={m.user_id}
                 onClick={() => startNewReport(m.user_id)}
-                className="flex items-center gap-1.5 border border-neutral-300 px-3 py-2 text-sm font-medium text-neutral-700 hover:border-primary-300 hover:bg-primary-50"
+                className="flex items-center gap-1.5 border border-border px-3 py-2 text-sm font-medium text-ink-muted hover:border-primary-700 hover:bg-primary-950"
               >
                 <Plus className="h-3.5 w-3.5" />
                 {m.full_name || 'Member'}
@@ -177,11 +177,11 @@ export function StrategistFridayReportsPage() {
         )}
       </div>
 
-      <h2 className="mb-3 font-serif text-lg font-semibold text-neutral-900">All Reports</h2>
+      <h2 className="mb-3 font-serif text-lg font-semibold text-ink">All Reports</h2>
       {reports.length === 0 ? (
-        <div className="border border-neutral-200 bg-white p-8 text-center">
-          <FileText className="mx-auto h-10 w-10 text-neutral-300" />
-          <p className="mt-3 text-sm text-neutral-500">No reports yet. Pick a member above to start one.</p>
+        <div className="border border-border bg-surface-card p-8 text-center">
+          <FileText className="mx-auto h-10 w-10 text-ink-muted" />
+          <p className="mt-3 text-sm text-ink-muted">No reports yet. Pick a member above to start one.</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -193,7 +193,7 @@ export function StrategistFridayReportsPage() {
                 key={r.id}
                 onClick={() => setEditing(r)}
                 disabled={r.approval_status === 'sent'}
-                className="w-full border border-neutral-200 border-l-4 border-l-primary-600 bg-white p-5 text-left transition-colors hover:bg-primary-50 disabled:cursor-default disabled:hover:bg-white"
+                className="w-full border border-border border-l-4 border-l-primary-600 bg-surface-card p-5 text-left transition-colors hover:bg-primary-950 disabled:cursor-default disabled:hover:bg-surface-card"
               >
                 <div className="flex items-center justify-between gap-3">
                   <div>
@@ -202,13 +202,13 @@ export function StrategistFridayReportsPage() {
                         <StatusIcon className="h-3 w-3" />
                         {STATUS_LABELS[r.approval_status] || r.approval_status}
                       </span>
-                      <span className="flex items-center gap-1 text-xs text-neutral-500">
+                      <span className="flex items-center gap-1 text-xs text-ink-muted">
                         <User className="h-3.5 w-3.5" />
                         {memberName}
                       </span>
                     </div>
-                    <h3 className="mt-2 font-serif text-base font-semibold text-neutral-900">{r.title}</h3>
-                    <p className="text-xs text-neutral-500">{formatDate(r.report_date)}</p>
+                    <h3 className="mt-2 font-serif text-base font-semibold text-ink">{r.title}</h3>
+                    <p className="text-xs text-ink-muted">{formatDate(r.report_date)}</p>
                   </div>
                 </div>
               </button>
@@ -239,18 +239,18 @@ function ReportEditor({ editing, setEditing, memberName, saving, onGenerate, onS
     <div>
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="font-serif text-2xl font-semibold text-neutral-900">Report for {memberName}</h1>
-          <p className="mt-1 text-sm text-neutral-600">
+          <h1 className="font-serif text-2xl font-semibold text-ink">Report for {memberName}</h1>
+          <p className="mt-1 text-sm text-ink-muted">
             {isLocked ? 'This report is with an admin for review — editing will pull it back to draft.' : 'Fill in the details below, or auto-fill from real activity data.'}
           </p>
         </div>
-        <button onClick={onGenerate} className="flex items-center gap-1.5 border border-primary-300 bg-primary-50 px-4 py-2.5 text-sm font-medium text-primary-700 hover:bg-primary-100">
+        <button onClick={onGenerate} className="flex items-center gap-1.5 border border-primary-700 bg-primary-950 px-4 py-2.5 text-sm font-medium text-primary-300 hover:bg-primary-900">
           <Sparkles className="h-4 w-4" />
           Generate From Data
         </button>
       </div>
 
-      <div className="space-y-5 border border-neutral-200 bg-white p-6">
+      <div className="space-y-5 border border-border bg-surface-card p-6">
         <div className="grid gap-4 sm:grid-cols-3">
           <Field label="Report Date" type="date" value={editing.report_date} onChange={(v) => set('report_date', v)} />
           <Field label="Period Start" type="date" value={editing.reporting_period_start ?? ''} onChange={(v) => set('reporting_period_start', v)} />
@@ -270,11 +270,11 @@ function ReportEditor({ editing, setEditing, memberName, saving, onGenerate, onS
         <TextArea label="Next Steps" value={editing.next_steps ?? ''} onChange={(v) => set('next_steps', v)} rows={2} />
       </div>
 
-      <div className="sticky bottom-0 z-10 mt-4 flex items-center justify-end gap-3 border border-neutral-200 bg-white/95 p-4 backdrop-blur-md">
-        <button onClick={onCancel} disabled={saving} className="border border-neutral-300 px-4 py-2.5 text-sm font-medium text-neutral-700 hover:bg-neutral-50 disabled:opacity-60">
+      <div className="sticky bottom-0 z-10 mt-4 flex items-center justify-end gap-3 border border-border bg-surface-card/95 p-4 backdrop-blur-md">
+        <button onClick={onCancel} disabled={saving} className="border border-border px-4 py-2.5 text-sm font-medium text-ink-muted hover:bg-surface-hover disabled:opacity-60">
           Cancel
         </button>
-        <button onClick={onSaveDraft} disabled={saving} className="flex items-center gap-1.5 border border-neutral-300 px-4 py-2.5 text-sm font-medium text-neutral-700 hover:bg-neutral-50 disabled:opacity-60">
+        <button onClick={onSaveDraft} disabled={saving} className="flex items-center gap-1.5 border border-border px-4 py-2.5 text-sm font-medium text-ink-muted hover:bg-surface-hover disabled:opacity-60">
           {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
           Save Draft
         </button>
@@ -290,12 +290,12 @@ function ReportEditor({ editing, setEditing, memberName, saving, onGenerate, onS
 function Field({ label, value, onChange, type = 'text' }: { label: string; value?: string; onChange: (v: string) => void; type?: string }) {
   return (
     <div>
-      <label className="block text-sm font-medium text-neutral-700">{label}</label>
+      <label className="block text-sm font-medium text-ink-muted">{label}</label>
       <input
         type={type}
         value={value ?? ''}
         onChange={(e) => onChange(e.target.value)}
-        className="mt-1.5 w-full border border-neutral-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+        className="mt-1.5 w-full border border-border px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
       />
     </div>
   )
@@ -304,12 +304,12 @@ function Field({ label, value, onChange, type = 'text' }: { label: string; value
 function TextArea({ label, value, onChange, rows }: { label: string; value: string; onChange: (v: string) => void; rows: number }) {
   return (
     <div>
-      <label className="block text-sm font-medium text-neutral-700">{label}</label>
+      <label className="block text-sm font-medium text-ink-muted">{label}</label>
       <textarea
         value={value}
         onChange={(e) => onChange(e.target.value)}
         rows={rows}
-        className="mt-1.5 w-full border border-neutral-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+        className="mt-1.5 w-full border border-border px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
       />
     </div>
   )

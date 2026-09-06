@@ -112,37 +112,37 @@ export function BlogPostEditorPage() {
   }
 
   const inputClass =
-    'mt-1 block w-full border border-neutral-300 px-3 py-2.5 text-sm text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500'
+    'mt-1 block w-full border border-border px-3 py-2.5 text-sm text-ink focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500'
 
   return (
     <StrategistLayout>
       <button
         onClick={() => navigate('/strategist/blog-posts')}
-        className="mb-4 inline-flex items-center gap-1.5 text-sm font-medium text-neutral-600 hover:text-neutral-900"
+        className="mb-4 inline-flex items-center gap-1.5 text-sm font-medium text-ink-muted hover:text-ink"
       >
         <ArrowLeft className="h-4 w-4" />
         Back to Blog Posts
       </button>
 
       <div className="mb-6">
-        <h1 className="font-serif text-2xl font-semibold text-neutral-900 sm:text-3xl">
+        <h1 className="font-serif text-2xl font-semibold text-ink sm:text-3xl">
           {isNew ? 'New Post' : 'Edit Post'}
         </h1>
-        <p className="mt-1 text-sm text-neutral-600">
+        <p className="mt-1 text-sm text-ink-muted">
           {isNew ? 'Write a new article for The Forward Feed.' : 'Update this article.'}
         </p>
       </div>
 
       {error && (
-        <div className="mb-6 flex items-start gap-2 border border-error-300 border-l-4 border-l-error-500 bg-error-50 px-4 py-3 text-sm text-error-600">
+        <div className="mb-6 flex items-start gap-2 border border-error-700 border-l-4 border-l-error-500 bg-error-950 px-4 py-3 text-sm text-error-300">
           <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
-      <div className="space-y-5 border border-neutral-200 bg-white p-6">
+      <div className="space-y-5 border border-border bg-surface-card p-6">
         <div>
-          <label className="block text-sm font-medium text-neutral-700">Title</label>
+          <label className="block text-sm font-medium text-ink-muted">Title</label>
           <input
             type="text"
             value={form.title}
@@ -153,7 +153,7 @@ export function BlogPostEditorPage() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-neutral-700">Slug (URL)</label>
+          <label className="block text-sm font-medium text-ink-muted">Slug (URL)</label>
           <input
             type="text"
             value={form.slug}
@@ -161,11 +161,11 @@ export function BlogPostEditorPage() {
             placeholder="5-ways-to-make-your-resume-stand-out"
             className={inputClass}
           />
-          <p className="mt-1 text-xs text-neutral-500">freshlyforward.com/forward-feed/{form.slug || '...'}</p>
+          <p className="mt-1 text-xs text-ink-muted">freshlyforward.com/forward-feed/{form.slug || '...'}</p>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-neutral-700">Excerpt</label>
+          <label className="block text-sm font-medium text-ink-muted">Excerpt</label>
           <textarea
             value={form.excerpt}
             onChange={(e) => update('excerpt', e.target.value)}
@@ -176,7 +176,7 @@ export function BlogPostEditorPage() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-neutral-700">Content</label>
+          <label className="block text-sm font-medium text-ink-muted">Content</label>
           <textarea
             value={form.content}
             onChange={(e) => update('content', e.target.value)}
@@ -188,7 +188,7 @@ export function BlogPostEditorPage() {
 
         <div className="grid gap-5 sm:grid-cols-2">
           <div>
-            <label className="block text-sm font-medium text-neutral-700">Category</label>
+            <label className="block text-sm font-medium text-ink-muted">Category</label>
             <select
               value={form.category}
               onChange={(e) => update('category', e.target.value as BlogCategory)}
@@ -201,7 +201,7 @@ export function BlogPostEditorPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-700">Read Time (minutes)</label>
+            <label className="block text-sm font-medium text-ink-muted">Read Time (minutes)</label>
             <input
               type="number"
               min={1}
@@ -212,7 +212,7 @@ export function BlogPostEditorPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-700">Author Name</label>
+            <label className="block text-sm font-medium text-ink-muted">Author Name</label>
             <input
               type="text"
               value={form.author_name}
@@ -223,7 +223,7 @@ export function BlogPostEditorPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-700">Cover Image URL (optional)</label>
+            <label className="block text-sm font-medium text-ink-muted">Cover Image URL (optional)</label>
             <input
               type="text"
               value={form.cover_image_url || ''}
@@ -234,7 +234,7 @@ export function BlogPostEditorPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-700">Status</label>
+            <label className="block text-sm font-medium text-ink-muted">Status</label>
             <select
               value={form.status}
               onChange={(e) => update('status', e.target.value as BlogPostStatus)}
@@ -248,7 +248,7 @@ export function BlogPostEditorPage() {
 
           {form.status !== 'draft' && (
             <div>
-              <label className="block text-sm font-medium text-neutral-700">
+              <label className="block text-sm font-medium text-ink-muted">
                 {form.status === 'scheduled' ? 'Publish Date & Time' : 'Published At'}
               </label>
               <input
@@ -267,7 +267,7 @@ export function BlogPostEditorPage() {
           <button
             onClick={handleDelete}
             disabled={deleting}
-            className="flex items-center gap-1.5 border border-error-200 px-4 py-2.5 text-sm font-medium text-error-600 transition-colors hover:bg-error-50 disabled:opacity-60"
+            className="flex items-center gap-1.5 border border-error-700 px-4 py-2.5 text-sm font-medium text-error-400 transition-colors hover:bg-error-950 disabled:opacity-60"
           >
             {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
             Delete Post
