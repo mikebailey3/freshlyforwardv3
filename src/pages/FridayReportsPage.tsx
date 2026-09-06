@@ -17,10 +17,10 @@ const approvalStatusLabels: Record<string, string> = {
 }
 
 const approvalStatusColors: Record<string, string> = {
-  draft: 'border-neutral-300 text-neutral-600',
-  pending_review: 'border-warning-300 text-warning-700',
-  approved: 'border-accent-300 text-accent-700',
-  sent: 'border-success-300 text-success-700',
+  draft: 'border-border text-ink-muted',
+  pending_review: 'border-warning-700 text-warning-300',
+  approved: 'border-accent-700 text-accent-300',
+  sent: 'border-success-700 text-success-300',
 }
 
 const approvalStatusIcons: Record<string, typeof Clock> = {
@@ -66,10 +66,10 @@ export function FridayReportsPage() {
   return (
     <MemberLayout>
       <div className="mb-6">
-        <h1 className="font-serif text-2xl font-semibold text-neutral-900 sm:text-3xl">
+        <h1 className="font-serif text-2xl font-semibold text-ink sm:text-3xl">
           Friday Progress Reports
         </h1>
-        <p className="mt-1 text-sm text-neutral-600">
+        <p className="mt-1 text-sm text-ink-muted">
           A weekly summary of your career search progress, prepared by your Career Strategist every Friday.
         </p>
       </div>
@@ -77,23 +77,23 @@ export function FridayReportsPage() {
       {selected ? (
         <ReportDetail report={selected} onBack={() => setSelected(null)} />
       ) : reports.length === 0 ? (
-        <div className="border border-neutral-200 bg-white p-12 text-center">
-          <FileText className="mx-auto h-12 w-12 text-neutral-300" />
-          <p className="mt-4 text-sm text-neutral-500">
+        <div className="border border-border bg-surface-card p-12 text-center">
+          <FileText className="mx-auto h-12 w-12 text-ink-muted" />
+          <p className="mt-4 text-sm text-ink-muted">
             No Friday Progress Reports are available yet. Your first report will appear here after your
             strategist completes it.
           </p>
         </div>
       ) : (
         <div className="space-y-4">
-          <h2 className="font-serif text-lg font-semibold text-neutral-900">Recent Reports</h2>
+          <h2 className="font-serif text-lg font-semibold text-ink">Recent Reports</h2>
           {reports.map((report) => {
             const StatusIcon = approvalStatusIcons[report.approval_status] || Clock
             return (
               <button
                 key={report.id}
                 onClick={() => setSelected(report)}
-                className="w-full border border-neutral-200 border-l-4 border-l-primary-600 bg-white p-6 text-left transition-colors hover:bg-neutral-50"
+                className="w-full border border-border border-l-4 border-l-primary-600 bg-surface-card p-6 text-left transition-colors hover:bg-surface-hover"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1">
@@ -101,32 +101,32 @@ export function FridayReportsPage() {
                       <span
                         className={cn(
                           'flex items-center gap-1 border px-2.5 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide',
-                          approvalStatusColors[report.approval_status] || 'border-neutral-300 text-neutral-600'
+                          approvalStatusColors[report.approval_status] || 'border-border text-ink-muted'
                         )}
                       >
                         <StatusIcon className="h-3 w-3" />
                         {approvalStatusLabels[report.approval_status] || report.approval_status}
                       </span>
-                      <span className="flex items-center gap-1 text-xs text-neutral-500">
+                      <span className="flex items-center gap-1 text-xs text-ink-muted">
                         <Calendar className="h-3.5 w-3.5" />
                         {formatDate(report.report_date)}
                       </span>
                     </div>
-                    <h3 className="mt-3 font-serif text-lg font-semibold text-neutral-900">
+                    <h3 className="mt-3 font-serif text-lg font-semibold text-ink">
                       {report.title}
                     </h3>
-                    <p className="mt-1 text-sm text-neutral-600 line-clamp-2">{report.summary}</p>
+                    <p className="mt-1 text-sm text-ink-muted line-clamp-2">{report.summary}</p>
 
                     <div className="mt-4 flex flex-wrap gap-4 text-sm">
-                      <span className="flex items-center gap-1.5 text-neutral-600">
+                      <span className="flex items-center gap-1.5 text-ink-muted">
                         <TrendingUp className="h-4 w-4 text-primary-600" />
                         {report.opportunities_reviewed} opportunities reviewed
                       </span>
-                      <span className="flex items-center gap-1.5 text-neutral-600">
+                      <span className="flex items-center gap-1.5 text-ink-muted">
                         <Mail className="h-4 w-4 text-primary-600" />
                         {report.applications_submitted} applications submitted
                       </span>
-                      <span className="flex items-center gap-1.5 text-neutral-600">
+                      <span className="flex items-center gap-1.5 text-ink-muted">
                         <Briefcase className="h-4 w-4 text-primary-600" />
                         {report.interviews_scheduled} interviews scheduled
                       </span>
@@ -164,57 +164,57 @@ function ReportDetail({ report, onBack }: { report: FridayReport; onBack: () => 
     <div>
       <button
         onClick={onBack}
-        className="mb-4 flex items-center gap-2 text-sm font-medium text-primary-600 transition-colors hover:text-primary-700"
+        className="mb-4 flex items-center gap-2 text-sm font-medium text-primary-600 transition-colors hover:text-primary-400"
       >
         <ArrowLeft className="h-4 w-4" />
         Back to all reports
       </button>
 
-      <div className="border border-neutral-200 bg-white p-6 sm:p-8">
+      <div className="border border-border bg-surface-card p-6 sm:p-8">
         {/* Header */}
-        <div className="flex flex-wrap items-center gap-3 border-b border-neutral-200 pb-5">
+        <div className="flex flex-wrap items-center gap-3 border-b border-border pb-5">
           <span
             className={cn(
               'flex items-center gap-1 border px-2.5 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide',
-              approvalStatusColors[report.approval_status] || 'border-neutral-300 text-neutral-600'
+              approvalStatusColors[report.approval_status] || 'border-border text-ink-muted'
             )}
           >
             <StatusIcon className="h-3 w-3" />
             {approvalStatusLabels[report.approval_status] || report.approval_status}
           </span>
-          <span className="flex items-center gap-1 text-xs text-neutral-500">
+          <span className="flex items-center gap-1 text-xs text-ink-muted">
             <Calendar className="h-3.5 w-3.5" />
             {formatDate(report.report_date)}
           </span>
         </div>
 
-        <h2 className="mt-5 font-serif text-2xl font-semibold text-neutral-900">
+        <h2 className="mt-5 font-serif text-2xl font-semibold text-ink">
           {report.title}
         </h2>
-        <p className="mt-2 text-sm text-neutral-600">{report.summary}</p>
+        <p className="mt-2 text-sm text-ink-muted">{report.summary}</p>
 
         {/* Stats */}
-        <div className="mt-6 grid grid-cols-1 border border-neutral-200 sm:grid-cols-3">
-          <div className="border-b border-neutral-200 p-4 sm:border-b-0 sm:border-r">
+        <div className="mt-6 grid grid-cols-1 border border-border sm:grid-cols-3">
+          <div className="border-b border-border p-4 sm:border-b-0 sm:border-r">
             <TrendingUp className="h-5 w-5 text-primary-600" />
-            <p className="mt-2 text-2xl font-semibold text-neutral-900">
+            <p className="mt-2 text-2xl font-semibold text-ink">
               {report.opportunities_reviewed}
             </p>
-            <p className="text-xs text-neutral-500">Opportunities Reviewed</p>
+            <p className="text-xs text-ink-muted">Opportunities Reviewed</p>
           </div>
-          <div className="border-b border-neutral-200 p-4 sm:border-b-0 sm:border-r">
+          <div className="border-b border-border p-4 sm:border-b-0 sm:border-r">
             <Mail className="h-5 w-5 text-primary-600" />
-            <p className="mt-2 text-2xl font-semibold text-neutral-900">
+            <p className="mt-2 text-2xl font-semibold text-ink">
               {report.applications_submitted}
             </p>
-            <p className="text-xs text-neutral-500">Applications Submitted</p>
+            <p className="text-xs text-ink-muted">Applications Submitted</p>
           </div>
           <div className="p-4">
             <Briefcase className="h-5 w-5 text-primary-600" />
-            <p className="mt-2 text-2xl font-semibold text-neutral-900">
+            <p className="mt-2 text-2xl font-semibold text-ink">
               {report.interviews_scheduled}
             </p>
-            <p className="text-xs text-neutral-500">Interviews Scheduled</p>
+            <p className="text-xs text-ink-muted">Interviews Scheduled</p>
           </div>
         </div>
 
@@ -224,11 +224,11 @@ function ReportDetail({ report, onBack }: { report: FridayReport; onBack: () => 
             .filter((s) => s.content)
             .map((section) => (
               <div key={section.label}>
-                <h3 className="flex items-center gap-2 font-serif text-base font-semibold text-neutral-900">
+                <h3 className="flex items-center gap-2 font-serif text-base font-semibold text-ink">
                   <section.icon className="h-4 w-4 text-primary-600" />
                   {section.label}
                 </h3>
-                <p className="mt-1.5 whitespace-pre-wrap text-sm text-neutral-600">
+                <p className="mt-1.5 whitespace-pre-wrap text-sm text-ink-muted">
                   {section.content}
                 </p>
               </div>
@@ -237,12 +237,12 @@ function ReportDetail({ report, onBack }: { report: FridayReport; onBack: () => 
 
         {/* Next Steps */}
         {report.next_steps && (
-          <div className="mt-6 border border-l-4 border-primary-200 border-l-primary-600 bg-primary-50 p-5">
-            <h3 className="flex items-center gap-2 font-serif text-base font-semibold text-primary-800">
+          <div className="mt-6 border border-l-4 border-primary-700 border-l-primary-600 bg-primary-950 p-5">
+            <h3 className="flex items-center gap-2 font-serif text-base font-semibold text-primary-300">
               <CheckCircle2 className="h-4 w-4" />
               Next Steps
             </h3>
-            <p className="mt-1.5 whitespace-pre-wrap text-sm text-primary-800">
+            <p className="mt-1.5 whitespace-pre-wrap text-sm text-primary-300">
               {report.next_steps}
             </p>
           </div>
