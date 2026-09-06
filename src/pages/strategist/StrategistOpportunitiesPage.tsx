@@ -22,16 +22,16 @@ interface MemberOption {
 type StatusFilter = 'all' | (typeof OPPORTUNITY_STATUSES)[number]
 
 const STATUS_COLORS: Record<string, string> = {
-  researching: 'border-neutral-300 text-neutral-700',
-  needs_review: 'border-accent-300 text-accent-700',
-  recommended: 'border-primary-300 text-primary-700',
-  awaiting_member_approval: 'border-warning-300 text-warning-700',
-  approved: 'border-success-300 text-success-700',
-  declined: 'border-error-300 text-error-700',
-  preparing_application: 'border-primary-300 text-primary-700',
-  submitted: 'border-success-300 text-success-700',
-  expired: 'border-neutral-300 text-neutral-500',
-  archived: 'border-neutral-300 text-neutral-500',
+  researching: 'border-border text-ink-muted',
+  needs_review: 'border-accent-700 text-accent-300',
+  recommended: 'border-primary-700 text-primary-300',
+  awaiting_member_approval: 'border-warning-700 text-warning-300',
+  approved: 'border-success-700 text-success-300',
+  declined: 'border-error-700 text-error-300',
+  preparing_application: 'border-primary-700 text-primary-300',
+  submitted: 'border-success-700 text-success-300',
+  expired: 'border-border text-ink-muted',
+  archived: 'border-border text-ink-muted',
 }
 
 const STATUS_LABELS: Record<string, string> = {
@@ -224,8 +224,8 @@ export function StrategistOpportunitiesPage() {
     <StrategistLayout isAdmin={role === 'admin'}>
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="font-serif text-2xl font-semibold text-neutral-900 sm:text-3xl">Opportunity Pipeline</h1>
-          <p className="mt-1 text-sm text-neutral-600">
+          <h1 className="font-serif text-2xl font-semibold text-ink sm:text-3xl">Opportunity Pipeline</h1>
+          <p className="mt-1 text-sm text-ink-muted">
             {opportunities.length} opportunit{opportunities.length !== 1 ? 'ies' : 'y'} across {members.length} member{members.length !== 1 ? 's' : ''}.
           </p>
         </div>
@@ -239,21 +239,21 @@ export function StrategistOpportunitiesPage() {
       </div>
 
       {/* Search & filter */}
-      <div className="mb-6 border border-neutral-200 bg-white p-4">
+      <div className="mb-6 border border-border bg-surface-card p-4">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
           <div className="relative flex-1">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-muted" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by employer or job title..."
               aria-label="Search opportunities"
-              className="w-full border border-neutral-300 bg-white py-2 pl-10 pr-4 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+              className="w-full border border-border bg-surface-card py-2 pl-10 pr-4 text-sm text-ink placeholder:text-ink-muted focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
             />
           </div>
           <div className="flex items-center gap-2">
-            <label htmlFor="status-filter" className="text-sm font-medium text-neutral-600">
+            <label htmlFor="status-filter" className="text-sm font-medium text-ink-muted">
               Status
             </label>
             <select
@@ -261,7 +261,7 @@ export function StrategistOpportunitiesPage() {
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
               aria-label="Filter by status"
-              className="border border-neutral-300 bg-white py-2 pl-3 pr-8 text-sm text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+              className="border border-border bg-surface-card py-2 pl-3 pr-8 text-sm text-ink focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
             >
               <option value="all">All Statuses ({opportunities.length})</option>
               {OPPORTUNITY_STATUSES.map((s) => (
@@ -276,9 +276,9 @@ export function StrategistOpportunitiesPage() {
 
       {/* Opportunities grouped by status */}
       {filteredOpportunities.length === 0 ? (
-        <div className="border border-neutral-200 bg-white p-12 text-center">
-          <Search className="mx-auto h-10 w-10 text-neutral-300" />
-          <p className="mt-4 text-sm text-neutral-500">
+        <div className="border border-border bg-surface-card p-12 text-center">
+          <Search className="mx-auto h-10 w-10 text-ink-muted" />
+          <p className="mt-4 text-sm text-ink-muted">
             {opportunities.length === 0
               ? 'No opportunities yet. Click "Create Opportunity" to add one.'
               : 'No opportunities match your filters.'}
@@ -289,10 +289,10 @@ export function StrategistOpportunitiesPage() {
           {Object.entries(groupedOpportunities).map(([status, opps]) => (
             <div key={status}>
               <div className="mb-3 flex items-center gap-2">
-                <span className={cn('border px-3 py-1 font-mono text-[11px] font-semibold uppercase tracking-wide', STATUS_COLORS[status] || 'border-neutral-300 text-neutral-700')}>
+                <span className={cn('border px-3 py-1 font-mono text-[11px] font-semibold uppercase tracking-wide', STATUS_COLORS[status] || 'border-border text-ink-muted')}>
                   {STATUS_LABELS[status] || status}
                 </span>
-                <span className="text-sm text-neutral-500">({opps.length})</span>
+                <span className="text-sm text-ink-muted">({opps.length})</span>
               </div>
               <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
                 {opps.map((opp) => (
@@ -310,14 +310,14 @@ export function StrategistOpportunitiesPage() {
 
       {/* Create Opportunity Modal */}
       {showCreateForm && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-neutral-900/50 p-4 py-8">
-          <div className="w-full max-w-2xl rounded-2xl border border-neutral-200 bg-white shadow-xl">
-            <div className="sticky top-0 flex items-center justify-between border-b border-neutral-200 bg-white px-6 py-4">
-              <h2 className="font-serif text-lg font-semibold text-neutral-900">Create Opportunity</h2>
+        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/60 p-4 py-8">
+          <div className="w-full max-w-2xl rounded-2xl border border-border bg-surface-card shadow-xl">
+            <div className="sticky top-0 flex items-center justify-between border-b border-border bg-surface-card px-6 py-4">
+              <h2 className="font-serif text-lg font-semibold text-ink">Create Opportunity</h2>
               <button
                 onClick={() => { setShowCreateForm(false); resetForm() }}
                 aria-label="Close create opportunity form"
-                className="p-1.5 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-600"
+                className="p-1.5 text-ink-muted hover:bg-surface-hover hover:text-ink"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -326,15 +326,15 @@ export function StrategistOpportunitiesPage() {
             <form onSubmit={handleSubmit} className="space-y-4 px-6 py-5">
               {/* Member selection */}
               <div>
-                <label htmlFor="member_id" className="mb-1 block text-sm font-medium text-neutral-700">
-                  Member <span className="text-error-600">*</span>
+                <label htmlFor="member_id" className="mb-1 block text-sm font-medium text-ink-muted">
+                  Member <span className="text-error-400">*</span>
                 </label>
                 <select
                   id="member_id"
                   required
                   value={formData.member_id}
                   onChange={(e) => handleFormChange('member_id', e.target.value)}
-                  className="w-full border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  className="w-full border border-border bg-surface-card px-3 py-2 text-sm text-ink focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                 >
                   <option value="">Select a member...</option>
                   {members.map((m) => (
@@ -348,8 +348,8 @@ export function StrategistOpportunitiesPage() {
               {/* Employer & Job Title */}
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label htmlFor="employer" className="mb-1 block text-sm font-medium text-neutral-700">
-                    Employer <span className="text-error-600">*</span>
+                  <label htmlFor="employer" className="mb-1 block text-sm font-medium text-ink-muted">
+                    Employer <span className="text-error-400">*</span>
                   </label>
                   <input
                     id="employer"
@@ -357,12 +357,12 @@ export function StrategistOpportunitiesPage() {
                     required
                     value={formData.employer}
                     onChange={(e) => handleFormChange('employer', e.target.value)}
-                    className="w-full border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                    className="w-full border border-border bg-surface-card px-3 py-2 text-sm text-ink focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                   />
                 </div>
                 <div>
-                  <label htmlFor="job_title" className="mb-1 block text-sm font-medium text-neutral-700">
-                    Job Title <span className="text-error-600">*</span>
+                  <label htmlFor="job_title" className="mb-1 block text-sm font-medium text-ink-muted">
+                    Job Title <span className="text-error-400">*</span>
                   </label>
                   <input
                     id="job_title"
@@ -370,7 +370,7 @@ export function StrategistOpportunitiesPage() {
                     required
                     value={formData.job_title}
                     onChange={(e) => handleFormChange('job_title', e.target.value)}
-                    className="w-full border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                    className="w-full border border-border bg-surface-card px-3 py-2 text-sm text-ink focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                   />
                 </div>
               </div>
@@ -378,24 +378,24 @@ export function StrategistOpportunitiesPage() {
               {/* Location & Source */}
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label htmlFor="location" className="mb-1 block text-sm font-medium text-neutral-700">Location</label>
+                  <label htmlFor="location" className="mb-1 block text-sm font-medium text-ink-muted">Location</label>
                   <input
                     id="location"
                     type="text"
                     value={formData.location}
                     onChange={(e) => handleFormChange('location', e.target.value)}
-                    className="w-full border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                    className="w-full border border-border bg-surface-card px-3 py-2 text-sm text-ink focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                   />
                 </div>
                 <div>
-                  <label htmlFor="source" className="mb-1 block text-sm font-medium text-neutral-700">Source</label>
+                  <label htmlFor="source" className="mb-1 block text-sm font-medium text-ink-muted">Source</label>
                   <input
                     id="source"
                     type="text"
                     value={formData.source}
                     onChange={(e) => handleFormChange('source', e.target.value)}
                     placeholder="LinkedIn, Indeed, Referral..."
-                    className="w-full border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                    className="w-full border border-border bg-surface-card px-3 py-2 text-sm text-ink placeholder:text-ink-muted focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                   />
                 </div>
               </div>
@@ -403,25 +403,25 @@ export function StrategistOpportunitiesPage() {
               {/* Salary range */}
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label htmlFor="salary_min" className="mb-1 block text-sm font-medium text-neutral-700">Salary Min ($)</label>
+                  <label htmlFor="salary_min" className="mb-1 block text-sm font-medium text-ink-muted">Salary Min ($)</label>
                   <input
                     id="salary_min"
                     type="number"
                     value={formData.salary_min}
                     onChange={(e) => handleFormChange('salary_min', e.target.value)}
                     placeholder="50000"
-                    className="w-full border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                    className="w-full border border-border bg-surface-card px-3 py-2 text-sm text-ink placeholder:text-ink-muted focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                   />
                 </div>
                 <div>
-                  <label htmlFor="salary_max" className="mb-1 block text-sm font-medium text-neutral-700">Salary Max ($)</label>
+                  <label htmlFor="salary_max" className="mb-1 block text-sm font-medium text-ink-muted">Salary Max ($)</label>
                   <input
                     id="salary_max"
                     type="number"
                     value={formData.salary_max}
                     onChange={(e) => handleFormChange('salary_max', e.target.value)}
                     placeholder="80000"
-                    className="w-full border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                    className="w-full border border-border bg-surface-card px-3 py-2 text-sm text-ink placeholder:text-ink-muted focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                   />
                 </div>
               </div>
@@ -429,12 +429,12 @@ export function StrategistOpportunitiesPage() {
               {/* Work arrangement & employment type */}
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label htmlFor="work_arrangement" className="mb-1 block text-sm font-medium text-neutral-700">Work Arrangement</label>
+                  <label htmlFor="work_arrangement" className="mb-1 block text-sm font-medium text-ink-muted">Work Arrangement</label>
                   <select
                     id="work_arrangement"
                     value={formData.work_arrangement}
                     onChange={(e) => handleFormChange('work_arrangement', e.target.value)}
-                    className="w-full border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                    className="w-full border border-border bg-surface-card px-3 py-2 text-sm text-ink focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                   >
                     <option value="">Select...</option>
                     {WORK_ARRANGEMENTS.map((w) => (
@@ -443,12 +443,12 @@ export function StrategistOpportunitiesPage() {
                   </select>
                 </div>
                 <div>
-                  <label htmlFor="employment_type" className="mb-1 block text-sm font-medium text-neutral-700">Employment Type</label>
+                  <label htmlFor="employment_type" className="mb-1 block text-sm font-medium text-ink-muted">Employment Type</label>
                   <select
                     id="employment_type"
                     value={formData.employment_type}
                     onChange={(e) => handleFormChange('employment_type', e.target.value)}
-                    className="w-full border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                    className="w-full border border-border bg-surface-card px-3 py-2 text-sm text-ink focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                   >
                     <option value="">Select...</option>
                     {EMPLOYMENT_TYPES.map((t) => (
@@ -460,25 +460,25 @@ export function StrategistOpportunitiesPage() {
 
               {/* Posting URL */}
               <div>
-                <label htmlFor="posting_url" className="mb-1 block text-sm font-medium text-neutral-700">Posting URL</label>
+                <label htmlFor="posting_url" className="mb-1 block text-sm font-medium text-ink-muted">Posting URL</label>
                 <input
                   id="posting_url"
                   type="url"
                   value={formData.posting_url}
                   onChange={(e) => handleFormChange('posting_url', e.target.value)}
                   placeholder="https://..."
-                  className="w-full border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  className="w-full border border-border bg-surface-card px-3 py-2 text-sm text-ink placeholder:text-ink-muted focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                 />
               </div>
 
               {/* Authorization mode */}
               <div>
-                <label htmlFor="authorization_mode" className="mb-1 block text-sm font-medium text-neutral-700">Authorization Mode</label>
+                <label htmlFor="authorization_mode" className="mb-1 block text-sm font-medium text-ink-muted">Authorization Mode</label>
                 <select
                   id="authorization_mode"
                   value={formData.authorization_mode}
                   onChange={(e) => handleFormChange('authorization_mode', e.target.value)}
-                  className="w-full border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  className="w-full border border-border bg-surface-card px-3 py-2 text-sm text-ink focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                 >
                   <option value="approval_required">Approval Required (member must approve)</option>
                   <option value="preauthorized">Preauthorized (member has given blanket consent)</option>
@@ -487,58 +487,58 @@ export function StrategistOpportunitiesPage() {
 
               {/* Full job description */}
               <div>
-                <label htmlFor="full_job_description" className="mb-1 block text-sm font-medium text-neutral-700">Full Job Description</label>
+                <label htmlFor="full_job_description" className="mb-1 block text-sm font-medium text-ink-muted">Full Job Description</label>
                 <textarea
                   id="full_job_description"
                   rows={4}
                   value={formData.full_job_description}
                   onChange={(e) => handleFormChange('full_job_description', e.target.value)}
-                  className="w-full border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  className="w-full border border-border bg-surface-card px-3 py-2 text-sm text-ink focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                 />
               </div>
 
               {/* Research notes */}
               <div>
-                <label htmlFor="research_notes" className="mb-1 block text-sm font-medium text-neutral-700">Research Notes</label>
+                <label htmlFor="research_notes" className="mb-1 block text-sm font-medium text-ink-muted">Research Notes</label>
                 <textarea
                   id="research_notes"
                   rows={3}
                   value={formData.research_notes}
                   onChange={(e) => handleFormChange('research_notes', e.target.value)}
-                  className="w-full border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  className="w-full border border-border bg-surface-card px-3 py-2 text-sm text-ink focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                 />
               </div>
 
               {/* Why it matches */}
               <div>
-                <label htmlFor="why_it_matches" className="mb-1 block text-sm font-medium text-neutral-700">Why It Matches</label>
+                <label htmlFor="why_it_matches" className="mb-1 block text-sm font-medium text-ink-muted">Why It Matches</label>
                 <textarea
                   id="why_it_matches"
                   rows={3}
                   value={formData.why_it_matches}
                   onChange={(e) => handleFormChange('why_it_matches', e.target.value)}
-                  className="w-full border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  className="w-full border border-border bg-surface-card px-3 py-2 text-sm text-ink focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                 />
               </div>
 
               {/* Potential concerns */}
               <div>
-                <label htmlFor="potential_concerns" className="mb-1 block text-sm font-medium text-neutral-700">Potential Concerns</label>
+                <label htmlFor="potential_concerns" className="mb-1 block text-sm font-medium text-ink-muted">Potential Concerns</label>
                 <textarea
                   id="potential_concerns"
                   rows={3}
                   value={formData.potential_concerns}
                   onChange={(e) => handleFormChange('potential_concerns', e.target.value)}
-                  className="w-full border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  className="w-full border border-border bg-surface-card px-3 py-2 text-sm text-ink focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                 />
               </div>
 
               {/* Actions */}
-              <div className="flex justify-end gap-3 border-t border-neutral-200 pt-4">
+              <div className="flex justify-end gap-3 border-t border-border pt-4">
                 <button
                   type="button"
                   onClick={() => { setShowCreateForm(false); resetForm() }}
-                  className="border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50"
+                  className="border border-border px-4 py-2 text-sm font-medium text-ink-muted transition-colors hover:bg-surface-hover"
                 >
                   Cancel
                 </button>
@@ -570,38 +570,38 @@ export function StrategistOpportunitiesPage() {
 
 function OpportunityCard({ opportunity, memberName }: { opportunity: Opportunity; memberName: string }) {
   return (
-    <div className="border border-neutral-200 border-l-4 border-l-primary-600 bg-white p-4 transition-colors hover:border-l-primary-700">
+    <div className="border border-border border-l-4 border-l-primary-600 bg-surface-card p-4 transition-colors hover:border-l-primary-700">
       <div className="mb-2 flex items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
-          <h3 className="font-serif text-sm font-semibold text-neutral-900 truncate">{opportunity.job_title}</h3>
+          <h3 className="font-serif text-sm font-semibold text-ink truncate">{opportunity.job_title}</h3>
           <p className="text-sm text-primary-600 font-medium truncate">{opportunity.employer}</p>
         </div>
-        <span className={cn('flex-shrink-0 border px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide', STATUS_COLORS[opportunity.status] || 'border-neutral-300 text-neutral-700')}>
+        <span className={cn('flex-shrink-0 border px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide', STATUS_COLORS[opportunity.status] || 'border-border text-ink-muted')}>
           {STATUS_LABELS[opportunity.status] || opportunity.status}
         </span>
       </div>
 
-      <div className="mb-3 flex items-center gap-1.5 text-xs text-neutral-500">
+      <div className="mb-3 flex items-center gap-1.5 text-xs text-ink-muted">
         <User className="h-3.5 w-3.5" />
         <span className="truncate">{memberName}</span>
       </div>
 
-      <div className="space-y-1.5 text-xs text-neutral-600">
+      <div className="space-y-1.5 text-xs text-ink-muted">
         {opportunity.location && (
           <div className="flex items-center gap-1.5">
-            <MapPin className="h-3.5 w-3.5 text-neutral-400" />
+            <MapPin className="h-3.5 w-3.5 text-ink-muted" />
             <span>{opportunity.location}</span>
           </div>
         )}
         {opportunity.work_arrangement && (
           <div className="flex items-center gap-1.5">
-            <Briefcase className="h-3.5 w-3.5 text-neutral-400" />
+            <Briefcase className="h-3.5 w-3.5 text-ink-muted" />
             <span>{opportunity.work_arrangement}{opportunity.employment_type ? ` · ${opportunity.employment_type}` : ''}</span>
           </div>
         )}
         {(opportunity.salary_min || opportunity.salary_max) && (
           <div className="flex items-center gap-1.5">
-            <DollarSign className="h-3.5 w-3.5 text-neutral-400" />
+            <DollarSign className="h-3.5 w-3.5 text-ink-muted" />
             <span>
               {opportunity.salary_min ? `$${opportunity.salary_min.toLocaleString()}` : ''}
               {opportunity.salary_min && opportunity.salary_max ? ' - ' : ''}
@@ -611,7 +611,7 @@ function OpportunityCard({ opportunity, memberName }: { opportunity: Opportunity
         )}
         {isSafeHttpUrl(opportunity.posting_url) && (
           <div className="flex items-center gap-1.5">
-            <ExternalLink className="h-3.5 w-3.5 text-neutral-400" />
+            <ExternalLink className="h-3.5 w-3.5 text-ink-muted" />
             <a
               href={opportunity.posting_url ?? undefined}
               target="_blank"
@@ -624,21 +624,21 @@ function OpportunityCard({ opportunity, memberName }: { opportunity: Opportunity
         )}
       </div>
 
-      <div className="mt-3 flex items-center justify-between border-t border-neutral-100 pt-2">
+      <div className="mt-3 flex items-center justify-between border-t border-border pt-2">
         <div className="flex items-center gap-1.5">
           {opportunity.authorization_mode === 'preauthorized' ? (
-            <span className="inline-flex items-center gap-1 text-xs text-success-600">
+            <span className="inline-flex items-center gap-1 text-xs text-success-400">
               <ShieldCheck className="h-3.5 w-3.5" />
               Preauthorized
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1 text-xs text-warning-600">
+            <span className="inline-flex items-center gap-1 text-xs text-warning-400">
               <Clock className="h-3.5 w-3.5" />
               Approval needed
             </span>
           )}
         </div>
-        <span className="text-xs text-neutral-400">{timeAgo(opportunity.created_at)}</span>
+        <span className="text-xs text-ink-muted">{timeAgo(opportunity.created_at)}</span>
       </div>
     </div>
   )

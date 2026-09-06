@@ -69,36 +69,36 @@ export function StrategistOpportunityEnginePage() {
   return (
     <StrategistLayout isAdmin={role === 'admin'}>
       <div className="mb-6">
-        <h1 className="flex items-center gap-2 font-serif text-2xl font-semibold text-neutral-900 sm:text-3xl">
+        <h1 className="flex items-center gap-2 font-serif text-2xl font-semibold text-ink sm:text-3xl">
           <Sparkles className="h-6 w-6 text-primary-600" />
           Opportunity Engine
         </h1>
-        <p className="mt-1 text-sm text-neutral-600">
+        <p className="mt-1 text-sm text-ink-muted">
           Auto-sourced job postings scored against each assigned member's Career Profile.
           Promote strong matches into their Opportunity Pipeline for review.
         </p>
       </div>
 
       {matches.length === 0 ? (
-        <div className="border border-neutral-200 bg-white p-12 text-center">
-          <Sparkles className="mx-auto h-10 w-10 text-neutral-300" />
-          <p className="mt-4 text-sm text-neutral-500">
+        <div className="border border-border bg-surface-card p-12 text-center">
+          <Sparkles className="mx-auto h-10 w-10 text-ink-muted" />
+          <p className="mt-4 text-sm text-ink-muted">
             No pending matches. Run the scraper + FreshFit sync scripts to populate this queue.
           </p>
         </div>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {matches.map((match) => (
-            <div key={match.id} className="border border-neutral-200 border-l-4 border-l-primary-600 bg-white p-4 transition-colors hover:border-l-primary-700">
+            <div key={match.id} className="border border-border border-l-4 border-l-primary-600 bg-surface-card p-4 transition-colors hover:border-l-primary-700">
               <div className="mb-2 flex items-center justify-between gap-2">
                 <FreshFitBadge score={match.fresh_fit_score} />
-                <span className="truncate text-xs text-neutral-500">{memberNames[match.member_id] || 'Member'}</span>
+                <span className="truncate text-xs text-ink-muted">{memberNames[match.member_id] || 'Member'}</span>
               </div>
 
-              <h3 className="font-serif text-sm font-semibold text-neutral-900">{match.scraped_job.title}</h3>
+              <h3 className="font-serif text-sm font-semibold text-ink">{match.scraped_job.title}</h3>
               <p className="text-sm text-primary-600 font-medium">{match.scraped_job.company}</p>
 
-              <div className="mt-2 space-y-1 text-xs text-neutral-500">
+              <div className="mt-2 space-y-1 text-xs text-ink-muted">
                 {match.scraped_job.location && (
                   <div className="flex items-center gap-1.5">
                     <MapPin className="h-3.5 w-3.5" />
@@ -116,7 +116,7 @@ export function StrategistOpportunityEnginePage() {
               {match.matched_skills.length > 0 && (
                 <div className="mt-2 flex flex-wrap gap-1">
                   {match.matched_skills.slice(0, 4).map((skill) => (
-                    <span key={skill} className="border border-success-300 px-1.5 py-0.5 font-mono text-[10px] font-medium text-success-700">
+                    <span key={skill} className="border border-success-700 px-1.5 py-0.5 font-mono text-[10px] font-medium text-success-300">
                       {skill}
                     </span>
                   ))}
@@ -125,19 +125,19 @@ export function StrategistOpportunityEnginePage() {
 
               <FreshFitDetails breakdown={match.score_breakdown as JobMatchScoreBreakdown} />
 
-              <div className="mt-3 flex items-center justify-between border-t border-neutral-100 pt-3">
+              <div className="mt-3 flex items-center justify-between border-t border-border pt-3">
                 {isSafeHttpUrl(match.scraped_job.posting_url) ? (
                   <a
                     href={match.scraped_job.posting_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-xs font-medium text-neutral-500 hover:text-neutral-700"
+                    className="inline-flex items-center gap-1 text-xs font-medium text-ink-muted hover:text-ink"
                   >
                     <ExternalLink className="h-3.5 w-3.5" />
                     Posting
                   </a>
                 ) : (
-                  <span className="text-xs text-neutral-400">No link provided</span>
+                  <span className="text-xs text-ink-muted">No link provided</span>
                 )}
                 <button
                   onClick={() => handlePromote(match)}

@@ -14,19 +14,19 @@ import { APPLICATION_STATUSES } from '@/types'
 type StatusFilter = 'all' | (typeof APPLICATION_STATUSES)[number]
 
 const STATUS_COLORS: Record<string, string> = {
-  preparing_resume: 'border-neutral-300 text-neutral-700',
-  preparing_cover_letter: 'border-neutral-300 text-neutral-700',
-  waiting_on_member: 'border-warning-300 text-warning-700',
-  ready_to_submit: 'border-accent-300 text-accent-700',
-  submitted: 'border-primary-300 text-primary-700',
-  employer_viewed: 'border-primary-300 text-primary-700',
-  follow_up_needed: 'border-warning-300 text-warning-700',
-  interview_requested: 'border-accent-300 text-accent-700',
-  interview_scheduled: 'border-primary-300 text-primary-700',
-  rejected: 'border-error-300 text-error-700',
-  offer_received: 'border-success-300 text-success-700',
-  offer_accepted: 'border-success-300 text-success-700',
-  closed: 'border-neutral-300 text-neutral-500',
+  preparing_resume: 'border-border text-ink-muted',
+  preparing_cover_letter: 'border-border text-ink-muted',
+  waiting_on_member: 'border-warning-700 text-warning-300',
+  ready_to_submit: 'border-accent-700 text-accent-300',
+  submitted: 'border-primary-700 text-primary-300',
+  employer_viewed: 'border-primary-700 text-primary-300',
+  follow_up_needed: 'border-warning-700 text-warning-300',
+  interview_requested: 'border-accent-700 text-accent-300',
+  interview_scheduled: 'border-primary-700 text-primary-300',
+  rejected: 'border-error-700 text-error-300',
+  offer_received: 'border-success-700 text-success-300',
+  offer_accepted: 'border-success-700 text-success-300',
+  closed: 'border-border text-ink-muted',
 }
 
 const STATUS_LABELS: Record<string, string> = {
@@ -132,28 +132,28 @@ export function StrategistApplicationsPage() {
   return (
     <StrategistLayout isAdmin={role === 'admin'}>
       <div className="mb-6">
-        <h1 className="font-serif text-2xl font-semibold text-neutral-900 sm:text-3xl">Applications</h1>
-        <p className="mt-1 text-sm text-neutral-600">
+        <h1 className="font-serif text-2xl font-semibold text-ink sm:text-3xl">Applications</h1>
+        <p className="mt-1 text-sm text-ink-muted">
           {applications.length} application{applications.length !== 1 ? 's' : ''} across all assigned members.
         </p>
       </div>
 
       {/* Search & filter */}
-      <div className="mb-6 border border-neutral-200 bg-white p-4">
+      <div className="mb-6 border border-border bg-surface-card p-4">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
           <div className="relative flex-1">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-muted" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by employer or job title..."
               aria-label="Search applications"
-              className="w-full border border-neutral-300 bg-white py-2 pl-10 pr-4 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+              className="w-full border border-border bg-surface-card py-2 pl-10 pr-4 text-sm text-ink placeholder:text-ink-muted focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
             />
           </div>
           <div className="flex items-center gap-2">
-            <label htmlFor="status-filter" className="text-sm font-medium text-neutral-600">
+            <label htmlFor="status-filter" className="text-sm font-medium text-ink-muted">
               Status
             </label>
             <select
@@ -161,7 +161,7 @@ export function StrategistApplicationsPage() {
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
               aria-label="Filter by application status"
-              className="border border-neutral-300 bg-white py-2 pl-3 pr-8 text-sm text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+              className="border border-border bg-surface-card py-2 pl-3 pr-8 text-sm text-ink focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
             >
               <option value="all">All Statuses ({applications.length})</option>
               {APPLICATION_STATUSES.map((s) => (
@@ -176,9 +176,9 @@ export function StrategistApplicationsPage() {
 
       {/* Applications list */}
       {filteredApplications.length === 0 ? (
-        <div className="border border-neutral-200 bg-white p-12 text-center">
-          <FileText className="mx-auto h-10 w-10 text-neutral-300" />
-          <p className="mt-4 text-sm text-neutral-500">
+        <div className="border border-border bg-surface-card p-12 text-center">
+          <FileText className="mx-auto h-10 w-10 text-ink-muted" />
+          <p className="mt-4 text-sm text-ink-muted">
             {applications.length === 0
               ? 'No applications yet. Applications will appear here once they are created.'
               : 'No applications match your filters.'}
@@ -210,65 +210,65 @@ interface ApplicationCardProps {
 
 function ApplicationCard({ application, memberName, updating, onStatusChange }: ApplicationCardProps) {
   return (
-    <div className="border border-neutral-200 border-l-4 border-l-primary-600 bg-white p-5 transition-colors hover:border-l-primary-700">
+    <div className="border border-border border-l-4 border-l-primary-600 bg-surface-card p-5 transition-colors hover:border-l-primary-700">
       {/* Header */}
       <div className="mb-3 flex items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
-          <h3 className="font-serif text-sm font-semibold text-neutral-900 truncate">{application.job_title}</h3>
+          <h3 className="font-serif text-sm font-semibold text-ink truncate">{application.job_title}</h3>
           <p className="text-sm font-medium text-primary-600 truncate">{application.employer}</p>
         </div>
-        <span className={cn('flex-shrink-0 border px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide', STATUS_COLORS[application.status] || 'border-neutral-300 text-neutral-700')}>
+        <span className={cn('flex-shrink-0 border px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide', STATUS_COLORS[application.status] || 'border-border text-ink-muted')}>
           {STATUS_LABELS[application.status] || application.status}
         </span>
       </div>
 
       {/* Member */}
-      <div className="mb-3 flex items-center gap-1.5 text-xs text-neutral-500">
+      <div className="mb-3 flex items-center gap-1.5 text-xs text-ink-muted">
         <User className="h-3.5 w-3.5" />
         <span className="truncate">{memberName}</span>
       </div>
 
       {/* Dates */}
-      <div className="mb-3 space-y-1.5 text-xs text-neutral-600">
+      <div className="mb-3 space-y-1.5 text-xs text-ink-muted">
         {application.date_found && (
           <div className="flex items-center gap-1.5">
-            <Calendar className="h-3.5 w-3.5 text-neutral-400" />
+            <Calendar className="h-3.5 w-3.5 text-ink-muted" />
             <span>Found: {formatDate(application.date_found)}</span>
           </div>
         )}
         {application.date_submitted && (
           <div className="flex items-center gap-1.5">
-            <Calendar className="h-3.5 w-3.5 text-neutral-400" />
+            <Calendar className="h-3.5 w-3.5 text-ink-muted" />
             <span>Submitted: {formatDate(application.date_submitted)}</span>
           </div>
         )}
         {application.follow_up_date && (
           <div className="flex items-center gap-1.5">
-            <Clock className="h-3.5 w-3.5 text-neutral-400" />
+            <Clock className="h-3.5 w-3.5 text-ink-muted" />
             <span>Follow-up: {formatDate(application.follow_up_date)}</span>
           </div>
         )}
         {application.interview_date && (
           <div className="flex items-center gap-1.5">
             <Calendar className="h-3.5 w-3.5 text-primary-500" />
-            <span className="font-medium text-primary-700">Interview: {formatDate(application.interview_date)}</span>
+            <span className="font-medium text-primary-400">Interview: {formatDate(application.interview_date)}</span>
           </div>
         )}
       </div>
 
       {/* Source */}
       {application.source && (
-        <div className="mb-3 flex items-center gap-1.5 text-xs text-neutral-500">
-          <Briefcase className="h-3.5 w-3.5 text-neutral-400" />
+        <div className="mb-3 flex items-center gap-1.5 text-xs text-ink-muted">
+          <Briefcase className="h-3.5 w-3.5 text-ink-muted" />
           <span>Source: {application.source}</span>
         </div>
       )}
 
       {/* Created date */}
-      <p className="mb-3 text-xs text-neutral-400">Created {timeAgo(application.created_at)}</p>
+      <p className="mb-3 text-xs text-ink-muted">Created {timeAgo(application.created_at)}</p>
 
       {/* Status update dropdown */}
-      <div className="border-t border-neutral-100 pt-3">
+      <div className="border-t border-border pt-3">
         <label htmlFor={`status-select-${application.id}`} className="sr-only">
           Update application status for {application.job_title} at {application.employer}
         </label>
@@ -278,13 +278,13 @@ function ApplicationCard({ application, memberName, updating, onStatusChange }: 
             value={application.status}
             disabled={updating}
             onChange={(e) => onStatusChange(application.id, e.target.value)}
-            className="w-full appearance-none border border-neutral-300 bg-white py-2 pl-3 pr-9 text-sm font-medium text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 disabled:cursor-not-allowed disabled:opacity-50"
+            className="w-full appearance-none border border-border bg-surface-card py-2 pl-3 pr-9 text-sm font-medium text-ink focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {APPLICATION_STATUSES.map((s) => (
               <option key={s} value={s}>{STATUS_LABELS[s]}</option>
             ))}
           </select>
-          <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+          <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-muted" />
           {updating && (
             <div className="absolute right-9 top-1/2 -translate-y-1/2">
               <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary-200 border-t-primary-600" />

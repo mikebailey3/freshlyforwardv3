@@ -74,31 +74,31 @@ export function StrategistMemberWorkspacePage() {
     <StrategistLayout isAdmin={role === 'admin'}>
       {/* Header */}
       <div className="mb-6">
-        <Link to="/strategist/members" className="mb-2 inline-flex items-center gap-1 text-sm text-neutral-600 hover:text-neutral-900">
+        <Link to="/strategist/members" className="mb-2 inline-flex items-center gap-1 text-sm text-ink-muted hover:text-ink">
           ← Back to Members
         </Link>
         <div className="flex items-center gap-4">
-          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary-100">
+          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary-950">
             <User className="h-7 w-7 text-primary-600" />
           </div>
           <div>
-            <h1 className="font-serif text-2xl font-semibold text-neutral-900">
+            <h1 className="font-serif text-2xl font-semibold text-ink">
               {profile?.full_name || 'Unknown Member'}
             </h1>
-            <p className="text-sm text-neutral-600">{profile?.headline || 'No headline set'}</p>
+            <p className="text-sm text-ink-muted">{profile?.headline || 'No headline set'}</p>
           </div>
           <div className="ml-auto">
-            <div className="flex items-center gap-2 border border-neutral-300 px-3 py-2">
+            <div className="flex items-center gap-2 border border-border px-3 py-2">
               <TrendingUp className="h-4 w-4 text-primary-600" />
-              <span className="text-sm font-semibold text-neutral-900">{readiness.score}%</span>
-              <span className="text-xs text-neutral-500">Search Readiness</span>
+              <span className="text-sm font-semibold text-ink">{readiness.score}%</span>
+              <span className="text-xs text-ink-muted">Search Readiness</span>
             </div>
           </div>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="mb-6 flex gap-1 overflow-x-auto border-b border-neutral-200">
+      <div className="mb-6 flex gap-1 overflow-x-auto border-b border-border">
         {tabs.map((tab) => (
           <button
             key={tab.key}
@@ -106,7 +106,7 @@ export function StrategistMemberWorkspacePage() {
             className={`flex flex-shrink-0 items-center gap-1.5 border-b-2 px-4 py-2.5 text-sm font-medium transition-colors ${
               activeTab === tab.key
                 ? 'border-primary-600 text-primary-600'
-                : 'border-transparent text-neutral-500 hover:text-neutral-900'
+                : 'border-transparent text-ink-muted hover:text-ink'
             }`}
           >
             <tab.icon className="h-4 w-4" />
@@ -137,8 +137,8 @@ function SnapshotTab({ profile, memberId }: { profile: MemberProfile | null; mem
 
   return (
     <div className="grid gap-6 lg:grid-cols-2">
-      <div className="border border-neutral-200 bg-white p-6">
-        <h3 className="mb-4 font-serif text-base font-semibold text-neutral-900">Career Snapshot</h3>
+      <div className="border border-border bg-surface-card p-6">
+        <h3 className="mb-4 font-serif text-base font-semibold text-ink">Career Snapshot</h3>
         <div className="space-y-3 text-sm">
           <Field label="Full Name" value={profile?.full_name} />
           <Field label="Headline" value={profile?.headline} />
@@ -149,24 +149,24 @@ function SnapshotTab({ profile, memberId }: { profile: MemberProfile | null; mem
         </div>
       </div>
 
-      <div className="border border-neutral-200 bg-white p-6">
-        <h3 className="mb-4 font-serif text-base font-semibold text-neutral-900">Search Readiness</h3>
+      <div className="border border-border bg-surface-card p-6">
+        <h3 className="mb-4 font-serif text-base font-semibold text-ink">Search Readiness</h3>
         <div className="mb-4">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-neutral-600">Profile Completeness</span>
-            <span className="font-serif text-2xl font-bold text-neutral-900">{readiness.score}%</span>
+            <span className="text-sm text-ink-muted">Profile Completeness</span>
+            <span className="font-serif text-2xl font-bold text-ink">{readiness.score}%</span>
           </div>
-          <div className="mt-2 h-2 w-full border border-neutral-300 bg-neutral-100">
+          <div className="mt-2 h-2 w-full border border-border bg-surface-subtle">
             <div className="h-full bg-primary-600 transition-all" style={{ width: `${readiness.score}%` }} />
           </div>
         </div>
         {readiness.missing.length > 0 && (
           <div>
-            <p className="mb-2 text-xs font-semibold text-neutral-500">Missing:</p>
+            <p className="mb-2 text-xs font-semibold text-ink-muted">Missing:</p>
             <ul className="space-y-1">
               {readiness.missing.map((m) => (
-                <li key={m.field} className="flex items-center gap-2 text-sm text-neutral-600">
-                  <AlertCircle className="h-3.5 w-3.5 text-warning-500" />
+                <li key={m.field} className="flex items-center gap-2 text-sm text-ink-muted">
+                  <AlertCircle className="h-3.5 w-3.5 text-warning-400" />
                   {m.label}
                 </li>
               ))}
@@ -175,28 +175,28 @@ function SnapshotTab({ profile, memberId }: { profile: MemberProfile | null; mem
         )}
       </div>
 
-      <div className="border border-neutral-200 bg-white p-6">
-        <h3 className="mb-4 flex items-center gap-2 font-serif text-base font-semibold text-neutral-900">
+      <div className="border border-border bg-surface-card p-6">
+        <h3 className="mb-4 flex items-center gap-2 font-serif text-base font-semibold text-ink">
           <Briefcase className="h-4 w-4 text-primary-600" />
           Work History
         </h3>
         {profile?.employment_history && profile.employment_history.length > 0 ? (
           <div className="space-y-3">
             {profile.employment_history.map((job, i) => (
-              <div key={i} className="border-l-2 border-primary-200 pl-3">
-                <p className="text-sm font-semibold text-neutral-900">{job.title}</p>
-                <p className="text-sm text-neutral-600">{job.company}</p>
-                <p className="text-xs text-neutral-500">{job.start_date} — {job.current ? 'Present' : job.end_date || 'N/A'}</p>
+              <div key={i} className="border-l-2 border-primary-800 pl-3">
+                <p className="text-sm font-semibold text-ink">{job.title}</p>
+                <p className="text-sm text-ink-muted">{job.company}</p>
+                <p className="text-xs text-ink-muted">{job.start_date} — {job.current ? 'Present' : job.end_date || 'N/A'}</p>
               </div>
             ))}
           </div>
         ) : (
-          <p className="text-sm text-neutral-400">No work history.</p>
+          <p className="text-sm text-ink-muted">No work history.</p>
         )}
       </div>
 
-      <div className="border border-neutral-200 bg-white p-6">
-        <h3 className="mb-4 flex items-center gap-2 font-serif text-base font-semibold text-neutral-900">
+      <div className="border border-border bg-surface-card p-6">
+        <h3 className="mb-4 flex items-center gap-2 font-serif text-base font-semibold text-ink">
           <Target className="h-4 w-4 text-primary-600" />
           Preferences
         </h3>
@@ -210,35 +210,35 @@ function SnapshotTab({ profile, memberId }: { profile: MemberProfile | null; mem
         </div>
       </div>
 
-      <div className="border border-neutral-200 bg-white p-6">
-        <h3 className="mb-4 flex items-center gap-2 font-serif text-base font-semibold text-neutral-900">
+      <div className="border border-border bg-surface-card p-6">
+        <h3 className="mb-4 flex items-center gap-2 font-serif text-base font-semibold text-ink">
           <Wrench className="h-4 w-4 text-primary-600" />
           Skills
         </h3>
         {profile?.skills && profile.skills.length > 0 ? (
           <div className="flex flex-wrap gap-2">
             {profile.skills.map((s, i) => (
-              <span key={i} className="border border-primary-300 px-2.5 py-1 font-mono text-[11px] font-semibold uppercase tracking-wide text-primary-700">{s}</span>
+              <span key={i} className="border border-primary-700 px-2.5 py-1 font-mono text-[11px] font-semibold uppercase tracking-wide text-primary-300">{s}</span>
             ))}
           </div>
         ) : (
-          <p className="text-sm text-neutral-400">No skills listed.</p>
+          <p className="text-sm text-ink-muted">No skills listed.</p>
         )}
       </div>
 
-      <div className="border border-neutral-200 bg-white p-6">
-        <h3 className="mb-4 flex items-center gap-2 font-serif text-base font-semibold text-neutral-900">
+      <div className="border border-border bg-surface-card p-6">
+        <h3 className="mb-4 flex items-center gap-2 font-serif text-base font-semibold text-ink">
           <FileCheck className="h-4 w-4 text-primary-600" />
           Authorization
         </h3>
         <div className="space-y-2">
           <div className="flex items-center gap-2 text-sm">
-            <div className={`h-2 w-2 rounded-full ${profile?.application_authorized ? 'bg-success-500' : 'bg-neutral-300'}`} />
-            <span className="text-neutral-700">Application Authorization {profile?.application_authorized ? '✓' : 'Not given'}</span>
+            <div className={`h-2 w-2 rounded-full ${profile?.application_authorized ? 'bg-success-500' : 'bg-surface-subtle'}`} />
+            <span className="text-ink-muted">Application Authorization {profile?.application_authorized ? '✓' : 'Not given'}</span>
           </div>
           <div className="flex items-center gap-2 text-sm">
-            <div className={`h-2 w-2 rounded-full ${profile?.electronic_consent ? 'bg-success-500' : 'bg-neutral-300'}`} />
-            <span className="text-neutral-700">Electronic Consent {profile?.electronic_consent ? '✓' : 'Not given'}</span>
+            <div className={`h-2 w-2 rounded-full ${profile?.electronic_consent ? 'bg-success-500' : 'bg-surface-subtle'}`} />
+            <span className="text-ink-muted">Electronic Consent {profile?.electronic_consent ? '✓' : 'Not given'}</span>
           </div>
         </div>
       </div>
@@ -263,7 +263,7 @@ function OpportunitiesTab({ memberId, strategistId }: { memberId: string; strate
   return (
     <div>
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="font-serif text-base font-semibold text-neutral-900">Opportunity Pipeline</h3>
+        <h3 className="font-serif text-base font-semibold text-ink">Opportunity Pipeline</h3>
         <button
           onClick={() => setShowForm(!showForm)}
           className="flex items-center gap-1.5 rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-700"
@@ -291,13 +291,13 @@ function OpportunitiesTab({ memberId, strategistId }: { memberId: string; strate
       ) : (
         <div className="space-y-3">
           {opportunities.map((opp) => (
-            <div key={opp.id} className="border border-neutral-200 bg-white p-4">
+            <div key={opp.id} className="border border-border bg-surface-card p-4">
               <div className="flex items-start justify-between">
                 <div>
-                  <span className="border px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide border-neutral-300 text-neutral-700">{opp.status.replace(/_/g, ' ')}</span>
-                  <p className="mt-2 text-sm font-semibold text-neutral-900">{opp.job_title} at {opp.employer}</p>
-                  <p className="text-xs text-neutral-500">{opp.location} — {opp.salary_text || 'Salary TBD'}</p>
-                  {opp.why_it_matches && <p className="mt-2 text-xs text-neutral-600">{opp.why_it_matches}</p>}
+                  <span className="border px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide border-border text-ink-muted">{opp.status.replace(/_/g, ' ')}</span>
+                  <p className="mt-2 text-sm font-semibold text-ink">{opp.job_title} at {opp.employer}</p>
+                  <p className="text-xs text-ink-muted">{opp.location} — {opp.salary_text || 'Salary TBD'}</p>
+                  {opp.why_it_matches && <p className="mt-2 text-xs text-ink-muted">{opp.why_it_matches}</p>}
                 </div>
                 <select
                   value={opp.status}
@@ -305,7 +305,7 @@ function OpportunitiesTab({ memberId, strategistId }: { memberId: string; strate
                     await updateOpportunity(opp.id, { status: e.target.value })
                     load()
                   }}
-                  className="border border-neutral-300 px-2 py-1 text-xs"
+                  className="border border-border px-2 py-1 text-xs"
                 >
                   {['researching', 'needs_review', 'recommended', 'awaiting_member_approval', 'approved', 'declined', 'preparing_application', 'submitted', 'expired', 'archived'].map((s) => (
                     <option key={s} value={s}>{s.replace(/_/g, ' ')}</option>
@@ -357,8 +357,8 @@ function OpportunityForm({ memberId, strategistId, onSave, onCancel }: {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mb-4 border border-primary-300 border-l-4 border-l-primary-600 bg-primary-50 p-6">
-      <h4 className="mb-4 font-serif text-base font-semibold text-neutral-900">New Opportunity</h4>
+    <form onSubmit={handleSubmit} className="mb-4 border border-primary-700 border-l-4 border-l-primary-600 bg-primary-950 p-6">
+      <h4 className="mb-4 font-serif text-base font-semibold text-ink">New Opportunity</h4>
       <div className="grid gap-3 sm:grid-cols-2">
         <Input label="Employer" value={form.employer} onChange={(v) => setForm({ ...form, employer: v })} required />
         <Input label="Job Title" value={form.job_title} onChange={(v) => setForm({ ...form, job_title: v })} required />
@@ -380,7 +380,7 @@ function OpportunityForm({ memberId, strategistId, onSave, onCancel }: {
         <button type="submit" className="flex items-center gap-1.5 rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">
           <Check className="h-4 w-4" /> Create
         </button>
-        <button type="button" onClick={onCancel} className="flex items-center gap-1.5 border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50">
+        <button type="button" onClick={onCancel} className="flex items-center gap-1.5 border border-border px-4 py-2 text-sm font-medium text-ink-muted hover:bg-surface-hover">
           <X className="h-4 w-4" /> Cancel
         </button>
       </div>
@@ -413,7 +413,7 @@ function ApplicationsTab({ memberId, strategistId }: { memberId: string; strateg
   return (
     <div>
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="font-serif text-base font-semibold text-neutral-900">Applications</h3>
+        <h3 className="font-serif text-base font-semibold text-ink">Applications</h3>
         <button
           onClick={() => setShowForm(!showForm)}
           className="flex items-center gap-1.5 rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700"
@@ -441,13 +441,13 @@ function ApplicationsTab({ memberId, strategistId }: { memberId: string; strateg
       ) : (
         <div className="space-y-3">
           {applications.map((app) => (
-            <div key={app.id} className="border border-neutral-200 bg-white p-4">
+            <div key={app.id} className="border border-border bg-surface-card p-4">
               <div className="flex items-start justify-between">
                 <div>
-                  <span className="border px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide border-neutral-300 text-neutral-700">{app.status.replace(/_/g, ' ')}</span>
-                  <p className="mt-2 text-sm font-semibold text-neutral-900">{app.job_title} at {app.employer}</p>
-                  {app.date_submitted && <p className="text-xs text-neutral-500">Submitted: {formatDate(app.date_submitted)}</p>}
-                  {app.interview_date && <p className="text-xs text-neutral-500">Interview: {formatDate(app.interview_date)}</p>}
+                  <span className="border px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide border-border text-ink-muted">{app.status.replace(/_/g, ' ')}</span>
+                  <p className="mt-2 text-sm font-semibold text-ink">{app.job_title} at {app.employer}</p>
+                  {app.date_submitted && <p className="text-xs text-ink-muted">Submitted: {formatDate(app.date_submitted)}</p>}
+                  {app.interview_date && <p className="text-xs text-ink-muted">Interview: {formatDate(app.interview_date)}</p>}
                 </div>
                 <select
                   value={app.status}
@@ -455,7 +455,7 @@ function ApplicationsTab({ memberId, strategistId }: { memberId: string; strateg
                     await updateApplication(app.id, { status: e.target.value })
                     load()
                   }}
-                  className="border border-neutral-300 px-2 py-1 text-xs"
+                  className="border border-border px-2 py-1 text-xs"
                 >
                   {['preparing_resume', 'preparing_cover_letter', 'waiting_on_member', 'ready_to_submit', 'submitted', 'employer_viewed', 'follow_up_needed', 'interview_requested', 'interview_scheduled', 'rejected', 'offer_received', 'offer_accepted', 'closed'].map((s) => (
                     <option key={s} value={s}>{s.replace(/_/g, ' ')}</option>
@@ -498,16 +498,16 @@ function ApplicationForm({ memberId, strategistId, opportunities, onSave, onCanc
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mb-4 border border-primary-300 border-l-4 border-l-primary-600 bg-primary-50 p-6">
-      <h4 className="mb-4 font-serif text-base font-semibold text-neutral-900">New Application</h4>
+    <form onSubmit={handleSubmit} className="mb-4 border border-primary-700 border-l-4 border-l-primary-600 bg-primary-950 p-6">
+      <h4 className="mb-4 font-serif text-base font-semibold text-ink">New Application</h4>
       <div className="space-y-3">
         <div>
-          <label className="block text-sm font-medium text-neutral-700">Opportunity</label>
+          <label className="block text-sm font-medium text-ink-muted">Opportunity</label>
           <select
             value={oppId}
             onChange={(e) => setOppId(e.target.value)}
             required
-            className="mt-1 block w-full border border-neutral-300 px-3 py-2.5 text-sm"
+            className="mt-1 block w-full border border-border px-3 py-2.5 text-sm"
           >
             <option value="">Select an approved opportunity…</option>
             {opportunities.map((o) => (
@@ -522,7 +522,7 @@ function ApplicationForm({ memberId, strategistId, opportunities, onSave, onCanc
         <button type="submit" className="flex items-center gap-1.5 rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">
           <Check className="h-4 w-4" /> Create
         </button>
-        <button type="button" onClick={onCancel} className="flex items-center gap-1.5 border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50">
+        <button type="button" onClick={onCancel} className="flex items-center gap-1.5 border border-border px-4 py-2 text-sm font-medium text-ink-muted hover:bg-surface-hover">
           <X className="h-4 w-4" /> Cancel
         </button>
       </div>
@@ -546,7 +546,7 @@ function ResumesTab({ memberId }: { memberId: string }) {
   return (
     <div>
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="font-serif text-base font-semibold text-neutral-900">Resume Versions</h3>
+        <h3 className="font-serif text-base font-semibold text-ink">Resume Versions</h3>
         <button onClick={() => setShowForm(!showForm)} className="flex items-center gap-1.5 rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">
           <Plus className="h-4 w-4" /> Add Version
         </button>
@@ -561,20 +561,20 @@ function ResumesTab({ memberId }: { memberId: string }) {
       ) : (
         <div className="space-y-3">
           {resumes.map((r) => (
-            <div key={r.id} className="border border-neutral-200 bg-white p-4">
+            <div key={r.id} className="border border-border bg-surface-card p-4">
               <div className="flex items-start justify-between">
                 <div>
                   <div className="flex items-center gap-2">
-                    <p className="text-sm font-semibold text-neutral-900">{r.title}</p>
-                    {r.is_master && <span className="border border-primary-300 px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide text-primary-700">Master</span>}
-                    {r.is_archived && <span className="border px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide border-neutral-300 text-neutral-500">Archived</span>}
+                    <p className="text-sm font-semibold text-ink">{r.title}</p>
+                    {r.is_master && <span className="border border-primary-700 px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide text-primary-300">Master</span>}
+                    {r.is_archived && <span className="border px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide border-border text-ink-muted">Archived</span>}
                   </div>
-                  <p className="text-xs text-neutral-500">Version {r.version_number} — {formatDate(r.created_at)}</p>
-                  {r.notes && <p className="mt-1 text-xs text-neutral-600">{r.notes}</p>}
+                  <p className="text-xs text-ink-muted">Version {r.version_number} — {formatDate(r.created_at)}</p>
+                  {r.notes && <p className="mt-1 text-xs text-ink-muted">{r.notes}</p>}
                 </div>
                 <button
                   onClick={async () => { await updateResumeVersion(r.id, { is_archived: !r.is_archived }); load() }}
-                  className="text-xs text-neutral-500 hover:text-neutral-900"
+                  className="text-xs text-ink-muted hover:text-ink"
                 >
                   {r.is_archived ? 'Unarchive' : 'Archive'}
                 </button>
@@ -593,19 +593,19 @@ function ResumeForm({ memberId, onSave, onCancel }: { memberId: string; onSave: 
   const [isMaster, setIsMaster] = useState(false)
 
   return (
-    <form onSubmit={(e) => { e.preventDefault(); onSave({ member_id: memberId, title, notes: notes || null, is_master: isMaster, version_number: 1 }) }} className="mb-4 border border-primary-300 border-l-4 border-l-primary-600 bg-primary-50 p-6">
-      <h4 className="mb-4 font-serif text-base font-semibold text-neutral-900">New Resume Version</h4>
+    <form onSubmit={(e) => { e.preventDefault(); onSave({ member_id: memberId, title, notes: notes || null, is_master: isMaster, version_number: 1 }) }} className="mb-4 border border-primary-700 border-l-4 border-l-primary-600 bg-primary-950 p-6">
+      <h4 className="mb-4 font-serif text-base font-semibold text-ink">New Resume Version</h4>
       <Input label="Title" value={title} onChange={setTitle} required />
       <TextArea label="Notes" value={notes} onChange={setNotes} />
-      <label className="mt-3 flex items-center gap-2 text-sm text-neutral-700">
-        <input type="checkbox" checked={isMaster} onChange={(e) => setIsMaster(e.target.checked)} className="h-4 w-4 border-neutral-300 text-primary-600" />
+      <label className="mt-3 flex items-center gap-2 text-sm text-ink-muted">
+        <input type="checkbox" checked={isMaster} onChange={(e) => setIsMaster(e.target.checked)} className="h-4 w-4 border-border text-primary-600" />
         Set as Master Resume
       </label>
       <div className="mt-4 flex gap-2">
         <button type="submit" className="flex items-center gap-1.5 rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">
           <Check className="h-4 w-4" /> Create
         </button>
-        <button type="button" onClick={onCancel} className="flex items-center gap-1.5 border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50">
+        <button type="button" onClick={onCancel} className="flex items-center gap-1.5 border border-border px-4 py-2 text-sm font-medium text-ink-muted hover:bg-surface-hover">
           <X className="h-4 w-4" /> Cancel
         </button>
       </div>
@@ -629,7 +629,7 @@ function CoverLettersTab({ memberId }: { memberId: string }) {
   return (
     <div>
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="font-serif text-base font-semibold text-neutral-900">Cover Letters</h3>
+        <h3 className="font-serif text-base font-semibold text-ink">Cover Letters</h3>
         <button onClick={() => setShowForm(!showForm)} className="flex items-center gap-1.5 rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">
           <Plus className="h-4 w-4" /> Add Letter
         </button>
@@ -644,14 +644,14 @@ function CoverLettersTab({ memberId }: { memberId: string }) {
       ) : (
         <div className="space-y-3">
           {letters.map((l) => (
-            <div key={l.id} className="border border-neutral-200 bg-white p-4">
+            <div key={l.id} className="border border-border bg-surface-card p-4">
               <div className="flex items-center gap-2">
-                <p className="text-sm font-semibold text-neutral-900">{l.title}</p>
+                <p className="text-sm font-semibold text-ink">{l.title}</p>
                 {l.is_template && <span className="border border-accent-300 px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide text-accent-700">Template</span>}
-                {l.is_archived && <span className="border px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide border-neutral-300 text-neutral-500">Archived</span>}
+                {l.is_archived && <span className="border px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide border-border text-ink-muted">Archived</span>}
               </div>
-              <p className="mt-1 text-xs text-neutral-500">{formatDate(l.created_at)}</p>
-              <p className="mt-2 line-clamp-3 text-sm text-neutral-600">{l.body}</p>
+              <p className="mt-1 text-xs text-ink-muted">{formatDate(l.created_at)}</p>
+              <p className="mt-2 line-clamp-3 text-sm text-ink-muted">{l.body}</p>
             </div>
           ))}
         </div>
@@ -666,22 +666,22 @@ function CoverLetterForm({ memberId, onSave, onCancel }: { memberId: string; onS
   const [isTemplate, setIsTemplate] = useState(false)
 
   return (
-    <form onSubmit={(e) => { e.preventDefault(); onSave({ member_id: memberId, title, body, is_template: isTemplate }) }} className="mb-4 border border-primary-300 border-l-4 border-l-primary-600 bg-primary-50 p-6">
-      <h4 className="mb-4 font-serif text-base font-semibold text-neutral-900">New Cover Letter</h4>
+    <form onSubmit={(e) => { e.preventDefault(); onSave({ member_id: memberId, title, body, is_template: isTemplate }) }} className="mb-4 border border-primary-700 border-l-4 border-l-primary-600 bg-primary-950 p-6">
+      <h4 className="mb-4 font-serif text-base font-semibold text-ink">New Cover Letter</h4>
       <Input label="Title" value={title} onChange={setTitle} required />
       <div>
-        <label className="block text-sm font-medium text-neutral-700">Body</label>
-        <textarea value={body} onChange={(e) => setBody(e.target.value)} required rows={8} className="mt-1 block w-full border border-neutral-300 px-3 py-2.5 text-sm" />
+        <label className="block text-sm font-medium text-ink-muted">Body</label>
+        <textarea value={body} onChange={(e) => setBody(e.target.value)} required rows={8} className="mt-1 block w-full border border-border px-3 py-2.5 text-sm" />
       </div>
-      <label className="mt-3 flex items-center gap-2 text-sm text-neutral-700">
-        <input type="checkbox" checked={isTemplate} onChange={(e) => setIsTemplate(e.target.checked)} className="h-4 w-4 border-neutral-300 text-primary-600" />
+      <label className="mt-3 flex items-center gap-2 text-sm text-ink-muted">
+        <input type="checkbox" checked={isTemplate} onChange={(e) => setIsTemplate(e.target.checked)} className="h-4 w-4 border-border text-primary-600" />
         Save as Template
       </label>
       <div className="mt-4 flex gap-2">
         <button type="submit" className="flex items-center gap-1.5 rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">
           <Check className="h-4 w-4" /> Create
         </button>
-        <button type="button" onClick={onCancel} className="flex items-center gap-1.5 border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50">
+        <button type="button" onClick={onCancel} className="flex items-center gap-1.5 border border-border px-4 py-2 text-sm font-medium text-ink-muted hover:bg-surface-hover">
           <X className="h-4 w-4" /> Cancel
         </button>
       </div>
@@ -715,17 +715,17 @@ function NotesTab({ memberId, strategistId }: { memberId: string; strategistId: 
   return (
     <div>
       <div className="mb-2 flex items-center gap-2">
-        <AlertCircle className="h-4 w-4 text-warning-500" />
-        <p className="text-xs text-neutral-500">Career notes are private — visible only to Career Strategists and Admins.</p>
+        <AlertCircle className="h-4 w-4 text-warning-400" />
+        <p className="text-xs text-ink-muted">Career notes are private — visible only to Career Strategists and Admins.</p>
       </div>
 
-      <form onSubmit={handleAdd} className="mb-4 border border-neutral-200 bg-white p-4">
+      <form onSubmit={handleAdd} className="mb-4 border border-border bg-surface-card p-4">
         <textarea
           value={newNote}
           onChange={(e) => setNewNote(e.target.value)}
           placeholder="Add a private note about this member…"
           rows={3}
-          className="w-full border border-neutral-300 px-3 py-2 text-sm"
+          className="w-full border border-border px-3 py-2 text-sm"
         />
         <div className="mt-2 flex gap-2">
           <input
@@ -733,7 +733,7 @@ function NotesTab({ memberId, strategistId }: { memberId: string; strategistId: 
             value={category}
             onChange={(e) => setCategory(e.target.value)}
             placeholder="Category (optional)"
-            className="flex-1 border border-neutral-300 px-3 py-2 text-sm"
+            className="flex-1 border border-border px-3 py-2 text-sm"
           />
           <button type="submit" className="flex items-center gap-1.5 rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">
             <Plus className="h-4 w-4" /> Add Note
@@ -746,24 +746,24 @@ function NotesTab({ memberId, strategistId }: { memberId: string; strategistId: 
       ) : (
         <div className="space-y-3">
           {notes.map((note) => (
-            <div key={note.id} className={`border p-4 ${note.is_pinned ? 'border-accent-300 border-l-4 border-l-accent-500 bg-accent-50' : 'border-neutral-200 bg-white'}`}>
+            <div key={note.id} className={`border p-4 ${note.is_pinned ? 'border-accent-300 border-l-4 border-l-accent-500 bg-accent-50' : 'border-border bg-surface-card'}`}>
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  {note.category && <span className="mb-1 inline-block border border-neutral-300 px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide text-neutral-600">{note.category}</span>}
-                  <p className="text-sm text-neutral-700">{note.note}</p>
-                  <p className="mt-1 text-xs text-neutral-400">{timeAgo(note.created_at)}</p>
+                  {note.category && <span className="mb-1 inline-block border border-border px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide text-ink-muted">{note.category}</span>}
+                  <p className="text-sm text-ink-muted">{note.note}</p>
+                  <p className="mt-1 text-xs text-ink-muted">{timeAgo(note.created_at)}</p>
                 </div>
                 <div className="flex gap-1">
                   <button
                     onClick={async () => { await updateCareerNote(note.id, { is_pinned: !note.is_pinned }); load() }}
-                    className="p-1 text-neutral-400 hover:text-accent-600"
+                    className="p-1 text-ink-muted hover:text-accent-600"
                     aria-label="Pin note"
                   >
                     <Pin className="h-4 w-4" />
                   </button>
                   <button
                     onClick={async () => { await deleteCareerNote(note.id); load() }}
-                    className="p-1 text-neutral-400 hover:text-error-600"
+                    className="p-1 text-ink-muted hover:text-error-400"
                     aria-label="Delete note"
                   >
                     <Trash2 className="h-4 w-4" />
@@ -813,20 +813,20 @@ function FollowUpsTab({ memberId, strategistId }: { memberId: string; strategist
   return (
     <div>
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="font-serif text-base font-semibold text-neutral-900">Follow-Ups</h3>
+        <h3 className="font-serif text-base font-semibold text-ink">Follow-Ups</h3>
         <button onClick={() => setShowForm(!showForm)} className="flex items-center gap-1.5 rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">
           <Plus className="h-4 w-4" /> Schedule
         </button>
       </div>
 
       {showForm && (
-        <form onSubmit={handleAdd} className="mb-4 border border-primary-300 border-l-4 border-l-primary-600 bg-primary-50 p-4">
+        <form onSubmit={handleAdd} className="mb-4 border border-primary-700 border-l-4 border-l-primary-600 bg-primary-950 p-4">
           <Input label="Title" value={form.title} onChange={(v) => setForm({ ...form, title: v })} required />
           <Input label="Description" value={form.description} onChange={(v) => setForm({ ...form, description: v })} />
           <Input label="Due Date" type="date" value={form.due_date} onChange={(v) => setForm({ ...form, due_date: v })} required />
           <div className="mt-3 flex gap-2">
             <button type="submit" className="rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">Create</button>
-            <button type="button" onClick={() => setShowForm(false)} className="border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50">Cancel</button>
+            <button type="button" onClick={() => setShowForm(false)} className="border border-border px-4 py-2 text-sm font-medium text-ink-muted hover:bg-surface-hover">Cancel</button>
           </div>
         </form>
       )}
@@ -837,7 +837,7 @@ function FollowUpsTab({ memberId, strategistId }: { memberId: string; strategist
         <div className="space-y-4">
           {overdue.length > 0 && (
             <div>
-              <p className="mb-2 text-xs font-semibold text-error-600">Overdue</p>
+              <p className="mb-2 text-xs font-semibold text-error-400">Overdue</p>
               {overdue.map((f) => <FollowUpItem key={f.id} f={f} onComplete={load} />)}
             </div>
           )}
@@ -849,7 +849,7 @@ function FollowUpsTab({ memberId, strategistId }: { memberId: string; strategist
           )}
           {completed.length > 0 && (
             <div>
-              <p className="mb-2 text-xs font-semibold text-success-600">Completed</p>
+              <p className="mb-2 text-xs font-semibold text-success-400">Completed</p>
               {completed.map((f) => <FollowUpItem key={f.id} f={f} onComplete={load} />)}
             </div>
           )}
@@ -863,12 +863,12 @@ function FollowUpItem({ f, onComplete }: { f: FollowUp; onComplete: () => void }
   return (
     <div className={`flex items-center justify-between border border-l-4 p-3 ${
       f.status === 'completed' ? 'border-success-200 bg-success-50' :
-      new Date(f.due_date) < new Date() ? 'border-error-200 bg-error-50' : 'border-neutral-200 bg-white'
+      new Date(f.due_date) < new Date() ? 'border-error-200 bg-error-50' : 'border-border bg-surface-card'
     }`}>
       <div>
-        <p className="text-sm font-medium text-neutral-900">{f.title}</p>
-        {f.description && <p className="text-xs text-neutral-600">{f.description}</p>}
-        <p className="text-xs text-neutral-400">Due: {formatDate(f.due_date)}</p>
+        <p className="text-sm font-medium text-ink">{f.title}</p>
+        {f.description && <p className="text-xs text-ink-muted">{f.description}</p>}
+        <p className="text-xs text-ink-muted">Due: {formatDate(f.due_date)}</p>
       </div>
       {f.status === 'pending' && (
         <button
@@ -912,35 +912,35 @@ function MessagesTab({ memberId }: { memberId: string }) {
   if (loading) return <LoadingSpinner />
 
   return (
-    <div className="flex h-[calc(100vh-20rem)] flex-col border border-neutral-200 bg-white">
+    <div className="flex h-[calc(100vh-20rem)] flex-col border border-border bg-surface-card">
       <div className="flex-1 overflow-y-auto p-4">
         {messages.length === 0 ? (
           <div className="flex h-full items-center justify-center text-center">
-            <p className="text-sm text-neutral-500">No messages yet. Start the conversation!</p>
+            <p className="text-sm text-ink-muted">No messages yet. Start the conversation!</p>
           </div>
         ) : (
           <div className="space-y-3">
             {messages.map((msg) => (
               <div key={msg.id} className={`flex ${msg.sender_type === 'strategist' ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm ${
-                  msg.sender_type === 'strategist' ? 'bg-primary-600 text-white' : 'bg-neutral-100 text-neutral-900'
+                  msg.sender_type === 'strategist' ? 'bg-primary-600 text-white' : 'bg-surface-subtle text-ink'
                 }`}>
                   {msg.body}
-                  <p className={`mt-1 text-xs ${msg.sender_type === 'strategist' ? 'text-primary-200' : 'text-neutral-400'}`}>{timeAgo(msg.created_at)}</p>
+                  <p className={`mt-1 text-xs ${msg.sender_type === 'strategist' ? 'text-primary-200' : 'text-ink-muted'}`}>{timeAgo(msg.created_at)}</p>
                 </div>
               </div>
             ))}
           </div>
         )}
       </div>
-      <div className="border-t border-neutral-200 p-4">
+      <div className="border-t border-border p-4">
         <form onSubmit={handleSend} className="flex items-center gap-2">
           <input
             type="text"
             value={body}
             onChange={(e) => setBody(e.target.value)}
             placeholder="Type a message…"
-            className="flex-1 border border-neutral-300 px-4 py-2.5 text-sm"
+            className="flex-1 border border-border px-4 py-2.5 text-sm"
           />
           <button type="submit" disabled={sending || !body.trim()} className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-600 text-white hover:bg-primary-700 disabled:opacity-60">
             <Send className="h-4 w-4" />
@@ -978,17 +978,17 @@ function TimelineTab({ memberId }: { memberId: string }) {
         <EmptyState text="No timeline events yet." />
       ) : (
         <div className="relative">
-          <div className="absolute left-4 top-0 h-full w-0.5 bg-neutral-200" />
+          <div className="absolute left-4 top-0 h-full w-0.5 bg-surface-subtle" />
           <div className="space-y-4">
             {events.map((event) => (
               <div key={event.id} className="relative flex items-start gap-4">
                 <div className="z-10 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-primary-600 ring-4 ring-primary-100">
                   <Check className="h-3.5 w-3.5 text-white" />
                 </div>
-                <div className="flex-1 border border-neutral-200 bg-white p-4">
-                  <p className="text-xs text-neutral-400">{formatDate(event.event_date)}</p>
-                  <p className="text-sm font-medium text-neutral-900">{event.event_title}</p>
-                  {event.event_description && <p className="text-xs text-neutral-600">{event.event_description}</p>}
+                <div className="flex-1 border border-border bg-surface-card p-4">
+                  <p className="text-xs text-ink-muted">{formatDate(event.event_date)}</p>
+                  <p className="text-sm font-medium text-ink">{event.event_title}</p>
+                  {event.event_description && <p className="text-xs text-ink-muted">{event.event_description}</p>}
                 </div>
               </div>
             ))}
@@ -1005,14 +1005,14 @@ function TimelineTab({ memberId }: { memberId: string }) {
 function Field({ label, value, multiline }: { label: string; value?: string | null; multiline?: boolean }) {
   if (!value) return (
     <div>
-      <p className="text-xs font-semibold text-neutral-500">{label}</p>
-      <p className="mt-0.5 text-sm text-neutral-400">Not provided</p>
+      <p className="text-xs font-semibold text-ink-muted">{label}</p>
+      <p className="mt-0.5 text-sm text-ink-muted">Not provided</p>
     </div>
   )
   return (
     <div>
-      <p className="text-xs font-semibold text-neutral-500">{label}</p>
-      <p className={`mt-0.5 text-sm text-neutral-700 ${multiline ? '' : ''}`}>{value}</p>
+      <p className="text-xs font-semibold text-ink-muted">{label}</p>
+      <p className={`mt-0.5 text-sm text-ink-muted ${multiline ? '' : ''}`}>{value}</p>
     </div>
   )
 }
@@ -1020,8 +1020,8 @@ function Field({ label, value, multiline }: { label: string; value?: string | nu
 function Input({ label, value, onChange, type = 'text', required }: { label: string; value: string; onChange: (v: string) => void; type?: string; required?: boolean }) {
   return (
     <div>
-      <label className="block text-sm font-medium text-neutral-700">{label}{required && <span className="ml-1 text-error-500">*</span>}</label>
-      <input type={type} value={value} onChange={(e) => onChange(e.target.value)} required={required} className="mt-1 block w-full border border-neutral-300 px-3 py-2.5 text-sm" />
+      <label className="block text-sm font-medium text-ink-muted">{label}{required && <span className="ml-1 text-error-500">*</span>}</label>
+      <input type={type} value={value} onChange={(e) => onChange(e.target.value)} required={required} className="mt-1 block w-full border border-border px-3 py-2.5 text-sm" />
     </div>
   )
 }
@@ -1029,8 +1029,8 @@ function Input({ label, value, onChange, type = 'text', required }: { label: str
 function TextArea({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
   return (
     <div>
-      <label className="block text-sm font-medium text-neutral-700">{label}</label>
-      <textarea value={value} onChange={(e) => onChange(e.target.value)} rows={3} className="mt-1 block w-full border border-neutral-300 px-3 py-2.5 text-sm" />
+      <label className="block text-sm font-medium text-ink-muted">{label}</label>
+      <textarea value={value} onChange={(e) => onChange(e.target.value)} rows={3} className="mt-1 block w-full border border-border px-3 py-2.5 text-sm" />
     </div>
   )
 }
@@ -1038,8 +1038,8 @@ function TextArea({ label, value, onChange }: { label: string; value: string; on
 function Select({ label, value, onChange, options }: { label: string; value: string; onChange: (v: string) => void; options: { value: string; label: string }[] }) {
   return (
     <div>
-      <label className="block text-sm font-medium text-neutral-700">{label}</label>
-      <select value={value} onChange={(e) => onChange(e.target.value)} className="mt-1 block w-full border border-neutral-300 px-3 py-2.5 text-sm">
+      <label className="block text-sm font-medium text-ink-muted">{label}</label>
+      <select value={value} onChange={(e) => onChange(e.target.value)} className="mt-1 block w-full border border-border px-3 py-2.5 text-sm">
         {options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
       </select>
     </div>
@@ -1056,8 +1056,8 @@ function LoadingSpinner() {
 
 function EmptyState({ text }: { text: string }) {
   return (
-    <div className="border border-neutral-200 bg-white p-8 text-center">
-      <p className="text-sm text-neutral-500">{text}</p>
+    <div className="border border-border bg-surface-card p-8 text-center">
+      <p className="text-sm text-ink-muted">{text}</p>
     </div>
   )
 }
