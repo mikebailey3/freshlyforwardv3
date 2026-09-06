@@ -15,6 +15,6 @@ describe('FreshFitBadge', () => {
 
   it('applies the weak-tier style for a low score', () => {
     render(<FreshFitBadge score={20} />)
-    expect(screen.getByText('FreshFit 20').className).toContain('neutral')
+    expect(screen.getByText('FreshFit 20').className).toContain('border-border')
   })
 })

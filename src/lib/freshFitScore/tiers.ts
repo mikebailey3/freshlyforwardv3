@@ -31,8 +31,8 @@ export const FRESHFIT_TIER_LABELS: Record<FreshFitTier, string> = {
 /** Tailwind classes for the score badge per tier -- shared so the member
  * and strategist Opportunity Engine pages never drift out of sync again. */
 export const FRESHFIT_TIER_STYLES: Record<FreshFitTier, string> = {
-  strong: 'border-success-300 text-success-700',
-  good: 'border-primary-300 text-primary-700',
-  fair: 'border-warning-300 text-warning-700',
-  weak: 'border-neutral-300 text-neutral-600',
+  strong: 'border-success-700 text-success-300',
+  good: 'border-primary-700 text-primary-300',
+  fair: 'border-warning-700 text-warning-300',
+  weak: 'border-border text-ink-muted',
 }

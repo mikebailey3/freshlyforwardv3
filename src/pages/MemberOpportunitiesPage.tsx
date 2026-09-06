@@ -26,16 +26,16 @@ const statusLabels: Record<string, string> = {
 }
 
 const statusColors: Record<string, string> = {
-  researching: 'border-neutral-300 text-neutral-700',
-  needs_review: 'border-neutral-300 text-neutral-700',
-  recommended: 'border-primary-300 text-primary-700',
-  awaiting_member_approval: 'border-warning-300 text-warning-700',
-  approved: 'border-success-300 text-success-700',
-  declined: 'border-error-300 text-error-700',
-  preparing_application: 'border-accent-300 text-accent-700',
+  researching: 'border-border text-ink-muted',
+  needs_review: 'border-border text-ink-muted',
+  recommended: 'border-primary-700 text-primary-300',
+  awaiting_member_approval: 'border-warning-700 text-warning-300',
+  approved: 'border-success-700 text-success-300',
+  declined: 'border-error-700 text-error-300',
+  preparing_application: 'border-accent-700 text-accent-300',
   submitted: 'rounded-full bg-primary-600 text-white',
-  expired: 'border-neutral-300 text-neutral-500',
-  archived: 'border-neutral-300 text-neutral-500',
+  expired: 'border-border text-ink-muted',
+  archived: 'border-border text-ink-muted',
 }
 
 export function MemberOpportunitiesPage() {
@@ -106,17 +106,17 @@ export function MemberOpportunitiesPage() {
   return (
     <MemberLayout>
       <div className="mb-6">
-        <h1 className="font-serif text-2xl font-semibold text-neutral-900 sm:text-3xl">Opportunities</h1>
-        <p className="mt-1 text-sm text-neutral-600">
+        <h1 className="font-serif text-2xl font-semibold text-ink sm:text-3xl">Opportunities</h1>
+        <p className="mt-1 text-sm text-ink-muted">
           Hand-selected opportunities researched by your Career Strategist.
         </p>
       </div>
 
       {pendingApproval.length > 0 && (
-        <div className="mb-6 border border-warning-300 border-l-4 border-l-warning-500 bg-warning-50 p-4">
+        <div className="mb-6 border border-warning-700 border-l-4 border-l-warning-500 bg-warning-950 p-4">
           <div className="flex items-center gap-2">
             <AlertCircle className="h-5 w-5 text-warning-600" />
-            <p className="text-sm font-medium text-warning-700">
+            <p className="text-sm font-medium text-warning-300">
               {pendingApproval.length} opportunit{pendingApproval.length === 1 ? 'y' : 'ies'} awaiting your approval.
             </p>
           </div>
@@ -124,27 +124,27 @@ export function MemberOpportunitiesPage() {
       )}
 
       {active.length === 0 ? (
-        <div className="border border-neutral-200 bg-white p-12 text-center">
-          <Search className="mx-auto h-12 w-12 text-neutral-300" />
-          <p className="mt-4 text-sm text-neutral-500">
+        <div className="border border-border bg-surface-card p-12 text-center">
+          <Search className="mx-auto h-12 w-12 text-ink-muted" />
+          <p className="mt-4 text-sm text-ink-muted">
             Your Career Strategist is researching opportunities for you. Check back soon!
           </p>
         </div>
       ) : (
         <div className="space-y-4">
           {active.map((opp) => (
-            <div key={opp.id} className="border border-neutral-200 border-l-4 border-l-primary-600 bg-white p-6">
+            <div key={opp.id} className="border border-border border-l-4 border-l-primary-600 bg-surface-card p-6">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
-                    <span className={`border px-2.5 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide ${statusColors[opp.status] || 'border-neutral-300 text-neutral-700'}`}>
+                    <span className={`border px-2.5 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide ${statusColors[opp.status] || 'border-border text-ink-muted'}`}>
                       {statusLabels[opp.status] || opp.status}
                     </span>
                   </div>
-                  <h3 className="mt-3 font-serif text-lg font-semibold text-neutral-900">{opp.job_title}</h3>
-                  <p className="text-sm text-neutral-600">{opp.employer}</p>
+                  <h3 className="mt-3 font-serif text-lg font-semibold text-ink">{opp.job_title}</h3>
+                  <p className="text-sm text-ink-muted">{opp.employer}</p>
 
-                  <div className="mt-3 flex flex-wrap gap-3 text-xs text-neutral-500">
+                  <div className="mt-3 flex flex-wrap gap-3 text-xs text-ink-muted">
                     {opp.location && (
                       <span className="flex items-center gap-1">
                         <MapPin className="h-3.5 w-3.5" />
@@ -172,15 +172,15 @@ export function MemberOpportunitiesPage() {
                   </div>
 
                   {opp.member_visible_notes && (
-                    <p className="mt-3 border-l-2 border-neutral-300 bg-neutral-50 p-3 text-sm text-neutral-600">
+                    <p className="mt-3 border-l-2 border-border bg-surface-subtle p-3 text-sm text-ink-muted">
                       {opp.member_visible_notes}
                     </p>
                   )}
 
                   {opp.why_it_matches && (
                     <div className="mt-3">
-                      <p className="text-xs font-semibold text-neutral-700">Why This Matches You</p>
-                      <p className="mt-1 text-sm text-neutral-600">{opp.why_it_matches}</p>
+                      <p className="text-xs font-semibold text-ink-muted">Why This Matches You</p>
+                      <p className="mt-1 text-sm text-ink-muted">{opp.why_it_matches}</p>
                     </div>
                   )}
 
@@ -200,7 +200,7 @@ export function MemberOpportunitiesPage() {
 
               {/* Approval actions */}
               {opp.status === 'awaiting_member_approval' && (
-                <div className="mt-4 flex flex-wrap gap-2 border-t border-neutral-200 pt-4">
+                <div className="mt-4 flex flex-wrap gap-2 border-t border-border pt-4">
                   <button
                     onClick={() => handleApprove(opp)}
                     disabled={feedbackLoading}
@@ -212,14 +212,14 @@ export function MemberOpportunitiesPage() {
                   <button
                     onClick={() => handleDecline(opp)}
                     disabled={feedbackLoading}
-                    className="flex items-center gap-1.5 border border-error-300 bg-error-50 px-4 py-2 text-sm font-semibold text-error-600 transition-colors hover:bg-error-100 disabled:opacity-60"
+                    className="flex items-center gap-1.5 border border-error-700 bg-error-950 px-4 py-2 text-sm font-semibold text-error-300 transition-colors hover:bg-error-900 disabled:opacity-60"
                   >
                     <X className="h-4 w-4" />
                     Decline
                   </button>
                   <Link
                     to="/messages"
-                    className="flex items-center gap-1.5 border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50"
+                    className="flex items-center gap-1.5 border border-border px-4 py-2 text-sm font-medium text-ink-muted transition-colors hover:bg-surface-hover"
                   >
                     <MessageSquare className="h-4 w-4" />
                     Ask Questions
@@ -229,39 +229,39 @@ export function MemberOpportunitiesPage() {
 
               {/* Feedback for approved/submitted */}
               {(opp.status === 'approved' || opp.status === 'submitted' || opp.status === 'preparing_application') && (
-                <div className="mt-4 flex flex-wrap gap-2 border-t border-neutral-200 pt-4">
-                  <span className="text-xs text-neutral-500">Your feedback:</span>
+                <div className="mt-4 flex flex-wrap gap-2 border-t border-border pt-4">
+                  <span className="text-xs text-ink-muted">Your feedback:</span>
                   <button
                     onClick={() => handleFeedback(opp, 'great_fit')}
-                    className="flex items-center gap-1 border border-success-300 px-2.5 py-1 text-xs font-medium text-success-700 hover:bg-success-50"
+                    className="flex items-center gap-1 border border-success-700 px-2.5 py-1 text-xs font-medium text-success-300 hover:bg-success-950"
                   >
                     <ThumbsUp className="h-3 w-3" />
                     Great Fit
                   </button>
                   <button
                     onClick={() => handleFeedback(opp, 'good_fit')}
-                    className="flex items-center gap-1 border border-primary-300 px-2.5 py-1 text-xs font-medium text-primary-700 hover:bg-primary-50"
+                    className="flex items-center gap-1 border border-primary-700 px-2.5 py-1 text-xs font-medium text-primary-300 hover:bg-primary-950"
                   >
                     <ThumbsUp className="h-3 w-3" />
                     Good Fit
                   </button>
                   <button
                     onClick={() => handleFeedback(opp, 'not_interested')}
-                    className="flex items-center gap-1 border border-neutral-300 px-2.5 py-1 text-xs font-medium text-neutral-700 hover:bg-neutral-100"
+                    className="flex items-center gap-1 border border-border px-2.5 py-1 text-xs font-medium text-ink-muted hover:bg-surface-hover"
                   >
                     <Frown className="h-3 w-3" />
                     Not Interested
                   </button>
                   <button
                     onClick={() => handleFeedback(opp, 'avoid_similar')}
-                    className="flex items-center gap-1 border border-error-300 px-2.5 py-1 text-xs font-medium text-error-700 hover:bg-error-50"
+                    className="flex items-center gap-1 border border-error-700 px-2.5 py-1 text-xs font-medium text-error-300 hover:bg-error-950"
                   >
                     <Ban className="h-3 w-3" />
                     Avoid Similar
                   </button>
                   <Link
                     to="/messages"
-                    className="flex items-center gap-1 border border-neutral-300 px-2.5 py-1 text-xs font-medium text-neutral-700 hover:bg-neutral-100"
+                    className="flex items-center gap-1 border border-border px-2.5 py-1 text-xs font-medium text-ink-muted hover:bg-surface-hover"
                   >
                     <MessageSquare className="h-3 w-3" />
                     Message Strategist

@@ -41,11 +41,11 @@ export function OpportunityEnginePage() {
   return (
     <MemberLayout>
       <div className="mb-6">
-        <h1 className="flex items-center gap-2 font-serif text-2xl font-semibold text-neutral-900 sm:text-3xl">
+        <h1 className="flex items-center gap-2 font-serif text-2xl font-semibold text-ink sm:text-3xl">
           <Sparkles className="h-6 w-6 text-primary-600" />
           Opportunity Engine
         </h1>
-        <p className="mt-1 text-sm text-neutral-600">
+        <p className="mt-1 text-sm text-ink-muted">
           Job postings automatically matched against your Career Profile, scored by FreshFit.
           Strong matches get promoted to your Career Strategist for review.
         </p>
@@ -59,30 +59,30 @@ export function OpportunityEnginePage() {
       </div>
 
       {matches.length === 0 ? (
-        <div className="border border-neutral-200 bg-white p-12 text-center">
-          <Sparkles className="mx-auto h-12 w-12 text-neutral-300" />
-          <p className="mt-4 text-sm text-neutral-500">
+        <div className="border border-border bg-surface-card p-12 text-center">
+          <Sparkles className="mx-auto h-12 w-12 text-ink-muted" />
+          <p className="mt-4 text-sm text-ink-muted">
             No matches yet. Keep your Career Profile (skills, preferred roles) up to date to improve matching.
           </p>
         </div>
       ) : (
         <div className="space-y-4">
           {matches.map((match) => (
-            <div key={match.id} className="border border-neutral-200 border-l-4 border-l-primary-600 bg-white p-6">
+            <div key={match.id} className="border border-border border-l-4 border-l-primary-600 bg-surface-card p-6">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <FreshFitBadge score={match.fresh_fit_score} />
                     {match.promoted_opportunity_id && (
-                      <span className="border border-accent-300 px-2.5 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide text-accent-700">
+                      <span className="border border-accent-700 px-2.5 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide text-accent-300">
                         Sent to Strategist
                       </span>
                     )}
                   </div>
-                  <h3 className="mt-3 font-serif text-lg font-semibold text-neutral-900">{match.scraped_job.title}</h3>
-                  <p className="text-sm text-neutral-600">{match.scraped_job.company}</p>
+                  <h3 className="mt-3 font-serif text-lg font-semibold text-ink">{match.scraped_job.title}</h3>
+                  <p className="text-sm text-ink-muted">{match.scraped_job.company}</p>
 
-                  <div className="mt-3 flex flex-wrap gap-3 text-xs text-neutral-500">
+                  <div className="mt-3 flex flex-wrap gap-3 text-xs text-ink-muted">
                     {match.scraped_job.location && (
                       <span className="flex items-center gap-1">
                         <MapPin className="h-3.5 w-3.5" />
@@ -100,7 +100,7 @@ export function OpportunityEnginePage() {
                   {match.matched_skills.length > 0 && (
                     <div className="mt-3 flex flex-wrap gap-1.5">
                       {match.matched_skills.map((skill) => (
-                        <span key={skill} className="border border-success-300 px-2 py-0.5 font-mono text-[11px] font-medium text-success-700">
+                        <span key={skill} className="border border-success-700 px-2 py-0.5 font-mono text-[11px] font-medium text-success-300">
                           {skill}
                         </span>
                       ))}
@@ -125,7 +125,7 @@ export function OpportunityEnginePage() {
                 <button
                   onClick={() => handleDismiss(match.id)}
                   aria-label="Dismiss match"
-                  className="p-2 text-neutral-400 transition-colors hover:bg-neutral-50 hover:text-neutral-600"
+                  className="p-2 text-ink-muted transition-colors hover:bg-surface-hover hover:text-ink"
                 >
                   <X className="h-4 w-4" />
                 </button>

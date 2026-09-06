@@ -12,10 +12,10 @@ import type { WhyWeApplied } from '@/types'
 
 const statusColors: Record<string, string> = {
   submitted: 'rounded-full bg-primary-600 text-white',
-  employer_viewed: 'border-primary-300 text-primary-700',
+  employer_viewed: 'border-primary-700 text-primary-300',
   interview_scheduled: 'rounded-full bg-primary-600 text-white',
-  offer_received: 'border-success-300 text-success-700',
-  rejected: 'border-error-300 text-error-700',
+  offer_received: 'border-success-700 text-success-300',
+  rejected: 'border-error-700 text-error-300',
 }
 
 export function WhyWeAppliedPage() {
@@ -44,9 +44,9 @@ export function WhyWeAppliedPage() {
   if (!data) {
     return (
       <MemberLayout>
-        <div className="border border-neutral-200 bg-white p-12 text-center">
-          <AlertCircle className="mx-auto h-12 w-12 text-neutral-300" />
-          <p className="mt-4 text-sm text-neutral-500">Why We Applied details are not available yet.</p>
+        <div className="border border-border bg-surface-card p-12 text-center">
+          <AlertCircle className="mx-auto h-12 w-12 text-ink-muted" />
+          <p className="mt-4 text-sm text-ink-muted">Why We Applied details are not available yet.</p>
           <Link to="/applications" className="mt-4 inline-block text-primary-600 hover:underline">
             Back to Applications
           </Link>
@@ -57,22 +57,22 @@ export function WhyWeAppliedPage() {
 
   return (
     <MemberLayout>
-      <Link to="/applications" className="mb-4 inline-flex items-center gap-1.5 text-sm font-medium text-neutral-600 hover:text-neutral-900">
+      <Link to="/applications" className="mb-4 inline-flex items-center gap-1.5 text-sm font-medium text-ink-muted hover:text-ink">
         <ArrowLeft className="h-4 w-4" />
         Back to Applications
       </Link>
 
-      <div className="border border-neutral-200 bg-white p-6 sm:p-8">
+      <div className="border border-border bg-surface-card p-6 sm:p-8">
         <div className="flex items-center gap-2">
-          <span className={`border px-2.5 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide ${statusColors[data.current_status] || 'border-neutral-300 text-neutral-700'}`}>
+          <span className={`border px-2.5 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide ${statusColors[data.current_status] || 'border-border text-ink-muted'}`}>
             {data.current_status.replace(/_/g, ' ')}
           </span>
         </div>
 
-        <h1 className="mt-4 font-serif text-2xl font-semibold text-neutral-900 sm:text-3xl">
+        <h1 className="mt-4 font-serif text-2xl font-semibold text-ink sm:text-3xl">
           Why We Applied
         </h1>
-        <p className="mt-2 text-lg text-neutral-600">
+        <p className="mt-2 text-lg text-ink-muted">
           {data.position_title} at {data.employer}
         </p>
 
@@ -110,34 +110,34 @@ export function WhyWeAppliedPage() {
         {/* Why We Selected This Job */}
         {data.why_selected && (
           <Section title="Why We Selected This Job" icon={CheckCircle2}>
-            <p className="text-sm text-neutral-700">{data.why_selected}</p>
+            <p className="text-sm text-ink-muted">{data.why_selected}</p>
           </Section>
         )}
 
         {/* How It Matches Experience */}
         {data.how_it_matches && (
           <Section title="How It Matches Your Experience" icon={Briefcase}>
-            <p className="text-sm text-neutral-700">{data.how_it_matches}</p>
+            <p className="text-sm text-ink-muted">{data.how_it_matches}</p>
           </Section>
         )}
 
         {/* Skills Highlighted */}
         {data.skills_highlighted && (
           <Section title="Skills We Highlighted" icon={User}>
-            <p className="text-sm text-neutral-700">{data.skills_highlighted}</p>
+            <p className="text-sm text-ink-muted">{data.skills_highlighted}</p>
           </Section>
         )}
 
         {/* Documents Used */}
         <Section title="Documents Used" icon={FileText}>
           <div className="space-y-2">
-            <div className="flex items-center gap-2 border-l-2 border-neutral-300 bg-neutral-50 p-3">
+            <div className="flex items-center gap-2 border-l-2 border-border bg-surface-subtle p-3">
               <FileText className="h-4 w-4 text-primary-600" />
-              <span className="text-sm text-neutral-700">Resume: {data.resume_version_title || 'Master Resume'}</span>
+              <span className="text-sm text-ink-muted">Resume: {data.resume_version_title || 'Master Resume'}</span>
             </div>
-            <div className="flex items-center gap-2 border-l-2 border-neutral-300 bg-neutral-50 p-3">
+            <div className="flex items-center gap-2 border-l-2 border-border bg-surface-subtle p-3">
               <Mail className="h-4 w-4 text-primary-600" />
-              <span className="text-sm text-neutral-700">Cover Letter: {data.cover_letter_title || 'Custom Cover Letter'}</span>
+              <span className="text-sm text-ink-muted">Cover Letter: {data.cover_letter_title || 'Custom Cover Letter'}</span>
             </div>
           </div>
         </Section>
@@ -145,14 +145,14 @@ export function WhyWeAppliedPage() {
         {/* Potential Challenges */}
         {data.potential_challenges && (
           <Section title="Potential Challenges" icon={AlertCircle}>
-            <p className="text-sm text-neutral-700">{data.potential_challenges}</p>
+            <p className="text-sm text-ink-muted">{data.potential_challenges}</p>
           </Section>
         )}
 
         {/* Interview Prep Notes */}
         {data.interview_prep_notes && (
           <Section title="Interview Preparation Notes" icon={User}>
-            <p className="text-sm text-neutral-700">{data.interview_prep_notes}</p>
+            <p className="text-sm text-ink-muted">{data.interview_prep_notes}</p>
           </Section>
         )}
       </div>
@@ -162,22 +162,22 @@ export function WhyWeAppliedPage() {
 
 function DetailCard({ icon: Icon, label, value }: { icon: typeof User; label: string; value: string }) {
   return (
-    <div className="border border-neutral-200 bg-neutral-50 p-4">
+    <div className="border border-border bg-surface-subtle p-4">
       <div className="flex items-center gap-2">
-        <Icon className="h-4 w-4 text-neutral-400" />
-        <span className="text-xs text-neutral-500">{label}</span>
+        <Icon className="h-4 w-4 text-ink-muted" />
+        <span className="text-xs text-ink-muted">{label}</span>
       </div>
-      <p className="mt-1 text-sm font-semibold text-neutral-900">{value}</p>
+      <p className="mt-1 text-sm font-semibold text-ink">{value}</p>
     </div>
   )
 }
 
 function Section({ title, icon: Icon, children }: { title: string; icon: typeof User; children: React.ReactNode }) {
   return (
-    <div className="mt-6 border-t border-neutral-200 pt-6">
+    <div className="mt-6 border-t border-border pt-6">
       <div className="mb-3 flex items-center gap-2">
         <Icon className="h-5 w-5 text-primary-600" />
-        <h2 className="font-serif text-base font-semibold text-neutral-900">{title}</h2>
+        <h2 className="font-serif text-base font-semibold text-ink">{title}</h2>
       </div>
       {children}
     </div>
