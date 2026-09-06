@@ -70,7 +70,7 @@ export function SiteFooter() {
       </div>
       {role === 'admin' && (
         <div className="shell" style={{ paddingTop: '10px' }}>
-          <Link to="/admin" style={{ fontSize: '.7rem', color: '#9aa6b4', opacity: .6 }}>Admin</Link>
+          <Link to="/admin" style={{ fontSize: '.7rem', color: 'var(--ink-soft)', opacity: .6 }}>Admin</Link>
         </div>
       )}
     </footer>

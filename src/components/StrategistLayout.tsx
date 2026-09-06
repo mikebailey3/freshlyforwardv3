@@ -37,14 +37,14 @@ export function StrategistLayout({ children, isAdmin = false }: { children: Reac
   }
 
   return (
-    <div className="min-h-screen bg-neutral-50">
+    <div className="min-h-screen bg-surface-subtle">
       {/* Desktop sidebar */}
-      <aside className="fixed left-0 top-0 z-30 hidden h-screen w-64 border-r border-neutral-200 bg-white lg:block">
+      <aside className="fixed left-0 top-0 z-30 hidden h-screen w-64 border-r border-border bg-surface-card lg:block">
         <div className="flex h-full flex-col">
-          <Link to="/strategist" className="flex items-center gap-2 border-b border-neutral-200 px-6 py-5">
+          <Link to="/strategist" className="flex items-center gap-2 border-b border-border px-6 py-5">
             <Compass className="h-7 w-7 text-primary-600" />
             <div>
-              <span className="font-serif text-lg font-semibold text-neutral-900">FreshlyForward</span>
+              <span className="font-serif text-lg font-semibold text-ink">FreshlyForward</span>
               <span className="block text-xs text-primary-600">{isAdmin ? 'Admin' : 'Strategist'}</span>
             </div>
           </Link>
@@ -58,8 +58,8 @@ export function StrategistLayout({ children, isAdmin = false }: { children: Reac
                   to={item.to}
                   className={`flex items-center gap-3 border-l-2 px-3 py-2.5 text-sm font-medium transition-colors ${
                     isActive
-                      ? 'border-primary-600 bg-primary-50/60 text-primary-700'
-                      : 'border-transparent text-neutral-600 hover:border-neutral-300 hover:bg-neutral-50 hover:text-neutral-900'
+                      ? 'border-primary-600 bg-primary-950/60 text-primary-300'
+                      : 'border-transparent text-ink-muted hover:border-border hover:bg-surface-hover hover:text-ink'
                   }`}
                 >
                   <item.icon className="h-5 w-5" />
@@ -69,17 +69,17 @@ export function StrategistLayout({ children, isAdmin = false }: { children: Reac
             })}
           </nav>
 
-          <div className="border-t border-neutral-200 p-3">
+          <div className="border-t border-border p-3">
             <Link
               to="/dashboard"
-              className="mb-1 flex items-center gap-3 border-l-2 border-transparent px-3 py-2.5 text-sm font-medium text-neutral-600 transition-colors hover:border-neutral-300 hover:bg-neutral-50"
+              className="mb-1 flex items-center gap-3 border-l-2 border-transparent px-3 py-2.5 text-sm font-medium text-ink-muted transition-colors hover:border-border hover:bg-surface-hover"
             >
               <User className="h-5 w-5" />
               Member View
             </Link>
             <button
               onClick={handleSignOut}
-              className="flex w-full items-center gap-3 border-l-2 border-transparent px-3 py-2.5 text-sm font-medium text-neutral-600 transition-colors hover:border-neutral-300 hover:bg-neutral-50"
+              className="flex w-full items-center gap-3 border-l-2 border-transparent px-3 py-2.5 text-sm font-medium text-ink-muted transition-colors hover:border-border hover:bg-surface-hover"
             >
               <LogOut className="h-5 w-5" />
               Sign Out
@@ -89,11 +89,11 @@ export function StrategistLayout({ children, isAdmin = false }: { children: Reac
       </aside>
 
       {/* Mobile header */}
-      <header className="sticky top-0 z-40 border-b border-neutral-200 bg-white lg:hidden">
+      <header className="sticky top-0 z-40 border-b border-border bg-surface-card lg:hidden">
         <div className="flex items-center justify-between px-4 py-3">
           <Link to="/strategist" className="flex items-center gap-2">
             <Compass className="h-6 w-6 text-primary-600" />
-            <span className="font-serif text-base font-semibold text-neutral-900">FreshlyForward</span>
+            <span className="font-serif text-base font-semibold text-ink">FreshlyForward</span>
             <span className="text-xs text-primary-600">{isAdmin ? 'Admin' : 'Strategist'}</span>
           </Link>
           <button
@@ -108,11 +108,11 @@ export function StrategistLayout({ children, isAdmin = false }: { children: Reac
 
       {/* Mobile nav */}
       {mobileNavOpen && (
-        <nav className="fixed inset-0 z-50 bg-white lg:hidden">
-          <div className="flex items-center justify-between border-b border-neutral-200 px-4 py-3">
+        <nav className="fixed inset-0 z-50 bg-surface-card lg:hidden">
+          <div className="flex items-center justify-between border-b border-border px-4 py-3">
             <Link to="/strategist" onClick={() => setMobileNavOpen(false)} className="flex items-center gap-2">
               <Compass className="h-6 w-6 text-primary-600" />
-              <span className="font-serif text-base font-semibold text-neutral-900">FreshlyForward</span>
+              <span className="font-serif text-base font-semibold text-ink">FreshlyForward</span>
             </Link>
             <button onClick={() => setMobileNavOpen(false)} aria-label="Close navigation">
               <X className="h-6 w-6" />
@@ -126,8 +126,8 @@ export function StrategistLayout({ children, isAdmin = false }: { children: Reac
                 onClick={() => setMobileNavOpen(false)}
                 className={`flex items-center gap-3 border-l-2 px-3 py-3 text-sm font-medium transition-colors ${
                   location.pathname === item.to
-                    ? 'border-primary-600 bg-primary-50/60 text-primary-700'
-                    : 'border-transparent text-neutral-600 hover:border-neutral-300 hover:bg-neutral-50'
+                    ? 'border-primary-600 bg-primary-950/60 text-primary-300'
+                    : 'border-transparent text-ink-muted hover:border-border hover:bg-surface-hover'
                 }`}
               >
                 <item.icon className="h-5 w-5" />
@@ -137,14 +137,14 @@ export function StrategistLayout({ children, isAdmin = false }: { children: Reac
             <Link
               to="/dashboard"
               onClick={() => setMobileNavOpen(false)}
-              className="flex items-center gap-3 border-l-2 border-transparent px-3 py-3 text-sm font-medium text-neutral-600 transition-colors hover:border-neutral-300 hover:bg-neutral-50"
+              className="flex items-center gap-3 border-l-2 border-transparent px-3 py-3 text-sm font-medium text-ink-muted transition-colors hover:border-border hover:bg-surface-hover"
             >
               <User className="h-5 w-5" />
               Member View
             </Link>
             <button
               onClick={handleSignOut}
-              className="flex w-full items-center gap-3 border-l-2 border-transparent px-3 py-3 text-sm font-medium text-neutral-600 transition-colors hover:border-neutral-300 hover:bg-neutral-50"
+              className="flex w-full items-center gap-3 border-l-2 border-transparent px-3 py-3 text-sm font-medium text-ink-muted transition-colors hover:border-border hover:bg-surface-hover"
             >
               <LogOut className="h-5 w-5" />
               Sign Out
@@ -161,7 +161,7 @@ export function StrategistLayout({ children, isAdmin = false }: { children: Reac
       </main>
 
       {/* Mobile bottom navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-neutral-200 bg-white lg:hidden">
+      <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-surface-card lg:hidden">
         <div className="flex items-center justify-around px-2 py-2">
           {navItems.map((item) => {
             const isActive = location.pathname === item.to
@@ -170,7 +170,7 @@ export function StrategistLayout({ children, isAdmin = false }: { children: Reac
                 key={item.to}
                 to={item.to}
                 className={`flex flex-col items-center gap-0.5 px-3 py-1.5 text-xs font-medium ${
-                  isActive ? 'text-primary-600' : 'text-neutral-500'
+                  isActive ? 'text-primary-600' : 'text-ink-muted'
                 }`}
               >
                 <item.icon className="h-5 w-5" />
