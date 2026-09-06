@@ -92,34 +92,34 @@ export function AdminReportReviewPage() {
   return (
     <StrategistLayout isAdmin>
       <div className="mb-6">
-        <h1 className="font-serif text-2xl font-semibold text-neutral-900 sm:text-3xl">Friday Report Review</h1>
-        <p className="mt-1 text-sm text-neutral-600">
+        <h1 className="font-serif text-2xl font-semibold text-ink sm:text-3xl">Friday Report Review</h1>
+        <p className="mt-1 text-sm text-ink-muted">
           Reports never reach a member automatically. Review each one, approve it, and add anything a
           strategist might have missed before sending.
         </p>
       </div>
 
       {error && (
-        <div className="mb-4 border border-error-300 border-l-4 border-l-error-500 bg-error-50 px-4 py-2.5 text-sm text-error-700">
+        <div className="mb-4 border border-error-700 border-l-4 border-l-error-500 bg-error-950 px-4 py-2.5 text-sm text-error-300">
           {error}
         </div>
       )}
 
       <section className="mb-8">
-        <h2 className="mb-3 font-serif text-lg font-semibold text-neutral-900">Pending Review ({reports.length})</h2>
+        <h2 className="mb-3 font-serif text-lg font-semibold text-ink">Pending Review ({reports.length})</h2>
         {reports.length === 0 ? (
           <EmptyState text="Nothing waiting on review right now." />
         ) : (
           <div className="space-y-4">
             {reports.map((r) => (
-              <div key={r.id} className="border border-neutral-200 border-l-4 border-l-primary-600 bg-white p-6">
+              <div key={r.id} className="border border-border border-l-4 border-l-primary-600 bg-surface-card p-6">
                 <ReportSummary report={r} memberName={memberMap[r.user_id]} />
                 <textarea
                   value={notesDraft[r.id] ?? ''}
                   onChange={(e) => setNotesDraft((prev) => ({ ...prev, [r.id]: e.target.value }))}
                   placeholder="Optional: notes for the strategist if you're sending this back for changes..."
                   rows={2}
-                  className="mt-4 w-full border border-neutral-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  className="mt-4 w-full border border-border px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                 />
                 <div className="mt-3 flex gap-3">
                   <button
@@ -133,7 +133,7 @@ export function AdminReportReviewPage() {
                   <button
                     onClick={() => handleRequestChanges(r.id)}
                     disabled={actingId === r.id}
-                    className="flex items-center gap-1.5 border border-neutral-300 px-4 py-2.5 text-sm font-medium text-neutral-700 hover:bg-neutral-50 disabled:opacity-60"
+                    className="flex items-center gap-1.5 border border-border px-4 py-2.5 text-sm font-medium text-ink-muted hover:bg-surface-hover disabled:opacity-60"
                   >
                     <XCircle className="h-4 w-4" />
                     Send Back for Changes
@@ -146,13 +146,13 @@ export function AdminReportReviewPage() {
       </section>
 
       <section>
-        <h2 className="mb-3 font-serif text-lg font-semibold text-neutral-900">Approved — Ready to Send ({approved.length})</h2>
+        <h2 className="mb-3 font-serif text-lg font-semibold text-ink">Approved — Ready to Send ({approved.length})</h2>
         {approved.length === 0 ? (
           <EmptyState text="No approved reports waiting to be sent." />
         ) : (
           <div className="space-y-4">
             {approved.map((r) => (
-              <div key={r.id} className="border border-accent-300 border-l-4 border-l-accent-500 bg-accent-50/40 p-6">
+              <div key={r.id} className="border border-accent-700 border-l-4 border-l-accent-500 bg-accent-950/40 p-6">
                 <ReportSummary report={r} memberName={memberMap[r.user_id]} />
                 <button
                   onClick={() => handleSend(r.id)}
@@ -174,16 +174,16 @@ export function AdminReportReviewPage() {
 function ReportSummary({ report, memberName }: { report: FridayReport; memberName?: string }) {
   return (
     <div>
-      <div className="flex flex-wrap items-center gap-3 text-xs text-neutral-500">
+      <div className="flex flex-wrap items-center gap-3 text-xs text-ink-muted">
         <span className="flex items-center gap-1"><User className="h-3.5 w-3.5" />{memberName || 'Member'}</span>
         <span className="flex items-center gap-1"><Calendar className="h-3.5 w-3.5" />{formatDate(report.report_date)}</span>
       </div>
-      <h3 className="mt-2 font-serif text-lg font-semibold text-neutral-900">{report.title}</h3>
-      <p className="mt-1 text-sm text-neutral-600">{report.summary}</p>
+      <h3 className="mt-2 font-serif text-lg font-semibold text-ink">{report.title}</h3>
+      <p className="mt-1 text-sm text-ink-muted">{report.summary}</p>
       {report.strategist_summary && (
-        <p className="mt-2 border-l-2 border-neutral-300 bg-neutral-50 p-3 text-sm text-neutral-600">{report.strategist_summary}</p>
+        <p className="mt-2 border-l-2 border-border bg-surface-subtle p-3 text-sm text-ink-muted">{report.strategist_summary}</p>
       )}
-      <div className="mt-3 flex flex-wrap gap-4 text-sm text-neutral-600">
+      <div className="mt-3 flex flex-wrap gap-4 text-sm text-ink-muted">
         <span>{report.opportunities_reviewed} opportunities reviewed</span>
         <span>{report.applications_submitted} applications submitted</span>
         <span>{report.interviews_scheduled} interviews scheduled</span>
@@ -194,9 +194,9 @@ function ReportSummary({ report, memberName }: { report: FridayReport; memberNam
 
 function EmptyState({ text }: { text: string }) {
   return (
-    <div className="border border-neutral-200 bg-white p-8 text-center">
-      <FileText className="mx-auto h-10 w-10 text-neutral-300" />
-      <p className="mt-3 text-sm text-neutral-500">{text}</p>
+    <div className="border border-border bg-surface-card p-8 text-center">
+      <FileText className="mx-auto h-10 w-10 text-ink-muted" />
+      <p className="mt-3 text-sm text-ink-muted">{text}</p>
     </div>
   )
 }

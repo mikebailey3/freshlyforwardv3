@@ -143,9 +143,9 @@ export function AdminMemberDetailPage() {
   if (!profile) {
     return (
       <StrategistLayout isAdmin>
-        <div className="border border-neutral-200 bg-white p-12 text-center">
-          <AlertCircle className="mx-auto h-10 w-10 text-neutral-300" />
-          <p className="mt-4 text-sm text-neutral-500">{error || 'Member not found.'}</p>
+        <div className="border border-border bg-surface-card p-12 text-center">
+          <AlertCircle className="mx-auto h-10 w-10 text-ink-muted" />
+          <p className="mt-4 text-sm text-ink-muted">{error || 'Member not found.'}</p>
           <button onClick={() => navigate('/admin/members')} className="mt-4 text-sm font-medium text-primary-600 hover:underline">
             Back to Members
           </button>
@@ -156,27 +156,27 @@ export function AdminMemberDetailPage() {
 
   return (
     <StrategistLayout isAdmin>
-      <Link to="/admin/members" className="mb-4 inline-flex items-center gap-1.5 text-sm font-medium text-neutral-600 hover:text-neutral-900">
+      <Link to="/admin/members" className="mb-4 inline-flex items-center gap-1.5 text-sm font-medium text-ink-muted hover:text-ink">
         <ArrowLeft className="h-4 w-4" />
         Back to Members
       </Link>
 
       <div className="mb-6">
-        <h1 className="font-serif text-2xl font-semibold text-neutral-900 sm:text-3xl">
+        <h1 className="font-serif text-2xl font-semibold text-ink sm:text-3xl">
           {profile.full_name || 'Unnamed Member'}
         </h1>
-        <p className="mt-1 text-sm text-neutral-600">{summary?.email}</p>
-        <p className="mt-1 text-xs text-neutral-400">Joined {formatDate(profile.created_at)}</p>
+        <p className="mt-1 text-sm text-ink-muted">{summary?.email}</p>
+        <p className="mt-1 text-xs text-ink-muted">Joined {formatDate(profile.created_at)}</p>
       </div>
 
       {error && (
-        <div className="mb-6 flex items-start gap-2 border border-error-300 border-l-4 border-l-error-500 bg-error-50 px-4 py-3 text-sm text-error-600">
+        <div className="mb-6 flex items-start gap-2 border border-error-700 border-l-4 border-l-error-500 bg-error-950 px-4 py-3 text-sm text-error-300">
           <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
           <span>{error}</span>
         </div>
       )}
       {successMsg && (
-        <div className="mb-6 flex items-center gap-2 border border-success-300 border-l-4 border-l-success-500 bg-success-50 px-4 py-3 text-sm text-success-700">
+        <div className="mb-6 flex items-center gap-2 border border-success-700 border-l-4 border-l-success-500 bg-success-950 px-4 py-3 text-sm text-success-300">
           <Check className="h-4 w-4 flex-shrink-0" />
           <span>{successMsg}</span>
         </div>
@@ -184,20 +184,20 @@ export function AdminMemberDetailPage() {
 
       <div className="mb-6 grid gap-6 lg:grid-cols-2">
         {/* Account Status */}
-        <div className="border border-neutral-200 border-l-4 border-l-warning-500 bg-white p-6">
+        <div className="border border-border border-l-4 border-l-warning-500 bg-surface-card p-6">
           <div className="mb-4 flex items-center gap-3">
             <ShieldAlert className="h-6 w-6 text-warning-600" />
             <div>
-              <h2 className="font-serif text-base font-semibold text-neutral-900">Account Status</h2>
-              <p className="text-xs text-neutral-500">Suspend or ban to restrict platform access</p>
+              <h2 className="font-serif text-base font-semibold text-ink">Account Status</h2>
+              <p className="text-xs text-ink-muted">Suspend or ban to restrict platform access</p>
             </div>
           </div>
 
-          <label className="block text-sm font-medium text-neutral-700">Status</label>
+          <label className="block text-sm font-medium text-ink-muted">Status</label>
           <select
             value={statusForm.status}
             onChange={(e) => setStatusForm((prev) => ({ ...prev, status: e.target.value as typeof prev.status }))}
-            className="mt-1 block w-full border border-neutral-300 px-3 py-2.5 text-sm capitalize focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+            className="mt-1 block w-full border border-border px-3 py-2.5 text-sm capitalize focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
           >
             {ACCOUNT_STATUSES.map((s) => (
               <option key={s} value={s}>{s}</option>
@@ -206,13 +206,13 @@ export function AdminMemberDetailPage() {
 
           {statusForm.status !== 'active' && (
             <div className="mt-4">
-              <label className="block text-sm font-medium text-neutral-700">Reason</label>
+              <label className="block text-sm font-medium text-ink-muted">Reason</label>
               <textarea
                 value={statusForm.reason}
                 onChange={(e) => setStatusForm((prev) => ({ ...prev, reason: e.target.value }))}
                 rows={3}
                 placeholder="Why is this account being restricted?"
-                className="mt-1 block w-full border border-neutral-300 px-3 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="mt-1 block w-full border border-border px-3 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
               />
             </div>
           )}
@@ -228,20 +228,20 @@ export function AdminMemberDetailPage() {
         </div>
 
         {/* Subscription */}
-        <div className="border border-neutral-200 border-l-4 border-l-primary-600 bg-white p-6">
+        <div className="border border-border border-l-4 border-l-primary-600 bg-surface-card p-6">
           <div className="mb-4 flex items-center gap-3">
             <CreditCard className="h-6 w-6 text-primary-600" />
             <div>
-              <h2 className="font-serif text-base font-semibold text-neutral-900">Subscription</h2>
-              <p className="text-xs text-neutral-500">Change plan or billing status manually</p>
+              <h2 className="font-serif text-base font-semibold text-ink">Subscription</h2>
+              <p className="text-xs text-ink-muted">Change plan or billing status manually</p>
             </div>
           </div>
 
-          <label className="block text-sm font-medium text-neutral-700">Plan</label>
+          <label className="block text-sm font-medium text-ink-muted">Plan</label>
           <select
             value={subForm.plan_id}
             onChange={(e) => setSubForm((prev) => ({ ...prev, plan_id: e.target.value }))}
-            className="mt-1 block w-full border border-neutral-300 px-3 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+            className="mt-1 block w-full border border-border px-3 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
           >
             <option value="">No plan</option>
             {plans.map((plan) => (
@@ -251,11 +251,11 @@ export function AdminMemberDetailPage() {
             ))}
           </select>
 
-          <label className="mt-4 block text-sm font-medium text-neutral-700">Subscription Status</label>
+          <label className="mt-4 block text-sm font-medium text-ink-muted">Subscription Status</label>
           <select
             value={subForm.subscription_status}
             onChange={(e) => setSubForm((prev) => ({ ...prev, subscription_status: e.target.value }))}
-            className="mt-1 block w-full border border-neutral-300 px-3 py-2.5 text-sm capitalize focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+            className="mt-1 block w-full border border-border px-3 py-2.5 text-sm capitalize focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
           >
             {SUBSCRIPTION_STATUSES.map((s) => (
               <option key={s} value={s}>{s}</option>
@@ -275,8 +275,8 @@ export function AdminMemberDetailPage() {
 
       {/* Profile Editor */}
       <div className="mb-4">
-        <h2 className="font-serif text-lg font-semibold text-neutral-900">Career Profile</h2>
-        <p className="text-sm text-neutral-600">Edit this member&rsquo;s career profile directly.</p>
+        <h2 className="font-serif text-lg font-semibold text-ink">Career Profile</h2>
+        <p className="text-sm text-ink-muted">Edit this member&rsquo;s career profile directly.</p>
       </div>
       <ProfileEditForm profile={profile} onSave={handleSaveProfile} onCancel={() => navigate('/admin/members')} />
     </StrategistLayout>

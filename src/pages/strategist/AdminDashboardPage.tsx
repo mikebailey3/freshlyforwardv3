@@ -78,19 +78,19 @@ const STATUS_LABELS: Record<string, string> = {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  preparing_resume: 'border-neutral-300 text-neutral-700',
-  preparing_cover_letter: 'border-neutral-300 text-neutral-700',
-  waiting_on_member: 'border-warning-300 text-warning-700',
-  ready_to_submit: 'border-accent-300 text-accent-700',
-  submitted: 'border-primary-300 text-primary-700',
-  employer_viewed: 'border-primary-300 text-primary-700',
-  follow_up_needed: 'border-warning-300 text-warning-700',
-  interview_requested: 'border-accent-300 text-accent-700',
-  interview_scheduled: 'border-primary-300 text-primary-700',
-  rejected: 'border-error-300 text-error-700',
-  offer_received: 'border-success-300 text-success-700',
-  offer_accepted: 'border-success-300 text-success-700',
-  closed: 'border-neutral-300 text-neutral-500',
+  preparing_resume: 'border-border text-ink-muted',
+  preparing_cover_letter: 'border-border text-ink-muted',
+  waiting_on_member: 'border-warning-700 text-warning-300',
+  ready_to_submit: 'border-accent-700 text-accent-300',
+  submitted: 'border-primary-700 text-primary-300',
+  employer_viewed: 'border-primary-700 text-primary-300',
+  follow_up_needed: 'border-warning-700 text-warning-300',
+  interview_requested: 'border-accent-700 text-accent-300',
+  interview_scheduled: 'border-primary-700 text-primary-300',
+  rejected: 'border-error-700 text-error-300',
+  offer_received: 'border-success-700 text-success-300',
+  offer_accepted: 'border-success-700 text-success-300',
+  closed: 'border-border text-ink-muted',
 }
 
 const MAX_CAPACITY = 10
@@ -306,11 +306,11 @@ export function AdminDashboardPage() {
   return (
     <StrategistLayout isAdmin={true}>
       <div className="mb-6">
-        <h1 className="font-serif text-2xl font-semibold text-neutral-900 sm:text-3xl">Admin Analytics Dashboard</h1>
-        <p className="mt-1 text-sm text-neutral-600">
+        <h1 className="font-serif text-2xl font-semibold text-ink sm:text-3xl">Admin Analytics Dashboard</h1>
+        <p className="mt-1 text-sm text-ink-muted">
           Platform-wide analytics across all strategists and members.
         </p>
-        <Link to="/master-admin/feature-entitlements" className="mt-3 inline-flex items-center gap-2 border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50">
+        <Link to="/master-admin/feature-entitlements" className="mt-3 inline-flex items-center gap-2 border border-border bg-surface-card px-4 py-2 text-sm font-medium text-ink-muted transition-colors hover:bg-surface-hover">
           <Settings className="h-4 w-4" />
           Manage Feature Entitlements
         </Link>
@@ -326,25 +326,25 @@ export function AdminDashboardPage() {
 
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Applications by Strategist */}
-        <div className="border border-neutral-200 bg-white p-6">
+        <div className="border border-border bg-surface-card p-6">
           <div className="mb-4 flex items-center gap-3">
             <Users className="h-6 w-6 text-primary-600" />
             <div>
-              <h2 className="font-serif text-base font-semibold text-neutral-900">Applications by Strategist</h2>
-              <p className="text-xs text-neutral-500">Workload distribution</p>
+              <h2 className="font-serif text-base font-semibold text-ink">Applications by Strategist</h2>
+              <p className="text-xs text-ink-muted">Workload distribution</p>
             </div>
           </div>
           {byStrategist.length === 0 ? (
-            <p className="text-sm text-neutral-500">No strategist data available.</p>
+            <p className="text-sm text-ink-muted">No strategist data available.</p>
           ) : (
             <div className="space-y-3">
               {byStrategist.map((s) => (
                 <div key={s.strategist_id}>
                   <div className="mb-1 flex items-center justify-between text-sm">
-                    <span className="font-medium text-neutral-900">{s.full_name || 'Unknown Strategist'}</span>
-                    <span className="text-neutral-500">{s.application_count} apps · {s.member_count} members</span>
+                    <span className="font-medium text-ink">{s.full_name || 'Unknown Strategist'}</span>
+                    <span className="text-ink-muted">{s.application_count} apps · {s.member_count} members</span>
                   </div>
-                  <div className="h-2 overflow-hidden border border-neutral-300 bg-neutral-100">
+                  <div className="h-2 overflow-hidden border border-border bg-surface-subtle">
                     <div
                       className="h-full bg-primary-500"
                       style={{ width: `${(s.application_count / maxStrategistApps) * 100}%` }}
@@ -357,24 +357,24 @@ export function AdminDashboardPage() {
         </div>
 
         {/* Applications by Status */}
-        <div className="border border-neutral-200 bg-white p-6">
+        <div className="border border-border bg-surface-card p-6">
           <div className="mb-4 flex items-center gap-3">
             <BarChart3 className="h-6 w-6 text-primary-600" />
             <div>
-              <h2 className="font-serif text-base font-semibold text-neutral-900">Applications by Status</h2>
-              <p className="text-xs text-neutral-500">Pipeline distribution</p>
+              <h2 className="font-serif text-base font-semibold text-ink">Applications by Status</h2>
+              <p className="text-xs text-ink-muted">Pipeline distribution</p>
             </div>
           </div>
           {byStatus.length === 0 ? (
-            <p className="text-sm text-neutral-500">No application data available.</p>
+            <p className="text-sm text-ink-muted">No application data available.</p>
           ) : (
             <div className="space-y-2">
               {byStatus.map((s) => (
-                <div key={s.status} className="flex items-center justify-between border border-neutral-200 px-3 py-2">
-                  <span className={cn('border px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide', STATUS_COLORS[s.status] || 'border-neutral-300 text-neutral-700')}>
+                <div key={s.status} className="flex items-center justify-between border border-border px-3 py-2">
+                  <span className={cn('border px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide', STATUS_COLORS[s.status] || 'border-border text-ink-muted')}>
                     {STATUS_LABELS[s.status] || s.status}
                   </span>
-                  <span className="text-sm font-semibold text-neutral-900">{s.count}</span>
+                  <span className="text-sm font-semibold text-ink">{s.count}</span>
                 </div>
               ))}
             </div>
@@ -382,21 +382,21 @@ export function AdminDashboardPage() {
         </div>
 
         {/* Member Workload */}
-        <div className="border border-neutral-200 bg-white p-6">
+        <div className="border border-border bg-surface-card p-6">
           <div className="mb-4 flex items-center gap-3">
             <Briefcase className="h-6 w-6 text-primary-600" />
             <div>
-              <h2 className="font-serif text-base font-semibold text-neutral-900">Member Workload</h2>
-              <p className="text-xs text-neutral-500">Per-strategist breakdown</p>
+              <h2 className="font-serif text-base font-semibold text-ink">Member Workload</h2>
+              <p className="text-xs text-ink-muted">Per-strategist breakdown</p>
             </div>
           </div>
           {workloads.length === 0 ? (
-            <p className="text-sm text-neutral-500">No workload data available.</p>
+            <p className="text-sm text-ink-muted">No workload data available.</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-neutral-200 text-left text-xs text-neutral-500">
+                  <tr className="border-b border-border text-left text-xs text-ink-muted">
                     <th className="pb-2 font-medium">Strategist</th>
                     <th className="pb-2 text-center font-medium">Members</th>
                     <th className="pb-2 text-center font-medium">Opps</th>
@@ -406,12 +406,12 @@ export function AdminDashboardPage() {
                 </thead>
                 <tbody>
                   {workloads.map((w) => (
-                    <tr key={w.strategist_id} className="border-b border-neutral-100 last:border-0">
-                      <td className="py-2.5 font-medium text-neutral-900">{w.full_name || 'Unknown'}</td>
-                      <td className="py-2.5 text-center text-neutral-600">{w.member_count}</td>
-                      <td className="py-2.5 text-center text-neutral-600">{w.opportunity_count}</td>
-                      <td className="py-2.5 text-center text-neutral-600">{w.application_count}</td>
-                      <td className="py-2.5 text-center text-neutral-600">{w.follow_up_count}</td>
+                    <tr key={w.strategist_id} className="border-b border-border last:border-0">
+                      <td className="py-2.5 font-medium text-ink">{w.full_name || 'Unknown'}</td>
+                      <td className="py-2.5 text-center text-ink-muted">{w.member_count}</td>
+                      <td className="py-2.5 text-center text-ink-muted">{w.opportunity_count}</td>
+                      <td className="py-2.5 text-center text-ink-muted">{w.application_count}</td>
+                      <td className="py-2.5 text-center text-ink-muted">{w.follow_up_count}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -421,16 +421,16 @@ export function AdminDashboardPage() {
         </div>
 
         {/* Strategist Capacity */}
-        <div className="border border-neutral-200 bg-white p-6">
+        <div className="border border-border bg-surface-card p-6">
           <div className="mb-4 flex items-center gap-3">
             <TrendingUp className="h-6 w-6 text-primary-600" />
             <div>
-              <h2 className="font-serif text-base font-semibold text-neutral-900">Strategist Capacity</h2>
-              <p className="text-xs text-neutral-500">Members per strategist (max {MAX_CAPACITY})</p>
+              <h2 className="font-serif text-base font-semibold text-ink">Strategist Capacity</h2>
+              <p className="text-xs text-ink-muted">Members per strategist (max {MAX_CAPACITY})</p>
             </div>
           </div>
           {workloads.length === 0 ? (
-            <p className="text-sm text-neutral-500">No capacity data available.</p>
+            <p className="text-sm text-ink-muted">No capacity data available.</p>
           ) : (
             <div className="space-y-3">
               {workloads.map((w) => {
@@ -440,16 +440,16 @@ export function AdminDashboardPage() {
                 return (
                   <div key={w.strategist_id}>
                     <div className="mb-1 flex items-center justify-between text-sm">
-                      <span className="font-medium text-neutral-900">{w.full_name || 'Unknown'}</span>
+                      <span className="font-medium text-ink">{w.full_name || 'Unknown'}</span>
                       <span className={cn(
                         'text-xs font-semibold',
-                        isOverCapacity ? 'text-error-600' : isNearCapacity ? 'text-warning-600' : 'text-neutral-500',
+                        isOverCapacity ? 'text-error-400' : isNearCapacity ? 'text-warning-400' : 'text-ink-muted',
                       )}>
                         {w.member_count}/{MAX_CAPACITY}
                         {isOverCapacity && ' (over capacity)'}
                       </span>
                     </div>
-                    <div className="h-2 overflow-hidden border border-neutral-300 bg-neutral-100">
+                    <div className="h-2 overflow-hidden border border-border bg-surface-subtle">
                       <div
                         className={cn(
                           'h-full',
@@ -466,23 +466,23 @@ export function AdminDashboardPage() {
         </div>
 
         {/* Opportunities Awaiting Review */}
-        <div className="border border-neutral-200 border-l-4 border-l-warning-500 bg-white p-6">
+        <div className="border border-border border-l-4 border-l-warning-500 bg-surface-card p-6">
           <div className="mb-4 flex items-center gap-3">
             <Search className="h-6 w-6 text-warning-600" />
             <div>
-              <h2 className="font-serif text-base font-semibold text-neutral-900">Opportunities Awaiting Review</h2>
-              <p className="text-xs text-neutral-500">{reviewOpps.length} pending review</p>
+              <h2 className="font-serif text-base font-semibold text-ink">Opportunities Awaiting Review</h2>
+              <p className="text-xs text-ink-muted">{reviewOpps.length} pending review</p>
             </div>
           </div>
           {reviewOpps.length === 0 ? (
-            <p className="text-sm text-neutral-500">No opportunities awaiting review.</p>
+            <p className="text-sm text-ink-muted">No opportunities awaiting review.</p>
           ) : (
             <div className="max-h-80 space-y-2 overflow-y-auto">
               {reviewOpps.map((o) => (
-                <div key={o.id} className="border border-neutral-200 p-3">
-                  <p className="text-sm font-medium text-neutral-900">{o.job_title}</p>
+                <div key={o.id} className="border border-border p-3">
+                  <p className="text-sm font-medium text-ink">{o.job_title}</p>
                   <p className="text-xs text-primary-600">{o.employer}</p>
-                  <div className="mt-1.5 flex items-center gap-3 text-xs text-neutral-500">
+                  <div className="mt-1.5 flex items-center gap-3 text-xs text-ink-muted">
                     <span className="flex items-center gap-1">
                       <User className="h-3 w-3" />
                       {o.member_name || 'Unknown'}
@@ -502,25 +502,25 @@ export function AdminDashboardPage() {
         </div>
 
         {/* Overdue Follow-ups */}
-        <div className="border border-neutral-200 border-l-4 border-l-error-500 bg-white p-6">
+        <div className="border border-border border-l-4 border-l-error-500 bg-surface-card p-6">
           <div className="mb-4 flex items-center gap-3">
             <Clock className="h-6 w-6 text-error-600" />
             <div>
-              <h2 className="font-serif text-base font-semibold text-neutral-900">Overdue Follow-ups</h2>
-              <p className="text-xs text-neutral-500">{overdueFollowUps.length} overdue</p>
+              <h2 className="font-serif text-base font-semibold text-ink">Overdue Follow-ups</h2>
+              <p className="text-xs text-ink-muted">{overdueFollowUps.length} overdue</p>
             </div>
           </div>
           {overdueFollowUps.length === 0 ? (
-            <div className="flex items-center gap-2 border border-success-300 border-l-4 border-l-success-500 bg-success-50 p-3 text-sm text-success-700">
+            <div className="flex items-center gap-2 border border-success-700 border-l-4 border-l-success-500 bg-success-950 p-3 text-sm text-success-300">
               <CheckCircle2 className="h-4 w-4" />
               All follow-ups are on track.
             </div>
           ) : (
             <div className="max-h-80 space-y-2 overflow-y-auto">
               {overdueFollowUps.map((f) => (
-                <div key={f.id} className="border border-error-300 border-l-4 border-l-error-500 bg-error-50 p-3">
-                  <p className="text-sm font-medium text-neutral-900">{f.title}</p>
-                  <div className="mt-1.5 flex items-center gap-3 text-xs text-neutral-500">
+                <div key={f.id} className="border border-error-700 border-l-4 border-l-error-500 bg-error-950 p-3">
+                  <p className="text-sm font-medium text-ink">{f.title}</p>
+                  <div className="mt-1.5 flex items-center gap-3 text-xs text-ink-muted">
                     {f.member_name && (
                       <span className="flex items-center gap-1">
                         <User className="h-3 w-3" />
@@ -533,7 +533,7 @@ export function AdminDashboardPage() {
                         {f.strategist_name}
                       </span>
                     )}
-                    <span className="ml-auto font-medium text-error-600">Due: {formatDate(f.due_date)}</span>
+                    <span className="ml-auto font-medium text-error-400">Due: {formatDate(f.due_date)}</span>
                   </div>
                 </div>
               ))}
@@ -542,33 +542,33 @@ export function AdminDashboardPage() {
         </div>
 
         {/* Top Employers Applied To */}
-        <div className="border border-neutral-200 bg-white p-6 lg:col-span-2">
+        <div className="border border-border bg-surface-card p-6 lg:col-span-2">
           <div className="mb-4 flex items-center gap-3">
             <Building2 className="h-6 w-6 text-primary-600" />
             <div>
-              <h2 className="font-serif text-base font-semibold text-neutral-900">Top Employers Applied To</h2>
-              <p className="text-xs text-neutral-500">Most frequently targeted companies</p>
+              <h2 className="font-serif text-base font-semibold text-ink">Top Employers Applied To</h2>
+              <p className="text-xs text-ink-muted">Most frequently targeted companies</p>
             </div>
           </div>
           {topEmployers.length === 0 ? (
-            <p className="text-sm text-neutral-500">No employer data available yet.</p>
+            <p className="text-sm text-ink-muted">No employer data available yet.</p>
           ) : (
             <div className="grid gap-3 sm:grid-cols-2">
               {topEmployers.map((e, idx) => (
-                <div key={e.employer} className="flex items-center gap-3 border border-neutral-200 p-3">
-                  <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center border border-primary-300 text-sm font-semibold text-primary-700">
+                <div key={e.employer} className="flex items-center gap-3 border border-border p-3">
+                  <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center border border-primary-700 text-sm font-semibold text-primary-300">
                     {idx + 1}
                   </span>
                   <div className="flex-1 min-w-0">
-                    <p className="truncate text-sm font-medium text-neutral-900">{e.employer}</p>
-                    <div className="mt-1 h-1.5 overflow-hidden border border-neutral-300 bg-neutral-100">
+                    <p className="truncate text-sm font-medium text-ink">{e.employer}</p>
+                    <div className="mt-1 h-1.5 overflow-hidden border border-border bg-surface-subtle">
                       <div
                         className="h-full bg-primary-500"
                         style={{ width: `${(e.count / maxEmployerCount) * 100}%` }}
                       />
                     </div>
                   </div>
-                  <span className="flex-shrink-0 text-sm font-semibold text-neutral-900">{e.count}</span>
+                  <span className="flex-shrink-0 text-sm font-semibold text-ink">{e.count}</span>
                 </div>
               ))}
             </div>
@@ -603,12 +603,12 @@ function SummaryCard({
   }
   const [borderColor, textColor] = colors[color].split(' ')
   return (
-    <div className={cn('border border-neutral-200 border-l-4 bg-white p-4', borderColor)}>
+    <div className={cn('border border-border border-l-4 bg-surface-card p-4', borderColor)}>
       <div className="flex items-center gap-3">
         <Icon className={cn('h-6 w-6', textColor)} />
         <div>
-          <p className="text-2xl font-serif font-bold text-neutral-900">{value}</p>
-          <p className="text-xs text-neutral-500">{label}</p>
+          <p className="text-2xl font-serif font-bold text-ink">{value}</p>
+          <p className="text-xs text-ink-muted">{label}</p>
         </div>
       </div>
     </div>

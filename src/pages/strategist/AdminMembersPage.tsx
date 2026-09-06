@@ -13,9 +13,9 @@ import type { AdminMemberSummary, EligibleStrategist } from '@/types'
 type StatusFilter = 'all' | 'active' | 'suspended' | 'banned'
 
 const STATUS_BADGE: Record<string, string> = {
-  active: 'border-success-300 text-success-700',
-  suspended: 'border-warning-300 text-warning-700',
-  banned: 'border-error-300 text-error-700',
+  active: 'border-success-700 text-success-300',
+  suspended: 'border-warning-700 text-warning-300',
+  banned: 'border-error-700 text-error-300',
 }
 
 export function AdminMembersPage() {
@@ -132,40 +132,40 @@ export function AdminMembersPage() {
   return (
     <StrategistLayout isAdmin>
       <div className="mb-6">
-        <h1 className="font-serif text-2xl font-semibold text-neutral-900 sm:text-3xl">Members</h1>
-        <p className="mt-1 text-sm text-neutral-600">
+        <h1 className="font-serif text-2xl font-semibold text-ink sm:text-3xl">Members</h1>
+        <p className="mt-1 text-sm text-ink-muted">
           Manage every member on the platform &mdash; profiles, subscriptions, and account access.
         </p>
       </div>
 
       {error && (
-        <div className="mb-6 flex items-start gap-2 border border-error-300 border-l-4 border-l-error-500 bg-error-50 px-4 py-3 text-sm text-error-600">
+        <div className="mb-6 flex items-start gap-2 border border-error-700 border-l-4 border-l-error-500 bg-error-950 px-4 py-3 text-sm text-error-300">
           <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
       {/* Search & filter bar */}
-      <div className="mb-6 border border-neutral-200 bg-white p-4">
+      <div className="mb-6 border border-border bg-surface-card p-4">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
           <div className="relative flex-1">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-muted" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by name or email..."
               aria-label="Search members by name or email"
-              className="w-full border border-neutral-300 bg-white py-2 pl-10 pr-4 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+              className="w-full border border-border bg-surface-card py-2 pl-10 pr-4 text-sm text-ink placeholder:text-ink-muted focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
             />
           </div>
           <div className="flex items-center gap-2">
-            <Filter className="h-4 w-4 text-neutral-400" />
+            <Filter className="h-4 w-4 text-ink-muted" />
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
               aria-label="Filter by account status"
-              className="border border-neutral-300 bg-white py-2 pl-3 pr-8 text-sm text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+              className="border border-border bg-surface-card py-2 pl-3 pr-8 text-sm text-ink focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
             >
               <option value="all">All Accounts</option>
               <option value="active">Active</option>
@@ -178,9 +178,9 @@ export function AdminMembersPage() {
 
       {/* Members list */}
       {filteredMembers.length === 0 ? (
-        <div className="border border-neutral-200 bg-white p-12 text-center">
-          <Users className="mx-auto h-10 w-10 text-neutral-300" />
-          <p className="mt-4 text-sm text-neutral-500">
+        <div className="border border-border bg-surface-card p-12 text-center">
+          <Users className="mx-auto h-10 w-10 text-ink-muted" />
+          <p className="mt-4 text-sm text-ink-muted">
             {members.length === 0 ? 'No members yet.' : 'No members match your search or filter.'}
           </p>
         </div>
@@ -189,40 +189,40 @@ export function AdminMembersPage() {
           {filteredMembers.map((m) => (
             <div
               key={m.user_id}
-              className="border border-neutral-200 border-l-4 border-l-primary-600 bg-white p-5 transition-colors hover:border-l-primary-400"
+              className="border border-border border-l-4 border-l-primary-600 bg-surface-card p-5 transition-colors hover:border-l-primary-400"
             >
               <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
-                    <h3 className="font-serif text-base font-semibold text-neutral-900 truncate">
+                    <h3 className="font-serif text-base font-semibold text-ink truncate">
                       {m.full_name || 'Unnamed Member'}
                     </h3>
                     <span className={cn('border px-2 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide', STATUS_BADGE[m.account_status])}>
                       {m.account_status}
                     </span>
                     {m.onboarding_completed && (
-                      <span className="border border-primary-300 px-2 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide text-primary-700">
+                      <span className="border border-primary-700 px-2 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide text-primary-300">
                         Onboarded
                       </span>
                     )}
                     {m.is_strategist && (
-                      <span className="flex items-center gap-1 border border-secondary-300 px-2 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide text-secondary-700">
+                      <span className="flex items-center gap-1 border border-secondary-700 px-2 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide text-secondary-300">
                         <UserCog className="h-3 w-3" />
                         Strategist
                       </span>
                     )}
                   </div>
-                  <p className="mt-0.5 text-sm text-neutral-500 truncate">{m.email}</p>
-                  <p className="mt-0.5 text-xs text-neutral-400">
+                  <p className="mt-0.5 text-sm text-ink-muted truncate">{m.email}</p>
+                  <p className="mt-0.5 text-xs text-ink-muted">
                     {m.plan_name || 'No plan'} &middot; {m.subscription_status} &middot; joined {formatDate(m.created_at)}
                   </p>
                   <div className="mt-2 flex items-center gap-2">
-                    <UserCog className="h-3.5 w-3.5 text-neutral-400" />
-                    <span className="text-xs text-neutral-500">
+                    <UserCog className="h-3.5 w-3.5 text-ink-muted" />
+                    <span className="text-xs text-ink-muted">
                       {m.strategist_name ? (
-                        <>Strategist: <span className="font-medium text-neutral-700">{m.strategist_name}</span></>
+                        <>Strategist: <span className="font-medium text-ink-muted">{m.strategist_name}</span></>
                       ) : (
-                        <span className="text-warning-600">No strategist assigned</span>
+                        <span className="text-warning-400">No strategist assigned</span>
                       )}
                     </span>
                     <select
@@ -230,7 +230,7 @@ export function AdminMembersPage() {
                       onChange={(e) => handleAssignStrategist(m.user_id, e.target.value)}
                       disabled={actioningId === m.user_id || strategists.length === 0}
                       aria-label={`Assign strategist to ${m.full_name || 'member'}`}
-                      className="border border-neutral-300 bg-white py-1 pl-2 pr-6 text-xs text-neutral-600 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 disabled:opacity-60"
+                      className="border border-border bg-surface-card py-1 pl-2 pr-6 text-xs text-ink-muted focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 disabled:opacity-60"
                     >
                       <option value="" disabled>
                         {m.strategist_name ? 'Reassign to...' : 'Assign to...'}
@@ -251,8 +251,8 @@ export function AdminMembersPage() {
                     className={cn(
                       'flex items-center gap-1.5 border px-3 py-2 text-xs font-medium transition-colors disabled:opacity-60',
                       m.is_strategist
-                        ? 'border-secondary-200 bg-secondary-50 text-secondary-700 hover:bg-secondary-100'
-                        : 'border-neutral-200 bg-neutral-50 text-neutral-600 hover:bg-neutral-100',
+                        ? 'border-secondary-700 bg-secondary-950 text-secondary-300 hover:bg-secondary-900'
+                        : 'border-border bg-surface-subtle text-ink-muted hover:bg-surface-hover',
                     )}
                   >
                     <UserCog className="h-3.5 w-3.5" />
@@ -262,7 +262,7 @@ export function AdminMembersPage() {
                     <button
                       onClick={() => setAccountStatus(m.user_id, 'active')}
                       disabled={actioningId === m.user_id}
-                      className="flex items-center gap-1.5 border border-success-300 bg-success-50 px-3 py-2 text-xs font-medium text-success-700 transition-colors hover:bg-success-100 disabled:opacity-60"
+                      className="flex items-center gap-1.5 border border-success-700 bg-success-950 px-3 py-2 text-xs font-medium text-success-300 transition-colors hover:bg-success-900 disabled:opacity-60"
                     >
                       <ShieldCheck className="h-3.5 w-3.5" />
                       Reactivate
@@ -272,7 +272,7 @@ export function AdminMembersPage() {
                     <button
                       onClick={() => setAccountStatus(m.user_id, 'suspended')}
                       disabled={actioningId === m.user_id}
-                      className="flex items-center gap-1.5 border border-warning-300 bg-warning-50 px-3 py-2 text-xs font-medium text-warning-700 transition-colors hover:bg-warning-100 disabled:opacity-60"
+                      className="flex items-center gap-1.5 border border-warning-700 bg-warning-950 px-3 py-2 text-xs font-medium text-warning-300 transition-colors hover:bg-warning-900 disabled:opacity-60"
                     >
                       <ShieldAlert className="h-3.5 w-3.5" />
                       Suspend
@@ -282,7 +282,7 @@ export function AdminMembersPage() {
                     <button
                       onClick={() => setAccountStatus(m.user_id, 'banned')}
                       disabled={actioningId === m.user_id}
-                      className="flex items-center gap-1.5 border border-error-300 bg-error-50 px-3 py-2 text-xs font-medium text-error-600 transition-colors hover:bg-error-100 disabled:opacity-60"
+                      className="flex items-center gap-1.5 border border-error-700 bg-error-950 px-3 py-2 text-xs font-medium text-error-300 transition-colors hover:bg-error-900 disabled:opacity-60"
                     >
                       <ShieldX className="h-3.5 w-3.5" />
                       Ban
