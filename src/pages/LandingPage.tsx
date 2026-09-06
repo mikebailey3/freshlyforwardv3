@@ -43,10 +43,10 @@ export function LandingPage() {
       <section className="bg-[var(--cream)] py-14 lg:py-24">
         <div className="shell grid items-center gap-12 lg:grid-cols-2">
           <div>
-            <h1 className="font-display text-4xl font-semibold leading-[1.1] text-[var(--navy)] sm:text-5xl lg:text-6xl">
+            <h1 className="font-display text-4xl font-semibold leading-[1.1] text-[var(--ink)] sm:text-5xl lg:text-6xl">
               A better search needs better judgment.
             </h1>
-            <p className="mt-6 max-w-lg text-lg leading-relaxed text-neutral-600">
+            <p className="mt-6 max-w-lg text-lg leading-relaxed text-ink-muted">
               FreshlyForward is a human-led career concierge. One real strategist searches,
               applies, and reports back — so you're never doing this alone, and never
               guessing what's happening behind the scenes.
@@ -60,13 +60,13 @@ export function LandingPage() {
               </LinkButton>
             </div>
             <div className="mt-7 flex flex-wrap gap-x-5 gap-y-2" aria-label="Service assurances">
-              <span className="flex items-center gap-1.5 text-sm font-medium text-neutral-600">
+              <span className="flex items-center gap-1.5 text-sm font-medium text-ink-muted">
                 <Check size={16} className="text-primary-600" /> Human-led
               </span>
-              <span className="flex items-center gap-1.5 text-sm font-medium text-neutral-600">
+              <span className="flex items-center gap-1.5 text-sm font-medium text-ink-muted">
                 <Check size={16} className="text-primary-600" /> No mass applying
               </span>
-              <span className="flex items-center gap-1.5 text-sm font-medium text-neutral-600">
+              <span className="flex items-center gap-1.5 text-sm font-medium text-ink-muted">
                 <Check size={16} className="text-primary-600" /> Pause anytime
               </span>
             </div>

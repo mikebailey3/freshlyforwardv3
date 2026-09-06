@@ -51,17 +51,17 @@ export function PricingPage() {
           </div>
         ) : error ? (
           <div className="flex flex-col items-center justify-center gap-4 py-20">
-            <AlertCircle className="h-12 w-12 text-neutral-400" />
-            <p className="text-neutral-600">{error}</p>
+            <AlertCircle className="h-12 w-12 text-ink-muted" />
+            <p className="text-ink-muted">{error}</p>
             <button type="button" className="button button-secondary button-small" onClick={fetchPlans}>
               <RefreshCw size={16} /> Try again
             </button>
           </div>
         ) : plans.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-2 py-20 text-center">
-            <AlertCircle className="h-12 w-12 text-neutral-400" />
-            <p className="text-neutral-600">Plans aren't available to show right now.</p>
-            <p className="text-sm text-neutral-500">
+            <AlertCircle className="h-12 w-12 text-ink-muted" />
+            <p className="text-ink-muted">Plans aren't available to show right now.</p>
+            <p className="text-sm text-ink-muted">
               Reach out on the <Link to="/contact">contact page</Link> and we'll walk you through pricing directly.
             </p>
           </div>

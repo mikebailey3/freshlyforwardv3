@@ -7,12 +7,12 @@ import { chromium } from 'playwright'
 import { mkdirSync } from 'node:fs'
 
 const BASE_URL = process.env.SCREENSHOT_BASE_URL || 'http://localhost:5176'
-const OUT_DIR = 'docs/superpowers/visual-review/2026-09-06-subproject1-checkpoint'
+const OUT_DIR = 'docs/superpowers/visual-review/2026-09-06-task29-public-marketing'
 
 const targets = [
-  { path: '/about', name: 'about' },
-  { path: '/internal/design-system', name: 'design-system' },
+  { path: '/', name: 'landing' },
   { path: '/how-it-works', name: 'how-it-works' },
+  { path: '/pricing', name: 'pricing' },
 ]
 
 const viewports = [
@@ -29,6 +29,20 @@ try {
       const page = await browser.newPage({ viewport: { width: viewport.width, height: viewport.height } })
       const url = `${BASE_URL}${target.path}`
       await page.goto(url, { waitUntil: 'networkidle' })
+      // Trigger any one-shot IntersectionObserver scroll-reveal animations
+      // (e.g. AlternatingRow, LandingPage's verdict section) before
+      // capturing -- otherwise below-the-fold content still shows as
+      // opacity-0 in a fullPage screenshot. scrollIntoView guarantees each
+      // element crosses the visibility threshold, unlike blind scroll steps.
+      await page.evaluate(async () => {
+        const targets = document.querySelectorAll('[class*="duration-700"]')
+        for (const el of targets) {
+          el.scrollIntoView({ block: 'center' })
+          await new Promise((r) => setTimeout(r, 150))
+        }
+        window.scrollTo(0, 0)
+        await new Promise((r) => setTimeout(r, 300))
+      })
       const outPath = `${OUT_DIR}/${target.name}-${viewport.name}.png`
       await page.screenshot({ path: outPath, fullPage: true })
       console.log(`Saved ${outPath}`)

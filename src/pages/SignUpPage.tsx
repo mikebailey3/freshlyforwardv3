@@ -55,7 +55,7 @@ export function SignUpPage() {
         <h2>Request an introduction</h2>
         <p>No contract. No obligation. Just a thoughtful first step.</p>
         {planSlug && (
-          <p style={{ marginTop: '16px', padding: '14px', borderRadius: '12px', background: 'var(--mint)', fontSize: '.85rem', color: 'var(--navy)' }}>
+          <p style={{ marginTop: '16px', padding: '14px', borderRadius: '12px', background: 'var(--mint)', fontSize: '.85rem', color: 'var(--ink)' }}>
             You selected the <strong style={{ textTransform: 'capitalize' }}>{planSlug.replace('-', ' ')}</strong> plan. Complete your account to continue to checkout.
           </p>
         )}
