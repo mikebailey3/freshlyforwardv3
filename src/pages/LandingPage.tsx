@@ -192,8 +192,22 @@ export function LandingPage() {
       </section>
 
       {/* Layer 3: Current Focus -- the TrophyCoach-inspired section. One
-          large spotlight panel, not a small dashboard widget. */}
-      <section className="bg-surface-subtle py-20 lg:py-28">
+          large spotlight panel, not a small dashboard widget.
+
+          Checkpoint C polish: bg-surface-subtle (#0E3444) is a real, visible
+          step up from bg-bg (#031421) -- a flat color swap here read as a
+          hard-stacked seam rather than a continuous page. The gradient fades
+          the surface in/out over a fixed 96px band at the top/bottom of the
+          section (inside its own existing py-20/28 padding, so no layout
+          changes), matching bg-bg exactly at both edges so the adjacent
+          flat-bg-bg sections above and below meet it with zero visible cut. */}
+      <section
+        className="relative py-20 lg:py-28"
+        style={{
+          background:
+            'linear-gradient(to bottom, var(--color-bg) 0, var(--color-surface-subtle) 96px, var(--color-surface-subtle) calc(100% - 96px), var(--color-bg) 100%)',
+        }}
+      >
         <div className="shell grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-16">
           <div>
             <SectionHeader
@@ -226,11 +240,11 @@ export function LandingPage() {
               of that gap.
             </p>
             <ProgressBar value={60} label="Interview readiness" className="mt-6" />
-            <LinkButton to="/forward-dna" variant="secondary">
-              <span className="flex items-center gap-2">
+            <div className="mt-6">
+              <LinkButton to="/forward-dna" variant="secondary">
                 Close this gap <ArrowRight size={16} />
-              </span>
-            </LinkButton>
+              </LinkButton>
+            </div>
           </div>
         </div>
       </section>
@@ -292,8 +306,15 @@ export function LandingPage() {
       </section>
 
       {/* Layer 5: Forward Profile -- foreshadows the upcoming Forward
-          Profiles project (identity backbone) without implementing it. */}
-      <section className="bg-surface-subtle py-20 lg:py-28">
+          Profiles project (identity backbone) without implementing it.
+          Same continuous-transition gradient treatment as Current Focus. */}
+      <section
+        className="relative py-20 lg:py-28"
+        style={{
+          background:
+            'linear-gradient(to bottom, var(--color-bg) 0, var(--color-surface-subtle) 96px, var(--color-surface-subtle) calc(100% - 96px), var(--color-bg) 100%)',
+        }}
+      >
         <div className="shell grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-16">
           <ProfileStrengthCard name="Mike B." headline="Career OS Member since 2026" strength={82} forwardScore={78} />
 
@@ -303,7 +324,7 @@ export function LandingPage() {
               title="Your career story, finally connected."
               description="Everything FreshlyForward learns about you lives in one place -- not scattered across resumes, forms, and forgotten notes."
             />
-            <ul className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <ul className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 [&>*:last-child]:sm:col-span-2">
               {PROFILE_THREADS.map((thread) => (
                 <li key={thread.label} className="flex items-center gap-2.5 text-sm text-ink-muted">
                   <thread.icon className="h-4 w-4 shrink-0 text-primary-400" aria-hidden="true" />
@@ -358,8 +379,15 @@ export function LandingPage() {
       </section>
 
       {/* Layer 7: Progress / outcomes -- sample metrics only, no
-          testimonials, logos, user counts, or success rates. */}
-      <section className="bg-surface-subtle py-20 lg:py-28">
+          testimonials, logos, user counts, or success rates. Same
+          continuous-transition gradient treatment as Current Focus. */}
+      <section
+        className="relative py-20 lg:py-28"
+        style={{
+          background:
+            'linear-gradient(to bottom, var(--color-bg) 0, var(--color-surface-subtle) 96px, var(--color-surface-subtle) calc(100% - 96px), var(--color-bg) 100%)',
+        }}
+      >
         <div className="shell">
           <SectionHeader
             eyebrow="Progress"
@@ -381,7 +409,11 @@ export function LandingPage() {
       {/* Layer 8: Final CTA */}
       <section className="bg-bg py-20 lg:py-28">
         <div className="shell text-center">
-          <h2 className="mx-auto max-w-2xl font-display text-3xl font-semibold leading-tight text-ink sm:text-4xl lg:text-5xl">
+          {/* Intentionally text-h1 (not the shared text-h2 every other section
+              uses) -- a deliberate bookend echoing the hero's h1 scale, using
+              the same design-system clamp() token rather than one-off
+              Tailwind sizes for consistency with the rest of the scale. */}
+          <h2 className="mx-auto max-w-2xl text-h1 font-display font-semibold leading-tight text-ink">
             Your next opportunity is closer than you think.
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-lg text-ink-muted">
