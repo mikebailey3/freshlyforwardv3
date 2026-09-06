@@ -170,14 +170,14 @@ export function ForwardDnaPage() {
   return (
     <MemberLayout>
       <div className="mb-6">
-        <h1 className="font-serif text-2xl font-semibold text-neutral-900 sm:text-3xl">Forward DNA</h1>
-        <p className="mt-1 text-sm text-neutral-600">
+        <h1 className="font-serif text-2xl font-semibold text-ink sm:text-3xl">Forward DNA</h1>
+        <p className="mt-1 text-sm text-ink-muted">
           Your complete professional intelligence profile — not a resume, the real thing underneath it.
         </p>
       </div>
 
       {error && (
-        <div className="mb-6 flex items-start gap-2 border border-error-200 bg-error-50 px-4 py-3 text-sm text-error-600">
+        <div className="mb-6 flex items-start gap-2 border border-error-700 bg-error-950 px-4 py-3 text-sm text-error-300">
           <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
           <span>{error}</span>
         </div>

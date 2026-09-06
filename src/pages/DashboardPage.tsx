@@ -155,15 +155,15 @@ export function DashboardPage() {
   return (
     <MemberLayout>
       {showSavedBanner && (
-        <div className="mb-6 flex items-center justify-between gap-3 rounded-xl border border-primary-200 bg-primary-50 px-4 py-3">
-          <p className="text-sm font-medium text-primary-800">
+        <div className="mb-6 flex items-center justify-between gap-3 rounded-xl border border-primary-700 bg-primary-950 px-4 py-3">
+          <p className="text-sm font-medium text-primary-300">
             Your Career Compass results have been saved to your account.
           </p>
           <button
             type="button"
             aria-label="Dismiss"
             onClick={() => setSavedBannerDismissed(true)}
-            className="flex-shrink-0 rounded-full p-1 text-primary-600 transition-colors hover:bg-primary-100"
+            className="flex-shrink-0 rounded-full p-1 text-primary-600 transition-colors hover:bg-primary-900"
           >
             <X className="h-4 w-4" />
           </button>
@@ -181,10 +181,10 @@ export function DashboardPage() {
         <p className="font-mono text-[11px] font-semibold uppercase tracking-wide text-primary-600">
           ForwardOS Home
         </p>
-        <h1 className="font-display text-2xl font-semibold text-neutral-900 sm:text-3xl">
+        <h1 className="font-display text-2xl font-semibold text-ink sm:text-3xl">
           {greeting()}{profile?.full_name ? `, ${profile.full_name.split(' ')[0]}` : ''}! \u2615
         </h1>
-        <p className="mt-1 text-sm text-neutral-600">Ready to make today a step forward?</p>
+        <p className="mt-1 text-sm text-ink-muted">Ready to make today a step forward?</p>
       </div>
 
       {/* Forward Score hero (locked layout position 1) */}
@@ -210,14 +210,14 @@ export function DashboardPage() {
       )}
 
       {/* Forward DNA (locked layout position 4) */}
-      <div className="mt-6 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+      <div className="mt-6 rounded-xl border border-border bg-surface-card p-6 shadow-sm">
         <div className="flex items-center justify-between">
-          <h2 className="font-display text-base font-semibold text-neutral-900">Forward DNA</h2>
+          <h2 className="font-display text-base font-semibold text-ink">Forward DNA</h2>
         </div>
         <div className="mt-4 flex items-center justify-between gap-3">
           <div>
-            <p className="text-sm font-medium text-neutral-900">Your professional intelligence profile</p>
-            <p className="mt-1 text-xs text-neutral-500">
+            <p className="text-sm font-medium text-ink">Your professional intelligence profile</p>
+            <p className="mt-1 text-xs text-ink-muted">
               Career history, scope, responsibilities, skills, and goals — the real profile behind your resume.
             </p>
           </div>
@@ -238,28 +238,28 @@ export function DashboardPage() {
       <CareerVaultPlaceholderCard />
 
       {/* Career Compass (locked layout position 6) */}
-      <div className="mt-6 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+      <div className="mt-6 rounded-xl border border-border bg-surface-card p-6 shadow-sm">
         <div className="flex items-center justify-between">
-          <h2 className="font-display text-base font-semibold text-neutral-900">Career Compass</h2>
+          <h2 className="font-display text-base font-semibold text-ink">Career Compass</h2>
           {!forwardScoreLoading && compassSummary && (
-            <Link to="/career-compass" className="font-mono text-xs font-medium text-primary-600 hover:text-primary-700">
+            <Link to="/career-compass" className="font-mono text-xs font-medium text-primary-600 hover:text-primary-400">
               Retake
             </Link>
           )}
         </div>
         {forwardScoreLoading ? (
           <div className="mt-4 flex items-center gap-3" role="status" aria-label="Loading Career Compass">
-            <Compass className="h-5 w-5 flex-shrink-0 animate-pulse text-neutral-300" />
-            <div className="h-4 w-48 animate-pulse rounded bg-neutral-100" />
+            <Compass className="h-5 w-5 flex-shrink-0 animate-pulse text-ink-muted" />
+            <div className="h-4 w-48 animate-pulse rounded bg-surface-hover" />
           </div>
         ) : compassSummary ? (
           <div className="mt-4 flex items-center gap-3">
             <Compass className="h-5 w-5 flex-shrink-0 text-primary-600" />
             <div>
-              <p className="text-sm font-medium text-neutral-900">
+              <p className="text-sm font-medium text-ink">
                 You're a {ARCHETYPE_LABELS[compassSummary.primary_archetype]}.
               </p>
-              <p className="mt-1 text-xs text-neutral-500">
+              <p className="mt-1 text-xs text-ink-muted">
                 Curious how things have shifted? Retake the free assessment anytime.
               </p>
             </div>
@@ -267,8 +267,8 @@ export function DashboardPage() {
         ) : (
           <div className="mt-4 flex items-center justify-between gap-3">
             <div>
-              <p className="text-sm font-medium text-neutral-900">Discover your Career Compass</p>
-              <p className="mt-1 text-xs text-neutral-500">
+              <p className="text-sm font-medium text-ink">Discover your Career Compass</p>
+              <p className="mt-1 text-xs text-ink-muted">
                 Take the free 5-minute assessment to find your career archetype and readiness score.
               </p>
             </div>
@@ -291,20 +291,20 @@ export function DashboardPage() {
           derives for the Career Momentum pillar, reused for this UI
           decision only, never a second/competing definition. */}
       <div
-        className={`mt-6 rounded-xl border bg-white p-5 ${
+        className={`mt-6 rounded-xl border bg-surface-card p-5 ${
           hasActiveApplication || hasRecentOrUpcomingInterview
-            ? 'border-primary-300 shadow-md'
-            : 'border-neutral-200 shadow-sm'
+            ? 'border-primary-700 shadow-md'
+            : 'border-border shadow-sm'
         }`}
       >
-        <p className="text-sm font-semibold text-neutral-700">Search Readiness</p>
+        <p className="text-sm font-semibold text-ink-muted">Search Readiness</p>
         <div className="mt-3 flex items-center gap-3">
           <CircularProgress value={readiness.score} size={56} strokeWidth={6} label="" />
-          <p className="text-xs text-neutral-500">
+          <p className="text-xs text-ink-muted">
             {readiness.score >= 80 ? "You're doing great! Keep going." : 'Keep going, you\u2019re getting closer.'}
           </p>
         </div>
-        <Link to={readiness.missing.length > 0 ? getReadinessFixLink(readiness.missing) : '/profile'} className="mt-3 inline-block font-mono text-xs font-medium text-primary-600 hover:text-primary-700">
+        <Link to={readiness.missing.length > 0 ? getReadinessFixLink(readiness.missing) : '/profile'} className="mt-3 inline-block font-mono text-xs font-medium text-primary-600 hover:text-primary-400">
           {readiness.missing.length > 0 ? "Let's fix it" : 'View My Progress'}
         </Link>
       </div>
@@ -313,47 +313,47 @@ export function DashboardPage() {
           tools, unchanged content, repositioned below the fold. */}
 
       {/* Stat cards */}
-      <div className="overflow-hidden rounded-xl border border-neutral-200 shadow-sm">
+      <div className="overflow-hidden rounded-xl border border-border shadow-sm">
         <div className="grid gap-0 lg:grid-cols-3">
-          <div className="border-b border-neutral-200 p-5 lg:border-b-0 lg:border-r">
-            <p className="text-sm font-semibold text-neutral-700">Applications</p>
-            <p className="mt-2 font-mono text-3xl font-bold text-neutral-900">{activeApplications.length}</p>
-            <p className="text-xs text-neutral-500">
+          <div className="border-b border-border p-5 lg:border-b-0 lg:border-r">
+            <p className="text-sm font-semibold text-ink-muted">Applications</p>
+            <p className="mt-2 font-mono text-3xl font-bold text-ink">{activeApplications.length}</p>
+            <p className="text-xs text-ink-muted">
               Active applications{newThisWeek > 0 && <span className="text-primary-600"> \u2022 {newThisWeek} new this week</span>}
             </p>
-            <Link to="/applications" className="mt-3 inline-block font-mono text-xs font-medium text-primary-600 hover:text-primary-700">
+            <Link to="/applications" className="mt-3 inline-block font-mono text-xs font-medium text-primary-600 hover:text-primary-400">
               View Applications
             </Link>
           </div>
 
-          <div className="border-b border-neutral-200 p-5 lg:border-b-0 lg:border-r">
-            <p className="text-sm font-semibold text-neutral-700">Interviews</p>
-            <p className="mt-2 font-mono text-3xl font-bold text-neutral-900">{upcomingInterviewApps.length}</p>
-            <p className="text-xs text-neutral-500">
+          <div className="border-b border-border p-5 lg:border-b-0 lg:border-r">
+            <p className="text-sm font-semibold text-ink-muted">Interviews</p>
+            <p className="mt-2 font-mono text-3xl font-bold text-ink">{upcomingInterviewApps.length}</p>
+            <p className="text-xs text-ink-muted">
               {nextInterview
                 ? `Next: ${new Date(nextInterview.interview_date!).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
                 : 'Upcoming interviews'}
             </p>
-            <Link to="/interviews" className="mt-3 inline-block font-mono text-xs font-medium text-primary-600 hover:text-primary-700">
+            <Link to="/interviews" className="mt-3 inline-block font-mono text-xs font-medium text-primary-600 hover:text-primary-400">
               View Interviews
             </Link>
           </div>
 
           <div className="p-5">
-            <p className="text-sm font-semibold text-neutral-700">Messages</p>
-            <p className="mt-2 font-mono text-3xl font-bold text-neutral-900">{unreadMessages.length}</p>
-            <p className="text-xs text-neutral-500">Unread messages</p>
-            <Link to="/messages" className="mt-3 inline-block font-mono text-xs font-medium text-primary-600 hover:text-primary-700">
+            <p className="text-sm font-semibold text-ink-muted">Messages</p>
+            <p className="mt-2 font-mono text-3xl font-bold text-ink">{unreadMessages.length}</p>
+            <p className="text-xs text-ink-muted">Unread messages</p>
+            <Link to="/messages" className="mt-3 inline-block font-mono text-xs font-medium text-primary-600 hover:text-primary-400">
               Open Messages
             </Link>
           </div>
         </div>
 
-        <div className="flex flex-col items-start justify-between gap-4 border-t border-neutral-200 bg-neutral-50 p-5 sm:flex-row sm:items-center">
+        <div className="flex flex-col items-start justify-between gap-4 border-t border-border bg-surface-subtle p-5 sm:flex-row sm:items-center">
           <div>
-            <p className="font-mono text-[10px] font-semibold uppercase tracking-wide text-neutral-500">On Call</p>
-            <p className="mt-1 text-sm font-semibold text-neutral-900">Your Career Strategist</p>
-            <p className="mt-1 text-xs text-neutral-600">Typically replies within 24 hrs.</p>
+            <p className="font-mono text-[10px] font-semibold uppercase tracking-wide text-ink-muted">On Call</p>
+            <p className="mt-1 text-sm font-semibold text-ink">Your Career Strategist</p>
+            <p className="mt-1 text-xs text-ink-muted">Typically replies within 24 hrs.</p>
           </div>
           <Link
             to="/messages"
@@ -367,29 +367,29 @@ export function DashboardPage() {
 
       {/* Tip / Motivation / Upcoming */}
       <div className="mt-6 grid gap-4 lg:grid-cols-3">
-        <div className="rounded-xl border border-dashed border-neutral-300 bg-[var(--cream)] p-5 lg:col-span-2">
+        <div className="rounded-xl border border-dashed border-border bg-surface-subtle p-5 lg:col-span-2">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="flex items-start gap-3">
               <Lightbulb className="mt-0.5 h-5 w-5 flex-shrink-0 text-primary-600" />
               <div>
-                <p className="text-sm font-semibold text-neutral-900">Tip of the Day</p>
-                <p className="mt-1 text-xs text-neutral-600">{tip}</p>
+                <p className="text-sm font-semibold text-ink">Tip of the Day</p>
+                <p className="mt-1 text-xs text-ink-muted">{tip}</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
               <Flag className="mt-0.5 h-5 w-5 flex-shrink-0 text-primary-600" />
               <div>
-                <p className="text-sm font-semibold text-neutral-900">Daily Motivation</p>
-                <p className="mt-1 text-xs italic text-neutral-600">\u201c{motivation}\u201d</p>
+                <p className="text-sm font-semibold text-ink">Daily Motivation</p>
+                <p className="mt-1 text-xs italic text-ink-muted">\u201c{motivation}\u201d</p>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
+        <div className="rounded-xl border border-border bg-surface-card p-5 shadow-sm">
           <div className="flex items-center justify-between">
-            <p className="text-sm font-semibold text-neutral-900">Upcoming</p>
-            <Link to="/calendar" className="font-mono text-xs font-medium text-primary-600 hover:text-primary-700">
+            <p className="text-sm font-semibold text-ink">Upcoming</p>
+            <Link to="/calendar" className="font-mono text-xs font-medium text-primary-600 hover:text-primary-400">
               View Calendar
             </Link>
           </div>
@@ -399,8 +399,8 @@ export function DashboardPage() {
                 <div key={event.id} className="flex items-start gap-2">
                   <Calendar className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary-600" />
                   <div>
-                    <p className="text-xs font-medium text-neutral-800">{event.title}</p>
-                    <p className="text-[11px] text-neutral-500">
+                    <p className="text-xs font-medium text-ink">{event.title}</p>
+                    <p className="text-[11px] text-ink-muted">
                       {new Date(event.start_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })},{' '}
                       {new Date(event.start_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
                     </p>
@@ -409,9 +409,9 @@ export function DashboardPage() {
               ))}
             </div>
           ) : (
-            <p className="mt-3 text-xs text-neutral-500">Nothing scheduled yet.</p>
+            <p className="mt-3 text-xs text-ink-muted">Nothing scheduled yet.</p>
           )}
-          <Link to="/calendar" className="mt-3 inline-block font-mono text-xs font-medium text-primary-600 hover:text-primary-700">
+          <Link to="/calendar" className="mt-3 inline-block font-mono text-xs font-medium text-primary-600 hover:text-primary-400">
             See all upcoming &rarr;
           </Link>
         </div>
@@ -419,10 +419,10 @@ export function DashboardPage() {
 
       {/* Recommended + Progress */}
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
-        <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+        <div className="rounded-xl border border-border bg-surface-card p-6 shadow-sm">
           <div className="flex items-center justify-between">
-            <h2 className="font-display text-base font-semibold text-neutral-900">Recommended for You</h2>
-            <Link to="/tools" className="font-mono text-xs font-medium text-primary-600 hover:text-primary-700">
+            <h2 className="font-display text-base font-semibold text-ink">Recommended for You</h2>
+            <Link to="/tools" className="font-mono text-xs font-medium text-primary-600 hover:text-primary-400">
               View All
             </Link>
           </div>
@@ -461,10 +461,10 @@ export function DashboardPage() {
           </div>
         </div>
 
-        <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+        <div className="rounded-xl border border-border bg-surface-card p-6 shadow-sm">
           <div className="flex items-center justify-between">
-            <h2 className="font-display text-base font-semibold text-neutral-900">Your Progress This Week</h2>
-            <Link to="/timeline" className="font-mono text-xs font-medium text-primary-600 hover:text-primary-700">
+            <h2 className="font-display text-base font-semibold text-ink">Your Progress This Week</h2>
+            <Link to="/timeline" className="font-mono text-xs font-medium text-primary-600 hover:text-primary-400">
               View Full Report
             </Link>
           </div>
@@ -474,9 +474,9 @@ export function DashboardPage() {
             <ProgressBar label="Interview Prep" value={interviewPrepPct} max={100} display={`${interviewPrepPct}%`} />
             <ProgressBar label="Messages Responded" value={messagesRespondedPct} max={100} display={`${messagesRespondedPct}%`} />
           </div>
-          <div className="mt-4 rounded-lg border border-dashed border-neutral-300 p-4">
-            <p className="text-sm font-semibold text-neutral-900">Keep the momentum!</p>
-            <p className="mt-1 text-xs text-neutral-600">
+          <div className="mt-4 rounded-lg border border-dashed border-border p-4">
+            <p className="text-sm font-semibold text-ink">Keep the momentum!</p>
+            <p className="mt-1 text-xs text-ink-muted">
               You've taken {activeApplications.length + submittedThisWeek} steps forward this week. You're building something great.
             </p>
           </div>
@@ -484,26 +484,26 @@ export function DashboardPage() {
       </div>
 
       {/* Forward Feed */}
-      <div className="mt-6 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+      <div className="mt-6 rounded-xl border border-border bg-surface-card p-6 shadow-sm">
         <div className="flex items-center justify-between">
-          <h2 className="font-display text-base font-semibold text-neutral-900">The Forward Feed</h2>
-          <Link to="/forward-feed" className="font-mono text-xs font-medium text-primary-600 hover:text-primary-700">
+          <h2 className="font-display text-base font-semibold text-ink">The Forward Feed</h2>
+          <Link to="/forward-feed" className="font-mono text-xs font-medium text-primary-600 hover:text-primary-400">
             Visit The Forward Feed &rarr;
           </Link>
         </div>
         {recentPosts.length === 0 ? (
-          <p className="mt-4 text-sm text-neutral-500">New articles are on the way &mdash; check back soon.</p>
+          <p className="mt-4 text-sm text-ink-muted">New articles are on the way &mdash; check back soon.</p>
         ) : (
           <div className="mt-4 grid gap-4 sm:grid-cols-3">
             {recentPosts.map((post) => (
               <Link
                 key={post.id}
                 to={`/forward-feed/${post.slug}`}
-                className="rounded-lg border border-neutral-200 border-l-4 border-l-primary-600 p-4 shadow-sm transition-[border-color,box-shadow] hover:border-l-primary-800 hover:shadow-md"
+                className="rounded-lg border border-border border-l-4 border-l-primary-600 p-4 shadow-sm transition-[border-color,box-shadow] hover:border-l-primary-400 hover:shadow-md"
               >
-                <p className="font-mono text-[11px] font-semibold uppercase tracking-wide text-primary-700">{post.category}</p>
-                <p className="mt-1 text-sm font-medium text-neutral-900">{post.title}</p>
-                <p className="mt-2 font-mono text-xs text-neutral-400">{post.read_time_minutes} min read</p>
+                <p className="font-mono text-[11px] font-semibold uppercase tracking-wide text-primary-300">{post.category}</p>
+                <p className="mt-1 text-sm font-medium text-ink">{post.title}</p>
+                <p className="mt-2 font-mono text-xs text-ink-muted">{post.read_time_minutes} min read</p>
               </Link>
             ))}
           </div>
@@ -511,20 +511,20 @@ export function DashboardPage() {
       </div>
 
       {/* Quick Access Tools */}
-      <div className="mt-6 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+      <div className="mt-6 rounded-xl border border-border bg-surface-card p-6 shadow-sm">
         <div className="flex items-center justify-between">
-          <h2 className="font-display text-base font-semibold text-neutral-900">Quick Access Tools</h2>
-          <Link to="/tools" className="font-mono text-xs font-medium text-primary-600 hover:text-primary-700">
+          <h2 className="font-display text-base font-semibold text-ink">Quick Access Tools</h2>
+          <Link to="/tools" className="font-mono text-xs font-medium text-primary-600 hover:text-primary-400">
             View All Tools &rarr;
           </Link>
         </div>
         <div className="mt-4 grid grid-cols-3 gap-4 sm:grid-cols-4 lg:grid-cols-7">
           {TOOL_TILES.map((tool) => (
-            <Link key={tool.label} to={tool.to} className="flex flex-col items-center gap-2 rounded-lg border border-transparent p-3 text-center transition-colors hover:border-neutral-200 hover:bg-neutral-50">
-              <div className="flex h-11 w-11 items-center justify-center rounded-lg border border-neutral-200 bg-neutral-50">
-                <tool.icon className="h-5 w-5 text-neutral-600" />
+            <Link key={tool.label} to={tool.to} className="flex flex-col items-center gap-2 rounded-lg border border-transparent p-3 text-center transition-colors hover:border-border hover:bg-surface-hover">
+              <div className="flex h-11 w-11 items-center justify-center rounded-lg border border-border bg-surface-subtle">
+                <tool.icon className="h-5 w-5 text-ink-muted" />
               </div>
-              <span className="text-[11px] font-medium text-neutral-700">{tool.label}</span>
+              <span className="text-[11px] font-medium text-ink-muted">{tool.label}</span>
             </Link>
           ))}
         </div>
@@ -544,12 +544,12 @@ export function DashboardPage() {
  */
 function CareerVaultPlaceholderCard() {
   return (
-    <div className="mt-6 rounded-xl border border-dashed border-neutral-300 bg-neutral-50 p-6">
+    <div className="mt-6 rounded-xl border border-dashed border-border bg-surface-subtle p-6">
       <div className="flex items-center gap-3">
-        <Archive className="h-5 w-5 flex-shrink-0 text-neutral-400" />
+        <Archive className="h-5 w-5 flex-shrink-0 text-ink-muted" />
         <div>
-          <h2 className="font-display text-base font-semibold text-neutral-500">Career Vault — coming soon</h2>
-          <p className="mt-1 text-xs text-neutral-500">
+          <h2 className="font-display text-base font-semibold text-ink-muted">Career Vault — coming soon</h2>
+          <p className="mt-1 text-xs text-ink-muted">
             Track evidence-backed career wins here once Career Vault ships.
           </p>
         </div>
@@ -570,25 +570,25 @@ function RecommendationRow({
   locked?: boolean
 }) {
   return (
-    <div className="flex items-center justify-between gap-3 border-l-2 border-neutral-200 pl-3">
+    <div className="flex items-center justify-between gap-3 border-l-2 border-border pl-3">
       <div className="flex items-center gap-3">
         <Icon className="h-5 w-5 flex-shrink-0 text-primary-600" />
         <div>
           <div className="flex items-center gap-1.5">
-            <p className="text-sm font-medium text-neutral-900">{title}</p>
+            <p className="text-sm font-medium text-ink">{title}</p>
             {tag && (
-              <span className="rounded-full border border-accent-300 px-1.5 py-0.5 font-mono text-[10px] font-semibold text-accent-700">
+              <span className="rounded-full border border-accent-700 px-1.5 py-0.5 font-mono text-[10px] font-semibold text-accent-300">
                 {tag}
               </span>
             )}
-            {locked && <Lock className="h-3 w-3 text-neutral-400" />}
+            {locked && <Lock className="h-3 w-3 text-ink-muted" />}
           </div>
-          <p className="text-xs text-neutral-500">{description}</p>
+          <p className="text-xs text-ink-muted">{description}</p>
         </div>
       </div>
       <Link
         to={to}
-        className="flex-shrink-0 rounded-full border border-neutral-300 px-3 py-1.5 text-xs font-semibold text-neutral-700 transition-colors hover:border-primary-300 hover:bg-primary-50 hover:text-primary-700"
+        className="flex-shrink-0 rounded-full border border-border px-3 py-1.5 text-xs font-semibold text-ink-muted transition-colors hover:border-primary-700 hover:bg-primary-950 hover:text-primary-300"
       >
         {cta}
       </Link>
@@ -601,10 +601,10 @@ function ProgressBar({ label, value, max, display }: { label: string; value: num
   return (
     <div>
       <div className="flex items-center justify-between">
-        <p className="text-xs font-medium text-neutral-700">{label}</p>
-        <p className="font-mono text-xs font-semibold text-neutral-900">{display}</p>
+        <p className="text-xs font-medium text-ink-muted">{label}</p>
+        <p className="font-mono text-xs font-semibold text-ink">{display}</p>
       </div>
-      <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full border border-neutral-200 bg-neutral-100">
+      <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full border border-border bg-surface-subtle">
         <div className="h-full rounded-full bg-primary-600 transition-all duration-700" style={{ width: `${pct}%` }} />
       </div>
     </div>
