@@ -9,24 +9,24 @@ interface OnboardingStepProps {
 export function OnboardingCelebration({ onNext }: OnboardingStepProps) {
   return (
     <div className="text-center">
-      <div className="mx-auto mb-8 flex h-20 w-20 items-center justify-center rounded-full bg-primary-100">
+      <div className="mx-auto mb-8 flex h-20 w-20 items-center justify-center rounded-full bg-primary-950">
         <PartyPopper className="h-10 w-10 text-primary-600" />
       </div>
 
-      <h1 className="font-serif text-3xl font-semibold text-neutral-900 sm:text-4xl">
+      <h1 className="font-serif text-3xl font-semibold text-ink sm:text-4xl">
         You are all set!
       </h1>
-      <p className="mx-auto mt-6 max-w-2xl text-lg text-neutral-600">
+      <p className="mx-auto mt-6 max-w-2xl text-lg text-ink-muted">
         Congratulations! You have completed onboarding. Your Career Strategist is reviewing your questionnaire
         and will begin building your personalized career plan.
       </p>
 
-      <div className="mx-auto mt-10 max-w-md border border-neutral-200 bg-white p-6">
+      <div className="mx-auto mt-10 max-w-md border border-border bg-surface-card p-6">
         <div className="flex items-center justify-center gap-2 text-primary-600">
           <Sparkles className="h-5 w-5" />
           <span className="text-sm font-semibold">What happens next?</span>
         </div>
-        <ul className="mt-4 space-y-3 text-left text-sm text-neutral-600">
+        <ul className="mt-4 space-y-3 text-left text-sm text-ink-muted">
           <li className="flex items-start gap-2">
             <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-primary-500" />
             Your Career Strategist reviews your questionnaire and resume.
@@ -54,7 +54,7 @@ export function OnboardingCelebration({ onNext }: OnboardingStepProps) {
         <ArrowRight className="h-5 w-5" />
       </button>
 
-      <p className="mt-6 text-sm text-neutral-500">
+      <p className="mt-6 text-sm text-ink-muted">
         You can always update your profile or questionnaire from your dashboard.
       </p>
     </div>

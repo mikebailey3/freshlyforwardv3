@@ -23,10 +23,10 @@ export function OnboardingDashboardIntro({ onNext }: OnboardingStepProps) {
 
   return (
     <div>
-      <h1 className="font-serif text-3xl font-semibold text-neutral-900 sm:text-4xl">
+      <h1 className="font-serif text-3xl font-semibold text-ink sm:text-4xl">
         Your Dashboard
       </h1>
-      <p className="mt-4 text-lg text-neutral-600">
+      <p className="mt-4 text-lg text-ink-muted">
         Your dashboard is your home base. Here is everything you will find there.
       </p>
 
@@ -34,19 +34,19 @@ export function OnboardingDashboardIntro({ onNext }: OnboardingStepProps) {
         {features.map((feature) => (
           <div
             key={feature.title}
-            className="flex items-start gap-3 border border-neutral-200 border-l-4 border-l-primary-600 bg-white p-5 transition-all"
+            className="flex items-start gap-3 border border-border border-l-4 border-l-primary-600 bg-surface-card p-5 transition-all"
           >
             <feature.icon className="h-6 w-6 flex-shrink-0 text-primary-600" />
             <div>
-              <h3 className="font-serif text-base font-semibold text-neutral-900">{feature.title}</h3>
-              <p className="mt-1 text-sm text-neutral-600">{feature.desc}</p>
+              <h3 className="font-serif text-base font-semibold text-ink">{feature.title}</h3>
+              <p className="mt-1 text-sm text-ink-muted">{feature.desc}</p>
             </div>
           </div>
         ))}
       </div>
 
-      <div className="mt-8 border border-primary-300 border-l-4 border-l-primary-600 bg-primary-50 p-5 text-center">
-        <p className="text-sm text-primary-700">
+      <div className="mt-8 border border-primary-700 border-l-4 border-l-primary-600 bg-primary-950 p-5 text-center">
+        <p className="text-sm text-primary-300">
           Ready to explore? Your dashboard is just one click away.
         </p>
       </div>
