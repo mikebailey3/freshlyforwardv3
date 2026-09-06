@@ -341,7 +341,7 @@ pricing-section { padding-bottom: 100px; }
 .values-grid svg { flex-shrink: 0; width: 44px; height: 44px; padding: 10px; box-sizing: border-box; border-radius: 9999px; margin-top: 2px; color: var(--green-dark); background: var(--mint); stroke-width: 1.7; }
 .about-checklist { margin-bottom: 100px; padding: 44px 50px; border-radius: 24px; color: var(--ink); background: var(--cream); box-shadow: 0 4px 24px rgba(7, 26, 49, .04); }
 .about-checklist h2 { font-size: 1.7rem; }
-.about-checklist p { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); color: #35445a; }
+.about-checklist p { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); color: var(--ink-soft); }
 .about-checklist p:last-child { border-bottom: 0; }
 .about-checklist svg { width: 18px; color: var(--green); }
 
