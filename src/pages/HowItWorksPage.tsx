@@ -147,17 +147,17 @@ export function HowItWorksPage() {
               <li className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-primary-500" aria-hidden="true" /> A calendar of what's coming up next</li>
             </ul>
           </div>
-          <div className="overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm">
-            <div className="grid grid-cols-3 divide-x divide-neutral-200">
-              <div className="p-5"><p className="text-xs font-semibold text-neutral-500">Applications</p><p className="mt-2 font-mono text-2xl font-bold text-neutral-900">4</p><p className="mt-1 text-[11px] text-neutral-500">Active</p></div>
-              <div className="p-5"><p className="text-xs font-semibold text-neutral-500">Interviews</p><p className="mt-2 font-mono text-2xl font-bold text-neutral-900">1</p><p className="mt-1 text-[11px] text-neutral-500">Upcoming</p></div>
-              <div className="p-5"><p className="text-xs font-semibold text-neutral-500">Messages</p><p className="mt-2 font-mono text-2xl font-bold text-neutral-900">2</p><p className="mt-1 text-[11px] text-neutral-500">Unread</p></div>
+          <div className="overflow-hidden rounded-xl border border-border bg-surface-card shadow-xl shadow-black/20">
+            <div className="grid grid-cols-3 divide-x divide-border">
+              <div className="p-5"><p className="text-xs font-semibold text-ink-muted">Applications</p><p className="mt-2 font-mono text-2xl font-bold text-ink">4</p><p className="mt-1 text-[11px] text-ink-muted">Active</p></div>
+              <div className="p-5"><p className="text-xs font-semibold text-ink-muted">Interviews</p><p className="mt-2 font-mono text-2xl font-bold text-ink">1</p><p className="mt-1 text-[11px] text-ink-muted">Upcoming</p></div>
+              <div className="p-5"><p className="text-xs font-semibold text-ink-muted">Messages</p><p className="mt-2 font-mono text-2xl font-bold text-ink">2</p><p className="mt-1 text-[11px] text-ink-muted">Unread</p></div>
             </div>
-            <div className="flex items-center justify-between border-t border-neutral-200 bg-neutral-50 p-5">
-              <div><p className="font-mono text-[10px] font-semibold uppercase tracking-wide text-neutral-500">On Call</p><p className="mt-1 text-sm font-semibold text-neutral-900">Your Career Strategist</p></div>
+            <div className="flex items-center justify-between border-t border-border bg-surface-subtle p-5">
+              <div><p className="font-mono text-[10px] font-semibold uppercase tracking-wide text-ink-muted">On Call</p><p className="mt-1 text-sm font-semibold text-ink">Your Career Strategist</p></div>
               <span className="inline-flex items-center justify-center gap-1.5 rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white"><Mail className="h-4 w-4" aria-hidden="true" /> Send a Message</span>
             </div>
-            <p className="border-t border-neutral-100 px-5 py-2 text-center font-mono text-[10px] font-semibold uppercase tracking-wide text-neutral-400">Sample dashboard preview</p>
+            <p className="border-t border-border px-5 py-2 text-center font-mono text-[10px] font-semibold uppercase tracking-wide text-ink-muted">Sample dashboard preview</p>
           </div>
         </div>
       </section>

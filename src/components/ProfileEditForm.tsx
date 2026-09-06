@@ -64,7 +64,7 @@ export function ProfileEditForm({ profile, onSave, onCancel, focusSection }: Pro
   return (
     <div className="space-y-6">
       {error && (
-        <div className="border border-error-200 bg-error-50 px-4 py-3 text-sm text-error-600">
+        <div className="border border-error-600 bg-error-950 px-4 py-3 text-sm text-error-300">
           {error}
         </div>
       )}
@@ -76,15 +76,15 @@ export function ProfileEditForm({ profile, onSave, onCancel, focusSection }: Pro
           <div
             key={section.key}
             ref={(el) => { sectionRefs.current[section.key] = el }}
-            className={`border bg-white p-6 transition-colors border-l-4 ${
-              isFocused ? 'border-l-primary-600 border-primary-200' : 'border-l-neutral-300 border-neutral-200'
+            className={`border bg-surface-card p-6 transition-colors border-l-4 ${
+              isFocused ? 'border-l-primary-600 border-primary-800' : 'border-l-border border-border'
             }`}
           >
-            <div className="mb-4 flex items-center gap-3 border-b border-neutral-100 pb-3">
+            <div className="mb-4 flex items-center gap-3 border-b border-border pb-3">
               <Icon className="h-5 w-5 text-primary-600" />
               <div>
-                <h3 className="font-serif text-base font-semibold text-neutral-900">{section.title}</h3>
-                <p className="text-xs text-neutral-500">{section.description}</p>
+                <h3 className="font-serif text-base font-semibold text-ink">{section.title}</h3>
+                <p className="text-xs text-ink-muted">{section.description}</p>
               </div>
             </div>
             <div className="space-y-5">
@@ -102,12 +102,12 @@ export function ProfileEditForm({ profile, onSave, onCancel, focusSection }: Pro
       })}
 
       {/* Sticky save bar */}
-      <div className="sticky bottom-0 z-10 flex items-center justify-end gap-3 border border-neutral-200 bg-white/95 p-4 shadow-lg backdrop-blur-md">
+      <div className="sticky bottom-0 z-10 flex items-center justify-end gap-3 border border-border bg-surface-card/95 p-4 shadow-lg backdrop-blur-md">
         <button
           type="button"
           onClick={onCancel}
           disabled={saving}
-          className="flex items-center gap-1.5 border border-neutral-300 px-4 py-2.5 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50 disabled:opacity-60"
+          className="flex items-center gap-1.5 border border-border px-4 py-2.5 text-sm font-medium text-ink-muted transition-colors hover:bg-surface-hover disabled:opacity-60"
         >
           <X className="h-4 w-4" />
           Cancel
