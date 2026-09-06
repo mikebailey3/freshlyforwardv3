@@ -58,25 +58,25 @@ export function CommunicationPreferencesPage() {
   return (
     <MemberLayout>
       <div className="mb-6">
-        <h1 className="font-serif text-2xl font-semibold text-neutral-900 sm:text-3xl">Communication Preferences</h1>
-        <p className="mt-1 text-sm text-neutral-600">Choose how and when FreshlyForward contacts you.</p>
+        <h1 className="font-serif text-2xl font-semibold text-ink sm:text-3xl">Communication Preferences</h1>
+        <p className="mt-1 text-sm text-ink-muted">Choose how and when FreshlyForward contacts you.</p>
       </div>
 
       <div className="max-w-xl space-y-3">
         {prefRows.map((row) => {
           const value = prefs ? (prefs[row.key] as boolean) : false
           return (
-            <div key={row.key} className={`flex items-center justify-between border border-neutral-200 border-l-4 border-l-primary-600 bg-white p-5 ${row.future ? 'opacity-60' : ''}`}>
+            <div key={row.key} className={`flex items-center justify-between border border-border border-l-4 border-l-primary-600 bg-surface-card p-5 ${row.future ? 'opacity-60' : ''}`}>
               <div className="flex items-center gap-3">
                 <row.icon className="h-5 w-5 flex-shrink-0 text-primary-600" />
                 <div>
                   <div className="flex items-center gap-2">
-                    <p className="text-sm font-semibold text-neutral-900">{row.label}</p>
+                    <p className="text-sm font-semibold text-ink">{row.label}</p>
                     {row.future && (
-                      <span className="border border-neutral-300 px-2 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide text-neutral-500">Coming Soon</span>
+                      <span className="border border-border px-2 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide text-ink-muted">Coming Soon</span>
                     )}
                   </div>
-                  <p className="text-xs text-neutral-500">{row.desc}</p>
+                  <p className="text-xs text-ink-muted">{row.desc}</p>
                 </div>
               </div>
               <button
@@ -85,7 +85,7 @@ export function CommunicationPreferencesPage() {
                 aria-label={`Toggle ${row.label}`}
                 disabled={row.future || saving === row.key}
                 onClick={() => handleToggle(row.key)}
-                className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-600 focus:ring-offset-2 disabled:cursor-not-allowed ${value ? 'bg-primary-600' : 'bg-neutral-200'}`}
+                className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-600 focus:ring-offset-2 disabled:cursor-not-allowed ${value ? 'bg-primary-600' : 'bg-surface-hover'}`}
               >
                 <span
                   className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${value ? 'translate-x-5' : 'translate-x-0'}`}
@@ -96,7 +96,7 @@ export function CommunicationPreferencesPage() {
         })}
       </div>
 
-      <p className="mt-6 text-xs text-neutral-400">
+      <p className="mt-6 text-xs text-ink-muted">
         Changes are saved automatically. You can update these preferences at any time.
       </p>
     </MemberLayout>

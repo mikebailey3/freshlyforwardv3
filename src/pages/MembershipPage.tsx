@@ -182,49 +182,49 @@ export function MembershipPage() {
   return (
     <MemberLayout>
       <div className="mb-6">
-        <h1 className="font-serif text-2xl font-semibold text-neutral-900 sm:text-3xl">Membership</h1>
-        <p className="mt-1 text-sm text-neutral-600">Manage your billing, pause, or cancel anytime.</p>
+        <h1 className="font-serif text-2xl font-semibold text-ink sm:text-3xl">Membership</h1>
+        <p className="mt-1 text-sm text-ink-muted">Manage your billing, pause, or cancel anytime.</p>
       </div>
 
       {error && (
-        <div className="mb-6 flex items-start gap-2 border border-error-200 bg-error-50 px-4 py-3 text-sm text-error-600">
+        <div className="mb-6 flex items-start gap-2 border border-error-700 bg-error-950 px-4 py-3 text-sm text-error-300">
           <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
       {/* Current Plan */}
-      <div className="border border-neutral-200 bg-white p-6">
-        <div className="flex items-center gap-3 border-b border-neutral-100 pb-3">
+      <div className="border border-border bg-surface-card p-6">
+        <div className="flex items-center gap-3 border-b border-border pb-3">
           <CreditCard className="h-5 w-5 text-primary-600" />
           <div>
-            <h3 className="font-serif text-base font-semibold text-neutral-900">Current Plan</h3>
-            <p className="text-xs text-neutral-500">Your active membership</p>
+            <h3 className="font-serif text-base font-semibold text-ink">Current Plan</h3>
+            <p className="text-xs text-ink-muted">Your active membership</p>
           </div>
         </div>
 
-        <div className="mt-4 grid gap-0 border border-neutral-200 sm:grid-cols-2">
-          <div className="border-b border-r-0 border-neutral-200 p-4 sm:border-r">
-            <p className="text-xs text-neutral-500">Plan</p>
-            <p className="mt-1 font-serif text-lg font-semibold text-neutral-900">{plan?.name || 'No plan'}</p>
+        <div className="mt-4 grid gap-0 border border-border sm:grid-cols-2">
+          <div className="border-b border-r-0 border-border p-4 sm:border-r">
+            <p className="text-xs text-ink-muted">Plan</p>
+            <p className="mt-1 font-serif text-lg font-semibold text-ink">{plan?.name || 'No plan'}</p>
           </div>
-          <div className="border-b border-neutral-200 p-4">
-            <p className="text-xs text-neutral-500">Price</p>
-            <p className="mt-1 font-serif text-lg font-semibold text-neutral-900">
+          <div className="border-b border-border p-4">
+            <p className="text-xs text-ink-muted">Price</p>
+            <p className="mt-1 font-serif text-lg font-semibold text-ink">
               {plan ? `${formatCurrency(plan.price_cents)}/${plan.interval}` : '\u2014'}
             </p>
           </div>
-          <div className="border-r-0 p-4 sm:border-r sm:border-neutral-200">
-            <p className="text-xs text-neutral-500">Status</p>
+          <div className="border-r-0 p-4 sm:border-r sm:border-border">
+            <p className="text-xs text-ink-muted">Status</p>
             <p className={`mt-1 font-mono text-sm font-semibold uppercase tracking-wide ${
-              status === 'active' ? 'text-success-600' : status === 'paused' ? 'text-warning-600' : status === 'canceled' ? 'text-error-600' : 'text-neutral-900'
+              status === 'active' ? 'text-success-400' : status === 'paused' ? 'text-warning-400' : status === 'canceled' ? 'text-error-400' : 'text-ink'
             }`}>
               {status}
             </p>
           </div>
           <div className="p-4">
-            <p className="text-xs text-neutral-500">Next Billing Date</p>
-            <p className="mt-1 font-mono text-sm font-semibold text-neutral-900">
+            <p className="text-xs text-ink-muted">Next Billing Date</p>
+            <p className="mt-1 font-mono text-sm font-semibold text-ink">
               {status === 'active'
                 ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
                 : '\u2014'}
@@ -234,10 +234,10 @@ export function MembershipPage() {
 
         {plan && (
           <div className="mt-4">
-            <p className="text-xs font-semibold text-neutral-700">Included:</p>
+            <p className="text-xs font-semibold text-ink-muted">Included:</p>
             <ul className="mt-2 grid gap-2 sm:grid-cols-2">
               {plan.features.map((feature, i) => (
-                <li key={i} className="flex items-start gap-2 text-sm text-neutral-600">
+                <li key={i} className="flex items-start gap-2 text-sm text-ink-muted">
                   <Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-success-600" />
                   {feature}
                 </li>
@@ -253,7 +253,7 @@ export function MembershipPage() {
           <button
             onClick={handlePause}
             disabled={actionLoading}
-            className="flex items-center justify-center gap-2 border border-neutral-300 bg-white px-4 py-3 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50 disabled:opacity-60"
+            className="flex items-center justify-center gap-2 border border-border bg-surface-card px-4 py-3 text-sm font-medium text-ink-muted transition-colors hover:bg-surface-hover disabled:opacity-60"
           >
             {actionLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Pause className="h-4 w-4" />}
             Pause Membership
@@ -275,7 +275,7 @@ export function MembershipPage() {
           <button
             onClick={handleCancel}
             disabled={actionLoading}
-            className="flex items-center justify-center gap-2 border border-error-300 bg-error-50 px-4 py-3 text-sm font-medium text-error-600 transition-colors hover:bg-error-100 disabled:opacity-60"
+            className="flex items-center justify-center gap-2 border border-error-700 bg-error-950 px-4 py-3 text-sm font-medium text-error-300 transition-colors hover:bg-error-900 disabled:opacity-60"
           >
             {actionLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <X className="h-4 w-4" />}
             Cancel Membership
@@ -285,7 +285,7 @@ export function MembershipPage() {
         <button
           onClick={handlePortal}
           disabled={portalLoading}
-          className="flex items-center justify-center gap-2 border border-neutral-300 bg-white px-4 py-3 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50 disabled:opacity-60 sm:col-span-3"
+          className="flex items-center justify-center gap-2 border border-border bg-surface-card px-4 py-3 text-sm font-medium text-ink-muted transition-colors hover:bg-surface-hover disabled:opacity-60 sm:col-span-3"
         >
           {portalLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ExternalLink className="h-4 w-4" />}
           Manage Billing in Stripe Portal
@@ -293,12 +293,12 @@ export function MembershipPage() {
       </div>
 
       {/* Billing Info */}
-      <div className="mt-6 border border-neutral-200 bg-white p-6">
-        <div className="flex items-center gap-3 border-b border-neutral-100 pb-3">
+      <div className="mt-6 border border-border bg-surface-card p-6">
+        <div className="flex items-center gap-3 border-b border-border pb-3">
           <Calendar className="h-5 w-5 text-primary-600" />
-          <h3 className="font-serif text-base font-semibold text-neutral-900">Billing Information</h3>
+          <h3 className="font-serif text-base font-semibold text-ink">Billing Information</h3>
         </div>
-        <div className="mt-4 space-y-3 text-sm text-neutral-600">
+        <div className="mt-4 space-y-3 text-sm text-ink-muted">
           <p>
             <Shield className="inline h-4 w-4 text-primary-600" /> Your billing is securely managed by Stripe.
             Your payment information is never stored on FreshlyForward servers.
@@ -311,8 +311,8 @@ export function MembershipPage() {
       </div>
 
       {/* Disclaimer */}
-      <div className="mt-6 border border-dashed border-neutral-300 bg-neutral-50 p-4">
-        <div className="space-y-1 text-xs text-neutral-500">
+      <div className="mt-6 border border-dashed border-border bg-surface-subtle p-4">
+        <div className="space-y-1 text-xs text-ink-muted">
           <p>Employment is never guaranteed.</p>
           <p>Applications are personally researched and submitted by a Career Strategist.</p>
           <p>Application volume depends on opportunity quality, member preferences, and membership level.</p>

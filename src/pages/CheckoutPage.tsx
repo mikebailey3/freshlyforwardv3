@@ -117,7 +117,7 @@ export function CheckoutPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-neutral-50">
+      <div className="flex min-h-screen items-center justify-center bg-bg">
         <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
       </div>
     )
@@ -125,9 +125,9 @@ export function CheckoutPage() {
 
   if (!plan) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-neutral-50">
-        <AlertCircle className="h-12 w-12 text-neutral-400" />
-        <p className="mt-4 text-neutral-600">{error || 'Plan not found.'}</p>
+      <div className="flex min-h-screen flex-col items-center justify-center bg-bg">
+        <AlertCircle className="h-12 w-12 text-ink-muted" />
+        <p className="mt-4 text-ink-muted">{error || 'Plan not found.'}</p>
         <Link to="/pricing" className="mt-4 text-primary-600 hover:underline">
           View all plans
         </Link>
@@ -136,40 +136,40 @@ export function CheckoutPage() {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-50">
+    <div className="min-h-screen bg-bg">
       <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
         <Link to="/" className="mb-8 flex items-center gap-2">
           <Compass className="h-7 w-7 text-primary-600" />
-          <span className="font-display text-xl font-semibold text-neutral-900">FreshlyForward</span>
+          <span className="font-display text-xl font-semibold text-ink">FreshlyForward</span>
         </Link>
 
-        <div className="rounded-2xl border border-neutral-200 bg-white p-8 shadow-sm">
-          <h1 className="font-display text-2xl font-semibold text-neutral-900">Checkout</h1>
-          <p className="mt-2 text-sm text-neutral-600">Review your plan and complete your purchase.</p>
+        <div className="rounded-2xl border border-border bg-surface-card p-8 shadow-sm">
+          <h1 className="font-display text-2xl font-semibold text-ink">Checkout</h1>
+          <p className="mt-2 text-sm text-ink-muted">Review your plan and complete your purchase.</p>
 
           {/* Plan Summary */}
-          <div className="mt-6 rounded-xl border border-neutral-200 border-l-4 border-l-primary-600 bg-neutral-50 p-6">
+          <div className="mt-6 rounded-xl border border-border border-l-4 border-l-primary-600 bg-surface-subtle p-6">
             <div className="flex items-start justify-between">
               <div>
-                <h2 className="font-display text-lg font-semibold text-neutral-900">{plan.name}</h2>
+                <h2 className="font-display text-lg font-semibold text-ink">{plan.name}</h2>
                 {plan.badge && (
-                  <span className="mt-1 inline-block rounded-full border border-primary-300 px-2.5 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide text-primary-700">
+                  <span className="mt-1 inline-block rounded-full border border-primary-700 px-2.5 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide text-primary-300">
                     {plan.badge}
                   </span>
                 )}
-                <p className="mt-2 text-sm text-neutral-600">{plan.description}</p>
+                <p className="mt-2 text-sm text-ink-muted">{plan.description}</p>
               </div>
               <div className="text-right">
-                <div className="font-display text-3xl font-bold text-neutral-900">
+                <div className="font-display text-3xl font-bold text-ink">
                   {formatCurrency(plan.price_cents)}
                 </div>
-                <div className="text-sm text-neutral-500">/{plan.interval}</div>
+                <div className="text-sm text-ink-muted">/{plan.interval}</div>
               </div>
             </div>
 
             <ul className="mt-4 space-y-2">
               {plan.features.map((feature, i) => (
-                <li key={i} className="flex items-start gap-2 text-sm text-neutral-700">
+                <li key={i} className="flex items-start gap-2 text-sm text-ink-muted">
                   <Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-success-600" />
                   <span>{feature}</span>
                 </li>
@@ -179,35 +179,35 @@ export function CheckoutPage() {
 
           {/* Discount Code */}
           <div className="mt-6">
-            <label className="block text-sm font-medium text-neutral-700">Discount Code</label>
+            <label className="block text-sm font-medium text-ink-muted">Discount Code</label>
             <form onSubmit={handleApplyDiscount} className="mt-1 flex gap-2">
               <div className="relative flex-1">
-                <Tag className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+                <Tag className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-muted" />
                 <input
                   type="text"
                   value={discountCode}
                   onChange={(e) => setDiscountCode(e.target.value)}
                   placeholder="Enter discount code"
-                  className="w-full rounded-full border border-neutral-300 py-2.5 pl-10 pr-3 text-sm text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  className="w-full rounded-full border border-border py-2.5 pl-10 pr-3 text-sm text-ink focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                 />
               </div>
               <button
                 type="submit"
-                className="rounded-full border border-neutral-300 px-4 py-2.5 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50"
+                className="rounded-full border border-border px-4 py-2.5 text-sm font-medium text-ink-muted transition-colors hover:bg-surface-hover"
               >
                 Apply
               </button>
             </form>
             {appliedDiscount && (
-              <p className="mt-2 text-sm text-success-600">Discount code "{appliedDiscount}" applied.</p>
+              <p className="mt-2 text-sm text-success-400">Discount code "{appliedDiscount}" applied.</p>
             )}
             {discountError && (
-              <p className="mt-2 text-sm text-error-600">{discountError}</p>
+              <p className="mt-2 text-sm text-error-400">{discountError}</p>
             )}
           </div>
 
           {error && (
-            <div className="mt-4 flex items-start gap-2 rounded-xl border border-error-200 bg-error-50 px-4 py-3 text-sm text-error-600">
+            <div className="mt-4 flex items-start gap-2 rounded-xl border border-error-700 bg-error-950 px-4 py-3 text-sm text-error-300">
               <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
               <span>{error}</span>
             </div>
@@ -232,7 +232,7 @@ export function CheckoutPage() {
             )}
           </button>
 
-          <p className="mt-4 text-center text-xs text-neutral-500">
+          <p className="mt-4 text-center text-xs text-ink-muted">
             Your membership can be paused or canceled anytime according to our billing policy.
           </p>
         </div>
