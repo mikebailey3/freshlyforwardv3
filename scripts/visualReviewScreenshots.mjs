@@ -7,12 +7,15 @@ import { chromium } from 'playwright'
 import { mkdirSync } from 'node:fs'
 
 const BASE_URL = process.env.SCREENSHOT_BASE_URL || 'http://localhost:5176'
-const OUT_DIR = 'docs/superpowers/visual-review/2026-09-06-task29-public-marketing'
+const OUT_DIR = process.env.SCREENSHOT_OUT_DIR || 'docs/superpowers/visual-review/2026-09-06-task29-public-marketing'
 
 const targets = [
   { path: '/', name: 'landing' },
   { path: '/how-it-works', name: 'how-it-works' },
   { path: '/pricing', name: 'pricing' },
+  { path: '/about', name: 'about' },
+  { path: '/faq', name: 'faq' },
+  { path: '/internal/design-system', name: 'design-system-showcase' },
 ]
 
 const viewports = [
