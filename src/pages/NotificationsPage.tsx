@@ -87,13 +87,13 @@ export function NotificationsPage() {
     <MemberLayout>
       <div className="mb-6 flex items-start justify-between gap-4">
         <div>
-          <h1 className="font-serif text-2xl font-semibold text-neutral-900 sm:text-3xl">
+          <h1 className="font-serif text-2xl font-semibold text-ink sm:text-3xl">
             Notifications
           </h1>
-          <p className="mt-1 text-sm text-neutral-600">
+          <p className="mt-1 text-sm text-ink-muted">
             Stay up to date on your career search activity.
             {unreadCount > 0 && (
-              <span className="ml-1.5 inline-flex items-center gap-1 border border-primary-300 px-2.5 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide text-primary-700">
+              <span className="ml-1.5 inline-flex items-center gap-1 border border-primary-700 px-2.5 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide text-primary-300">
                 {unreadCount} unread
               </span>
             )}
@@ -102,7 +102,7 @@ export function NotificationsPage() {
         {unreadCount > 0 && (
           <button
             onClick={handleMarkAllRead}
-            className="flex flex-shrink-0 items-center gap-2 border border-neutral-300 px-4 py-2.5 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-50"
+            className="flex flex-shrink-0 items-center gap-2 border border-border px-4 py-2.5 text-sm font-medium text-ink-muted transition-colors hover:bg-surface-hover"
           >
             <CheckCheck className="h-4 w-4" />
             Mark all read
@@ -112,7 +112,7 @@ export function NotificationsPage() {
 
       {/* Filter bar */}
       <div className="mb-6 flex flex-wrap items-center gap-2">
-        <span className="flex items-center gap-1.5 text-xs font-medium text-neutral-500">
+        <span className="flex items-center gap-1.5 text-xs font-medium text-ink-muted">
           <Filter className="h-3.5 w-3.5" />
           Filter:
         </span>
@@ -121,8 +121,8 @@ export function NotificationsPage() {
           className={cn(
             'border-b-2 px-3 py-1.5 font-mono text-xs font-medium transition-colors',
             filter === 'all'
-              ? 'border-primary-600 text-primary-700'
-              : 'border-transparent text-neutral-500 hover:text-neutral-700'
+              ? 'border-primary-600 text-primary-300'
+              : 'border-transparent text-ink-muted hover:text-ink'
           )}
           aria-pressed={filter === 'all'}
         >
@@ -133,8 +133,8 @@ export function NotificationsPage() {
           className={cn(
             'border-b-2 px-3 py-1.5 font-mono text-xs font-medium transition-colors',
             filter === 'unread'
-              ? 'border-primary-600 text-primary-700'
-              : 'border-transparent text-neutral-500 hover:text-neutral-700'
+              ? 'border-primary-600 text-primary-300'
+              : 'border-transparent text-ink-muted hover:text-ink'
           )}
           aria-pressed={filter === 'unread'}
         >
@@ -151,8 +151,8 @@ export function NotificationsPage() {
               className={cn(
                 'flex items-center gap-1.5 border-b-2 px-3 py-1.5 font-mono text-xs font-medium transition-colors',
                 filter === type
-                  ? 'border-primary-600 text-primary-700'
-                  : 'border-transparent text-neutral-500 hover:text-neutral-700'
+                  ? 'border-primary-600 text-primary-300'
+                  : 'border-transparent text-ink-muted hover:text-ink'
               )}
               aria-pressed={filter === type}
             >
@@ -165,9 +165,9 @@ export function NotificationsPage() {
 
       {/* Notifications list */}
       {filtered.length === 0 ? (
-        <div className="border border-neutral-200 bg-white p-12 text-center">
-          <Bell className="mx-auto h-12 w-12 text-neutral-300" />
-          <p className="mt-4 text-sm text-neutral-500">
+        <div className="border border-border bg-surface-card p-12 text-center">
+          <Bell className="mx-auto h-12 w-12 text-ink-muted" />
+          <p className="mt-4 text-sm text-ink-muted">
             {filter === 'unread'
               ? "You're all caught up! No unread notifications."
               : "No notifications yet. You'll see updates here as your career search progresses."}
@@ -183,42 +183,42 @@ export function NotificationsPage() {
               <div
                 key={notification.id}
                 className={cn(
-                  'border bg-white p-5 transition-colors border-l-4',
-                  notification.is_read ? 'border-neutral-200 border-l-neutral-300' : 'border-primary-200 border-l-primary-600 bg-primary-50/30'
+                  'border bg-surface-card p-5 transition-colors border-l-4',
+                  notification.is_read ? 'border-border border-l-border' : 'border-primary-700 border-l-primary-600 bg-primary-950/30'
                 )}
               >
                 <div className="flex items-start gap-3">
                   <Icon
                     className={cn(
                       'mt-0.5 h-5 w-5 flex-shrink-0',
-                      notification.is_read ? 'text-neutral-500' : 'text-primary-600'
+                      notification.is_read ? 'text-ink-muted' : 'text-primary-600'
                     )}
                   />
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <span className="border border-neutral-300 px-2.5 py-0.5 font-mono text-[11px] font-medium uppercase tracking-wide text-neutral-600">
+                      <span className="border border-border px-2.5 py-0.5 font-mono text-[11px] font-medium uppercase tracking-wide text-ink-muted">
                         {label}
                       </span>
                       {!notification.is_read && (
-                        <span className="flex items-center gap-1 border border-primary-300 px-2.5 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide text-primary-700">
+                        <span className="flex items-center gap-1 border border-primary-700 px-2.5 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide text-primary-300">
                           New
                         </span>
                       )}
                     </div>
-                    <h3 className="mt-2 font-serif text-base font-semibold text-neutral-900">
+                    <h3 className="mt-2 font-serif text-base font-semibold text-ink">
                       {notification.title}
                     </h3>
                     {notification.body && (
-                      <p className="mt-1 text-sm text-neutral-600">{notification.body}</p>
+                      <p className="mt-1 text-sm text-ink-muted">{notification.body}</p>
                     )}
                     <div className="mt-2 flex items-center gap-3">
-                      <span className="text-xs text-neutral-400">
+                      <span className="text-xs text-ink-muted">
                         {timeAgo(notification.created_at)}
                       </span>
                       {notification.link && (
                         <a
                           href={notification.link}
-                          className="flex items-center gap-1 text-xs font-medium text-primary-600 hover:text-primary-700"
+                          className="flex items-center gap-1 text-xs font-medium text-primary-600 hover:text-primary-400"
                         >
                           View
                           <ExternalLink className="h-3 w-3" />
@@ -227,7 +227,7 @@ export function NotificationsPage() {
                       {!notification.is_read && (
                         <button
                           onClick={() => handleMarkRead(notification.id)}
-                          className="flex items-center gap-1 text-xs font-medium text-neutral-500 transition-colors hover:text-primary-600"
+                          className="flex items-center gap-1 text-xs font-medium text-ink-muted transition-colors hover:text-primary-400"
                         >
                           <CheckCircle2 className="h-3.5 w-3.5" />
                           Mark as read

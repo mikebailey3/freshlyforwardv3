@@ -42,10 +42,10 @@ const statusLabels: Record<string, string> = {
 }
 
 const statusColors: Record<string, string> = {
-  scheduled: 'border-primary-300 text-primary-700',
-  completed: 'border-success-300 text-success-700',
-  cancelled: 'border-neutral-300 text-neutral-500',
-  no_show: 'border-error-300 text-error-700',
+  scheduled: 'border-primary-700 text-primary-300',
+  completed: 'border-success-700 text-success-300',
+  cancelled: 'border-border text-ink-muted',
+  no_show: 'border-error-700 text-error-300',
 }
 
 export function MockInterviewPage() {
@@ -183,10 +183,10 @@ export function MockInterviewPage() {
     <MemberLayout>
       <div className="mb-6 flex items-start justify-between gap-4">
         <div>
-          <h1 className="font-serif text-2xl font-semibold text-neutral-900 sm:text-3xl">
+          <h1 className="font-serif text-2xl font-semibold text-ink sm:text-3xl">
             Mock Interviews
           </h1>
-          <p className="mt-1 text-sm text-neutral-600">
+          <p className="mt-1 text-sm text-ink-muted">
             Practice with your Career Strategist before the real thing. Build confidence, refine your answers, and get expert feedback. All mock interviews take place over Microsoft Teams — your strategist will send the meeting link before your scheduled time.
           </p>
         </div>
@@ -201,13 +201,13 @@ export function MockInterviewPage() {
 
       {/* Booking form */}
       {showForm && (
-        <div className="mb-6 border border-neutral-200 bg-white p-6 animate-fade-in">
-          <h2 className="font-serif text-lg font-semibold text-neutral-900">Book a Mock Interview</h2>
+        <div className="mb-6 border border-border bg-surface-card p-6 animate-fade-in">
+          <h2 className="font-serif text-lg font-semibold text-ink">Book a Mock Interview</h2>
           <form onSubmit={handleBook} className="mt-4 space-y-4">
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <label htmlFor="mi-company" className="block text-sm font-medium text-neutral-700">
-                  Company <span className="text-neutral-400">(optional)</span>
+                <label htmlFor="mi-company" className="block text-sm font-medium text-ink-muted">
+                  Company <span className="text-ink-muted">(optional)</span>
                 </label>
                 <input
                   id="mi-company"
@@ -215,12 +215,12 @@ export function MockInterviewPage() {
                   value={company}
                   onChange={(e) => setCompany(e.target.value)}
                   placeholder="e.g. Acme Corp"
-                  className="mt-1.5 w-full border border-neutral-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  className="mt-1.5 w-full border border-border px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                 />
               </div>
               <div>
-                <label htmlFor="mi-position" className="block text-sm font-medium text-neutral-700">
-                  Position <span className="text-neutral-400">(optional)</span>
+                <label htmlFor="mi-position" className="block text-sm font-medium text-ink-muted">
+                  Position <span className="text-ink-muted">(optional)</span>
                 </label>
                 <input
                   id="mi-position"
@@ -228,21 +228,21 @@ export function MockInterviewPage() {
                   value={position}
                   onChange={(e) => setPosition(e.target.value)}
                   placeholder="e.g. Senior Product Manager"
-                  className="mt-1.5 w-full border border-neutral-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  className="mt-1.5 w-full border border-border px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                 />
               </div>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <label htmlFor="mi-type" className="block text-sm font-medium text-neutral-700">
+                <label htmlFor="mi-type" className="block text-sm font-medium text-ink-muted">
                   Interview Type
                 </label>
                 <select
                   id="mi-type"
                   value={interviewType}
                   onChange={(e) => setInterviewType(e.target.value)}
-                  className="mt-1.5 w-full border border-neutral-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  className="mt-1.5 w-full border border-border px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                 >
                   {interviewTypes.map((t) => (
                     <option key={t} value={t}>{t}</option>
@@ -250,7 +250,7 @@ export function MockInterviewPage() {
                 </select>
               </div>
               <div>
-                <label htmlFor="mi-datetime" className="block text-sm font-medium text-neutral-700">
+                <label htmlFor="mi-datetime" className="block text-sm font-medium text-ink-muted">
                   Preferred Date &amp; Time
                 </label>
                 <input
@@ -259,20 +259,20 @@ export function MockInterviewPage() {
                   value={scheduledAt}
                   onChange={(e) => setScheduledAt(e.target.value)}
                   required
-                  className="mt-1.5 w-full border border-neutral-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  className="mt-1.5 w-full border border-border px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                 />
               </div>
             </div>
 
             <div>
-              <label htmlFor="mi-focus" className="block text-sm font-medium text-neutral-700">
+              <label htmlFor="mi-focus" className="block text-sm font-medium text-ink-muted">
                 Focus Area
               </label>
               <select
                 id="mi-focus"
                 value={focusArea}
                 onChange={(e) => setFocusArea(e.target.value)}
-                className="mt-1.5 w-full border border-neutral-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="mt-1.5 w-full border border-border px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
               >
                 {focusAreas.map((a) => (
                   <option key={a} value={a}>{a}</option>
@@ -281,7 +281,7 @@ export function MockInterviewPage() {
             </div>
 
             {error && (
-              <p className="border border-error-200 bg-error-50 px-4 py-2.5 text-sm text-error-700">{error}</p>
+              <p className="border border-error-700 bg-error-950 px-4 py-2.5 text-sm text-error-300">{error}</p>
             )}
 
             <div className="flex items-center gap-3">
@@ -300,7 +300,7 @@ export function MockInterviewPage() {
               <button
                 type="button"
                 onClick={() => setShowForm(false)}
-                className="border border-neutral-300 px-5 py-2.5 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-50"
+                className="border border-border px-5 py-2.5 text-sm font-medium text-ink-muted transition-colors hover:bg-surface-hover"
               >
                 Cancel
               </button>
@@ -311,13 +311,13 @@ export function MockInterviewPage() {
 
       {/* Upcoming interviews */}
       <section className="mb-6" aria-labelledby="upcoming-heading">
-        <h2 id="upcoming-heading" className="mb-4 font-serif text-lg font-semibold text-neutral-900">
+        <h2 id="upcoming-heading" className="mb-4 font-serif text-lg font-semibold text-ink">
           Upcoming Interviews
         </h2>
         {upcoming.length === 0 ? (
-          <div className="border border-neutral-200 bg-white p-8 text-center">
-            <Calendar className="mx-auto h-10 w-10 text-neutral-300" />
-            <p className="mt-3 text-sm text-neutral-500">
+          <div className="border border-border bg-surface-card p-8 text-center">
+            <Calendar className="mx-auto h-10 w-10 text-ink-muted" />
+            <p className="mt-3 text-sm text-ink-muted">
               No upcoming mock interviews. Click "Book Interview" to schedule one.
             </p>
           </div>
@@ -333,7 +333,7 @@ export function MockInterviewPage() {
       {/* Interview history */}
       {past.length > 0 && (
         <section className="mb-6" aria-labelledby="history-heading">
-          <h2 id="history-heading" className="mb-4 font-serif text-lg font-semibold text-neutral-900">
+          <h2 id="history-heading" className="mb-4 font-serif text-lg font-semibold text-ink">
             Interview History
           </h2>
           <div className="space-y-3">
@@ -347,7 +347,7 @@ export function MockInterviewPage() {
       {/* Cancelled */}
       {cancelled.length > 0 && (
         <section aria-labelledby="cancelled-heading">
-          <h2 id="cancelled-heading" className="mb-4 font-serif text-lg font-semibold text-neutral-900">
+          <h2 id="cancelled-heading" className="mb-4 font-serif text-lg font-semibold text-ink">
             Cancelled
           </h2>
           <div className="space-y-3">
@@ -370,7 +370,7 @@ function InterviewCard({
 }) {
   const hasFeedback = !!interview.feedback
   return (
-    <div className="border border-neutral-200 border-l-4 border-l-primary-600 bg-white p-5 transition-colors">
+    <div className="border border-border border-l-4 border-l-primary-600 bg-surface-card p-5 transition-colors">
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-start gap-3">
           <Briefcase className="mt-0.5 h-5 w-5 flex-shrink-0 text-primary-600" />
@@ -379,29 +379,29 @@ function InterviewCard({
               <span
                 className={cn(
                   'border px-2.5 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide',
-                  statusColors[interview.status] || 'border-neutral-300 text-neutral-600'
+                  statusColors[interview.status] || 'border-border text-ink-muted'
                 )}
               >
                 {statusLabels[interview.status] || interview.status}
               </span>
               {hasFeedback && (
-                <span className="flex items-center gap-1 border border-success-300 px-2.5 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide text-success-700">
+                <span className="flex items-center gap-1 border border-success-700 px-2.5 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide text-success-300">
                   <CheckCircle2 className="h-3 w-3" />
                   Feedback Ready
                 </span>
               )}
             </div>
             {interview.focus_area && (
-              <h3 className="mt-2 font-serif text-base font-semibold text-neutral-900">
+              <h3 className="mt-2 font-serif text-base font-semibold text-ink">
                 {interview.focus_area}
               </h3>
             )}
-            <p className="mt-0.5 flex items-center gap-1.5 text-sm text-neutral-600">
+            <p className="mt-0.5 flex items-center gap-1.5 text-sm text-ink-muted">
               <Clock className="h-3.5 w-3.5" />
               {formatDateTime(interview.scheduled_at)}
             </p>
             {interview.status === 'scheduled' && (
-              <p className="mt-1 flex items-center gap-1.5 text-xs text-neutral-500">
+              <p className="mt-1 flex items-center gap-1.5 text-xs text-ink-muted">
                 <Video className="h-3.5 w-3.5 text-primary-500" />
                 {interview.meeting_link ? (
                   <a
@@ -420,8 +420,8 @@ function InterviewCard({
               </p>
             )}
             {interview.feedback && (
-              <div className="mt-3 border border-neutral-200 bg-neutral-50 p-3 text-sm text-neutral-600">
-                <p className="flex items-center gap-1.5 font-medium text-neutral-700">
+              <div className="mt-3 border border-border bg-surface-subtle p-3 text-sm text-ink-muted">
+                <p className="flex items-center gap-1.5 font-medium text-ink-muted">
                   <MessageSquare className="h-3.5 w-3.5" />
                   Strategist Feedback
                 </p>
@@ -433,7 +433,7 @@ function InterviewCard({
         {interview.status === 'scheduled' && (
           <button
             onClick={() => onCancel(interview.id)}
-            className="flex-shrink-0 border border-neutral-300 px-3 py-2 text-xs font-medium text-neutral-500 transition-colors hover:bg-neutral-50 hover:text-error-600"
+            className="flex-shrink-0 border border-border px-3 py-2 text-xs font-medium text-ink-muted transition-colors hover:bg-surface-hover hover:text-error-400"
           >
             Cancel
           </button>

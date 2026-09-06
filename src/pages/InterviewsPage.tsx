@@ -74,15 +74,15 @@ export function InterviewsPage() {
     <MemberLayout>
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="font-serif text-2xl font-semibold text-neutral-900 sm:text-3xl">Interviews</h1>
-          <p className="mt-1 text-sm text-neutral-600">
+          <h1 className="font-serif text-2xl font-semibold text-ink sm:text-3xl">Interviews</h1>
+          <p className="mt-1 text-sm text-ink-muted">
             Real employer interviews from your applications. Got a date from an employer? Add it here so
             your strategist knows right away. Practicing? Head to Mock Interviews.
           </p>
         </div>
         <Link
           to="/mock-interviews"
-          className="inline-flex items-center gap-1.5 border border-neutral-300 px-3 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
+          className="inline-flex items-center gap-1.5 border border-border px-3 py-2 text-sm font-medium text-ink-muted hover:bg-surface-hover"
         >
           <Video className="h-4 w-4" />
           Mock Interviews
@@ -90,15 +90,15 @@ export function InterviewsPage() {
       </div>
 
       {error && (
-        <div className="mb-4 border border-error-200 bg-error-50 px-4 py-2.5 text-sm text-error-700">
+        <div className="mb-4 border border-error-700 bg-error-950 px-4 py-2.5 text-sm text-error-300">
           {error}
         </div>
       )}
 
       {applications.length === 0 ? (
-        <div className="border border-neutral-200 bg-white p-12 text-center">
-          <Briefcase className="mx-auto h-12 w-12 text-neutral-300" />
-          <p className="mt-4 text-sm text-neutral-500">
+        <div className="border border-border bg-surface-card p-12 text-center">
+          <Briefcase className="mx-auto h-12 w-12 text-ink-muted" />
+          <p className="mt-4 text-sm text-ink-muted">
             No applications yet. Interviews will show up here once your strategist starts applying on your behalf.
           </p>
         </div>
@@ -106,7 +106,7 @@ export function InterviewsPage() {
         <div className="space-y-6">
           {upcoming.length > 0 && (
             <div className="space-y-3">
-              <h2 className="font-serif text-lg font-semibold text-neutral-900">Upcoming</h2>
+              <h2 className="font-serif text-lg font-semibold text-ink">Upcoming</h2>
               {upcoming.map((app) => (
                 <InterviewCard
                   key={app.id}
@@ -123,8 +123,8 @@ export function InterviewsPage() {
 
           {needsDate.length > 0 && (
             <div className="space-y-3">
-              <h2 className="font-serif text-lg font-semibold text-neutral-900">Awaiting an Interview Date</h2>
-              <p className="text-sm text-neutral-500">
+              <h2 className="font-serif text-lg font-semibold text-ink">Awaiting an Interview Date</h2>
+              <p className="text-sm text-ink-muted">
                 Heard back from an employer? Add the date so it lands on your strategist's radar.
               </p>
               {needsDate.map((app) => (
@@ -143,7 +143,7 @@ export function InterviewsPage() {
 
           {past.length > 0 && (
             <div className="space-y-3">
-              <h2 className="font-serif text-lg font-semibold text-neutral-900">Past</h2>
+              <h2 className="font-serif text-lg font-semibold text-ink">Past</h2>
               {past.map((app) => (
                 <InterviewCard
                   key={app.id}
@@ -185,16 +185,16 @@ function InterviewCard({ app, editing, saving, onEdit, onCancelEdit, onSave }: I
   }
 
   return (
-    <div className="border border-neutral-200 border-l-4 border-l-primary-600 bg-white p-6 transition-colors hover:border-l-primary-800">
+    <div className="border border-border border-l-4 border-l-primary-600 bg-surface-card p-6 transition-colors hover:border-l-primary-400">
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1">
           {isActive && (
-            <span className="border-2 border-primary-600 px-2.5 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide text-primary-700">
+            <span className="border-2 border-primary-600 px-2.5 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide text-primary-300">
               Interview Scheduled
             </span>
           )}
-          <h3 className="mt-3 font-serif text-lg font-semibold text-neutral-900">{app.job_title}</h3>
-          <p className="flex items-center gap-1 text-sm text-neutral-600">
+          <h3 className="mt-3 font-serif text-lg font-semibold text-ink">{app.job_title}</h3>
+          <p className="flex items-center gap-1 text-sm text-ink-muted">
             <MapPin className="h-3.5 w-3.5" />
             {app.employer}
           </p>
@@ -206,7 +206,7 @@ function InterviewCard({ app, editing, saving, onEdit, onCancelEdit, onSave }: I
                 value={localValue}
                 onChange={(e) => setLocalValue(e.target.value)}
                 required
-                className="border border-neutral-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="border border-border px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
               />
               <button
                 type="submit"
@@ -220,7 +220,7 @@ function InterviewCard({ app, editing, saving, onEdit, onCancelEdit, onSave }: I
                 type="button"
                 onClick={onCancelEdit}
                 disabled={saving}
-                className="flex items-center gap-1.5 border border-neutral-300 px-3 py-2 text-sm font-medium text-neutral-600 hover:bg-neutral-50"
+                className="flex items-center gap-1.5 border border-border px-3 py-2 text-sm font-medium text-ink-muted hover:bg-surface-hover"
               >
                 <X className="h-4 w-4" />
                 Cancel
@@ -231,18 +231,18 @@ function InterviewCard({ app, editing, saving, onEdit, onCancelEdit, onSave }: I
               {app.interview_date ? (
                 <button
                   onClick={onEdit}
-                  className="mt-3 flex items-center gap-1.5 font-mono text-sm font-medium text-neutral-700 hover:text-primary-700"
+                  className="mt-3 flex items-center gap-1.5 font-mono text-sm font-medium text-ink-muted hover:text-primary-300"
                 >
                   <Calendar className="h-4 w-4 text-primary-600" />
                   {new Date(app.interview_date).toLocaleString('en-US', {
                     weekday: 'long', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit',
                   })}
-                  <Pencil className="h-3 w-3 text-neutral-400" />
+                  <Pencil className="h-3 w-3 text-ink-muted" />
                 </button>
               ) : (
                 <button
                   onClick={onEdit}
-                  className="mt-3 flex items-center gap-1.5 border border-dashed border-primary-300 px-3 py-1.5 text-sm font-medium text-primary-700 hover:bg-primary-50"
+                  className="mt-3 flex items-center gap-1.5 border border-dashed border-primary-700 px-3 py-1.5 text-sm font-medium text-primary-300 hover:bg-primary-950"
                 >
                   <Plus className="h-4 w-4" />
                   Add Interview Date
@@ -252,12 +252,12 @@ function InterviewCard({ app, editing, saving, onEdit, onCancelEdit, onSave }: I
           )}
 
           {app.date_submitted && (
-            <p className="mt-2 font-mono text-xs text-neutral-400">Applied {formatDate(app.date_submitted)}</p>
+            <p className="mt-2 font-mono text-xs text-ink-muted">Applied {formatDate(app.date_submitted)}</p>
           )}
         </div>
         <Link
           to={`/why-we-applied/${app.id}`}
-          className="flex flex-shrink-0 items-center gap-1.5 border border-primary-600 px-4 py-2 text-sm font-medium text-primary-700 transition-colors hover:bg-primary-50"
+          className="flex flex-shrink-0 items-center gap-1.5 border border-primary-600 px-4 py-2 text-sm font-medium text-primary-300 transition-colors hover:bg-primary-950"
         >
           Prep Notes
           <ArrowRight className="h-4 w-4" />

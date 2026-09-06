@@ -186,23 +186,23 @@ export function MessagesPage() {
   return (
     <MemberLayout>
       <div className="mb-4">
-        <h1 className="font-serif text-2xl font-semibold text-neutral-900 sm:text-3xl">Messages</h1>
-        <p className="mt-1 text-sm text-neutral-600">Direct communication with your Career Strategist.</p>
+        <h1 className="font-serif text-2xl font-semibold text-ink sm:text-3xl">Messages</h1>
+        <p className="mt-1 text-sm text-ink-muted">Direct communication with your Career Strategist.</p>
       </div>
 
-      <div className="flex h-[calc(100vh-16rem)] overflow-hidden border border-neutral-200 bg-white">
+      <div className="flex h-[calc(100vh-16rem)] overflow-hidden border border-border bg-surface-card">
         {/* Conversation list */}
-        <div className="flex w-full flex-col border-r border-neutral-200 sm:w-80 lg:w-96">
+        <div className="flex w-full flex-col border-r border-border sm:w-80 lg:w-96">
           {/* Filters + search */}
-          <div className="border-b border-neutral-200 p-3">
+          <div className="border-b border-border p-3">
             <div className="relative mb-2">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-muted" />
               <input
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search messages…"
-                className="w-full border border-neutral-300 py-2 pl-9 pr-3 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="w-full border border-border py-2 pl-9 pr-3 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                 aria-label="Search messages"
               />
             </div>
@@ -212,7 +212,7 @@ export function MessagesPage() {
                   key={f}
                   onClick={() => setFilter(f)}
                   className={`border-b-2 px-3 py-1.5 font-mono text-xs font-medium capitalize transition-colors ${
-                    filter === f ? 'border-primary-600 text-primary-700' : 'border-transparent text-neutral-500 hover:text-neutral-700'
+                    filter === f ? 'border-primary-600 text-primary-300' : 'border-transparent text-ink-muted hover:text-ink'
                   }`}
                 >
                   {f}
@@ -224,8 +224,8 @@ export function MessagesPage() {
           {/* Conversation items */}
           <div className="flex-1 overflow-y-auto">
             {filteredConversations.length === 0 ? (
-              <div className="p-8 text-center text-sm text-neutral-500">
-                <MessageSquare className="mx-auto mb-2 h-8 w-8 text-neutral-300" />
+              <div className="p-8 text-center text-sm text-ink-muted">
+                <MessageSquare className="mx-auto mb-2 h-8 w-8 text-ink-muted" />
                 No conversations.
               </div>
             ) : (
@@ -235,16 +235,16 @@ export function MessagesPage() {
                   <button
                     key={conv.id}
                     onClick={() => setActiveConversation(conv)}
-                    className={`flex w-full items-center gap-3 border-b border-neutral-100 border-l-2 p-3 text-left transition-colors hover:bg-neutral-50 ${
-                      activeConversation?.id === conv.id ? 'border-l-primary-600 bg-primary-50/60' : 'border-l-transparent'
+                    className={`flex w-full items-center gap-3 border-b border-border border-l-2 p-3 text-left transition-colors hover:bg-surface-hover ${
+                      activeConversation?.id === conv.id ? 'border-l-primary-600 bg-primary-950/60' : 'border-l-transparent'
                     }`}
                   >
-                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center border border-neutral-200 bg-neutral-50">
-                      <User className="h-5 w-5 text-neutral-500" />
+                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center border border-border bg-surface-subtle">
+                      <User className="h-5 w-5 text-ink-muted" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="truncate text-sm font-semibold text-neutral-900">Your Career Strategist</p>
-                      <p className="truncate font-mono text-xs text-neutral-500">{timeAgo(conv.last_message_at)}</p>
+                      <p className="truncate text-sm font-semibold text-ink">Your Career Strategist</p>
+                      <p className="truncate font-mono text-xs text-ink-muted">{timeAgo(conv.last_message_at)}</p>
                     </div>
                     <div className="flex items-center gap-1">
                       {conv.is_pinned && <Pin className="h-3.5 w-3.5 text-primary-600" fill="currentColor" />}
@@ -265,30 +265,30 @@ export function MessagesPage() {
         <div className="hidden flex-1 flex-col sm:flex">
           {!activeConversation ? (
             <div className="flex h-full flex-col items-center justify-center text-center">
-              <MessageSquare className="mb-3 h-12 w-12 text-neutral-300" />
-              <p className="text-sm text-neutral-500">Select a conversation to start messaging.</p>
+              <MessageSquare className="mb-3 h-12 w-12 text-ink-muted" />
+              <p className="text-sm text-ink-muted">Select a conversation to start messaging.</p>
             </div>
           ) : (
             <>
               {/* Thread header */}
-              <div className="flex items-center justify-between border-b border-neutral-200 p-3">
+              <div className="flex items-center justify-between border-b border-border p-3">
                 <div className="flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center border border-neutral-200 bg-neutral-50">
-                    <User className="h-4 w-4 text-neutral-500" />
+                  <div className="flex h-8 w-8 items-center justify-center border border-border bg-surface-subtle">
+                    <User className="h-4 w-4 text-ink-muted" />
                   </div>
-                  <span className="text-sm font-semibold text-neutral-900">Your Career Strategist</span>
+                  <span className="text-sm font-semibold text-ink">Your Career Strategist</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <button
                     onClick={() => togglePin(activeConversation)}
-                    className="p-2 text-neutral-400 hover:bg-neutral-50 hover:text-primary-600"
+                    className="p-2 text-ink-muted hover:bg-surface-hover hover:text-primary-600"
                     aria-label={activeConversation.is_pinned ? 'Unpin conversation' : 'Pin conversation'}
                   >
                     <Pin className={`h-4 w-4 ${activeConversation.is_pinned ? 'text-primary-600' : ''}`} fill={activeConversation.is_pinned ? 'currentColor' : 'none'} />
                   </button>
                   <button
                     onClick={() => toggleArchive(activeConversation)}
-                    className="p-2 text-neutral-400 hover:bg-neutral-50 hover:text-neutral-700"
+                    className="p-2 text-ink-muted hover:bg-surface-hover hover:text-ink"
                     aria-label={activeConversation.is_archived ? 'Unarchive conversation' : 'Archive conversation'}
                   >
                     <Archive className="h-4 w-4" />
@@ -300,7 +300,7 @@ export function MessagesPage() {
               <div className="flex-1 overflow-y-auto p-4">
                 {filteredMessages.length === 0 ? (
                   <div className="flex h-full items-center justify-center text-center">
-                    <p className="text-sm text-neutral-500">No messages yet. Start the conversation!</p>
+                    <p className="text-sm text-ink-muted">No messages yet. Start the conversation!</p>
                   </div>
                 ) : (
                   <div className="space-y-3">
@@ -310,21 +310,21 @@ export function MessagesPage() {
                         className={`flex ${msg.sender_type === 'member' ? 'justify-end' : 'justify-start'}`}
                       >
                         <div className={`flex items-start gap-2 max-w-[80%] ${msg.sender_type === 'member' ? 'flex-row-reverse' : ''}`}>
-                          <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-neutral-100">
-                            <User className="h-4 w-4 text-neutral-500" />
+                          <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-surface-subtle">
+                            <User className="h-4 w-4 text-ink-muted" />
                           </div>
                           <div>
                             <div
                               className={`rounded-2xl px-4 py-2.5 text-sm ${
                                 msg.sender_type === 'member'
                                   ? 'bg-primary-600 text-white'
-                                  : 'bg-neutral-100 text-neutral-900'
+                                  : 'bg-surface-subtle text-ink'
                               }`}
                             >
                               {msg.body}
                               {msg.attachment_url && (
                                 <div className={`mt-2 flex items-center gap-2 p-2 text-xs ${
-                                  msg.sender_type === 'member' ? 'bg-primary-700' : 'bg-neutral-200'
+                                  msg.sender_type === 'member' ? 'bg-primary-700' : 'bg-surface-hover'
                                 }`}>
                                   {msg.attachment_type?.startsWith('image/') ? (
                                     <ImageIcon className="h-4 w-4" />
@@ -337,7 +337,7 @@ export function MessagesPage() {
                                 </div>
                               )}
                             </div>
-                            <div className={`mt-1 flex items-center gap-1 text-xs text-neutral-400 ${msg.sender_type === 'member' ? 'justify-end' : ''}`}>
+                            <div className={`mt-1 flex items-center gap-1 text-xs text-ink-muted ${msg.sender_type === 'member' ? 'justify-end' : ''}`}>
                               <time dateTime={msg.created_at}>{timeAgo(msg.created_at)}</time>
                               {msg.sender_type === 'member' && msg.is_read && (
                                 <Check className="h-3 w-3 text-primary-500" aria-label="Read" />
@@ -354,7 +354,7 @@ export function MessagesPage() {
 
               {/* Error */}
               {error && (
-                <div className="mx-4 mb-2 flex items-center gap-2 border border-error-200 bg-error-50 px-3 py-2 text-xs text-error-600">
+                <div className="mx-4 mb-2 flex items-center gap-2 border border-error-700 bg-error-950 px-3 py-2 text-xs text-error-300">
                   <AlertCircle className="h-3.5 w-3.5" />
                   {error}
                 </div>
@@ -362,19 +362,19 @@ export function MessagesPage() {
 
               {/* Attachment preview */}
               {attachment && (
-                <div className="mx-4 mb-2 flex items-center gap-2 border border-primary-200 bg-primary-50 px-3 py-2 text-xs">
+                <div className="mx-4 mb-2 flex items-center gap-2 border border-primary-700 bg-primary-950 px-3 py-2 text-xs">
                   <FileText className="h-3.5 w-3.5 text-primary-600" />
-                  <span className="flex-1 text-primary-700">{attachment.name}</span>
-                  <button onClick={() => setAttachment(null)} className="text-neutral-400 hover:text-error-600" aria-label="Remove attachment">
+                  <span className="flex-1 text-primary-300">{attachment.name}</span>
+                  <button onClick={() => setAttachment(null)} className="text-ink-muted hover:text-error-600" aria-label="Remove attachment">
                     <X className="h-3.5 w-3.5" />
                   </button>
                 </div>
               )}
 
               {/* Input */}
-              <div className="border-t border-neutral-200 p-3">
+              <div className="border-t border-border p-3">
                 <form onSubmit={handleSend} className="flex items-center gap-2">
-                  <label className="cursor-pointer p-2 text-neutral-400 hover:bg-neutral-50 hover:text-primary-600" aria-label="Attach file">
+                  <label className="cursor-pointer p-2 text-ink-muted hover:bg-surface-hover hover:text-primary-600" aria-label="Attach file">
                     {uploading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Paperclip className="h-5 w-5" />}
                     <input
                       type="file"
@@ -388,7 +388,7 @@ export function MessagesPage() {
                     value={body}
                     onChange={(e) => setBody(e.target.value)}
                     placeholder="Type a message…"
-                    className="flex-1 border border-neutral-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                    className="flex-1 border border-border px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                     aria-label="Message input"
                   />
                   <button

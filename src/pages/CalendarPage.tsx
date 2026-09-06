@@ -24,14 +24,14 @@ interface UnifiedEvent {
 }
 
 const eventTypeMeta: Record<string, { label: string; icon: typeof Calendar; color: string; dot: string }> = {
-  mock_interview: { label: 'Mock Interview', icon: Briefcase, color: 'text-primary-700 bg-primary-50', dot: 'bg-primary-600' },
-  real_interview: { label: 'Real Interview', icon: Briefcase, color: 'text-primary-700 bg-primary-50', dot: 'bg-primary-600' },
-  career_review: { label: 'Career Review Session', icon: Users, color: 'text-secondary-700 bg-secondary-50', dot: 'bg-secondary-600' },
-  membership_renewal: { label: 'Membership Renewal', icon: CreditCard, color: 'text-accent-700 bg-accent-50', dot: 'bg-accent-500' },
-  friday_report: { label: 'Friday Report', icon: FileText, color: 'text-accent-700 bg-accent-50', dot: 'bg-accent-500' },
-  strategist_meeting: { label: 'Strategist Meeting', icon: Users, color: 'text-secondary-700 bg-secondary-50', dot: 'bg-secondary-600' },
-  reminder: { label: 'Reminder', icon: Bell, color: 'text-neutral-700 bg-neutral-100', dot: 'bg-neutral-500' },
-  default: { label: 'Event', icon: Calendar, color: 'text-neutral-700 bg-neutral-100', dot: 'bg-neutral-400' },
+  mock_interview: { label: 'Mock Interview', icon: Briefcase, color: 'text-primary-300 bg-primary-950', dot: 'bg-primary-600' },
+  real_interview: { label: 'Real Interview', icon: Briefcase, color: 'text-primary-300 bg-primary-950', dot: 'bg-primary-600' },
+  career_review: { label: 'Career Review Session', icon: Users, color: 'text-secondary-300 bg-secondary-950', dot: 'bg-secondary-600' },
+  membership_renewal: { label: 'Membership Renewal', icon: CreditCard, color: 'text-accent-300 bg-accent-950', dot: 'bg-accent-500' },
+  friday_report: { label: 'Friday Report', icon: FileText, color: 'text-accent-300 bg-accent-950', dot: 'bg-accent-500' },
+  strategist_meeting: { label: 'Strategist Meeting', icon: Users, color: 'text-secondary-300 bg-secondary-950', dot: 'bg-secondary-600' },
+  reminder: { label: 'Reminder', icon: Bell, color: 'text-ink-muted bg-surface-subtle', dot: 'bg-neutral-500' },
+  default: { label: 'Event', icon: Calendar, color: 'text-ink-muted bg-surface-subtle', dot: 'bg-neutral-400' },
 }
 
 function getEventMeta(type: string) {
@@ -204,10 +204,10 @@ export function CalendarPage() {
     <MemberLayout>
       <div className="mb-6 flex items-start justify-between gap-4">
         <div>
-          <h1 className="font-serif text-2xl font-semibold text-neutral-900 sm:text-3xl">
+          <h1 className="font-serif text-2xl font-semibold text-ink sm:text-3xl">
             Calendar
           </h1>
-          <p className="mt-1 text-sm text-neutral-600">
+          <p className="mt-1 text-sm text-ink-muted">
             All your career events in one place — mock interviews, real interviews, Friday reports, and more.
           </p>
         </div>
@@ -232,29 +232,29 @@ export function CalendarPage() {
       )}
 
       {/* Calendar */}
-      <div className="mb-8 border border-neutral-200 bg-white p-4 sm:p-6">
+      <div className="mb-8 border border-border bg-surface-card p-4 sm:p-6">
         {/* Month navigation */}
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="font-serif text-lg font-semibold text-neutral-900">
+          <h2 className="font-serif text-lg font-semibold text-ink">
             {MONTHS[currentMonth.getMonth()]} {currentMonth.getFullYear()}
           </h2>
           <div className="flex items-center gap-2">
             <button
               onClick={prevMonth}
-              className="flex h-9 w-9 items-center justify-center border border-neutral-200 text-neutral-600 transition-colors hover:bg-neutral-50"
+              className="flex h-9 w-9 items-center justify-center border border-border text-ink-muted transition-colors hover:bg-surface-hover"
               aria-label="Previous month"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
             <button
               onClick={() => setCurrentMonth(new Date())}
-              className="border border-neutral-200 px-3 py-1.5 font-mono text-xs font-medium text-neutral-600 transition-colors hover:bg-neutral-50"
+              className="border border-border px-3 py-1.5 font-mono text-xs font-medium text-ink-muted transition-colors hover:bg-surface-hover"
             >
               Today
             </button>
             <button
               onClick={nextMonth}
-              className="flex h-9 w-9 items-center justify-center border border-neutral-200 text-neutral-600 transition-colors hover:bg-neutral-50"
+              className="flex h-9 w-9 items-center justify-center border border-border text-ink-muted transition-colors hover:bg-surface-hover"
               aria-label="Next month"
             >
               <ChevronRight className="h-4 w-4" />
@@ -265,7 +265,7 @@ export function CalendarPage() {
         {/* Weekday header */}
         <div className="mb-1 grid grid-cols-7 gap-1">
           {WEEKDAYS.map((day) => (
-            <div key={day} className="py-2 text-center text-xs font-medium uppercase tracking-wide text-neutral-400">
+            <div key={day} className="py-2 text-center text-xs font-medium uppercase tracking-wide text-ink-muted">
               {day}
             </div>
           ))}
@@ -282,7 +282,7 @@ export function CalendarPage() {
                 key={i}
                 className={cn(
                   'min-h-[80px] border p-1.5 sm:min-h-[100px]',
-                  day.isCurrentMonth ? 'border-neutral-200 bg-white' : 'border-neutral-100 bg-neutral-50',
+                  day.isCurrentMonth ? 'border-border bg-surface-card' : 'border-border bg-surface-subtle',
                   todayHighlight && 'border-primary-600'
                 )}
               >
@@ -292,8 +292,8 @@ export function CalendarPage() {
                     todayHighlight
                       ? 'flex h-6 w-6 items-center justify-center rounded-full bg-primary-600 text-white'
                       : day.isCurrentMonth
-                        ? 'text-neutral-700'
-                        : 'text-neutral-400'
+                        ? 'text-ink'
+                        : 'text-ink-muted'
                   )}
                 >
                   {day.date.getDate()}
@@ -313,7 +313,7 @@ export function CalendarPage() {
                     )
                   })}
                   {dayEvents.length > 3 && (
-                    <p className="px-1 text-[10px] text-neutral-400">+{dayEvents.length - 3} more</p>
+                    <p className="px-1 text-[10px] text-ink-muted">+{dayEvents.length - 3} more</p>
                   )}
                 </div>
               </div>
@@ -322,9 +322,9 @@ export function CalendarPage() {
         </div>
 
         {/* Legend */}
-        <div className="mt-4 flex flex-wrap gap-3 border-t border-neutral-200 pt-4">
+        <div className="mt-4 flex flex-wrap gap-3 border-t border-border pt-4">
           {Object.entries(eventTypeMeta).filter(([k]) => k !== 'default').map(([key, meta]) => (
-            <div key={key} className="flex items-center gap-1.5 text-xs text-neutral-500">
+            <div key={key} className="flex items-center gap-1.5 text-xs text-ink-muted">
               <span className={cn('h-2.5 w-2.5 rounded-full', meta.dot)} />
               {meta.label}
             </div>
@@ -334,13 +334,13 @@ export function CalendarPage() {
 
       {/* Upcoming events list */}
       <section aria-labelledby="upcoming-heading">
-        <h2 id="upcoming-heading" className="mb-4 font-serif text-lg font-semibold text-neutral-900">
+        <h2 id="upcoming-heading" className="mb-4 font-serif text-lg font-semibold text-ink">
           Upcoming Events
         </h2>
         {upcomingEvents.length === 0 ? (
-          <div className="border border-neutral-200 bg-white p-8 text-center">
-            <Calendar className="mx-auto h-10 w-10 text-neutral-300" />
-            <p className="mt-3 text-sm text-neutral-500">
+          <div className="border border-border bg-surface-card p-8 text-center">
+            <Calendar className="mx-auto h-10 w-10 text-ink-muted" />
+            <p className="mt-3 text-sm text-ink-muted">
               No upcoming events. Your calendar will fill up as your career search progresses.
             </p>
           </div>
@@ -351,27 +351,27 @@ export function CalendarPage() {
               return (
                 <div
                   key={ev.id}
-                  className="border border-neutral-200 border-l-4 border-l-primary-600 bg-white p-5 transition-colors hover:border-l-primary-800"
+                  className="border border-border border-l-4 border-l-primary-600 bg-surface-card p-5 transition-colors hover:border-l-primary-400"
                 >
                   <div className="flex items-start gap-3">
-                    <meta.icon className="mt-0.5 h-5 w-5 flex-shrink-0 text-neutral-500" />
+                    <meta.icon className="mt-0.5 h-5 w-5 flex-shrink-0 text-ink-muted" />
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
                         <span className={cn('border-2 px-2.5 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide', meta.color)}>
                           {meta.label}
                         </span>
                       </div>
-                      <h3 className="mt-2 font-serif text-base font-semibold text-neutral-900">
+                      <h3 className="mt-2 font-serif text-base font-semibold text-ink">
                         {ev.title}
                       </h3>
-                      <p className="mt-0.5 flex items-center gap-1.5 font-mono text-sm text-neutral-600">
+                      <p className="mt-0.5 flex items-center gap-1.5 font-mono text-sm text-ink-muted">
                         <Clock className="h-3.5 w-3.5" />
                         {formatDateTime(ev.start_at)}
                       </p>
                       {ev.description && (
-                        <p className="mt-2 text-sm text-neutral-600">{ev.description}</p>
+                        <p className="mt-2 text-sm text-ink-muted">{ev.description}</p>
                       )}
-                      <div className="mt-2 flex flex-wrap gap-3 text-xs text-neutral-500">
+                      <div className="mt-2 flex flex-wrap gap-3 text-xs text-ink-muted">
                         {ev.location && (
                           <span className="flex items-center gap-1">
                             <MapPin className="h-3.5 w-3.5" />
@@ -385,7 +385,7 @@ export function CalendarPage() {
                               href={ev.meeting_link}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-primary-600 hover:text-primary-700"
+                              className="text-primary-600 hover:text-primary-400"
                             >
                               Join meeting
                             </a>
