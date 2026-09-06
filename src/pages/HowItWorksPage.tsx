@@ -139,9 +139,9 @@ export function HowItWorksPage() {
         <div className="shell grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
           <div>
             <span className="font-mono text-xs font-bold uppercase tracking-wide text-primary-600">Always on</span>
-            <h2 className="mt-3 font-display text-3xl font-semibold leading-tight text-[var(--navy)] sm:text-4xl">Your dashboard, always on -- not just Friday.</h2>
-            <p className="mt-4 max-w-lg text-base leading-relaxed text-neutral-600">The Friday report is the headline, but the dashboard behind it never sleeps. Track every application and interview as it moves, message your strategist directly whenever something comes up, and see what's next on your calendar -- all in one place, updated in real time, not just once a week.</p>
-            <ul className="mt-6 space-y-2 text-sm text-neutral-700">
+            <h2 className="mt-3 font-display text-3xl font-semibold leading-tight text-ink sm:text-4xl">Your dashboard, always on -- not just Friday.</h2>
+            <p className="mt-4 max-w-lg text-base leading-relaxed text-ink-muted">The Friday report is the headline, but the dashboard behind it never sleeps. Track every application and interview as it moves, message your strategist directly whenever something comes up, and see what's next on your calendar -- all in one place, updated in real time, not just once a week.</p>
+            <ul className="mt-6 space-y-2 text-sm text-ink-muted">
               <li className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-primary-500" aria-hidden="true" /> Live application &amp; interview tracking</li>
               <li className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-primary-500" aria-hidden="true" /> Direct messaging with your strategist, any time</li>
               <li className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-primary-500" aria-hidden="true" /> A calendar of what's coming up next</li>

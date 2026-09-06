@@ -12,6 +12,7 @@ const OUT_DIR = 'docs/superpowers/visual-review/2026-09-06-subproject1-checkpoin
 const targets = [
   { path: '/about', name: 'about' },
   { path: '/internal/design-system', name: 'design-system' },
+  { path: '/how-it-works', name: 'how-it-works' },
 ]
 
 const viewports = [
