@@ -49,6 +49,14 @@ function greeting() {
   return 'Good evening'
 }
 
+// Shared card chrome for this page's plain (non-hero) sections -- rounded-2xl
+// + shadow-sm, matching the same premium surface language introduced on the
+// Opportunity Engine redesign (JobMatchCard), so both pages read as one
+// consistent design system rather than two different eras of the app.
+// ForwardScoreWidget/NextBestMoveCard/PillarCard are separate, already-built
+// components and intentionally NOT touched here.
+const CARD_CLASS = 'rounded-2xl border border-border bg-surface-card p-6 shadow-sm'
+
 export function DashboardPage() {
   const { user, profile, refreshProfile } = useAuth()
   const { canAccess } = useEntitlements()
@@ -176,13 +184,20 @@ export function DashboardPage() {
           modes, just quieter here. Dropping it entirely on card headers
           would make this page's typography an unexplained one-off relative
           to both this page's own h1 and every other (not-yet-migrated) page
-          in the app, which still uses a heading font throughout. */}
+          in the app, which still uses a heading font throughout.
+          `!text-2xl`/`sm:!text-3xl`: found during Sub-Project 4 verification
+          that a pre-existing, unlayered global `h1{font-size:clamp(...)}`
+          rule in index.css was silently overriding this size (rendering
+          hero-scale instead). Same root cause as the Opportunity Engine fix
+          -- scoped locally here rather than touched globally, since the
+          global rule also affects the already-locked homepage hero (see
+          kennel memory / commit history for the full explanation). */}
       <div className="mb-6">
         <p className="font-mono text-[11px] font-semibold uppercase tracking-wide text-primary-600">
           ForwardOS Home
         </p>
-        <h1 className="font-display text-2xl font-semibold text-ink sm:text-3xl">
-          {greeting()}{profile?.full_name ? `, ${profile.full_name.split(' ')[0]}` : ''}! \u2615
+        <h1 className="font-display !text-2xl font-semibold text-ink sm:!text-3xl">
+          {greeting()}{profile?.full_name ? `, ${profile.full_name.split(' ')[0]}` : ''}! 
         </h1>
         <p className="mt-1 text-sm text-ink-muted">Ready to make today a step forward?</p>
       </div>
@@ -210,9 +225,9 @@ export function DashboardPage() {
       )}
 
       {/* Forward DNA (locked layout position 4) */}
-      <div className="mt-6 rounded-xl border border-border bg-surface-card p-6 shadow-sm">
+      <div className={`mt-6 ${CARD_CLASS}`}>
         <div className="flex items-center justify-between">
-          <h2 className="font-display text-base font-semibold text-ink">Forward DNA</h2>
+          <h2 className="font-display !text-base font-semibold text-ink">Forward DNA</h2>
         </div>
         <div className="mt-4 flex items-center justify-between gap-3">
           <div>
@@ -238,9 +253,9 @@ export function DashboardPage() {
       <CareerVaultPlaceholderCard />
 
       {/* Career Compass (locked layout position 6) */}
-      <div className="mt-6 rounded-xl border border-border bg-surface-card p-6 shadow-sm">
+      <div className={`mt-6 ${CARD_CLASS}`}>
         <div className="flex items-center justify-between">
-          <h2 className="font-display text-base font-semibold text-ink">Career Compass</h2>
+          <h2 className="font-display !text-base font-semibold text-ink">Career Compass</h2>
           {!forwardScoreLoading && compassSummary && (
             <Link to="/career-compass" className="font-mono text-xs font-medium text-primary-600 hover:text-primary-400">
               Retake
@@ -291,7 +306,7 @@ export function DashboardPage() {
           derives for the Career Momentum pillar, reused for this UI
           decision only, never a second/competing definition. */}
       <div
-        className={`mt-6 rounded-xl border bg-surface-card p-5 ${
+        className={`mt-6 rounded-2xl border bg-surface-card p-5 ${
           hasActiveApplication || hasRecentOrUpcomingInterview
             ? 'border-primary-700 shadow-md'
             : 'border-border shadow-sm'
@@ -313,13 +328,13 @@ export function DashboardPage() {
           tools, unchanged content, repositioned below the fold. */}
 
       {/* Stat cards */}
-      <div className="overflow-hidden rounded-xl border border-border shadow-sm">
+      <div className="overflow-hidden rounded-2xl border border-border shadow-sm">
         <div className="grid gap-0 lg:grid-cols-3">
           <div className="border-b border-border p-5 lg:border-b-0 lg:border-r">
             <p className="text-sm font-semibold text-ink-muted">Applications</p>
             <p className="mt-2 font-mono text-3xl font-bold text-ink">{activeApplications.length}</p>
             <p className="text-xs text-ink-muted">
-              Active applications{newThisWeek > 0 && <span className="text-primary-600"> \u2022 {newThisWeek} new this week</span>}
+              Active applications{newThisWeek > 0 && <span className="text-primary-600"> • {newThisWeek} new this week</span>}
             </p>
             <Link to="/applications" className="mt-3 inline-block font-mono text-xs font-medium text-primary-600 hover:text-primary-400">
               View Applications
@@ -367,7 +382,7 @@ export function DashboardPage() {
 
       {/* Tip / Motivation / Upcoming */}
       <div className="mt-6 grid gap-4 lg:grid-cols-3">
-        <div className="rounded-xl border border-dashed border-border bg-surface-subtle p-5 lg:col-span-2">
+        <div className="rounded-2xl border border-dashed border-border bg-surface-subtle p-5 lg:col-span-2">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="flex items-start gap-3">
               <Lightbulb className="mt-0.5 h-5 w-5 flex-shrink-0 text-primary-600" />
@@ -380,13 +395,13 @@ export function DashboardPage() {
               <Flag className="mt-0.5 h-5 w-5 flex-shrink-0 text-primary-600" />
               <div>
                 <p className="text-sm font-semibold text-ink">Daily Motivation</p>
-                <p className="mt-1 text-xs italic text-ink-muted">\u201c{motivation}\u201d</p>
+                <p className="mt-1 text-xs italic text-ink-muted">“{motivation}”</p>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="rounded-xl border border-border bg-surface-card p-5 shadow-sm">
+        <div className="rounded-2xl border border-border bg-surface-card p-5 shadow-sm">
           <div className="flex items-center justify-between">
             <p className="text-sm font-semibold text-ink">Upcoming</p>
             <Link to="/calendar" className="font-mono text-xs font-medium text-primary-600 hover:text-primary-400">
@@ -419,14 +434,14 @@ export function DashboardPage() {
 
       {/* Recommended + Progress */}
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
-        <div className="rounded-xl border border-border bg-surface-card p-6 shadow-sm">
+        <div className={CARD_CLASS}>
           <div className="flex items-center justify-between">
-            <h2 className="font-display text-base font-semibold text-ink">Recommended for You</h2>
+            <h2 className="font-display !text-base font-semibold text-ink">Recommended for You</h2>
             <Link to="/tools" className="font-mono text-xs font-medium text-primary-600 hover:text-primary-400">
               View All
             </Link>
           </div>
-          <div className="mt-4 space-y-4">
+          <div className="mt-4 space-y-1">
             <RecommendationRow
               icon={FileText}
               title="Update Your Career Profile"
@@ -461,9 +476,9 @@ export function DashboardPage() {
           </div>
         </div>
 
-        <div className="rounded-xl border border-border bg-surface-card p-6 shadow-sm">
+        <div className={CARD_CLASS}>
           <div className="flex items-center justify-between">
-            <h2 className="font-display text-base font-semibold text-ink">Your Progress This Week</h2>
+            <h2 className="font-display !text-base font-semibold text-ink">Your Progress This Week</h2>
             <Link to="/timeline" className="font-mono text-xs font-medium text-primary-600 hover:text-primary-400">
               View Full Report
             </Link>
@@ -474,7 +489,7 @@ export function DashboardPage() {
             <ProgressBar label="Interview Prep" value={interviewPrepPct} max={100} display={`${interviewPrepPct}%`} />
             <ProgressBar label="Messages Responded" value={messagesRespondedPct} max={100} display={`${messagesRespondedPct}%`} />
           </div>
-          <div className="mt-4 rounded-lg border border-dashed border-border p-4">
+          <div className="mt-4 rounded-xl border border-dashed border-border p-4">
             <p className="text-sm font-semibold text-ink">Keep the momentum!</p>
             <p className="mt-1 text-xs text-ink-muted">
               You've taken {activeApplications.length + submittedThisWeek} steps forward this week. You're building something great.
@@ -484,9 +499,9 @@ export function DashboardPage() {
       </div>
 
       {/* Forward Feed */}
-      <div className="mt-6 rounded-xl border border-border bg-surface-card p-6 shadow-sm">
+      <div className={`mt-6 ${CARD_CLASS}`}>
         <div className="flex items-center justify-between">
-          <h2 className="font-display text-base font-semibold text-ink">The Forward Feed</h2>
+          <h2 className="font-display !text-base font-semibold text-ink">The Forward Feed</h2>
           <Link to="/forward-feed" className="font-mono text-xs font-medium text-primary-600 hover:text-primary-400">
             Visit The Forward Feed &rarr;
           </Link>
@@ -499,7 +514,7 @@ export function DashboardPage() {
               <Link
                 key={post.id}
                 to={`/forward-feed/${post.slug}`}
-                className="rounded-lg border border-border border-l-4 border-l-primary-600 p-4 shadow-sm transition-[border-color,box-shadow] hover:border-l-primary-400 hover:shadow-md"
+                className="rounded-xl border border-border border-l-4 border-l-primary-600 p-4 shadow-sm transition-[border-color,box-shadow] hover:border-l-primary-400 hover:shadow-md"
               >
                 <p className="font-mono text-[11px] font-semibold uppercase tracking-wide text-primary-300">{post.category}</p>
                 <p className="mt-1 text-sm font-medium text-ink">{post.title}</p>
@@ -511,17 +526,17 @@ export function DashboardPage() {
       </div>
 
       {/* Quick Access Tools */}
-      <div className="mt-6 rounded-xl border border-border bg-surface-card p-6 shadow-sm">
+      <div className={`mt-6 ${CARD_CLASS}`}>
         <div className="flex items-center justify-between">
-          <h2 className="font-display text-base font-semibold text-ink">Quick Access Tools</h2>
+          <h2 className="font-display !text-base font-semibold text-ink">Quick Access Tools</h2>
           <Link to="/tools" className="font-mono text-xs font-medium text-primary-600 hover:text-primary-400">
             View All Tools &rarr;
           </Link>
         </div>
         <div className="mt-4 grid grid-cols-3 gap-4 sm:grid-cols-4 lg:grid-cols-7">
           {TOOL_TILES.map((tool) => (
-            <Link key={tool.label} to={tool.to} className="flex flex-col items-center gap-2 rounded-lg border border-transparent p-3 text-center transition-colors hover:border-border hover:bg-surface-hover">
-              <div className="flex h-11 w-11 items-center justify-center rounded-lg border border-border bg-surface-subtle">
+            <Link key={tool.label} to={tool.to} className="flex flex-col items-center gap-2 rounded-xl border border-transparent p-3 text-center transition-colors hover:border-border hover:bg-surface-hover">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-border bg-surface-subtle">
                 <tool.icon className="h-5 w-5 text-ink-muted" />
               </div>
               <span className="text-[11px] font-medium text-ink-muted">{tool.label}</span>
@@ -544,11 +559,11 @@ export function DashboardPage() {
  */
 function CareerVaultPlaceholderCard() {
   return (
-    <div className="mt-6 rounded-xl border border-dashed border-border bg-surface-subtle p-6">
+    <div className="mt-6 rounded-2xl border border-dashed border-border bg-surface-subtle p-6">
       <div className="flex items-center gap-3">
         <Archive className="h-5 w-5 flex-shrink-0 text-ink-muted" />
         <div>
-          <h2 className="font-display text-base font-semibold text-ink-muted">Career Vault — coming soon</h2>
+          <h2 className="font-display !text-base font-semibold text-ink-muted">Career Vault — coming soon</h2>
           <p className="mt-1 text-xs text-ink-muted">
             Track evidence-backed career wins here once Career Vault ships.
           </p>
@@ -570,7 +585,7 @@ function RecommendationRow({
   locked?: boolean
 }) {
   return (
-    <div className="flex items-center justify-between gap-3 border-l-2 border-border pl-3">
+    <div className="flex items-center justify-between gap-3 rounded-lg border-l-2 border-border px-3 py-2.5 transition-colors hover:bg-surface-hover">
       <div className="flex items-center gap-3">
         <Icon className="h-5 w-5 flex-shrink-0 text-primary-600" />
         <div>
