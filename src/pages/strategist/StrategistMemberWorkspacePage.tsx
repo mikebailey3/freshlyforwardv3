@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { StrategistLayout } from '@/components/StrategistLayout'
+import { AddRoadmapMilestoneForm } from '@/components/AddRoadmapMilestoneForm'
 import { useAuth } from '@/context/AuthContext'
 import { supabase } from '@/lib/supabase'
 import { calculateSearchReadiness } from '@/lib/profile'
@@ -974,6 +975,10 @@ function TimelineTab({ memberId }: { memberId: string }) {
 
   return (
     <div>
+      <AddRoadmapMilestoneForm
+        memberId={memberId}
+        onMilestoneAdded={(milestone) => setEvents((prev) => [milestone, ...prev])}
+      />
       {events.length === 0 ? (
         <EmptyState text="No timeline events yet." />
       ) : (
