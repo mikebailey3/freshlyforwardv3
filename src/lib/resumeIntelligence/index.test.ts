@@ -15,6 +15,7 @@ const COMPLETE_CONTENT: ResumeContentInput = {
   education: [
     { institution: 'State University', degree: 'B.A.', field: 'Economics', graduation_year: '2015' },
   ],
+  certifications: [],
   skills: ['product strategy', 'roadmapping', 'stakeholder management', 'sql', 'a/b testing'],
 }
 

@@ -12,6 +12,7 @@ const BASE: ResumeContentInput = {
     { company: 'Acme Co', title: 'Product Manager', start_date: '2021-01', end_date: null, current: true, description: 'Launched three major features that increased retention by 15%.' },
   ],
   education: [],
+  certifications: [],
   skills: [],
 }
 

@@ -10,6 +10,7 @@ const BASE: ResumeContentInput = {
   summary: '',
   employment: [],
   education: [],
+  certifications: [],
   skills: [],
 }
 

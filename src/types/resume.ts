@@ -156,7 +156,14 @@ export interface ResumeEntry {
   overrideDescription: string | null
 }
 
-export type ResumeContentSuggestionStatus = 'pending' | 'accepted' | 'rejected'
+/**
+ * Workflow status, kept separate from the member's actual decision
+ * (`ConfirmationDecision` below) per the Phase 2 persistence
+ * clarification — `status='reviewed'` + `decision='keep_existing_canonical'`
+ * rather than overloading one status column with five values. Deliberately
+ * minimal: two states, not a generalized workflow engine.
+ */
+export type ResumeContentSuggestionStatus = 'pending' | 'reviewed'
 
 /**
  * An AI- or system-proposed rewrite/addition. Always proposed, never
@@ -171,6 +178,105 @@ export interface ResumeContentSuggestion {
   /** What this suggestion is traceable to (e.g. a Career Vault career_win id or statement excerpt). Null only for a purely stylistic suggestion with no factual content. */
   evidenceReference: string | null
   status: ResumeContentSuggestionStatus
+  /** Null while status is 'pending'. Set exactly once, when status becomes 'reviewed' -- preserves which of the five distinguishable member decisions this was, for later parsing evaluation/AI/analytics ("why was this not applied?"). */
+  decision: ConfirmationDecision | null
   createdAt: string
   decidedAt: string | null
+}
+
+/* ---------------------------------------------------------------------- */
+/* Phase 2 — proposal / provenance / confirmation types                   */
+/* ---------------------------------------------------------------------- */
+
+export type ProposalConfidence = 'high' | 'medium' | 'low'
+
+/**
+ * Single source of truth for "is this canonical" -- no separate boolean
+ * flag exists anywhere that could disagree with this. Derive with
+ * `isCanonicalDestination()` below rather than storing the answer twice.
+ */
+export type ProposalDestination =
+  | { kind: 'canonical-profile'; field: 'full_name' | 'email' | 'phone' | 'location' }
+  | { kind: 'canonical-profile-array'; field: 'employment_history' | 'education' | 'certifications' | 'skills'; index: number | 'append' }
+  | { kind: 'resume-specific'; field: 'summary_override' | 'section_order' }
+
+export function isCanonicalDestination(destination: ProposalDestination): boolean {
+  return destination.kind !== 'resume-specific'
+}
+
+/**
+ * Structured provenance -- not a human-readable string contract. Every
+ * candidate must be traceable to a literal source. `sourceExcerpt` must
+ * always be a literal substring of the block(s) named in `blockOrders`
+ * (anti-fabrication invariant, enforced by the field-mapper tests).
+ *
+ * Extensibility strategy: this interface is flat and open-ended. Later
+ * phases add new OPTIONAL fields directly to it when actually needed --
+ * PDF bounding-box coordinates, a Career Vault evidence reference, the
+ * extraction engine used, the parser/provider that produced the
+ * candidate, AI provider metadata -- each additive and non-breaking.
+ * None of those are implemented speculatively here.
+ */
+export interface ResumeFieldProvenance {
+  sourceDocumentId: string
+  sectionKind: import('@/lib/resumeIntelligence/parsing/types').ResumeSectionKind
+  blockOrders: number[]
+  sourceExcerpt: string
+  page: number | null
+  matchedRule: string
+}
+
+export interface ResumeFieldProposal {
+  id: string
+  candidateValue: string
+  destination: ProposalDestination
+  provenance: ResumeFieldProvenance
+  confidence: ProposalConfidence
+  proposedAction: 'create' | 'update' | 'no-op-already-present'
+}
+
+/**
+ * Async from day one, same reason as Career Vault's `CareerWinInterpreter`
+ * -- a future `AIResumeFieldMapper` needs a network call, and designing
+ * this async now means that swap costs nothing later. The deterministic
+ * `DeterministicResumeFieldMapper` is the only Phase 2 implementation and
+ * remains the default.
+ */
+export interface ResumeFieldMapper {
+  /**
+   * `sourceDocumentId` is optional and defaults to 'unknown' when omitted
+   * -- a minor, backward-compatible addition discovered during
+   * implementation: structured provenance (§3 of the Phase 2 design)
+   * requires a source document id on every proposal, and the originally
+   * locked two-argument signature had no slot for it. Any
+   * `ResumeFieldMapper` implementation, including a future
+   * `AIResumeFieldMapper`, keeps the same shape.
+   */
+  map(
+    sections: import('@/lib/resumeIntelligence/parsing/types').DetectedSection[],
+    document: import('@/lib/resumeIntelligence/parsing/types').ExtractedDocument,
+    sourceDocumentId?: string,
+  ): Promise<ResumeFieldProposal[]>
+}
+
+/**
+ * The five distinguishable member decisions (Phase 2 persistence
+ * clarification). `reject` and `keep_existing_canonical` are NOT the same
+ * decision -- one means the suggestion was wrong/unwanted, the other means
+ * it was reviewed and the member explicitly chose to keep their existing
+ * canonical value. Both must remain distinguishable in persisted
+ * review/audit data.
+ */
+export type ConfirmationDecision =
+  | 'reject'
+  | 'accept_as_canonical'
+  | 'accept_edited_canonical'
+  | 'keep_existing_canonical'
+  | 'use_as_resume_specific_only'
+
+export interface ProposalDecision {
+  proposal: ResumeFieldProposal
+  decision: ConfirmationDecision
+  /** Required for accept_edited_canonical; optional for use_as_resume_specific_only when the member adjusts the wording. */
+  editedValue?: string
 }

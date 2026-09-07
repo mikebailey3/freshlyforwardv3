@@ -47,10 +47,15 @@ scores existing content.
    suggest/confirm shape. No AI is implemented in this phase.
 9. **JSON Resume is import/export interop only**, never the internal
    model — not implemented in this phase.
-10. **Reactive Resume (MIT) is pattern/reference only** for the ATS
-    finding/rule-catalog shape (`code`/`severity`/`meaning`/`evidence`/`action`).
-    No code copied — reimplemented clean-room against this codebase's own
-    conventions and content.
+10. **Reactive Resume (MIT) is pattern/reference only** — scoped to the
+    ATS finding/rule-catalog shape (`code`/`severity`/`meaning`/`evidence`/`action`)
+    used in §7, a future AI-provider reference, and later renderer
+    research. It is explicitly **not** the deterministic-parser reference:
+    Phase 2's `resume → structured data` extraction and field-mapping logic
+    (`src/lib/resumeIntelligence/parsing/`) was built clean-room against
+    unpdf/mammoth output and this codebase's own conventions, with no
+    Reactive Resume code, algorithm, or design copied. No code from
+    Reactive Resume is copied anywhere in this codebase.
 11. **Open Resume (AGPL) is algorithm-pattern research only.** No code
     referenced or copied in this phase (no parsing was built at all this
     phase — see §9).
