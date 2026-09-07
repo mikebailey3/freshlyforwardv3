@@ -7,6 +7,12 @@ import { supabase } from '@/lib/supabase'
 import { Award, Loader2 } from 'lucide-react'
 import type { Badge } from '@/types'
 
+// Same rounded-2xl + shadow-sm card chrome introduced on Opportunity
+// Engine (Sub-Project 3) and carried into Dashboard (Sub-Project 4) --
+// this page's two cards were still on the old sharp-cornered, shadow-less
+// `border border-border bg-surface-card p-6` treatment before this pass.
+const CARD_CLASS = 'rounded-2xl border border-border bg-surface-card p-6 shadow-sm'
+
 export function AchievementVaultPage() {
   const { user } = useAuth()
   const { earnedBadges, hasBadge, loading: badgesLoading } = useBadges(user?.id)
@@ -42,18 +48,27 @@ export function AchievementVaultPage() {
 
   return (
     <MemberLayout>
-      <div className="mb-6 flex items-center gap-2">
-        <Award className="h-6 w-6 text-primary-600" />
+      <div className="mb-6 flex items-center gap-3">
+        <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-primary-950">
+          <Award className="h-5 w-5 text-primary-500" />
+        </div>
         <div>
-          <h1 className="font-serif text-2xl font-semibold text-ink sm:text-3xl">Achievement Vault</h1>
+          {/* `!` important modifiers: same pre-existing, unlayered global
+              h1{font-size:clamp(...)} rule found during Sub-Project 3/4
+              (index.css) silently overrides plain text-2xl/text-3xl
+              classes on a bare <h1>. Scoped locally here for the same
+              reason as before -- the global rule also affects the
+              already-locked homepage hero, so it's not touched globally
+              as a side effect of this page's redesign. */}
+          <h1 className="font-display !text-2xl font-semibold text-ink sm:!text-3xl">Achievement Vault</h1>
           <p className="mt-1 text-sm text-ink-muted">
             {earnedCount} of {allBadges.length} badges earned. Every badge is earned through real progress.
           </p>
         </div>
       </div>
 
-      <div className="border border-border bg-surface-card p-6">
-        <h2 className="font-serif text-base font-semibold text-ink">Membership Badges</h2>
+      <div className={CARD_CLASS}>
+        <h2 className="font-display !text-base font-semibold text-ink">Membership Badges</h2>
         <p className="mt-1 text-xs text-ink-muted">Show your current membership and special status.</p>
         <div className="mt-5 flex flex-wrap gap-8">
           {membershipBadges.map((badge) => (
@@ -66,8 +81,8 @@ export function AchievementVaultPage() {
         </div>
       </div>
 
-      <div className="mt-6 border border-border bg-surface-card p-6">
-        <h2 className="font-serif text-base font-semibold text-ink">Achievement Badges</h2>
+      <div className={`mt-6 ${CARD_CLASS}`}>
+        <h2 className="font-display !text-base font-semibold text-ink">Achievement Badges</h2>
         <p className="mt-1 text-xs text-ink-muted">Earned by reaching meaningful milestones.</p>
         <div className="mt-5 grid grid-cols-2 gap-6 sm:grid-cols-4 lg:grid-cols-6">
           {achievementBadges.map((badge) => {
@@ -86,7 +101,7 @@ export function AchievementVaultPage() {
       </div>
 
       {earnedCount === 0 && (
-        <div className="mt-6 border border-dashed border-border bg-surface-subtle p-6 text-center">
+        <div className="mt-6 rounded-2xl border border-dashed border-border bg-surface-subtle p-6 text-center">
           <p className="text-sm text-ink-muted">
             You haven't earned any badges yet. Complete your Career Profile, submit applications, and land
             interviews to start unlocking achievements.
