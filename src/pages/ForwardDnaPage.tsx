@@ -16,6 +16,7 @@ import { ResponsibilitiesCard } from '@/components/forwardDna/ResponsibilitiesCa
 import { SkillEvidenceCard } from '@/components/forwardDna/SkillEvidenceCard'
 import { CareerGoalsCard } from '@/components/forwardDna/CareerGoalsCard'
 import { CompletenessWidget } from '@/components/forwardDna/CompletenessWidget'
+import { CareerVaultTeaserCard } from '@/components/careerVault/CareerVaultTeaserCard'
 import { Loader2, AlertCircle } from 'lucide-react'
 import type { MemberProfile, EmploymentEntry } from '@/types'
 import type { CareerScope, CareerResponsibility, CareerSkill } from '@/types/forwardDna'
@@ -188,6 +189,7 @@ export function ForwardDnaPage() {
           <CompassSummaryCard result={compassResult} />
           <CareerScopeCard entries={entries} scope={scope} onSave={handleSaveScope} />
           <ResponsibilitiesCard entries={entries} responsibilities={responsibilities} onAdd={handleAddResponsibility} onRemove={handleRemoveResponsibility} />
+          <CareerVaultTeaserCard />
           <SkillEvidenceCard skills={skills} onChangeState={handleChangeSkillState} />
           <CareerGoalsCard profile={profile} onSaveTargets={handleSaveTargets} />
         </div>

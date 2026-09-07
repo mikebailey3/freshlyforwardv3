@@ -97,6 +97,9 @@ describe('ForwardDnaPage', () => {
     await waitFor(() => expect(screen.getByText('Forward DNA')).toBeInTheDocument())
     expect(screen.getByText('Professional Scope')).toBeInTheDocument()
     expect(screen.getByText('Responsibilities')).toBeInTheDocument()
+    // Career Vault teaser (recovered 2026-09-08): links out to /career-vault,
+    // does not itself query career_wins/career_win_capabilities.
+    expect(screen.getByText('Career Vault')).toBeInTheDocument()
     expect(screen.getByText('Skills')).toBeInTheDocument()
     expect(screen.getByText('Career Goals')).toBeInTheDocument()
     expect(screen.getByText('Forward DNA Completeness')).toBeInTheDocument()

@@ -8,7 +8,7 @@ import {
   Compass, LayoutDashboard, User, CreditCard, Calendar, MessageSquare,
   Sparkles, Menu, X, LogOut, Search, FileText, Briefcase,
   Bell, Settings, Activity, Award, FileText as FileTextIcon,
-  Lock, Video, Map, ChevronDown, Linkedin, Dna,
+  Lock, Video, Map, ChevronDown, Linkedin, Dna, Trophy,
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
@@ -40,6 +40,7 @@ const navGroups: NavGroup[] = [
       { to: '/interviews', label: 'Interviews', icon: Briefcase },
       { to: '/profile', label: 'Career Profile', icon: User, feature: 'career_profile' },
       { to: '/forward-dna', label: 'Forward DNA', icon: Dna, isNew: true },
+      { to: '/career-vault', label: 'Career Vault', icon: Trophy, isNew: true },
       { to: '/linkedin-optimizer', label: 'LinkedIn Optimizer', icon: Linkedin, isNew: true },
     ],
   },

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { StrategistLayout } from '@/components/StrategistLayout'
 import { AddRoadmapMilestoneForm } from '@/components/AddRoadmapMilestoneForm'
+import { CareerVaultTab } from '@/pages/strategist/CareerVaultTab'
 import { useAuth } from '@/context/AuthContext'
 import { supabase } from '@/lib/supabase'
 import { calculateSearchReadiness } from '@/lib/profile'
@@ -18,14 +19,14 @@ import {
   User, Briefcase, Search, FileText, Mail, Calendar, Clock,
   TrendingUp, Plus, Trash2, X, Check, AlertCircle, Loader2,
   GraduationCap, Wrench, Target, DollarSign, FileCheck, MessageSquare,
-  ClipboardList, Send, Pin,
+  ClipboardList, Send, Pin, Trophy,
 } from 'lucide-react'
 import type {
   MemberProfile, Opportunity, Application, ResumeVersion,
   CoverLetter, CareerNote, FollowUp,
 } from '@/types'
 
-type TabKey = 'snapshot' | 'opportunities' | 'applications' | 'resumes' | 'cover_letters' | 'notes' | 'follow_ups' | 'messages' | 'timeline'
+type TabKey = 'snapshot' | 'opportunities' | 'applications' | 'resumes' | 'cover_letters' | 'notes' | 'follow_ups' | 'messages' | 'timeline' | 'career_vault'
 
 const tabs: { key: TabKey; label: string; icon: typeof User }[] = [
   { key: 'snapshot', label: 'Snapshot', icon: User },
@@ -37,6 +38,7 @@ const tabs: { key: TabKey; label: string; icon: typeof User }[] = [
   { key: 'follow_ups', label: 'Follow-ups', icon: Clock },
   { key: 'messages', label: 'Messages', icon: MessageSquare },
   { key: 'timeline', label: 'Timeline', icon: Calendar },
+  { key: 'career_vault', label: 'Career Vault', icon: Trophy },
 ]
 
 export function StrategistMemberWorkspacePage() {
@@ -126,6 +128,7 @@ export function StrategistMemberWorkspacePage() {
       {activeTab === 'follow_ups' && <FollowUpsTab memberId={memberId!} strategistId={user?.id || ''} />}
       {activeTab === 'messages' && <MessagesTab memberId={memberId!} />}
       {activeTab === 'timeline' && <TimelineTab memberId={memberId!} />}
+      {activeTab === 'career_vault' && <CareerVaultTab memberId={memberId!} />}
     </StrategistLayout>
   )
 }
