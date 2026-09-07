@@ -3,9 +3,13 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 
 const { mockAddRoadmapMilestone } = vi.hoisted(() => ({ mockAddRoadmapMilestone: vi.fn() }))
 
-vi.mock('@/lib/roadmap', () => ({
-  addRoadmapMilestone: mockAddRoadmapMilestone,
-}))
+vi.mock('@/lib/roadmap', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/roadmap')>()
+  // Only the RPC-calling function is mocked -- dateInputValueToRoadmapEventDate
+  // stays real so these tests prove the form wires the actual conversion
+  // helper correctly, not a test-only stand-in for it.
+  return { ...actual, addRoadmapMilestone: mockAddRoadmapMilestone }
+})
 
 import { AddRoadmapMilestoneForm } from './AddRoadmapMilestoneForm'
 
@@ -147,5 +151,86 @@ describe('AddRoadmapMilestoneForm', () => {
     await waitFor(() => expect(screen.getByRole('alert')).toBeInTheDocument())
     expect(onMilestoneAdded).not.toHaveBeenCalled()
     expect(screen.getByRole('button', { name: /^save$/i })).not.toBeDisabled()
+  })
+
+  it('renders an optional target-date field', () => {
+    render(<AddRoadmapMilestoneForm memberId="member-1" onMilestoneAdded={vi.fn()} />)
+
+    fireEvent.click(screen.getByRole('button', { name: /add roadmap milestone/i }))
+
+    const dateInput = screen.getByLabelText(/target date/i)
+    expect(dateInput).toHaveAttribute('type', 'date')
+  })
+
+  it('omits eventDate entirely when no target date is chosen', async () => {
+    const fakeMilestone = { id: 'm1', user_id: 'member-1', event_type: 'career_roadmap', event_title: 'No date', event_description: null, event_date: '2026-01-01', metadata: {}, created_at: '2026-01-01' }
+    mockAddRoadmapMilestone.mockResolvedValue({ milestone: fakeMilestone, error: null })
+
+    render(<AddRoadmapMilestoneForm memberId="member-1" onMilestoneAdded={vi.fn()} />)
+
+    fireEvent.click(screen.getByRole('button', { name: /add roadmap milestone/i }))
+    fireEvent.change(screen.getByLabelText(/title/i), { target: { value: 'No date' } })
+    fireEvent.click(screen.getByRole('button', { name: /^save$/i }))
+
+    await waitFor(() => expect(mockAddRoadmapMilestone).toHaveBeenCalled())
+    expect(mockAddRoadmapMilestone.mock.calls[0][0].eventDate).toBeUndefined()
+  })
+
+  it('converts a chosen calendar date to a UTC-midnight-anchored ISO string, never shifting the day', async () => {
+    const fakeMilestone = { id: 'm1', user_id: 'member-1', event_type: 'career_roadmap', event_title: 'Dated', event_description: null, event_date: '2026-06-01T00:00:00.000Z', metadata: {}, created_at: '2026-01-01' }
+    mockAddRoadmapMilestone.mockResolvedValue({ milestone: fakeMilestone, error: null })
+
+    render(<AddRoadmapMilestoneForm memberId="member-1" onMilestoneAdded={vi.fn()} />)
+
+    fireEvent.click(screen.getByRole('button', { name: /add roadmap milestone/i }))
+    fireEvent.change(screen.getByLabelText(/title/i), { target: { value: 'Dated' } })
+    fireEvent.change(screen.getByLabelText(/target date/i), { target: { value: '2026-06-01' } })
+    fireEvent.click(screen.getByRole('button', { name: /^save$/i }))
+
+    await waitFor(() => expect(mockAddRoadmapMilestone).toHaveBeenCalled())
+    expect(mockAddRoadmapMilestone.mock.calls[0][0].eventDate).toBe('2026-06-01T00:00:00.000Z')
+  })
+
+  it('clears the target date after a successful save, so the next milestone starts blank', async () => {
+    const fakeMilestone = { id: 'm1', user_id: 'member-1', event_type: 'career_roadmap', event_title: 'Dated', event_description: null, event_date: '2026-06-01T00:00:00.000Z', metadata: {}, created_at: '2026-01-01' }
+    mockAddRoadmapMilestone.mockResolvedValue({ milestone: fakeMilestone, error: null })
+
+    render(<AddRoadmapMilestoneForm memberId="member-1" onMilestoneAdded={vi.fn()} />)
+
+    fireEvent.click(screen.getByRole('button', { name: /add roadmap milestone/i }))
+    fireEvent.change(screen.getByLabelText(/title/i), { target: { value: 'Dated' } })
+    fireEvent.change(screen.getByLabelText(/target date/i), { target: { value: '2026-06-01' } })
+    fireEvent.click(screen.getByRole('button', { name: /^save$/i }))
+    await waitFor(() => expect(mockAddRoadmapMilestone).toHaveBeenCalledTimes(1))
+
+    fireEvent.click(screen.getByRole('button', { name: /add roadmap milestone/i }))
+    expect(screen.getByLabelText(/target date/i)).toHaveValue('')
+  })
+
+  it('clears the target date after Cancel, so a new draft starts blank', () => {
+    render(<AddRoadmapMilestoneForm memberId="member-1" onMilestoneAdded={vi.fn()} />)
+
+    fireEvent.click(screen.getByRole('button', { name: /add roadmap milestone/i }))
+    fireEvent.change(screen.getByLabelText(/target date/i), { target: { value: '2026-06-01' } })
+    fireEvent.click(screen.getByRole('button', { name: /cancel/i }))
+
+    fireEvent.click(screen.getByRole('button', { name: /add roadmap milestone/i }))
+    expect(screen.getByLabelText(/target date/i)).toHaveValue('')
+  })
+
+  it('shows an inline error rather than hanging if a malformed date value somehow reaches the save call', async () => {
+    mockAddRoadmapMilestone.mockResolvedValue({ milestone: null, error: 'invalid input syntax for type timestamp with time zone' })
+
+    render(<AddRoadmapMilestoneForm memberId="member-1" onMilestoneAdded={vi.fn()} />)
+
+    fireEvent.click(screen.getByRole('button', { name: /add roadmap milestone/i }))
+    fireEvent.change(screen.getByLabelText(/title/i), { target: { value: 'Bad date' } })
+    // Native <input type="date"> enforces the YYYY-MM-DD format in every
+    // real browser, but this simulates a value slipping through anyway
+    // (e.g. a non-native fallback) to prove the form fails loud, not silent.
+    fireEvent.change(screen.getByLabelText(/target date/i), { target: { value: 'not-a-real-date' } })
+    fireEvent.click(screen.getByRole('button', { name: /^save$/i }))
+
+    await waitFor(() => expect(screen.getByRole('alert')).toBeInTheDocument())
   })
 })

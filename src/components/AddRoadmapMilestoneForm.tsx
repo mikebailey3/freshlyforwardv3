@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Plus, Loader2, AlertCircle } from 'lucide-react'
-import { addRoadmapMilestone } from '@/lib/roadmap'
+import { addRoadmapMilestone, dateInputValueToRoadmapEventDate } from '@/lib/roadmap'
 import type { CareerTimelineEvent } from '@/types'
 
 interface AddRoadmapMilestoneFormProps {
@@ -18,6 +18,7 @@ interface AddRoadmapMilestoneFormProps {
 export function AddRoadmapMilestoneForm({ memberId, onMilestoneAdded }: AddRoadmapMilestoneFormProps) {
   const [open, setOpen] = useState(false)
   const [title, setTitle] = useState('')
+  const [eventDate, setEventDate] = useState('')
   const [description, setDescription] = useState('')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -38,6 +39,7 @@ export function AddRoadmapMilestoneForm({ memberId, onMilestoneAdded }: AddRoadm
 
   const reset = () => {
     setTitle('')
+    setEventDate('')
     setDescription('')
     setError(null)
     setOpen(false)
@@ -60,6 +62,7 @@ export function AddRoadmapMilestoneForm({ memberId, onMilestoneAdded }: AddRoadm
         memberId,
         title: trimmedTitle,
         description: trimmedDescription || undefined,
+        eventDate: eventDate ? dateInputValueToRoadmapEventDate(eventDate) : undefined,
         idempotencyKey: idempotencyKeyRef.current,
       })
 
@@ -108,6 +111,17 @@ export function AddRoadmapMilestoneForm({ memberId, onMilestoneAdded }: AddRoadm
         onChange={(e) => setTitle(e.target.value)}
         className="mt-1 w-full border border-border px-3 py-2 text-sm"
         placeholder="e.g. Promotion review"
+      />
+
+      <label htmlFor="roadmap-milestone-date" className="mt-3 block text-xs font-medium text-ink-muted">
+        Target date (optional)
+      </label>
+      <input
+        id="roadmap-milestone-date"
+        type="date"
+        value={eventDate}
+        onChange={(e) => setEventDate(e.target.value)}
+        className="mt-1 w-full border border-border px-3 py-2 text-sm"
       />
 
       <label htmlFor="roadmap-milestone-description" className="mt-3 block text-xs font-medium text-ink-muted">
