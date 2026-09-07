@@ -206,8 +206,9 @@ export function LockedFeatureCard({
   const planLabel = requiredPlan ? getPlanDisplayName(requiredPlan) : ''
 
   return (
-    <div
-      className="relative border border-dashed border-border bg-surface-card p-6 transition-colors hover:border-primary-400 cursor-pointer"
+    <button
+      type="button"
+      className="relative w-full rounded-2xl border border-dashed border-border bg-surface-card p-6 text-left transition-colors hover:border-primary-400 cursor-pointer"
       onClick={onUpgrade}
     >
       <div className="flex items-start gap-4">
@@ -229,9 +230,9 @@ export function LockedFeatureCard({
       </div>
       <div className="mt-4 flex items-center gap-2 text-sm font-medium text-primary-600">
         <span>Upgrade to unlock</span>
-        <ArrowRight className="h-4 w-4" />
+        <ArrowRight className="h-4 w-4" aria-hidden="true" />
       </div>
-    </div>
+    </button>
   )
 }
 

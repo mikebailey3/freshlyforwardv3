@@ -2,9 +2,19 @@ import { useEffect, useState } from 'react'
 import { MemberLayout } from '@/components/MemberLayout'
 import { useEntitlements } from '@/hooks/useEntitlements'
 import { LockedFeatureCard, UpgradeModal } from '@/components/FeatureEntitlements'
+import { CareerSuccessNextStepsTeaser } from '@/components/CareerSuccessNextStepsTeaser'
+import { CareerSuccessRoadmapTeaser } from '@/components/CareerSuccessRoadmapTeaser'
+import { CareerSuccessVaultTeaser } from '@/components/CareerSuccessVaultTeaser'
 import { Sparkles, Loader2, Lock } from 'lucide-react'
 import type { CareerSuccessItem, FeatureKey } from '@/types'
 import { supabase } from '@/lib/supabase'
+
+// Same rounded-2xl + shadow-sm card chrome introduced on Opportunity Engine
+// (Sub-Project 3) and carried through Dashboard/Vault/Career Profile
+// (Sub-Projects 4-6) -- this page's cards were still on the old
+// sharp-cornered, shadow-less `border border-border bg-surface-card p-6`
+// treatment before this pass.
+const CARD_CLASS = 'rounded-2xl border border-border bg-surface-card p-6 shadow-sm'
 
 const iconMap: Record<string, string> = {
   CalendarCheck: '📅',
@@ -62,7 +72,11 @@ export function CareerSuccessPage() {
       <div className="mb-6">
         <div className="flex items-center gap-2">
           <Sparkles className="h-6 w-6 text-primary-600" />
-          <h1 className="font-serif text-2xl font-semibold text-ink sm:text-3xl">Career Success</h1>
+          {/* `!` important modifiers: same pre-existing, unlayered global
+              h1{font-size:clamp(...)} rule found during Sub-Projects 3-6
+              (index.css) silently overrides plain text-2xl/text-3xl classes
+              on a bare <h1>. Scoped locally here for the same reason. */}
+          <h1 className="font-display !text-2xl font-semibold text-ink sm:!text-3xl">Career Success</h1>
         </div>
         <p className="mt-2 text-sm text-ink-muted">
           FreshlyForward continues helping you long after you secure employment. These tools support your
@@ -70,12 +84,19 @@ export function CareerSuccessPage() {
         </p>
       </div>
 
+      {/* Section: Your current focus -- Next Steps teaser, real data only. */}
+      <div className="mb-6">
+        <CareerSuccessNextStepsTeaser />
+      </div>
+
       {loading ? (
         <div className="flex items-center justify-center py-20">
           <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
         </div>
       ) : (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mb-6">
+          <h2 className="mb-4 font-display !text-lg font-semibold text-ink">Ongoing coaching &amp; growth services</h2>
+          <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
           {items.map((item) => {
             const featureKey = itemFeatureMap[item.title]
             const requiredPlan = featureKey ? featureRequiredPlan[featureKey] : undefined
@@ -97,23 +118,24 @@ export function CareerSuccessPage() {
             return (
               <div
                 key={item.id}
-                className="relative border border-border bg-surface-card p-6 transition-colors hover:border-primary-700"
+                className={`relative ${CARD_CLASS} transition-colors hover:border-primary-700`}
               >
                 {item.is_coming_soon && (
                   <div className="absolute right-3 top-3">
-                    <span className="border border-accent-700 px-2.5 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide text-accent-300">
-                      Coming Soon
+                    <span className="rounded-full border border-accent-700 px-2.5 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide text-accent-300">
+                      <span aria-hidden="true">Coming Soon</span>
+                      <span className="sr-only">This feature is coming soon and is not yet available.</span>
                     </span>
                   </div>
                 )}
                 <div className="mb-4 text-2xl">
                   {iconMap[item.icon] || <Sparkles className="h-6 w-6 text-primary-600" />}
                 </div>
-                <h3 className="font-serif text-lg font-semibold text-ink">{item.title}</h3>
+                <h3 className="font-display !text-lg font-semibold text-ink">{item.title}</h3>
                 <p className="mt-2 text-sm text-ink-muted">{item.description}</p>
 
                 {item.is_coming_soon && (
-                  <div className="mt-4 border border-border bg-surface-subtle p-3">
+                  <div className="mt-4 rounded-xl border border-border bg-surface-subtle p-3">
                     <p className="text-xs text-ink-muted">
                       This feature is in development. You will be the first to know when it launches.
                     </p>
@@ -122,11 +144,19 @@ export function CareerSuccessPage() {
               </div>
             )
           })}
+          </div>
         </div>
       )}
 
-      <div className="mt-12 border border-dashed border-primary-700 bg-surface-subtle p-8 text-center">
-        <h2 className="font-serif text-xl font-semibold text-ink">
+      {/* Section: Your roadmap + Your evidence -- both honest link-out
+          teasers, side by side on desktop, stacked on mobile/tablet. */}
+      <div className="mb-6 grid gap-6 md:grid-cols-2">
+        <CareerSuccessRoadmapTeaser />
+        <CareerSuccessVaultTeaser />
+      </div>
+
+      <div className="mt-6 rounded-2xl border border-dashed border-primary-700 bg-surface-subtle p-8 text-center">
+        <h2 className="font-display !text-xl font-semibold text-ink">
           Your career does not stop at your next job.
         </h2>
         <p className="mt-3 text-sm text-ink-muted">
