@@ -56,18 +56,38 @@ scores existing content.
     was built clean-room against unpdf/mammoth output and this codebase's
     own conventions, with no Reactive Resume code, algorithm, or design
     copied. No code from Reactive Resume is copied anywhere in this
-    codebase. Reactive Resume's own current resume-file import path is
-    reported to be AI-native — it hands raw uploaded PDF/DOCX input to an
-    LLM rather than parsing it deterministically — which is a further,
-    independent reason it was never a candidate as this codebase's
-    parsing reference; Phase 2's parser is deterministic-first by design
-    (§2 of the Phase 2 spec), not an AI import pipeline. (Caveat:
-    `docs.rxresu.me` was unreachable from this environment to verify that
-    behavior directly; public README/search sources describe Reactive
-    Resume's AI features as JSON/Markdown export-to-assistant workflows
-    and multi-provider AI settings, not a documented PDF/DOCX-upload
-    parsing feature — this line reflects the correction as given, not an
-    independently confirmed source.)
+    codebase. **Verified directly against a local clone of the Reactive
+    Resume repository** (`amruthpillai/reactive-resume`, commit
+    `ad91a0838c7d739eec4df5b2622750b0a4f1f7f3`, 2026-09-07) — the earlier
+    version of this line could not be confirmed from this environment;
+    with the local clone available, here is what the source actually
+    does. Its import dialog (`apps/web/src/dialogs/resume/import.tsx`)
+    branches by file type: **`.docx`/`.doc` import has no deterministic
+    path at all** — `aiRequired = type === "docx"`, and the dialog
+    blocks the import entirely ("Importing from Word requires a
+    connected AI provider") if none is configured. **PDF import prefers
+    AI but has a deterministic fallback**: with a usable AI provider
+    connected it calls `client.ai.parsePdf`, which sends the raw PDF
+    file straight to an LLM (`packages/api/src/features/ai/service.ts`,
+    `generateText` with the file as a multimodal message part); with no
+    provider connected it falls back to `extractPdfLines` + the
+    deterministic `parseResumeText` (`packages/import/src/plain-text.ts`)
+    — geometric PDF-to-text extraction (font-relative line clustering,
+    column-gutter detection, shared with Reactive Resume's own ATS
+    checker) followed by rule-based line parsing, no LLM involved. One
+    further nuance worth recording precisely: for `.docx` specifically
+    (not legacy `.doc`), the server extracts plain text deterministically
+    first (`extractDocxText`) and sends that *text*, not the raw file
+    bytes, to the LLM — only PDF and legacy `.doc` send the raw file
+    itself. None of this changes anything about FreshlyForward's own
+    architecture: Phase 2's parser remains deterministic-first by design
+    (§2 of the Phase 2 spec) and was built clean-room, independent of
+    which of Reactive Resume's two import paths it might otherwise have
+    resembled. (Superseded caveat, kept for history: an earlier pass
+    relying on public README/search sources only found JSON/Markdown
+    export-to-assistant workflows and multi-provider AI settings, not a
+    documented PDF/DOCX-upload parsing feature — the direct source
+    inspection above supersedes that gap.)
 11. **Open Resume (AGPL) is algorithm-pattern research only.** No code
     referenced or copied in this phase (no parsing was built at all this
     phase — see §9).
