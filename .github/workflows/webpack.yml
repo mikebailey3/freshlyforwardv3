@@ -1,4 +1,4 @@
-name: NodeJS with Webpack
+name: Build and Test
 
 on:
   push:
@@ -12,7 +12,17 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18.x, 20.x, 22.x]
+        # @supabase/supabase-js requires Node >=22 (see its own package.json
+        # engines field) -- on Node 20 createClient() throws "Node.js
+        # detected but native WebSocket not found" before anything else
+        # runs, already confirmed via a live workflow_dispatch run
+        # documented in job-discovery-pipeline.yml. Vite (^20.19.0 ||
+        # >=22.12.0) and Vitest (^20.0.0 || ^22.0.0 || >=24.0.0) both also
+        # rule out Node 18.x outright. 22.x is therefore the smallest
+        # matrix that actually matches this project's real dependency
+        # requirements, and mirrors the Node version already used
+        # successfully in job-discovery-pipeline.yml.
+        node-version: [22.x]
 
     steps:
     - uses: actions/checkout@v4
@@ -21,8 +31,16 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
+        cache: npm
+
+    - name: Install dependencies (deterministic)
+      run: npm ci
+
+    - name: Run tests
+      run: npm test
+
+    - name: Type-check
+      run: npx tsc --noEmit
 
     - name: Build
-      run: |
-        npm install
-        npx webpack
+      run: npm run build
