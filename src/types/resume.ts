@@ -140,21 +140,50 @@ export interface ResumeDocument {
 }
 
 /**
- * Per-version selection of which employment content to include, plus any
+ * Which member_profiles array an entry-kind's canonicalEntryId resolves
+ * against. Skills are the one kind with no per-entry object —
+ * member_profiles.skills is a flat string[] — so a skill's identity is
+ * its own value, not a generated id (Phase 3).
+ */
+export type ResumeEntryKind = 'employment' | 'education' | 'certification' | 'skill'
+
+/**
+ * Per-version selection of which canonical content to include, plus any
  * resume-specific override text. `originalDescription` is always
  * retained alongside `overrideDescription` so nothing in member_profiles
  * is ever silently rewritten — mirrors Career Vault's "never rewrite
  * original_statement" rule.
+ *
+ * `canonicalEntryId`/`skillValue` are a discriminated pair (exactly one
+ * set, matching `entryKind`) — not a foreign key the database can
+ * enforce (Postgres cannot reference an element of a jsonb array).
+ * Service code creating/updating a ResumeEntry MUST verify the
+ * referenced canonical entry actually exists for that member; see
+ * `createMasterResume.ts`.
  */
-export interface ResumeEntry {
-  id: string
-  resumeDocumentId: string
-  /** References an employment_entry_id in member_profiles.employment_history. */
-  employmentEntryId: string
-  included: boolean
-  originalDescription: string
-  overrideDescription: string | null
-}
+export type ResumeEntry =
+  | {
+      id: string
+      resumeVersionId: string
+      entryKind: 'employment' | 'education' | 'certification'
+      /** References the durable `id` backfilled by src/lib/profile/entryIds.ts onto the matching member_profiles array entry. */
+      canonicalEntryId: string
+      included: boolean
+      sortOrder: number | null
+      originalDescription: string | null
+      overrideDescription: string | null
+    }
+  | {
+      id: string
+      resumeVersionId: string
+      entryKind: 'skill'
+      /** A skill's identity is its own string value — member_profiles.skills has no per-entry object to generate an id for. */
+      skillValue: string
+      included: boolean
+      sortOrder: number | null
+      originalDescription: null
+      overrideDescription: string | null
+    }
 
 /**
  * Workflow status, kept separate from the member's actual decision

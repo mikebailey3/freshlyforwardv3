@@ -1,13 +1,28 @@
 /*
-# Resume Intelligence Phase 2 — Persistence Foundation
+# Resume Intelligence Phase 2/3 — Persistence Foundation
 
 ## Status: AUTHORED, NOT APPLIED
-This migration is written to document the Phase 2 persistence design and is
-intentionally NOT run against any live Supabase project as part of Phase 2.
-No `resume_field_proposals` or `resume_entries` row is written by any
-Phase 2 application code -- `applyConfirmedProposals()` writes only to the
-existing `member_profiles` table. This file exists so the schema is
-reviewed and locked before Phase 3 wires it up.
+This migration is written to document the persistence design and is
+intentionally NOT run against any live Supabase project. This file exists
+so the schema is reviewed and locked before it is ever wired up against a
+real database (local/branch environment for integration testing first,
+never production from this design turn).
+
+## Revision history
+- 2026-09-07 (Phase 2): initial authoring -- `resume_versions` lineage
+  columns, Master uniqueness, `resume_entries` (employment/source_index
+  discriminator), `resume_field_proposals`.
+- 2026-09-07 (Phase 3): revised in place (not layered as a second
+  migration, since nothing here has ever been applied) once stable
+  canonical entry ids existed for employment/education/certifications
+  (src/lib/profile/entryIds.ts): `resume_entries` collapses to a single
+  `canonical_entry_id` + `skill_value` discriminator (§ "resume_entries
+  discriminator/reference design" below); added `resume_import_attempts`
+  and `resume_field_proposals.import_attempt_id`/`superseded_at` to make
+  retry/supersession explicit rather than timestamp-inferred (§ "Design
+  note: import attempts & retry/supersession"); documented the member-only
+  canonical-confirmation authorization boundary already implied by the
+  Phase 2 RLS (§ "Design note: confirmation authorization").
 
 ## Overview
 Additive-only evolution of the existing `resume_versions` concept (from
@@ -44,6 +59,10 @@ architecture:
    and `keep_existing_canonical` are both `status = 'reviewed'` but
    different `decision` values, so later analytics can tell *why* a
    proposal was not applied.
+6. `resume_import_attempts` (Phase 3) -- one row per scan/import
+   execution, explicit `resume_field_proposals.import_attempt_id`
+   lineage, and `superseded_at` for retry/supersession (see design note
+   below).
 
 ## Design note: one-active-Master partial unique index
 `resume_versions` already has `is_master boolean` (unused as a uniqueness
@@ -78,50 +97,102 @@ state. This is wrapped in `set_master_resume_version()`, a
 `SECURITY DEFINER` RPC, rather than left for application code to reconstruct
 as two calls.
 
-## Design note: resume_entries discriminator/reference design
-`member_profiles.employment_history` entries CAN carry a stable string
-`id` (backfilled by `ensureEmploymentEntryIdsForUser`, see
-src/lib/forwardDna/employmentEntryIds.ts) -- `resume_entries` references
-those by `employment_entry_id`. This id is opportunistic, not guaranteed:
-live-schema inspection (2026-09-07) found member_profiles rows with
-non-empty employment_history both with and without the `id` key present,
-depending on whether that member's data has been through the Forward DNA
-backfill path yet. `education`, `certifications`, and `skills` entries
-have NO id mechanism at all today (see `EducationEntry` /
-`CertificationEntry` in src/types/index.ts; confirmed against live data --
-zero inspected education/certification entries carried an `id` key) --
-for those three kinds this migration references entries by
-`source_index`, the entry's position in its array at the time the
-`resume_entries` row was created.
+## Design note: resume_entries discriminator/reference design (revised, Phase 3)
+Phase 3 introduced `src/lib/profile/entryIds.ts`: a domain-neutral,
+additive backfill (existing ids never regenerated, only missing ones
+assigned) that gives `member_profiles.employment_history`, `.education`,
+and `.certifications` entries a durable string `id`. With that in place,
+`resume_entries` no longer needs the Phase 2 `employment_entry_id` /
+`source_index`-by-kind split -- every non-skill kind now references its
+source entry the same way:
 
-None of `employment_entry_id`/`source_index` are declared as a REFERENCES
-/ foreign key -- Postgres cannot enforce a foreign key into an element of
-a jsonb array, whether or not that element happens to carry an `id`
-field, so this migration does not pretend otherwise. A single
-entry_kind-discriminated table (this design) versus one narrow table per
-content type were both considered; a split schema would not gain any
-enforcement Postgres can't actually provide here, since the real
-constraint is member_profiles storing these as jsonb arrays rather than
-normalized rows -- so the single discriminated table was kept.
+  employment/education/certification -> `canonical_entry_id text`
+  skill                               -> `skill_value text` (a skill's
+                                          identity is its own string value;
+                                          member_profiles.skills is a
+                                          flat string[] with no per-entry
+                                          object at all, so there is
+                                          nothing else to reference)
 
-This positional reference is a known, documented limitation: if a member
-edits or reorders `member_profiles.education` (etc.) after a
-`resume_entries` row referencing it was created, that row can silently
-point at the wrong entry. This is acceptable for Phase 2 because no
-application code writes `resume_entries` rows yet -- there is no UI for
-per-version entry selection. It must be revisited before any Phase 3 UI
-writes through this table, most likely by extending `EducationEntry` /
-`CertificationEntry` / the skills array with a stable id, mirroring the
-existing employment-entry-id pattern, rather than continuing with
-positional references.
+**`canonical_entry_id`/`skill_value` are still not, and cannot be, a
+REFERENCES / foreign key.** Postgres cannot enforce a foreign key into an
+individual element of a jsonb array no matter what identity scheme that
+element carries -- this is unchanged from Phase 2 and is not a gap this
+migration can close. What changed is *reliability*, not *enforceability*:
+a Phase 2 `employment_entry_id` might not exist yet (backfill was
+opportunistic, driven only by a Forward DNA page load); after Phase 3's
+save-path-audited, always-assign-on-first-touch backfill, every entry a
+member has interacted with since has one. **Because the database still
+cannot check this, application/service code MUST verify the referenced
+canonical entry actually exists for that member before creating or
+updating a `resume_entries` row** -- see `createMasterResume.ts`'s
+validation step, which is the actual enforcement boundary here, not this
+schema.
+
+A single `entry_kind`-discriminated table (kept) versus one narrow table
+per content type (rejected) were both reconsidered under the same
+reasoning as Phase 2: splitting the table would not gain any enforcement
+Postgres can't already provide, since the real constraint is
+`member_profiles` storing these as jsonb arrays rather than normalized
+rows -- unchanged by which shape `resume_entries` itself takes.
 
 The `resume_entries_identity_by_kind` check constraint enforces that every
 row uses exactly the identity column appropriate to its `entry_kind` and
 never both or neither.
 
+## Design note: import attempts & retry/supersession (Phase 3)
+`resume_import_attempts` is one row per scan/import execution --
+`member_documents` -> `resume_import_attempts` -> `resume_field_proposals`.
+A re-scan is always an explicit member action, never automatic. On retry:
+1. a new `resume_import_attempts` row is created for the same
+   `source_document_id`;
+2. the new field-mapping pass's proposals are inserted with
+   `import_attempt_id` pointing at that new row;
+3. still-`pending` proposals from the prior attempt(s) on the same
+   document are marked `superseded_at = now()` -- never deleted, so the
+   audit trail survives;
+4. any proposal already `status = 'reviewed'` from a prior attempt is left
+   completely untouched -- `resume_field_proposals_supersede_only_when_pending`
+   makes this a schema-enforced invariant, not just an application
+   convention;
+5. nothing here ever re-applies a canonical write on its own -- a retry
+   only ever creates new *proposals*; a canonical `member_profiles` write
+   still requires a fresh, explicit member decision through the
+   confirmation layer, exactly as on a first import.
+Generation/supersession is keyed by `import_attempt_id`, never inferred
+from `created_at` -- two attempts started in the same instant (unlikely
+but not impossible) would be ambiguous under timestamp-only inference.
+
+## Design note: confirmation authorization (member-only canonical decisions)
+Resume Intelligence Phase 3 requires that only the member themself can
+turn a proposal into a canonical `member_profiles` write --
+`accept_as_canonical` / `accept_edited_canonical` must never be
+performable by an assisting strategist on the member's behalf, absent an
+explicit product decision to allow it (none exists as of Phase 3). Two
+independent layers already enforce this, verified by direct read-only
+inspection of the live schema (2026-09-07), not assumed:
+1. `resume_field_proposals`'s own `update_own_resume_field_proposals`
+   policy (unchanged by this revision) is `USING (auth.uid() = user_id)`
+   with no strategist branch at all -- a strategist's session cannot move
+   a proposal's `status`/`decision` regardless of assignment, full stop.
+2. Even if it somehow could, `member_profiles`'s live UPDATE policies
+   (`update_own_profile`: `auth.uid() = user_id`; `admin_update_all_profiles`:
+   admin-only) also have no strategist branch -- so the canonical write
+   `applyConfirmedProposals()` ultimately issues is independently blocked
+   at the actual target table too. A strategist's assistance is therefore
+   necessarily limited to what the SELECT policies above already allow:
+   viewing `resume_import_attempts` and `resume_field_proposals` for an
+   assigned member. `resume_entries` (which never touches
+   `member_profiles`, only which existing entries a resume version
+   selects) intentionally keeps the more permissive `FOR ALL`
+   member-or-strategist shape already established for `resume_versions`
+   itself in the Phase 4 schema -- curating a resume's contents is not a
+   canonical-fact decision.
+
 ## Security
-RLS enabled on both new tables, mirroring `resume_versions`' existing
-member-or-assigned-strategist policy shape.
+RLS enabled on all three new/revised tables, mirroring `resume_versions`'
+existing member-or-assigned-strategist SELECT shape, with the
+member-only-write exception for canonical decisions documented above.
 */
 
 -- ============================================================
@@ -192,12 +263,16 @@ CREATE TABLE IF NOT EXISTS resume_entries (
   entry_kind resume_entry_kind NOT NULL,
 
   -- Exactly one of these two identifies the source member_profiles entry,
-  -- chosen by entry_kind. See "resume_entries discriminator/reference
-  -- design" note above.
-  employment_entry_id text,
-  source_index integer,
+  -- chosen by entry_kind. Neither is a REFERENCES / foreign key -- see
+  -- "resume_entries discriminator/reference design" note above.
+  canonical_entry_id text,
+  skill_value text,
 
   included boolean NOT NULL DEFAULT true,
+  -- Explicit per-version ordering. Nullable-but-conventionally-set rather
+  -- than relying on row insertion order, which Postgres never guarantees
+  -- on SELECT.
+  sort_order integer,
   -- Snapshot of the member_profiles description at the time this row was
   -- created, retained alongside override_description so nothing in
   -- member_profiles is ever silently rewritten (mirrors Career Vault's
@@ -209,8 +284,8 @@ CREATE TABLE IF NOT EXISTS resume_entries (
   created_at timestamptz DEFAULT now(),
 
   CONSTRAINT resume_entries_identity_by_kind CHECK (
-    (entry_kind = 'employment' AND employment_entry_id IS NOT NULL AND source_index IS NULL)
-    OR (entry_kind <> 'employment' AND employment_entry_id IS NULL AND source_index IS NOT NULL)
+    (entry_kind IN ('employment', 'education', 'certification') AND canonical_entry_id IS NOT NULL AND skill_value IS NULL)
+    OR (entry_kind = 'skill' AND canonical_entry_id IS NULL AND skill_value IS NOT NULL)
   )
 );
 
@@ -271,6 +346,59 @@ CREATE POLICY "modify_own_resume_entries"
   );
 
 -- ============================================================
+-- RESUME_IMPORT_ATTEMPTS: one row per scan/import execution (Phase 3)
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS resume_import_attempts (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  source_document_id uuid NOT NULL REFERENCES member_documents(id) ON DELETE CASCADE,
+  user_id uuid NOT NULL DEFAULT auth.uid() REFERENCES auth.users(id) ON DELETE CASCADE,
+  status text NOT NULL DEFAULT 'pending' CHECK (
+    status IN ('pending', 'succeeded', 'partial', 'unsupported_format', 'extraction_failed', 'no_content_found')
+  ),
+  error_message text,
+  proposal_count integer NOT NULL DEFAULT 0,
+  attempted_at timestamptz NOT NULL DEFAULT now(),
+  completed_at timestamptz
+);
+
+CREATE INDEX IF NOT EXISTS resume_import_attempts_source_document_id_idx ON resume_import_attempts(source_document_id);
+CREATE INDEX IF NOT EXISTS resume_import_attempts_user_id_idx ON resume_import_attempts(user_id);
+
+ALTER TABLE resume_import_attempts ENABLE ROW LEVEL SECURITY;
+
+-- View-only for an assisting strategist (per the Phase 3 authorization
+-- rule -- see "Design note: confirmation authorization" below): a
+-- strategist may see that an import happened and what its outcome was,
+-- but attempts are only ever created/updated by the member's own
+-- import-triggering action in Phase 3, so INSERT/UPDATE stay member-only.
+DROP POLICY IF EXISTS "select_own_resume_import_attempts" ON resume_import_attempts;
+CREATE POLICY "select_own_resume_import_attempts"
+  ON resume_import_attempts FOR SELECT
+  TO authenticated
+  USING (
+    auth.uid() = user_id
+    OR auth.uid() IN (
+      SELECT strategist_id FROM strategist_assignments
+      WHERE strategist_assignments.member_id = resume_import_attempts.user_id
+      AND strategist_assignments.is_active = true
+    )
+  );
+
+DROP POLICY IF EXISTS "insert_own_resume_import_attempts" ON resume_import_attempts;
+CREATE POLICY "insert_own_resume_import_attempts"
+  ON resume_import_attempts FOR INSERT
+  TO authenticated
+  WITH CHECK (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "update_own_resume_import_attempts" ON resume_import_attempts;
+CREATE POLICY "update_own_resume_import_attempts"
+  ON resume_import_attempts FOR UPDATE
+  TO authenticated
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
+
+-- ============================================================
 -- RESUME_FIELD_PROPOSALS: parsing proposals, provenance, member decision
 -- ============================================================
 
@@ -305,6 +433,16 @@ CREATE TABLE IF NOT EXISTS resume_field_proposals (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id uuid NOT NULL DEFAULT auth.uid() REFERENCES auth.users(id) ON DELETE CASCADE,
   source_document_id uuid NOT NULL REFERENCES member_documents(id) ON DELETE CASCADE,
+  -- Phase 3: the scan/import execution that produced this proposal. Drives
+  -- retry/supersession by attempt identity rather than inferring
+  -- "generations" from created_at timestamps -- see "Design note: import
+  -- attempts & retry/supersession" below.
+  import_attempt_id uuid NOT NULL REFERENCES resume_import_attempts(id) ON DELETE CASCADE,
+  -- Phase 3: set when a later import attempt on the same source document
+  -- supersedes this still-pending proposal. NULL for the current
+  -- generation. A `reviewed` proposal is never superseded -- a retry only
+  -- ever touches proposals still `pending`.
+  superseded_at timestamptz,
   -- NULL until a resume_versions row exists for this parsing pass -- a
   -- proposal can be reviewed and applied to member_profiles before any
   -- resume version is created from the uploaded document.
@@ -349,12 +487,19 @@ CREATE TABLE IF NOT EXISTS resume_field_proposals (
   ),
   CONSTRAINT resume_field_proposals_edited_value_only_when_relevant CHECK (
     decision_edited_value IS NULL OR decision IN ('accept_edited_canonical', 'use_as_resume_specific_only')
+  ),
+  -- A reviewed proposal represents a real member decision and is never
+  -- retroactively superseded by a later retry -- only a still-pending
+  -- proposal can be.
+  CONSTRAINT resume_field_proposals_supersede_only_when_pending CHECK (
+    superseded_at IS NULL OR status = 'pending'
   )
 );
 
 CREATE INDEX IF NOT EXISTS resume_field_proposals_source_document_id_idx ON resume_field_proposals(source_document_id);
 CREATE INDEX IF NOT EXISTS resume_field_proposals_resume_version_id_idx ON resume_field_proposals(resume_version_id);
 CREATE INDEX IF NOT EXISTS resume_field_proposals_user_id_idx ON resume_field_proposals(user_id);
+CREATE INDEX IF NOT EXISTS resume_field_proposals_import_attempt_id_idx ON resume_field_proposals(import_attempt_id);
 
 ALTER TABLE resume_field_proposals ENABLE ROW LEVEL SECURITY;
 
