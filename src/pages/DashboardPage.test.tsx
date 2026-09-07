@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { DashboardPage } from './DashboardPage'
 import type { ArchetypeKey } from '@/types/careerCompass'
@@ -169,15 +169,35 @@ describe('DashboardPage - Forward Score integration (Task 7)', () => {
     expect(hero.compareDocumentPosition(searchReadinessLabel) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   })
 
-  it('renders the Career Vault placeholder card with no link anywhere pointing at /career-vault', async () => {
+  it('renders the Career Vault placeholder card with no link inside the card itself pointing at /career-vault', async () => {
     setCompassRow(null)
 
-    const { container } = renderPage()
+    renderPage()
 
-    await waitFor(() => expect(screen.getByText('Career Vault \u2014 coming soon')).toBeInTheDocument())
-    expect(screen.getByText('Track evidence-backed career wins here once Career Vault ships.')).toBeInTheDocument()
+    // Career Vault now legitimately exists and is reachable via the shared
+    // MemberLayout nav (recovered 2026-09-08) -- a page-wide "no anchor
+    // anywhere links to /career-vault" check is stale now that a real,
+    // intentional nav link exists. The invariant this placeholder card
+    // actually needs to hold is narrower: it still renders its unchanged
+    // "coming soon" content, and the CARD ITSELF still contains no link --
+    // a shared/global nav link elsewhere on the page is fine and expected.
+    const heading = await screen.findByRole('heading', { name: 'Career Vault \u2014 coming soon' })
+    const description = screen.getByText('Track evidence-backed career wins here once Career Vault ships.')
 
-    const allLinks = Array.from(container.querySelectorAll('a'))
-    expect(allLinks.some((a) => a.getAttribute('href') === '/career-vault')).toBe(false)
+    // Scope to the placeholder card's own DOM subtree by walking up from the
+    // heading to the smallest ancestor that also encloses the description
+    // text -- accessible-query-based and agnostic to exact wrapper-div
+    // nesting depth, so it doesn't hard-code a brittle CSS class or a fixed
+    // number of parentElement hops.
+    let card: HTMLElement = heading
+    while (!card.contains(description)) {
+      if (!card.parentElement) {
+        throw new Error('Could not find a shared ancestor for the Career Vault placeholder heading and description')
+      }
+      card = card.parentElement
+    }
+
+    const cardLinks = within(card).queryAllByRole('link')
+    expect(cardLinks.some((a) => a.getAttribute('href') === '/career-vault')).toBe(false)
   })
 })

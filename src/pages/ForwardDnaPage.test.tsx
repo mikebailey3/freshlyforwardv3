@@ -98,8 +98,11 @@ describe('ForwardDnaPage', () => {
     expect(screen.getByText('Professional Scope')).toBeInTheDocument()
     expect(screen.getByText('Responsibilities')).toBeInTheDocument()
     // Career Vault teaser (recovered 2026-09-08): links out to /career-vault,
-    // does not itself query career_wins/career_win_capabilities.
-    expect(screen.getByText('Career Vault')).toBeInTheDocument()
+    // does not itself query career_wins/career_win_capabilities. "Career Vault"
+    // legitimately appears twice once MemberLayout's nav renders alongside the
+    // teaser card, same as the CareerScopeCard/ResponsibilitiesCard dual-match
+    // handled below via getAllByText.
+    expect(screen.getAllByText('Career Vault').length).toBeGreaterThan(0)
     expect(screen.getByText('Skills')).toBeInTheDocument()
     expect(screen.getByText('Career Goals')).toBeInTheDocument()
     expect(screen.getByText('Forward DNA Completeness')).toBeInTheDocument()
