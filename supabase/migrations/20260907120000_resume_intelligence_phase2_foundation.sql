@@ -79,14 +79,30 @@ state. This is wrapped in `set_master_resume_version()`, a
 as two calls.
 
 ## Design note: resume_entries discriminator/reference design
-`member_profiles.employment_history` entries carry a stable string `id`
-(backfilled by `ensureEmploymentEntryIdsForUser`, see
+`member_profiles.employment_history` entries CAN carry a stable string
+`id` (backfilled by `ensureEmploymentEntryIdsForUser`, see
 src/lib/forwardDna/employmentEntryIds.ts) -- `resume_entries` references
-those by `employment_entry_id`. `education`, `certifications`, and `skills`
-entries have NO stable id today (see `EducationEntry` / `CertificationEntry`
-in src/types/index.ts) -- for those three kinds this migration references
-entries by `source_index`, the entry's position in its array at the time
-the `resume_entries` row was created.
+those by `employment_entry_id`. This id is opportunistic, not guaranteed:
+live-schema inspection (2026-09-07) found member_profiles rows with
+non-empty employment_history both with and without the `id` key present,
+depending on whether that member's data has been through the Forward DNA
+backfill path yet. `education`, `certifications`, and `skills` entries
+have NO id mechanism at all today (see `EducationEntry` /
+`CertificationEntry` in src/types/index.ts; confirmed against live data --
+zero inspected education/certification entries carried an `id` key) --
+for those three kinds this migration references entries by
+`source_index`, the entry's position in its array at the time the
+`resume_entries` row was created.
+
+None of `employment_entry_id`/`source_index` are declared as a REFERENCES
+/ foreign key -- Postgres cannot enforce a foreign key into an element of
+a jsonb array, whether or not that element happens to carry an `id`
+field, so this migration does not pretend otherwise. A single
+entry_kind-discriminated table (this design) versus one narrow table per
+content type were both considered; a split schema would not gain any
+enforcement Postgres can't actually provide here, since the real
+constraint is member_profiles storing these as jsonb arrays rather than
+normalized rows -- so the single discriminated table was kept.
 
 This positional reference is a known, documented limitation: if a member
 edits or reorders `member_profiles.education` (etc.) after a

@@ -49,13 +49,25 @@ scores existing content.
    model — not implemented in this phase.
 10. **Reactive Resume (MIT) is pattern/reference only** — scoped to the
     ATS finding/rule-catalog shape (`code`/`severity`/`meaning`/`evidence`/`action`)
-    used in §7, a future AI-provider reference, and later renderer
-    research. It is explicitly **not** the deterministic-parser reference:
-    Phase 2's `resume → structured data` extraction and field-mapping logic
-    (`src/lib/resumeIntelligence/parsing/`) was built clean-room against
-    unpdf/mammoth output and this codebase's own conventions, with no
-    Reactive Resume code, algorithm, or design copied. No code from
-    Reactive Resume is copied anywhere in this codebase.
+    used in §7, a future optional AI mapper/provider reference, and later
+    template/render research. It is explicitly **not** the
+    deterministic-parser reference: Phase 2's `resume → structured data`
+    extraction and field-mapping logic (`src/lib/resumeIntelligence/parsing/`)
+    was built clean-room against unpdf/mammoth output and this codebase's
+    own conventions, with no Reactive Resume code, algorithm, or design
+    copied. No code from Reactive Resume is copied anywhere in this
+    codebase. Reactive Resume's own current resume-file import path is
+    reported to be AI-native — it hands raw uploaded PDF/DOCX input to an
+    LLM rather than parsing it deterministically — which is a further,
+    independent reason it was never a candidate as this codebase's
+    parsing reference; Phase 2's parser is deterministic-first by design
+    (§2 of the Phase 2 spec), not an AI import pipeline. (Caveat:
+    `docs.rxresu.me` was unreachable from this environment to verify that
+    behavior directly; public README/search sources describe Reactive
+    Resume's AI features as JSON/Markdown export-to-assistant workflows
+    and multi-provider AI settings, not a documented PDF/DOCX-upload
+    parsing feature — this line reflects the correction as given, not an
+    independently confirmed source.)
 11. **Open Resume (AGPL) is algorithm-pattern research only.** No code
     referenced or copied in this phase (no parsing was built at all this
     phase — see §9).
@@ -159,6 +171,15 @@ All four deterministic dimensions score via one shared helper,
 100, deduct `error: 25 / warning: 10 / info: 3` per finding, clamp to
 `[0, 100]`. Every finding follows **Finding → why it matters → evidence →
 recommended action**.
+
+**Scope note on ATS Readability:** this dimension analyzes structured
+content (`ResumeContentInput`, the same shape `member_profiles` and the
+Phase 2 parser produce) — it checks whether identity/contact *fields are
+present and well-formed*, never whether a rendered PDF/DOCX file would
+survive an actual ATS's own parsing. There is no rendered-file ATS
+round-trip validation anywhere in Phase 1 or Phase 2 (no PDF/DOCX export
+exists yet); that is RenderCV's round-trip technique (decision #12,
+above), explicitly deferred until export is built.
 
 | Dimension | Module | Rules implemented |
 |---|---|---|

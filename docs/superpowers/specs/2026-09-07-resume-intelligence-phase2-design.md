@@ -299,6 +299,68 @@ Additive to the existing schema:
 RLS on both new tables mirrors `resume_versions`' existing
 member-or-assigned-strategist policy shape.
 
+### 8.1 Live-schema verification (2026-09-07, read-only)
+
+Before treating this migration as final, its assumptions were checked
+against the actual live Supabase project (`siysdmgdsxlceewlwngl`,
+Postgres 17.6) via read-only inspection — no DDL, no data writes:
+
+- `resume_versions`, `member_documents`, `member_profiles`, `applications`
+  all exist with exactly the columns/types this design assumes,
+  including `member_profiles.certifications` as `jsonb default '[]'`
+  and — confirmed again — no `email` column on `member_profiles` (§6's
+  known limitation).
+- `applications.resume_version_id` is `uuid`, nullable,
+  `REFERENCES resume_versions(id) ON DELETE SET NULL` — untouched by this
+  migration, which only adds nullable columns to `resume_versions`.
+- Every new FK in this migration targets a real PK of a compatible type:
+  `resume_versions.id` (self-FK for `derived_from_resume_version_id`),
+  `opportunities.id`, `member_documents.id`, `auth.users.id` — all `uuid`.
+- `resume_versions` currently has **no unique constraint or index on
+  `member_id`/`is_master`** — only a plain `idx_resume_versions_member
+  (member_id, is_archived)` — so the new partial unique index
+  (§8's one-active-Master constraint) has no name collision and no
+  existing-data conflict (`resume_versions` currently has 0 rows).
+- `resume_versions`' and the sibling tables' live RLS policies exactly
+  match the member-or-active-strategist-assignment shape this migration's
+  new tables mirror — no conflicting policy.
+- **`employment_entry_id`/`source_index` on `resume_entries` are
+  deliberately not `REFERENCES` anything** — confirmed by inspecting the
+  migration text directly, not just by design intent. Live data makes
+  clear why a real FK is impossible here: of the `member_profiles` rows
+  with at least one employment entry, one has entries carrying the
+  Forward-DNA-backfilled `id` key and one does not — `id` presence on
+  employment entries is **opportunistic** (populated only once
+  `ensureEmploymentEntryIdsForUser` has run for that member), not a
+  guaranteed invariant, which is stronger than the Phase 2 §8 text
+  originally implied. Every live `education` and `certifications` entry
+  inspected had **no `id` key at all**. Postgres cannot enforce a foreign
+  key into an element of a `jsonb` array regardless of whether that
+  element happens to carry an `id` field — `resume_entries` correctly
+  stores `employment_entry_id`/`source_index` as plain, unconstrained
+  columns, not a foreign key the schema can't actually check. See §8.2.
+
+### 8.2 `resume_entries`: single discriminated table vs. one table per content type
+
+Re-evaluated directly against the finding above, not just in the
+abstract: the constraint is `member_profiles.employment_history`/
+`education`/`certifications` being `jsonb` arrays, not normalized row
+tables. That constraint is identical no matter how `resume_entries` itself
+is shaped — splitting it into `resume_employment_entries`/
+`resume_education_entries`/`resume_certification_entries` would still
+leave every one of those tables referencing a `jsonb` array element by an
+inherently unenforceable text/index value; it would only spread the same
+non-enforceable reference across three tables instead of one, for no
+additional integrity. **Decision: keep the single `entry_kind`-discriminated
+table** (already authored) — it is simpler, equally honest about what
+Postgres can and cannot enforce, and does not pretend a split schema buys
+referential integrity that the underlying `member_profiles` storage model
+cannot provide. Closing this gap for real means giving `education` and
+`certifications` entries a stable id (mirroring the existing employment
+pattern) — a `member_profiles` schema change, out of scope for Phase 2 and
+deferred to whenever Phase 3 needs to write `resume_entries` rows for
+real.
+
 ---
 
 ## 9. What Was Deliberately Not Built This Phase
