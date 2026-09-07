@@ -1,6 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase'
-import type { ConfirmationDecision, ProposalDecision } from '@/types/resume'
+import type { ConfirmationDecision, ProposalDecision, ResumeFieldProposal } from '@/types/resume'
 
 export interface ApplyConfirmedProposalsResult {
   errors: string[]
@@ -49,6 +49,10 @@ export async function applyConfirmedProposals(
 async function applyOne(userId: string, decision: ProposalDecision, client: SupabaseClient): Promise<string | null> {
   const { proposal, decision: action, editedValue } = decision
 
+  if (action === 'use_as_resume_specific_only') {
+    return validateNoOrphanFactualEntry(proposal)
+  }
+
   if (!writesCanonicalProfile(action)) return null
 
   if (proposal.destination.kind !== 'canonical-profile') {
@@ -80,4 +84,26 @@ async function applyOne(userId: string, decision: ProposalDecision, client: Supa
 
 function writesCanonicalProfile(action: ConfirmationDecision): boolean {
   return action === 'accept_as_canonical' || action === 'accept_edited_canonical'
+}
+
+/**
+ * Phase 3 Master Resume safety rule: a completely new factual career entry
+ * must never exist only as resume-specific content. `use_as_resume_specific_only`
+ * against a `canonical-profile-array` proposal is only valid when the
+ * candidate corresponds to an entry that already exists canonically
+ * (`proposedAction` is `update` or `no-op-already-present`) -- the member
+ * is choosing resume-specific wording for a fact their Profile already
+ * has. A brand-new fact (`proposedAction === 'create'`) has no canonical
+ * entry to attach resume-specific wording to; accepting it this way would
+ * let Master Resume become a shadow Career Profile containing experience
+ * the canonical Profile does not. `resume-specific` destinations (summary
+ * wording, section order) are inherently presentation-level and have no
+ * independent canonical-fact concept at all, so they are always valid
+ * regardless of `proposedAction`.
+ */
+function validateNoOrphanFactualEntry(proposal: ResumeFieldProposal): string | null {
+  if (proposal.destination.kind !== 'canonical-profile-array') return null
+  if (proposal.proposedAction !== 'create') return null
+
+  return `Cannot apply decision 'use_as_resume_specific_only' to proposal ${proposal.id}: it proposes a brand-new '${proposal.destination.field}' entry with no existing canonical Profile entry to attach resume-specific wording to. Accept it canonically first (or reject it) -- Master Resume must never contain a factual career entry the Profile does not.`
 }

@@ -111,4 +111,54 @@ describe('applyConfirmedProposals', () => {
     expect(updateMock).toHaveBeenCalledTimes(2)
     expect(result.errors).toEqual([])
   })
+
+  describe('Phase 3 Master Resume safety rule: no orphan factual entries via use_as_resume_specific_only', () => {
+    it('rejects use_as_resume_specific_only for a brand-new canonical-array fact (proposedAction=create) -- would orphan a new career fact outside the canonical Profile', async () => {
+      const { client, updateMock } = makeFakeClient()
+      const newEmploymentFact = makeProposal({
+        destination: { kind: 'canonical-profile-array', field: 'employment_history', index: 'append' },
+        proposedAction: 'create',
+      })
+      const decisions: ProposalDecision[] = [{ proposal: newEmploymentFact, decision: 'use_as_resume_specific_only' }]
+      const result = await applyConfirmedProposals('user-1', decisions, client)
+      expect(updateMock).not.toHaveBeenCalled()
+      expect(result.errors).toHaveLength(1)
+      expect(result.errors[0]).toContain('use_as_resume_specific_only')
+    })
+
+    it('allows use_as_resume_specific_only for wording on an entry that already exists canonically (proposedAction=update)', async () => {
+      const { client, updateMock } = makeFakeClient()
+      const existingEntryWording = makeProposal({
+        destination: { kind: 'canonical-profile-array', field: 'employment_history', index: 0 },
+        proposedAction: 'update',
+      })
+      const decisions: ProposalDecision[] = [{ proposal: existingEntryWording, decision: 'use_as_resume_specific_only' }]
+      const result = await applyConfirmedProposals('user-1', decisions, client)
+      expect(result.errors).toEqual([])
+      // use_as_resume_specific_only never writes to member_profiles regardless.
+      expect(updateMock).not.toHaveBeenCalled()
+    })
+
+    it('allows use_as_resume_specific_only for a no-op-already-present canonical-array proposal', async () => {
+      const { client } = makeFakeClient()
+      const alreadyPresent = makeProposal({
+        destination: { kind: 'canonical-profile-array', field: 'skills', index: 2 },
+        proposedAction: 'no-op-already-present',
+      })
+      const decisions: ProposalDecision[] = [{ proposal: alreadyPresent, decision: 'use_as_resume_specific_only' }]
+      const result = await applyConfirmedProposals('user-1', decisions, client)
+      expect(result.errors).toEqual([])
+    })
+
+    it('always allows use_as_resume_specific_only for resume-specific destinations (presentation-level, e.g. summary wording) regardless of proposedAction', async () => {
+      const { client } = makeFakeClient()
+      const summaryWording = makeProposal({
+        destination: { kind: 'resume-specific', field: 'summary_override' },
+        proposedAction: 'create',
+      })
+      const decisions: ProposalDecision[] = [{ proposal: summaryWording, decision: 'use_as_resume_specific_only' }]
+      const result = await applyConfirmedProposals('user-1', decisions, client)
+      expect(result.errors).toEqual([])
+    })
+  })
 })
