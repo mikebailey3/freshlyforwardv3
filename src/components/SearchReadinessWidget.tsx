@@ -14,11 +14,11 @@ export function SearchReadinessWidget({ profile }: { profile: MemberProfile | nu
   const fixLink = useMemo(() => getReadinessFixLink(missing), [missing])
 
   return (
-    <div className="border border-border bg-surface-card p-6">
+    <div className="rounded-2xl border border-border bg-surface-card p-6 shadow-sm">
       <div className="flex items-center gap-3 border-b border-border pb-3">
         <TrendingUp className="h-5 w-5 text-primary-600" />
         <div>
-          <h3 className="font-serif text-base font-semibold text-ink">Search Readiness</h3>
+          <h3 className="font-display !text-base font-semibold text-ink">Search Readiness</h3>
           <p className="text-xs text-ink-muted">Profile completeness</p>
         </div>
       </div>
@@ -52,7 +52,7 @@ export function SearchReadinessWidget({ profile }: { profile: MemberProfile | nu
           </Link>
         </div>
       ) : (
-        <div className="mt-6 flex items-center gap-2 border border-success-600 bg-success-950 p-3">
+        <div className="mt-6 flex items-center gap-2 rounded-lg border border-success-600 bg-success-950 p-3">
           <Check className="h-5 w-5 text-success-400" />
           <p className="text-sm text-success-300">Your profile is complete. Your Strategist has everything needed.</p>
         </div>

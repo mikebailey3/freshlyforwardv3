@@ -92,7 +92,14 @@ export function CareerProfilePage() {
       <MemberLayout>
         <div className="mb-6 flex items-center justify-between">
           <div>
-            <h1 className="font-serif text-2xl font-semibold text-ink sm:text-3xl">Edit Career Profile</h1>
+            {/* `!` important modifiers: same pre-existing, unlayered global
+                h1{font-size:clamp(...)} rule found during the Opportunity
+                Engine/Dashboard/Achievement Vault redesigns (index.css)
+                silently overrides plain text-2xl/text-3xl classes on a
+                bare <h1>. Scoped locally here for the same reason as
+                before -- that global rule also affects the already-locked
+                homepage hero, so it's not touched globally. */}
+            <h1 className="font-display !text-2xl font-semibold text-ink sm:!text-3xl">Edit Career Profile</h1>
             <p className="mt-1 text-sm text-ink-muted">Update any section below, then save your changes.</p>
           </div>
         </div>
@@ -110,7 +117,7 @@ export function CareerProfilePage() {
     <MemberLayout>
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="font-serif text-2xl font-semibold text-ink sm:text-3xl">Career Profile</h1>
+          <h1 className="font-display !text-2xl font-semibold text-ink sm:!text-3xl">Career Profile</h1>
           <p className="mt-1 text-sm text-ink-muted">Your complete career profile, built from your questionnaire.</p>
         </div>
         <button
@@ -201,7 +208,7 @@ export function CareerProfilePage() {
             {p?.skills && p.skills.length > 0 ? (
               <div className="flex flex-wrap gap-2">
                 {p.skills.map((skill, i) => (
-                  <span key={i} className="border border-primary-700 px-3 py-1.5 font-mono text-sm font-medium text-primary-300">
+                  <span key={i} className="rounded-full border border-primary-700 px-3 py-1.5 font-mono text-sm font-medium text-primary-300">
                     {skill}
                   </span>
                 ))}
@@ -273,7 +280,7 @@ export function CareerProfilePage() {
             {documents.length > 0 ? (
               <div className="space-y-2">
                 {documents.map((doc) => (
-                  <div key={doc.id} className="flex items-center gap-3 border border-border p-3">
+                  <div key={doc.id} className="flex items-center gap-3 rounded-xl border border-border p-3">
                     <FileText className="h-4 w-4 text-ink-muted" />
                     <div className="flex-1">
                       <p className="text-sm font-medium text-ink">{doc.file_name}</p>
@@ -285,7 +292,7 @@ export function CareerProfilePage() {
             ) : (
               <EmptyState text="No documents uploaded yet." />
             )}
-            <label className="mt-4 flex cursor-pointer items-center justify-center gap-2 border border-dashed border-border px-4 py-3 text-sm font-medium text-ink-muted transition-colors hover:border-primary-400 hover:text-primary-600">
+            <label className="mt-4 flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-border px-4 py-3 text-sm font-medium text-ink-muted transition-colors hover:border-primary-400 hover:text-primary-600">
               {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
               {uploading ? 'Uploading…' : 'Upload Document'}
               <input
@@ -309,10 +316,10 @@ export function CareerProfilePage() {
 
 function ProfileCard({ icon: Icon, title, children }: { icon: typeof User; title: string; children: React.ReactNode }) {
   return (
-    <div className="border border-border bg-surface-card p-6">
+    <div className="rounded-2xl border border-border bg-surface-card p-6 shadow-sm">
       <div className="mb-4 flex items-center gap-3 border-b border-border pb-3">
         <Icon className="h-5 w-5 text-primary-600" />
-        <h3 className="font-serif text-base font-semibold text-ink">{title}</h3>
+        <h3 className="font-display !text-base font-semibold text-ink">{title}</h3>
       </div>
       {children}
     </div>

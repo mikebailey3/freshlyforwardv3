@@ -98,7 +98,7 @@ export function ProfileCard({ userId, profile, onUpdated }: ProfileCardProps) {
   }
 
   return (
-    <div className="border border-border bg-surface-card p-6">
+    <div className="rounded-2xl border border-border bg-surface-card p-6 shadow-sm">
       <div className="flex items-center gap-4">
         <div className="relative">
           <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-primary-950 text-xl font-semibold text-primary-300">
@@ -126,7 +126,7 @@ export function ProfileCard({ userId, profile, onUpdated }: ProfileCardProps) {
         </div>
 
         <div className="min-w-0 flex-1">
-          <p className="truncate font-serif text-lg font-semibold text-ink">
+          <p className="truncate font-display text-lg font-semibold text-ink">
             {profile.full_name || 'Your Name'}
           </p>
 
@@ -165,7 +165,7 @@ export function ProfileCard({ userId, profile, onUpdated }: ProfileCardProps) {
       </div>
 
       {error && (
-        <p className="mt-3 border border-error-600 bg-error-950 px-3 py-2 text-xs text-error-300">{error}</p>
+        <p className="mt-3 rounded-lg border border-error-600 bg-error-950 px-3 py-2 text-xs text-error-300">{error}</p>
       )}
     </div>
   )
