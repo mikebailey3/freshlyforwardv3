@@ -52,24 +52,50 @@ describe('career_timeline reserved event-type RLS migration (static text checks 
     expect(policyBlock).toContain('NOT public.is_reserved_roadmap_event_type(event_type)')
   })
 
-  it('update_own_timeline policy preserves ownership USING/CHECK AND blocks turning a row into a reserved event type', () => {
+  it('update_own_timeline policy blocks turning a normal row into a reserved event type (WITH CHECK) AND blocks touching an already-reserved row at all (USING)', () => {
     const sql = readMigration()
     const policyBlock = extractPolicyBlock(sql, 'update_own_timeline')
 
     expect(policyBlock).toMatch(/FOR UPDATE/)
     expect(policyBlock).toMatch(/TO authenticated/)
-    expect(policyBlock).toMatch(/USING \(auth\.uid\(\) = user_id\)/)
+
+    // Split the USING and WITH CHECK clauses apart so each can be verified
+    // to independently carry both the ownership check AND the reserved-type
+    // exclusion. This is the exact fix for the historical gap: the original
+    // draft only had the reserved-type exclusion in WITH CHECK, which let a
+    // member "launder" an already-reserved row back to a normal type (WITH
+    // CHECK only inspects the resulting NEW row, so it can never see what
+    // the row looked like before the update). Moving the exclusion into
+    // USING as well closes that gap, since USING evaluates against the OLD
+    // row and gates whether the row can be targeted for update at all.
+    const usingMatch = policyBlock.match(/USING \(([\s\S]*?)\)\s*WITH CHECK/)
+    const withCheckMatch = policyBlock.match(/WITH CHECK \(([\s\S]*?)\)\s*;/)
+    expect(usingMatch).not.toBeNull()
+    expect(withCheckMatch).not.toBeNull()
+    const usingClause = usingMatch![1]
+    const withCheckClause = withCheckMatch![1]
+
+    expect(usingClause).toContain('auth.uid() = user_id')
+    expect(usingClause).toContain('NOT public.is_reserved_roadmap_event_type(event_type)')
+    expect(withCheckClause).toContain('auth.uid() = user_id')
+    expect(withCheckClause).toContain('NOT public.is_reserved_roadmap_event_type(event_type)')
+  })
+
+  it('delete_own_timeline policy preserves ownership AND blocks deleting an already-reserved row', () => {
+    const sql = readMigration()
+    const policyBlock = extractPolicyBlock(sql, 'delete_own_timeline')
+
+    expect(policyBlock).toMatch(/FOR DELETE/)
+    expect(policyBlock).toMatch(/TO authenticated/)
     expect(policyBlock).toContain('auth.uid() = user_id')
     expect(policyBlock).toContain('NOT public.is_reserved_roadmap_event_type(event_type)')
   })
 
-  it('does not touch select_own_timeline, delete_own_timeline, or any GRANT/REVOKE statement', () => {
+  it('does not touch select_own_timeline or any GRANT/REVOKE statement', () => {
     const sql = readMigration()
 
     expect(sql).not.toMatch(/DROP POLICY[^\n]*select_own_timeline/)
     expect(sql).not.toMatch(/CREATE POLICY "select_own_timeline"/)
-    expect(sql).not.toMatch(/DROP POLICY[^\n]*delete_own_timeline/)
-    expect(sql).not.toMatch(/CREATE POLICY "delete_own_timeline"/)
 
     // No real GRANT/REVOKE statements -- only mentions of the words are in
     // prose comments describing add_roadmap_milestone's *existing*,
@@ -85,6 +111,18 @@ describe('career_timeline reserved event-type RLS migration (static text checks 
     expect(executableLines).not.toMatch(/\bGRANT\b/)
     expect(executableLines).not.toMatch(/\bREVOKE\b/)
     expect(executableLines).not.toMatch(/FORCE ROW LEVEL SECURITY/)
+  })
+
+  it('rollback comment restores all three touched policies (insert, update, delete) to their pre-migration form', () => {
+    const sql = readMigration()
+    const rollbackIndex = sql.indexOf('ROLLBACK')
+    expect(rollbackIndex).toBeGreaterThan(-1)
+    const rollbackSection = sql.slice(rollbackIndex)
+
+    expect(rollbackSection).toContain('CREATE POLICY "delete_own_timeline"')
+    expect(rollbackSection).toContain('CREATE POLICY "update_own_timeline"')
+    expect(rollbackSection).toContain('CREATE POLICY "insert_own_timeline"')
+    expect(rollbackSection).toContain('DROP FUNCTION IF EXISTS public.is_reserved_roadmap_event_type(text)')
   })
 
   it('does not add a CHECK constraint or enum (event_type stays free-form text per the approved design direction)', () => {
