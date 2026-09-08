@@ -218,6 +218,8 @@ export interface EmploymentEntry {
 }
 
 export interface EducationEntry {
+  /** Additive, Phase 3 -- backfilled by ensureEducationEntryIdsForUser (src/lib/profile/entryIds.ts). Absent on entries never touched by that backfill. */
+  id?: string
   institution: string
   degree: string
   field: string
@@ -225,6 +227,8 @@ export interface EducationEntry {
 }
 
 export interface CertificationEntry {
+  /** Additive, Phase 3 -- backfilled by ensureCertificationEntryIdsForUser (src/lib/profile/entryIds.ts). Absent on entries never touched by that backfill. */
+  id?: string
   name: string
   issuer: string
   date: string | null

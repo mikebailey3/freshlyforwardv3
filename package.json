@@ -18,12 +18,14 @@
     "cheerio": "^1.0.0",
     "clsx": "^2.1.1",
     "lucide-react": "^0.469.0",
+    "mammoth": "^1.12.2",
     "postcss": "^8.5.26",
     "react": "latest",
     "react-dom": "latest",
     "react-router-dom": "latest",
     "tailwind-merge": "^3.6.0",
-    "tailwindcss": "^4.3.3"
+    "tailwindcss": "^4.3.3",
+    "unpdf": "^1.8.1"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^7.0.1",
