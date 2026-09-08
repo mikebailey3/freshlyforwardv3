@@ -3,6 +3,38 @@
 -- REVIEW-ONLY DRAFT. NOT APPLIED. Do not run against any Supabase project
 -- (local or production) without explicit approval.
 --
+-- ============================================================================
+-- DEPLOYMENT PREREQUISITE -- DO NOT APPLY THIS MIGRATION STANDALONE.
+--
+-- Live-audit finding (2026-09-08): a direct `pg_proc` query against the live
+-- FreshlyForward Supabase project (bolt-native-database-69540068, ref
+-- siysdmgdsxlceewlwngl) for `public.add_roadmap_milestone` returned ZERO
+-- ROWS. The RPC this migration's entire safety argument depends on
+-- (20260907000000_add_roadmap_milestone_rpc.sql) has NOT been deployed to
+-- production as of that finding.
+--
+-- This migration's core assumption -- that add_roadmap_milestone's insert
+-- bypasses these tightened `authenticated`-scoped policies via table-owner/
+-- superuser RLS bypass -- is REPO-LEVEL REASONING ONLY until the RPC has
+-- actually been deployed and smoke-tested live. It cannot be verified before
+-- that RPC exists to inspect.
+--
+-- REQUIRED deployment sequence (do not apply this file out of that order):
+--   1. Deploy 20260907000000_add_roadmap_milestone_rpc.sql.
+--   2. Live smoke-test add_roadmap_milestone: confirm a self-service member
+--      call AND an assigned-strategist-for-another-member call both
+--      successfully insert a career_timeline row.
+--   3. Only after step 2 passes, apply this migration as its own controlled
+--      step.
+-- Chronological filename ordering (20260907000000 < 20260908010000) means a
+-- normal `supabase db push`/`migration up` batch run already applies them in
+-- the correct order -- the real risk is a manual/partial apply (e.g. running
+-- only this file via the SQL editor) that skips step 1-2 entirely. See
+-- src/lib/careerTimelineRlsMigrationOrdering.test.ts for the repo-side
+-- static guard against this file's timestamp ever silently sorting ahead of
+-- the RPC migration's.
+-- ============================================================================
+--
 -- Confirmed live facts this migration is designed against (per user-supplied
 -- audit of Supabase project bolt-native-database-69540068, ref
 -- siysdmgdsxlceewlwngl -- NOT independently verified from this sandbox,
