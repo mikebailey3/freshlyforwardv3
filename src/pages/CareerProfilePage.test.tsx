@@ -61,6 +61,7 @@ vi.mock('@/components/ProfileEditForm', () => ({
   ),
 }))
 vi.mock('@/components/ProfileCard', () => ({ ProfileCard: () => <div>Stub Sidebar Profile Card</div> }))
+vi.mock('@/components/ForwardProfileVisibilitySettings', () => ({ ForwardProfileVisibilitySettings: () => <div>Stub Forward Profile Visibility</div> }))
 vi.mock('@/components/SearchReadinessWidget', () => ({ SearchReadinessWidget: () => <div>Stub Search Readiness</div> }))
 
 function renderPage() {
