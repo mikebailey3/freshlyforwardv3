@@ -11,6 +11,7 @@ import { ContactPage } from '@/pages/ContactPage'
 import { FaqPage } from '@/pages/FaqPage'
 import { ForwardFeedPage } from '@/pages/ForwardFeedPage'
 import { ForwardFeedPostPage } from '@/pages/ForwardFeedPostPage'
+import { PublicProfilePage } from '@/pages/PublicProfilePage'
 import { AuthorizationPage } from '@/pages/AuthorizationPage'
 import { PrivacyPage } from '@/pages/PrivacyPage'
 import { TermsPage } from '@/pages/TermsPage'
@@ -71,7 +72,7 @@ import { StrategistLayout } from '@/components/StrategistLayout'
 const publicRoutes = [
   '/', '/pricing', '/how-it-works', '/services', '/why-freshlyforward',
   '/about', '/contact', '/faq', '/authorization', '/privacy', '/terms',
-  '/signin', '/signup', '/forward-feed', '/career-compass',
+  '/signin', '/signup', '/forward-feed', '/career-compass', '/u',
 ]
 
 function App() {
@@ -107,6 +108,12 @@ function App() {
         <Route path="/faq" element={<FaqPage />} />
         <Route path="/forward-feed" element={<ForwardFeedPage />} />
         <Route path="/forward-feed/:slug" element={<ForwardFeedPostPage />} />
+
+        {/* Forward Profiles: public, unauthenticated /u/:username page --
+            distinct from the PRIVATE "Forward Profile" identity layer at
+            /profile and /forward-dna. See
+            docs/superpowers/plans/2026-09-09-forward-profiles-implementation.md */}
+        <Route path="/u/:username" element={<PublicProfilePage />} />
         <Route path="/authorization" element={<AuthorizationPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="/terms" element={<TermsPage />} />
