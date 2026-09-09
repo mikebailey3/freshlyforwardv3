@@ -10,8 +10,7 @@ interface FakeClientOptions {
     certifications: { id?: string }[]
     skills: string[]
   }
-  deleteError?: { message: string } | null
-  insertError?: { message: string } | null
+  rpcError?: { message: string } | null
 }
 
 function makeFakeClient(opts: FakeClientOptions = {}) {
@@ -23,8 +22,7 @@ function makeFakeClient(opts: FakeClientOptions = {}) {
       certifications: [{ id: 'entry-cert-1' }],
       skills: ['SQL'],
     },
-    deleteError = null,
-    insertError = null,
+    rpcError = null,
   } = opts
 
   const masterMaybeSingleMock = vi.fn().mockResolvedValue({ data: master, error: null })
@@ -38,32 +36,27 @@ function makeFakeClient(opts: FakeClientOptions = {}) {
   const profileEqMock = vi.fn().mockReturnValue({ maybeSingle: profileMaybeSingleMock })
   const profileSelectMock = vi.fn().mockReturnValue({ eq: profileEqMock })
 
-  const deleteEqMock = vi.fn().mockResolvedValue({ error: deleteError })
-  const deleteMock = vi.fn().mockReturnValue({ eq: deleteEqMock })
-
-  const entriesInsertMock = vi.fn().mockResolvedValue({ error: insertError })
+  const rpcMock = vi.fn().mockResolvedValue({ error: rpcError })
 
   const fromMock = vi.fn((table: string) => {
     if (table === 'resume_versions') return { select: masterSelectMock }
     if (table === 'member_profiles') return { select: profileSelectMock }
-    if (table === 'resume_entries') return { delete: deleteMock, insert: entriesInsertMock }
     throw new Error(`unexpected table in test: ${table}`)
   })
 
-  return { client: { from: fromMock } as unknown as SupabaseClient, fromMock, deleteMock, deleteEqMock, entriesInsertMock }
+  return { client: { from: fromMock, rpc: rpcMock } as unknown as SupabaseClient, fromMock, rpcMock }
 }
 
 describe('updateMasterResumeEntries', () => {
-  it('reports an error and writes nothing when no active Master exists for this version/member', async () => {
-    const { client, deleteMock, entriesInsertMock } = makeFakeClient({ master: null })
+  it('reports an error and never calls the replace RPC when no active Master exists for this version/member', async () => {
+    const { client, rpcMock } = makeFakeClient({ master: null })
     const result = await updateMasterResumeEntries('user-1', 'version-1', [], client)
     expect(result.errors[0]).toContain('not found')
-    expect(deleteMock).not.toHaveBeenCalled()
-    expect(entriesInsertMock).not.toHaveBeenCalled()
+    expect(rpcMock).not.toHaveBeenCalled()
   })
 
-  it('replaces all entries for the Master: deletes existing rows, then inserts the validated new set', async () => {
-    const { client, deleteMock, deleteEqMock, entriesInsertMock } = makeFakeClient()
+  it('replaces all entries for the Master via one atomic replace_master_resume_entries RPC call', async () => {
+    const { client, rpcMock } = makeFakeClient()
     const result = await updateMasterResumeEntries(
       'user-1',
       'version-1',
@@ -71,15 +64,16 @@ describe('updateMasterResumeEntries', () => {
       client,
     )
     expect(result.errors).toEqual([])
-    expect(deleteMock).toHaveBeenCalled()
-    expect(deleteEqMock).toHaveBeenCalledWith('resume_version_id', 'version-1')
-    const [rows] = entriesInsertMock.mock.calls[0] as [Record<string, unknown>[]]
-    expect(rows).toHaveLength(1)
-    expect(rows[0]).toMatchObject({ resume_version_id: 'version-1', canonical_entry_id: 'entry-emp-1' })
+    expect(rpcMock).toHaveBeenCalledTimes(1)
+    const [rpcName, rpcArgs] = rpcMock.mock.calls[0] as [string, { p_resume_version_id: string; p_entries: Record<string, unknown>[] }]
+    expect(rpcName).toBe('replace_master_resume_entries')
+    expect(rpcArgs.p_resume_version_id).toBe('version-1')
+    expect(rpcArgs.p_entries).toHaveLength(1)
+    expect(rpcArgs.p_entries[0]).toMatchObject({ resume_version_id: 'version-1', canonical_entry_id: 'entry-emp-1' })
   })
 
-  it('never fabricates a reference to an entry no longer present in the Profile -- reports and skips it', async () => {
-    const { client, entriesInsertMock } = makeFakeClient()
+  it('never fabricates a reference to an entry no longer present in the Profile -- reports and excludes it from the RPC payload', async () => {
+    const { client, rpcMock } = makeFakeClient()
     const result = await updateMasterResumeEntries(
       'user-1',
       'version-1',
@@ -87,26 +81,27 @@ describe('updateMasterResumeEntries', () => {
       client,
     )
     expect(result.errors).toHaveLength(1)
-    expect(entriesInsertMock).not.toHaveBeenCalled()
+    const [, rpcArgs] = rpcMock.mock.calls[0] as [string, { p_entries: unknown[] }]
+    expect(rpcArgs.p_entries).toEqual([])
   })
 
-  it('an empty entry set is valid -- clears the Master down to zero entries without error', async () => {
-    const { client, deleteMock, entriesInsertMock } = makeFakeClient()
+  it('an empty entry set is valid -- calls the RPC with an empty array to clear the Master down to zero entries', async () => {
+    const { client, rpcMock } = makeFakeClient()
     const result = await updateMasterResumeEntries('user-1', 'version-1', [], client)
     expect(result.errors).toEqual([])
-    expect(deleteMock).toHaveBeenCalled()
-    expect(entriesInsertMock).not.toHaveBeenCalled()
+    expect(rpcMock).toHaveBeenCalledTimes(1)
+    const [, rpcArgs] = rpcMock.mock.calls[0] as [string, { p_entries: unknown[] }]
+    expect(rpcArgs.p_entries).toEqual([])
   })
 
-  it('surfaces a delete failure without attempting the insert', async () => {
-    const { client, entriesInsertMock } = makeFakeClient({ deleteError: { message: 'delete failed' } })
+  it('surfaces an RPC failure as an error -- the atomic RPC guarantees nothing was partially written', async () => {
+    const { client } = makeFakeClient({ rpcError: { message: 'replace failed' } })
     const result = await updateMasterResumeEntries(
       'user-1',
       'version-1',
       [{ entryKind: 'skill', skillValue: 'SQL', included: true, sortOrder: 0 }],
       client,
     )
-    expect(result.errors).toContain('delete failed')
-    expect(entriesInsertMock).not.toHaveBeenCalled()
+    expect(result.errors).toContain('replace failed')
   })
 })

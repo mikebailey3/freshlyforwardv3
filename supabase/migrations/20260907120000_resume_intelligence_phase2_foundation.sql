@@ -35,6 +35,19 @@ never production from this design turn).
   (`applyCanonicalArrayWrite.ts`, `updateMasterResumeEntries.ts`,
   `promoteResumeVersionToMaster.ts`, `listResumeVersions.ts`) reads/writes
   only columns this file already defined before Phase 4.
+- 2026-09-08 (Phase 4 verification-pass fix): revised in place again, still
+  never applied. Added `replace_master_resume_entries()`, an atomic RPC
+  performing the Master Resume entry replace (delete + reinsert) in one
+  function call, closing a release-blocker found during Phase 4's dedicated
+  verification pass: `updateMasterResumeEntries.ts` previously issued the
+  delete and insert as two separate PostgREST calls (two separate implicit
+  transactions) -- if the delete succeeded and the insert then failed, a
+  member's Master Resume was left with zero entries with no way to recover
+  except re-submitting the edit. `updateMasterResumeEntries.ts` now calls
+  this RPC instead; entry-selection validation against the member's current
+  Profile (`validateEntries()`) is unchanged and still runs in TypeScript
+  before the RPC is called -- this RPC only makes the already-validated
+  replace atomic, it does not re-implement that validation in SQL.
 
 ## Overview
 Additive-only evolution of the existing `resume_versions` concept (from
@@ -366,6 +379,82 @@ CREATE POLICY "modify_own_resume_entries"
       )
     )
   );
+
+-- ============================================================
+-- REPLACE_MASTER_RESUME_ENTRIES: atomic delete+reinsert (Phase 4 fix)
+-- ============================================================
+-- Closes the release blocker found during Phase 4's dedicated
+-- verification pass (see revision history above): application code
+-- previously issued the Master Resume entry replace as two separate
+-- PostgREST calls (DELETE, then INSERT), which are two separate
+-- implicit transactions -- a failure between them could leave a
+-- member's Master Resume with zero entries. Wrapping both statements in
+-- one SECURITY DEFINER function makes the replace atomic: either both
+-- succeed, or (per Postgres's normal function/transaction semantics) an
+-- exception anywhere in the function rolls back everything it did,
+-- leaving the prior entries completely untouched.
+--
+-- Entry-selection validation against the member's current Profile
+-- (validateEntries() in resumeEntryValidation.ts) is NOT duplicated
+-- here -- callers must pass only already-validated entries. This
+-- mirrors the existing design note above: application code, not this
+-- schema, is the actual enforcement boundary for canonical_entry_id/
+-- skill_value references (Postgres cannot FK into a jsonb array
+-- element). This RPC's only job is atomicity of the replace, not
+-- re-validating what's already been validated.
+CREATE OR REPLACE FUNCTION replace_master_resume_entries(p_resume_version_id uuid, p_entries jsonb)
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_member_id uuid;
+  v_is_master boolean;
+  v_is_archived boolean;
+BEGIN
+  SELECT member_id, is_master, is_archived
+    INTO v_member_id, v_is_master, v_is_archived
+  FROM resume_versions
+  WHERE id = p_resume_version_id;
+
+  IF v_member_id IS NULL THEN
+    RAISE EXCEPTION 'resume_versions row % not found', p_resume_version_id;
+  END IF;
+
+  IF v_member_id <> auth.uid() THEN
+    RAISE EXCEPTION 'not authorized to modify this resume version';
+  END IF;
+
+  IF v_is_archived THEN
+    RAISE EXCEPTION 'cannot modify an archived resume version';
+  END IF;
+
+  IF NOT v_is_master THEN
+    RAISE EXCEPTION 'resume_versions row % is not the active Master Resume', p_resume_version_id;
+  END IF;
+
+  DELETE FROM resume_entries WHERE resume_version_id = p_resume_version_id;
+
+  INSERT INTO resume_entries (resume_version_id, entry_kind, canonical_entry_id, skill_value, included, sort_order, override_description)
+  SELECT
+    p_resume_version_id,
+    (x.entry_kind)::resume_entry_kind,
+    x.canonical_entry_id,
+    x.skill_value,
+    x.included,
+    x.sort_order,
+    x.override_description
+  FROM jsonb_to_recordset(p_entries) AS x(
+    entry_kind text,
+    canonical_entry_id text,
+    skill_value text,
+    included boolean,
+    sort_order integer,
+    override_description text
+  );
+END;
+$$;
 
 -- ============================================================
 -- RESUME_IMPORT_ATTEMPTS: one row per scan/import execution (Phase 3)

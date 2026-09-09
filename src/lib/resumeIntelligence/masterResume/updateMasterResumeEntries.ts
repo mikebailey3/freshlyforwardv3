@@ -27,6 +27,17 @@ export interface UpdateMasterResumeEntriesResult {
  * entry selection that no longer resolves against the member's current
  * Profile (e.g. it was edited/removed there since this Master was last
  * saved) is reported as an error and skipped, never silently written.
+ *
+ * Verification-pass fix (2026-09-08): the delete and insert are issued
+ * as one call to `replace_master_resume_entries()`, a SECURITY DEFINER
+ * RPC (see the migration), not as two separate PostgREST calls. Two
+ * separate calls are two separate implicit transactions -- if the
+ * delete succeeded and the insert then failed, a member's Master Resume
+ * would be left with zero entries with no way to recover except
+ * re-submitting the edit. The RPC makes the replace atomic; entry
+ * validation against the member's current Profile still happens here in
+ * TypeScript beforehand, unchanged -- only already-validated entries are
+ * ever sent to the RPC.
  */
 export async function updateMasterResumeEntries(
   userId: string,
@@ -55,14 +66,12 @@ export async function updateMasterResumeEntries(
 
   const { validEntries, errors } = validateEntries(entries, profile as MemberProfileArrays | null)
 
-  const { error: deleteError } = await client.from('resume_entries').delete().eq('resume_version_id', resumeVersionId)
-  if (deleteError) return { errors: [...errors, deleteError.message] }
-
-  if (validEntries.length > 0) {
-    const rows = validEntries.map((entry) => entryInputToRow(resumeVersionId, entry))
-    const { error: insertError } = await client.from('resume_entries').insert(rows)
-    if (insertError) errors.push(insertError.message)
-  }
+  const rows = validEntries.map((entry) => entryInputToRow(resumeVersionId, entry))
+  const { error: rpcError } = await client.rpc('replace_master_resume_entries', {
+    p_resume_version_id: resumeVersionId,
+    p_entries: rows,
+  })
+  if (rpcError) errors.push(rpcError.message)
 
   return { errors }
 }
