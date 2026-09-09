@@ -37,7 +37,13 @@ BEGIN
     RAISE EXCEPTION 'resume_versions row % not found', p_resume_version_id;
   END IF;
 
-  IF v_member_id <> auth.uid() THEN
+  -- NULL-safe: `v_member_id <> auth.uid()` alone is NULL (not TRUE) when
+  -- auth.uid() is NULL (an anon/unauthenticated caller), and PL/pgSQL's
+  -- `IF NULL THEN` never raises -- that would silently let an
+  -- unauthenticated caller sail past this check entirely. Found and
+  -- fixed during the Phase 5-8 completion audit; explicitly rejecting a
+  -- NULL auth.uid() first closes it.
+  IF auth.uid() IS NULL OR v_member_id <> auth.uid() THEN
     RAISE EXCEPTION 'not authorized to modify this resume version';
   END IF;
 
@@ -66,3 +72,12 @@ BEGIN
   );
 END;
 $$;
+
+-- Phase 5-8 completion audit: match the repo's established SECURITY
+-- DEFINER hardening convention (see
+-- 20260902021400_harden_rls_and_security_definer_access.sql) rather than
+-- relying on Postgres's default PUBLIC-execute grant. Belt-and-suspenders
+-- alongside the NULL-safe auth.uid() check above -- an anon/unauthenticated
+-- caller should never even be able to reach this function to begin with.
+REVOKE EXECUTE ON FUNCTION replace_resume_version_entries(uuid, jsonb) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION replace_resume_version_entries(uuid, jsonb) TO authenticated;
