@@ -32,6 +32,13 @@ CREATE TABLE IF NOT EXISTS resume_content_suggestions (
   -- excerpt, or a literal substring of the member's own canonical Profile
   -- content. Never an invented example. See validateGroundedProposal.ts.
   evidence_reference text,
+  -- Human-readable "why this suggestion" (e.g. "Adds a quantified result
+  -- your Master Resume already states elsewhere" or "Aligns wording with
+  -- the target role's job description"). Nullable -- a provider that has
+  -- nothing meaningful to say beyond the text itself may omit it, but it
+  -- is never fabricated by this schema; the application layer supplies
+  -- whatever the provider actually returned, unedited.
+  reasoning text,
 
   -- Same propose/review split as resume_field_proposals, reusing its enums.
   status resume_suggestion_status NOT NULL DEFAULT 'pending',

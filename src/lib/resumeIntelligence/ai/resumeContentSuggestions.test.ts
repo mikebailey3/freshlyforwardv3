@@ -34,18 +34,18 @@ describe('createResumeContentSuggestion', () => {
   })
 
   it('persists a grounded proposal as a pending suggestion', async () => {
-    const provider = fakeProvider({ available: true, proposedText: 'Led a team of 5 engineers to ship checkout.', evidenceReference: 'Led a team of 5 engineers' })
+    const provider = fakeProvider({ available: true, proposedText: 'Led a team of 5 engineers to ship checkout.', evidenceReference: 'Led a team of 5 engineers', reasoning: 'Quantifies team size using evidence already on file.' })
     const { client, insertMock } = makeInsertClient()
     const result = await createResumeContentSuggestion(baseInput, provider, false, client)
     expect(result.error).toBeNull()
     expect(result.suggestionId).toBe('sugg-1')
     expect(insertMock).toHaveBeenCalledWith(
-      expect.objectContaining({ user_id: 'user-1', resume_version_id: 'v-1', proposed_text: 'Led a team of 5 engineers to ship checkout.', evidence_reference: 'Led a team of 5 engineers' }),
+      expect.objectContaining({ user_id: 'user-1', resume_version_id: 'v-1', proposed_text: 'Led a team of 5 engineers to ship checkout.', evidence_reference: 'Led a team of 5 engineers', reasoning: 'Quantifies team size using evidence already on file.' }),
     )
   })
 
   it('refuses to persist a proposal that fails the grounding check -- never writes an ungrounded suggestion', async () => {
-    const provider = fakeProvider({ available: true, proposedText: 'Led a team of 500 engineers.', evidenceReference: 'Led a team of 500 engineers' })
+    const provider = fakeProvider({ available: true, proposedText: 'Led a team of 500 engineers.', evidenceReference: 'Led a team of 500 engineers', reasoning: 'Fabricated scale.' })
     const { client, insertMock } = makeInsertClient()
     const result = await createResumeContentSuggestion(baseInput, provider, false, client)
     expect(result.skipped).toBe(true)
@@ -54,7 +54,7 @@ describe('createResumeContentSuggestion', () => {
   })
 
   it('surfaces a database error without pretending the suggestion was skipped', async () => {
-    const provider = fakeProvider({ available: true, proposedText: 'Led a team of 5 engineers to ship checkout.', evidenceReference: 'Led a team of 5 engineers' })
+    const provider = fakeProvider({ available: true, proposedText: 'Led a team of 5 engineers to ship checkout.', evidenceReference: 'Led a team of 5 engineers', reasoning: 'Quantifies team size.' })
     const { client } = makeInsertClient(null, { message: 'insert failed' })
     const result = await createResumeContentSuggestion(baseInput, provider, false, client)
     expect(result.skipped).toBe(false)

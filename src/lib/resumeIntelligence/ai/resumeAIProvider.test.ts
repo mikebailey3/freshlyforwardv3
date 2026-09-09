@@ -15,6 +15,7 @@ describe('NullResumeAIContentProvider', () => {
     expect(result.available).toBe(false)
     expect(result.proposedText).toBeNull()
     expect(result.evidenceReference).toBeNull()
+    expect(result.reasoning).toBeNull()
     expect(result.unavailableReason).toBeTruthy()
   })
 })

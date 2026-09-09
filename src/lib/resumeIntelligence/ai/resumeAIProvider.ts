@@ -40,6 +40,8 @@ export interface ResumeAISuggestionResult {
   proposedText: string | null
   /** Present only when available is true. Null only for a purely stylistic suggestion (see interface doc). */
   evidenceReference: string | null
+  /** Present only when available is true. Human-readable "why this suggestion" the member sees alongside it in the review UI. Null when a provider has nothing beyond the text itself to add. */
+  reasoning: string | null
   /** Present only when available is false -- why no suggestion exists. */
   unavailableReason?: string
 }
@@ -56,6 +58,7 @@ export class NullResumeAIContentProvider implements ResumeAIContentProvider {
       available: false,
       proposedText: null,
       evidenceReference: null,
+      reasoning: null,
       unavailableReason: 'AI-assisted resume suggestions are not connected yet. This will be available once a real ResumeAIContentProvider (e.g. via AI Innovation Lab) is wired in.',
     })
   }

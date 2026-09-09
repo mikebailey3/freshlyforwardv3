@@ -49,6 +49,7 @@ export async function createResumeContentSuggestion(
       target_field: input.targetField,
       proposed_text: suggestion.proposedText,
       evidence_reference: suggestion.evidenceReference,
+      reasoning: suggestion.reasoning,
     })
     .select('id')
     .single()
