@@ -23,6 +23,18 @@ never production from this design turn).
   note: import attempts & retry/supersession"); documented the member-only
   canonical-confirmation authorization boundary already implied by the
   Phase 2 RLS (§ "Design note: confirmation authorization").
+- 2026-09-08 (Phase 4): revised in place again, still never applied. Added
+  one nullable `resume_versions.summary_override` column -- the one
+  resume-specific override this phase gives a persistence layer to
+  (`setMasterResumeSummaryOverride`/`analyzeMasterResume`, which now
+  prefers it over the canonical `member_profiles.summary` when set).
+  Everything else in this file is unchanged: no table was added or
+  removed, no RLS policy was altered, `set_master_resume_version()` and
+  `resume_entries`/`resume_field_proposals`/`resume_import_attempts` are
+  exactly as Phase 3 left them. Application code added in Phase 4
+  (`applyCanonicalArrayWrite.ts`, `updateMasterResumeEntries.ts`,
+  `promoteResumeVersionToMaster.ts`, `listResumeVersions.ts`) reads/writes
+  only columns this file already defined before Phase 4.
 
 ## Overview
 Additive-only evolution of the existing `resume_versions` concept (from
@@ -215,6 +227,16 @@ DROP INDEX IF EXISTS resume_versions_one_active_master_per_member;
 CREATE UNIQUE INDEX resume_versions_one_active_master_per_member
   ON resume_versions (member_id)
   WHERE is_master AND NOT is_archived;
+
+-- Phase 4: the one new column this revision adds. Nullable, resume-specific,
+-- version-scoped -- never a second copy of member_profiles.summary and
+-- never written by anything other than an explicit member action on this
+-- specific version (setMasterResumeSummaryOverride).
+ALTER TABLE resume_versions
+  ADD COLUMN IF NOT EXISTS summary_override text;
+
+COMMENT ON COLUMN resume_versions.summary_override IS
+  'Resume-specific override of the Master''s summary/objective text for this version only. NULL means "use the canonical member_profiles.summary as-is" -- never a second canonical source, never written except by the version''s own member.';
 
 CREATE OR REPLACE FUNCTION set_master_resume_version(p_new_master_id uuid)
 RETURNS void

@@ -53,13 +53,12 @@ interface MemberProfileRow {
  * some of their Profile's content).
  *
  * Known limitation: resume-specific overrides for fields other than an
- * employment entry's description (a resume-specific `summary_override`,
- * per-entry overrides for education/certification, which have no
- * free-text field to override in the first place) have no persistence
- * layer yet -- `resume-specific` proposal destinations are confirmed but
- * never written anywhere by `applyConfirmedProposals` (by design, Phase
- * 2's locked boundary). Until that lands, `summary` here is always the
- * canonical `member_profiles.summary`.
+ * employment entry's description or the Master's overall summary have
+ * no persistence layer yet -- per-entry overrides for education/
+ * certification, which have no free-text field to override in the first
+ * place. `summary_override` (Phase 4, `setMasterResumeSummaryOverride`)
+ * is read here and preferred over the canonical `member_profiles.summary`
+ * when set; it is never written to `member_profiles` itself.
  */
 export async function analyzeMasterResume(
   options: AnalyzeMasterResumeOptions,
@@ -67,7 +66,7 @@ export async function analyzeMasterResume(
 ): Promise<AnalyzeMasterResumeResult> {
   const { data: master } = await client
     .from('resume_versions')
-    .select('id')
+    .select('id, summary_override')
     .eq('member_id', options.userId)
     .eq('is_master', true)
     .eq('is_archived', false)
@@ -78,6 +77,7 @@ export async function analyzeMasterResume(
   }
 
   const resumeVersionId = (master as { id: string }).id
+  const summaryOverride = (master as { summary_override: string | null }).summary_override
 
   const [{ data: entriesData }, { data: profileData }] = await Promise.all([
     client.from('resume_entries').select('entry_kind, canonical_entry_id, skill_value, included, sort_order, override_description').eq('resume_version_id', resumeVersionId),
@@ -87,7 +87,7 @@ export async function analyzeMasterResume(
   const entries = (entriesData ?? []) as ResumeEntryRow[]
   const profile = profileData as MemberProfileRow | null
 
-  const content = buildResumeContentInput(options.email, profile, entries)
+  const content = buildResumeContentInput(options.email, profile, entries, summaryOverride)
 
   const result = await computeResumeIntelligence(content, {
     userId: options.userId,
@@ -100,7 +100,12 @@ export async function analyzeMasterResume(
   return { result, error: null }
 }
 
-function buildResumeContentInput(email: string, profile: MemberProfileRow | null, entries: ResumeEntryRow[]): ResumeContentInput {
+function buildResumeContentInput(
+  email: string,
+  profile: MemberProfileRow | null,
+  entries: ResumeEntryRow[],
+  summaryOverride: string | null,
+): ResumeContentInput {
   const selected = (kind: ResumeEntryRow['entry_kind']) =>
     entries
       .filter((e) => e.entry_kind === kind && e.included)
@@ -131,7 +136,7 @@ function buildResumeContentInput(email: string, profile: MemberProfileRow | null
     email,
     phone: profile?.phone ?? '',
     location: profile?.location ?? '',
-    summary: profile?.summary ?? '',
+    summary: summaryOverride ?? profile?.summary ?? '',
     employment,
     education,
     certifications,

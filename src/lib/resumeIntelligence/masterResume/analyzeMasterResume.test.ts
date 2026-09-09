@@ -96,4 +96,33 @@ describe('analyzeMasterResume', () => {
     const quant = result?.dimensions.find((d) => d.key === 'quantification')
     expect(quant?.findings.some((f) => f.code === 'BULLET_NOT_QUANTIFIED')).toBe(false)
   })
+
+  it('prefers resume_versions.summary_override over the canonical member_profiles.summary when set', async () => {
+    const { client, fromMock } = makeFakeClient({
+      master: { id: 'version-1', summary_override: 'A results-driven summary written for this version only.' } as unknown as { id: string },
+      profile: {
+        full_name: 'Jamie Rivera', phone: null, location: null, summary: 'Clean canonical summary with no cliches.',
+        employment_history: [], education: [], certifications: [], skills: [],
+      },
+    })
+    const { result } = await analyzeMasterResume({ userId: 'user-1', email: 'jamie@example.com' }, client)
+    expect(fromMock).toHaveBeenCalledWith('resume_versions')
+    // The override text contains a cliche the canonical summary does not -- this only fires if the
+    // override actually reached the analyzer instead of the canonical member_profiles.summary.
+    const contentStrength = result?.dimensions.find((d) => d.key === 'contentStrength')
+    expect(contentStrength?.findings.some((f) => f.code === 'CLICHE_IN_SUMMARY')).toBe(true)
+  })
+
+  it('falls back to the canonical member_profiles.summary when no summary_override is set', async () => {
+    const { client } = makeFakeClient({
+      master: { id: 'version-1' },
+      profile: {
+        full_name: 'Jamie Rivera', phone: null, location: null, summary: 'Results-driven summary in the canonical Profile.',
+        employment_history: [], education: [], certifications: [], skills: [],
+      },
+    })
+    const { result } = await analyzeMasterResume({ userId: 'user-1', email: 'jamie@example.com' }, client)
+    const contentStrength = result?.dimensions.find((d) => d.key === 'contentStrength')
+    expect(contentStrength?.findings.some((f) => f.code === 'CLICHE_IN_SUMMARY')).toBe(true)
+  })
 })
