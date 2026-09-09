@@ -48,6 +48,18 @@ never production from this design turn).
   Profile (`validateEntries()`) is unchanged and still runs in TypeScript
   before the RPC is called -- this RPC only makes the already-validated
   replace atomic, it does not re-implement that validation in SQL.
+- 2026-09-09 (Phases 5-8 completion pass): revised in place again, still
+  never applied. Added two nullable `resume_versions` columns for the
+  Visual Resume Builder (Phase 5): `section_order` (jsonb array of section
+  keys -- member-chosen display order) and `template_key` (text, defaults
+  to `'ats_classic'` -- which template renders this version). Neither
+  column duplicates a canonical fact -- both are pure presentation
+  preference, same category as the existing `summary_override`. No table
+  added or removed, no RLS policy altered, no existing column changed.
+  `derived_from_resume_version_id`/`target_opportunity_id` (Phase 6
+  tailoring lineage) and `applications.resume_version_id` (Phase 6 job
+  linkage) already existed from Phase 2/3 -- reused as-is, nothing new
+  needed for lineage or job linkage.
 
 ## Overview
 Additive-only evolution of the existing `resume_versions` concept (from
@@ -250,6 +262,18 @@ ALTER TABLE resume_versions
 
 COMMENT ON COLUMN resume_versions.summary_override IS
   'Resume-specific override of the Master''s summary/objective text for this version only. NULL means "use the canonical member_profiles.summary as-is" -- never a second canonical source, never written except by the version''s own member.';
+
+-- Phase 5 (Visual Resume Builder): two more resume-specific, version-scoped
+-- presentation columns. Neither is a canonical fact; both default to a
+-- sane value so every pre-Phase-5 row (none exist live yet) reads cleanly.
+ALTER TABLE resume_versions
+  ADD COLUMN IF NOT EXISTS section_order jsonb,
+  ADD COLUMN IF NOT EXISTS template_key text NOT NULL DEFAULT 'ats_classic';
+
+COMMENT ON COLUMN resume_versions.section_order IS
+  'Member-chosen display order of resume sections (e.g. ["summary","employment","education","skills","certifications"]) for this version only. NULL means "use the default section order". Never affects member_profiles or which entries are selected -- purely presentation.';
+COMMENT ON COLUMN resume_versions.template_key IS
+  'Which template (src/lib/resumeIntelligence/templates/registry.ts) renders this version. Presentation only -- never changes which content is included.';
 
 CREATE OR REPLACE FUNCTION set_master_resume_version(p_new_master_id uuid)
 RETURNS void
