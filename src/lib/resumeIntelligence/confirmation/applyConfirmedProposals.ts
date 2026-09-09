@@ -1,5 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase'
+import { applyCanonicalArrayWrite } from './applyCanonicalArrayWrite'
 import type { ConfirmationDecision, ProposalDecision, ResumeFieldProposal } from '@/types/resume'
 
 export interface ApplyConfirmedProposalsResult {
@@ -26,10 +27,11 @@ const UNSUPPORTED_CANONICAL_SCALAR_FIELDS = new Set(['email'])
  * `accept_as_canonical` and `accept_edited_canonical` write to
  * member_profiles, and only for `canonical-profile` destinations.
  * `canonical-profile-array` destinations (employment_history, education,
- * certifications, skills) are out of scope for this function -- Phase 2
- * ships confirmation for the four scalar canonical-profile fields only;
- * array-field confirmation is deferred, per the Phase 2 boundary, to the
- * persistence layer that will land with resume_versions.
+ * certifications, skills) are delegated to `applyCanonicalArrayWrite.ts`
+ * (Phase 4) -- kept as a separate module rather than inlined here since
+ * it has meaningfully different concerns (array indexing, entry
+ * construction from unstructured text, per-kind landing fields) than the
+ * four-scalar-field logic below.
  */
 export async function applyConfirmedProposals(
   userId: string,
@@ -54,6 +56,10 @@ async function applyOne(userId: string, decision: ProposalDecision, client: Supa
   }
 
   if (!writesCanonicalProfile(action)) return null
+
+  if (proposal.destination.kind === 'canonical-profile-array') {
+    return applyCanonicalArrayWrite(userId, proposal, action, editedValue, client)
+  }
 
   if (proposal.destination.kind !== 'canonical-profile') {
     return `Cannot apply decision '${action}' to proposal ${proposal.id}: destination is '${proposal.destination.kind}', not 'canonical-profile'.`

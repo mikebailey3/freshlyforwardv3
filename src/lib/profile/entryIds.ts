@@ -24,8 +24,13 @@ import type { EducationEntry, CertificationEntry } from '@/types'
  * strategy (e.g. crypto.randomUUID()) non-breaking -- existing ids of
  * either shape are never regenerated or rewritten for cosmetic
  * consistency.
+ *
+ * Exported (Phase 4): `applyCanonicalArrayWrite.ts` reuses this exact
+ * generator when a confirmed resume proposal creates a brand-new
+ * employment/education/certification entry, rather than duplicating id
+ * generation logic in a second place.
  */
-function generateEntryId(): string {
+export function generateEntryId(): string {
   return `entry-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`
 }
 
