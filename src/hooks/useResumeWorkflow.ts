@@ -15,6 +15,8 @@ import { promoteResumeVersionToMaster } from '@/lib/resumeIntelligence/masterRes
 import { listResumeVersions } from '@/lib/resumeIntelligence/masterResume/listResumeVersions'
 import { fetchMasterResumeEntries } from '@/lib/resumeIntelligence/masterResume/fetchMasterResumeEntries'
 import { analyzeMasterResume } from '@/lib/resumeIntelligence/masterResume/analyzeMasterResume'
+import { CareerVaultEvidenceCoverageProvider } from '@/lib/resumeIntelligence/evidenceCoverage'
+import { FreshFitTargetRoleAlignmentProvider } from '@/lib/resumeIntelligence/alignment'
 import type { MasterResumeEntryInput } from '@/lib/resumeIntelligence/masterResume/resumeEntryValidation'
 import type { ResumeVersionSummary } from '@/lib/resumeIntelligence/masterResume/listResumeVersions'
 import type { ConfirmationDecision, ResumeIntelligenceResult } from '@/types/resume'
@@ -156,7 +158,20 @@ export function useResumeWorkflow() {
       }
       setBusy(true)
       setError(null)
-      const { result, error: analysisError } = await analyzeMasterResume({ userId: user.id, email: user.email, targetRole: targetRole ?? null })
+      const { result, error: analysisError } = await analyzeMasterResume({
+        userId: user.id,
+        email: user.email,
+        targetRole: targetRole ?? null,
+        // Phase 7/6: real, DB-backed providers now that Career Vault and
+        // FreshFit's dictionary matcher are both available -- this is the
+        // one call site where the Phase 1 Null-provider defaults are
+        // deliberately overridden with the live implementations. Kept
+        // explicit here (rather than changing computeResumeIntelligence's
+        // internal default) so no other/future caller is silently
+        // surprised by a live Supabase call it didn't ask for.
+        evidenceProvider: new CareerVaultEvidenceCoverageProvider(),
+        alignmentProvider: new FreshFitTargetRoleAlignmentProvider(),
+      })
       if (analysisError) setError(analysisError)
       setAnalysis(result)
       setBusy(false)
