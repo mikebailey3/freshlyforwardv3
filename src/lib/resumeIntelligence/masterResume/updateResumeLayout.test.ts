@@ -59,4 +59,17 @@ describe('updateResumeLayout', () => {
     const result = await updateResumeLayout('user-1', 'version-1', { templateKey: 'minimal' }, client)
     expect(result.error).toBe('write failed')
   })
+
+  it('persists a summary override for a NON-master version -- the one write path derived/tailored versions use for this', async () => {
+    const { client, updateMock } = makeFakeClient()
+    const result = await updateResumeLayout('user-1', 'version-1', { summaryOverride: 'Tailored summary text' }, client)
+    expect(result.error).toBeNull()
+    expect(updateMock).toHaveBeenCalledWith({ summary_override: 'Tailored summary text' })
+  })
+
+  it('persists an explicit null summary override (clearing it) -- distinguished from "field not provided"', async () => {
+    const { client, updateMock } = makeFakeClient()
+    await updateResumeLayout('user-1', 'version-1', { summaryOverride: null }, client)
+    expect(updateMock).toHaveBeenCalledWith({ summary_override: null })
+  })
 })
