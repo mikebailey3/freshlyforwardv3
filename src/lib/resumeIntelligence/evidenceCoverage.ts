@@ -39,10 +39,20 @@ export class NullEvidenceCoverageProvider implements EvidenceCoverageProvider {
  * member-confirmed row is "confirmed evidence" (mirrors the propose/
  * accept discipline used everywhere else in this system).
  *
- * A skill with zero confirmed capability rows is reported as a finding,
- * not silently omitted -- the member should know which claims on their
- * resume currently have no vault evidence, exactly the same "coverage
- * gap, not a fabricated pass" spirit as FreshFit's gap reporting.
+ * Phase 5-8 completion pass: the member-facing requirement is "understand
+ * WHY Evidence Coverage produced its result", not just a bare percentage.
+ * This now reports four distinguishable finding kinds, each carrying its
+ * own literal evidence and action, rather than only the original
+ * missing-evidence gap:
+ *  - `SKILL_STRONG_VAULT_EVIDENCE`  -- 2+ confirmed Career Wins back this claim.
+ *  - `SKILL_WEAK_VAULT_EVIDENCE`    -- exactly 1 confirmed Career Win backs it.
+ *  - `SKILL_MISSING_VAULT_EVIDENCE` -- claimed on the resume, zero confirmed evidence.
+ *  - `VAULT_EVIDENCE_NOT_ON_RESUME` -- the reverse gap: a skill has confirmed
+ *    Career Vault evidence but is not claimed anywhere on this resume version.
+ *    Surfaced only as a finding/suggestion -- never silently added to the
+ *    resume or promoted into canonical Profile fields (locked: Career
+ *    Vault is evidence-only, mutated only through its own explicit
+ *    propose/confirm flow).
  */
 export class CareerVaultEvidenceCoverageProvider implements EvidenceCoverageProvider {
   constructor(private readonly client: SupabaseClient = defaultClient) {}
@@ -76,15 +86,40 @@ export class CareerVaultEvidenceCoverageProvider implements EvidenceCoverageProv
       }
     }
 
-    const confirmedSkills = new Set(((data ?? []) as { skill_name: string }[]).map((row) => row.skill_name.toLowerCase()))
+    // Count confirmed capability rows per skill (case-insensitive) rather
+    // than only presence/absence -- this is what lets a member tell
+    // "strong" evidence (multiple confirmed wins) apart from "weak"
+    // (exactly one), not just covered/not-covered.
+    const confirmedCountBySkill = new Map<string, number>()
+    for (const row of (data ?? []) as { skill_name: string }[]) {
+      const key = row.skill_name.toLowerCase()
+      confirmedCountBySkill.set(key, (confirmedCountBySkill.get(key) ?? 0) + 1)
+    }
 
     const findings: ResumeFinding[] = []
     let coveredCount = 0
+    const claimedSkillKeys = new Set(input.claimedSkills.map((s) => s.toLowerCase()))
 
     for (const skill of input.claimedSkills) {
-      const covered = confirmedSkills.has(skill.toLowerCase())
-      if (covered) {
+      const confirmedCount = confirmedCountBySkill.get(skill.toLowerCase()) ?? 0
+      if (confirmedCount >= 2) {
         coveredCount++
+        findings.push({
+          code: 'SKILL_STRONG_VAULT_EVIDENCE',
+          severity: 'info',
+          meaning: `This skill has strong Career Vault evidence -- ${confirmedCount} confirmed Career Wins demonstrate it.`,
+          evidence: skill,
+          action: 'No action needed.',
+        })
+      } else if (confirmedCount === 1) {
+        coveredCount++
+        findings.push({
+          code: 'SKILL_WEAK_VAULT_EVIDENCE',
+          severity: 'info',
+          meaning: 'This skill has only one confirmed Career Vault win behind it -- evidence exists, but it is thin.',
+          evidence: skill,
+          action: 'Add another confirmed Career Win that demonstrates this skill to strengthen it.',
+        })
       } else {
         findings.push({
           code: 'SKILL_MISSING_VAULT_EVIDENCE',
@@ -96,7 +131,22 @@ export class CareerVaultEvidenceCoverageProvider implements EvidenceCoverageProv
       }
     }
 
-    const score = Math.round((coveredCount / input.claimedSkills.length) * 100)
+    // Reverse direction: confirmed evidence the member already has, for a
+    // skill this resume version doesn't claim at all. Surfaced as an
+    // honest opportunity finding only -- never silently added to the
+    // resume and never written back into member_profiles/Career Vault.
+    for (const [skillKey, confirmedCount] of confirmedCountBySkill.entries()) {
+      if (claimedSkillKeys.has(skillKey)) continue
+      findings.push({
+        code: 'VAULT_EVIDENCE_NOT_ON_RESUME',
+        severity: 'info',
+        meaning: `You have ${confirmedCount} confirmed Career Vault win(s) demonstrating this skill, but it is not claimed anywhere on this resume version.`,
+        evidence: skillKey,
+        action: 'Consider adding this skill to your resume if it is relevant to the role you are targeting.',
+      })
+    }
+
+    const score = input.claimedSkills.length === 0 ? 0 : Math.round((coveredCount / input.claimedSkills.length) * 100)
 
     return {
       key: 'evidenceCoverage',

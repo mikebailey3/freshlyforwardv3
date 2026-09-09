@@ -38,20 +38,39 @@ describe('CareerVaultEvidenceCoverageProvider', () => {
     expect(result.score).toBeNull()
   })
 
-  it('scores 100 when every claimed skill has a confirmed career_win_capabilities row', async () => {
+  it('scores 100 and reports WEAK evidence findings when every claimed skill has exactly one confirmed career_win_capabilities row', async () => {
     const provider = new CareerVaultEvidenceCoverageProvider(makeFakeClient(['SQL', 'Leadership']))
     const result = await provider.score({ userId: 'user-1', claimedSkills: ['sql', 'leadership'] })
     expect(result.status).toBe('scored')
     expect(result.score).toBe(100)
-    expect(result.findings).toEqual([])
+    expect(result.findings).toHaveLength(2)
+    expect(result.findings.every((f) => f.code === 'SKILL_WEAK_VAULT_EVIDENCE')).toBe(true)
+  })
+
+  it('reports STRONG evidence when a claimed skill has 2+ confirmed career_win_capabilities rows', async () => {
+    const provider = new CareerVaultEvidenceCoverageProvider(makeFakeClient(['SQL', 'SQL', 'SQL']))
+    const result = await provider.score({ userId: 'user-1', claimedSkills: ['sql'] })
+    expect(result.score).toBe(100)
+    expect(result.findings).toEqual([expect.objectContaining({ code: 'SKILL_STRONG_VAULT_EVIDENCE', evidence: 'sql' })])
   })
 
   it('reports a SKILL_MISSING_VAULT_EVIDENCE finding (never invented coverage) for a claimed skill with no confirmed evidence', async () => {
     const provider = new CareerVaultEvidenceCoverageProvider(makeFakeClient(['sql']))
     const result = await provider.score({ userId: 'user-1', claimedSkills: ['sql', 'leadership'] })
     expect(result.score).toBe(50)
-    expect(result.findings).toHaveLength(1)
-    expect(result.findings[0]).toMatchObject({ code: 'SKILL_MISSING_VAULT_EVIDENCE', evidence: 'leadership' })
+    const missing = result.findings.filter((f) => f.code === 'SKILL_MISSING_VAULT_EVIDENCE')
+    expect(missing).toHaveLength(1)
+    expect(missing[0]).toMatchObject({ code: 'SKILL_MISSING_VAULT_EVIDENCE', evidence: 'leadership' })
+  })
+
+  it('surfaces confirmed Career Vault evidence for a skill NOT claimed on this resume as an honest opportunity finding -- never silently adds it', async () => {
+    const provider = new CareerVaultEvidenceCoverageProvider(makeFakeClient(['python']))
+    const result = await provider.score({ userId: 'user-1', claimedSkills: ['sql'] })
+    const notOnResume = result.findings.filter((f) => f.code === 'VAULT_EVIDENCE_NOT_ON_RESUME')
+    expect(notOnResume).toHaveLength(1)
+    expect(notOnResume[0]).toMatchObject({ evidence: 'python' })
+    // the claimed skill itself still gets its own (missing-evidence) finding -- the reverse finding is purely additive
+    expect(result.findings.some((f) => f.code === 'SKILL_MISSING_VAULT_EVIDENCE')).toBe(true)
   })
 
   it('matches skill names case-insensitively', async () => {
