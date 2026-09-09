@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { cn } from '@/lib/utils'
+import { isReservedUsername } from '@/lib/publicProfile'
 import { Camera, Loader2, Pencil, Check, X, BadgeCheck } from 'lucide-react'
 import type { MemberProfile } from '@/types'
 
@@ -79,6 +80,10 @@ export function ProfileCard({ userId, profile, onUpdated }: ProfileCardProps) {
       setError('Usernames must be 3-20 characters: letters, numbers, and underscores only.')
       return
     }
+    if (isReservedUsername(trimmed)) {
+      setError('That username is reserved. Please choose another.')
+      return
+    }
     setSavingUsername(true)
     setError(null)
     const { error: updateError } = await supabase
@@ -138,12 +143,13 @@ export function ProfileCard({ userId, profile, onUpdated }: ProfileCardProps) {
                 value={usernameDraft}
                 onChange={(e) => setUsernameDraft(e.target.value)}
                 autoFocus
+                aria-label="Username"
                 className="w-32 border border-border px-2 py-1 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
               />
-              <button onClick={handleSaveUsername} disabled={savingUsername} className="p-1 text-primary-600 hover:bg-surface-hover">
+              <button onClick={handleSaveUsername} disabled={savingUsername} aria-label="Save username" className="p-1 text-primary-600 hover:bg-surface-hover">
                 {savingUsername ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />}
               </button>
-              <button onClick={() => { setEditingUsername(false); setUsernameDraft(profile.username || '') }} className="p-1 text-ink-muted hover:bg-surface-hover">
+              <button onClick={() => { setEditingUsername(false); setUsernameDraft(profile.username || '') }} aria-label="Cancel editing username" className="p-1 text-ink-muted hover:bg-surface-hover">
                 <X className="h-3.5 w-3.5" />
               </button>
             </div>

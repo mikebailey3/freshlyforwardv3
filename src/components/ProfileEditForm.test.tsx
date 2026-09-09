@@ -19,6 +19,8 @@ const baseProfile: MemberProfile = {
   status: 'active',
   username: null,
   avatar_url: null,
+  public_profile_enabled: false,
+  public_profile_sections: { summary: true, employment: true, education: true, certifications: true, skills: true, career_goals: false },
   headline: null,
   summary: null,
   full_name: 'Ada Lovelace',
