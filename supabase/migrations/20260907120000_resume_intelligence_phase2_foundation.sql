@@ -60,6 +60,23 @@ never production from this design turn).
   tailoring lineage) and `applications.resume_version_id` (Phase 6 job
   linkage) already existed from Phase 2/3 -- reused as-is, nothing new
   needed for lineage or job linkage.
+- 2026-09-09 (Phase 5-8 completion, independent security-hardening
+  follow-up): revised in place again, still never applied anywhere.
+  `set_master_resume_version()` and `replace_master_resume_entries()`
+  both used `IF v_member_id <> auth.uid() THEN` as their sole ownership
+  check. Because SQL comparison against NULL yields NULL (not TRUE), and
+  PL/pgSQL's `IF NULL THEN` never raises, an unauthenticated caller with
+  `auth.uid() IS NULL` would silently sail past that check -- the exact
+  same bypass independently found and fixed in the new Phase 5
+  `replace_resume_version_entries()` RPC during the same audit (see
+  20260909010000_resume_intelligence_phase5_version_entries_rpc.sql).
+  Both functions here now explicitly reject `auth.uid() IS NULL` first,
+  and both gain the repo's established
+  `REVOKE EXECUTE ... FROM PUBLIC, anon` /
+  `GRANT EXECUTE ... TO authenticated` pair (matching
+  20260902021400_harden_rls_and_security_definer_access.sql), rather than
+  relying on Postgres's default PUBLIC-execute grant. No table, column,
+  RLS policy, or non-authorization behavior of either function changed.
 
 ## Overview
 Additive-only evolution of the existing `resume_versions` concept (from
@@ -292,7 +309,10 @@ BEGIN
     RAISE EXCEPTION 'resume_versions row % not found or archived', p_new_master_id;
   END IF;
 
-  IF v_member_id <> auth.uid() THEN
+  -- NULL-safe: see "Phase 5-8 completion, independent security-hardening
+  -- follow-up" in the revision history above -- `v_member_id <>
+  -- auth.uid()` alone is NULL, not TRUE, for an unauthenticated caller.
+  IF auth.uid() IS NULL OR v_member_id <> auth.uid() THEN
     RAISE EXCEPTION 'not authorized to modify this resume version';
   END IF;
 
@@ -305,6 +325,13 @@ BEGIN
     AND (is_master OR id = p_new_master_id);
 END;
 $$;
+
+-- Phase 5-8 completion audit: match the repo's established SECURITY
+-- DEFINER hardening convention (see
+-- 20260902021400_harden_rls_and_security_definer_access.sql) instead of
+-- relying on Postgres's default PUBLIC-execute grant.
+REVOKE EXECUTE ON FUNCTION set_master_resume_version(uuid) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION set_master_resume_version(uuid) TO authenticated;
 
 -- ============================================================
 -- RESUME_ENTRIES: per-version entry selection + resume-specific overrides
@@ -446,7 +473,10 @@ BEGIN
     RAISE EXCEPTION 'resume_versions row % not found', p_resume_version_id;
   END IF;
 
-  IF v_member_id <> auth.uid() THEN
+  -- NULL-safe: see "Phase 5-8 completion, independent security-hardening
+  -- follow-up" in the revision history above -- `v_member_id <>
+  -- auth.uid()` alone is NULL, not TRUE, for an unauthenticated caller.
+  IF auth.uid() IS NULL OR v_member_id <> auth.uid() THEN
     RAISE EXCEPTION 'not authorized to modify this resume version';
   END IF;
 
@@ -479,6 +509,13 @@ BEGIN
   );
 END;
 $$;
+
+-- Phase 5-8 completion audit: match the repo's established SECURITY
+-- DEFINER hardening convention (see
+-- 20260902021400_harden_rls_and_security_definer_access.sql) instead of
+-- relying on Postgres's default PUBLIC-execute grant.
+REVOKE EXECUTE ON FUNCTION replace_master_resume_entries(uuid, jsonb) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION replace_master_resume_entries(uuid, jsonb) TO authenticated;
 
 -- ============================================================
 -- RESUME_IMPORT_ATTEMPTS: one row per scan/import execution (Phase 3)
