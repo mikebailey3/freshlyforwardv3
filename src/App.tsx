@@ -25,6 +25,7 @@ import { CareerCompassResultsPage } from '@/pages/CareerCompassResultsPage'
 import { CareerProfilePage } from '@/pages/CareerProfilePage'
 import { ForwardDnaPage } from '@/pages/ForwardDnaPage'
 import { CareerVaultPage } from '@/pages/CareerVaultPage'
+import { ResumeIntelligencePage } from '@/pages/ResumeIntelligencePage'
 import { MembershipPage } from '@/pages/MembershipPage'
 import { CareerSuccessPage } from '@/pages/CareerSuccessPage'
 import { TimelinePage } from '@/pages/TimelinePage'
@@ -167,6 +168,14 @@ function App() {
           element={
             <ProtectedRoute>
               <CareerVaultPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/resume-intelligence"
+          element={
+            <ProtectedRoute>
+              <ResumeIntelligencePage />
             </ProtectedRoute>
           }
         />

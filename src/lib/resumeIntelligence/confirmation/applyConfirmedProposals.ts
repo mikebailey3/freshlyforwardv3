@@ -88,7 +88,7 @@ async function applyOne(userId: string, decision: ProposalDecision, client: Supa
   return null
 }
 
-function writesCanonicalProfile(action: ConfirmationDecision): boolean {
+function writesCanonicalProfile(action: ConfirmationDecision): action is 'accept_as_canonical' | 'accept_edited_canonical' {
   return action === 'accept_as_canonical' || action === 'accept_edited_canonical'
 }
 

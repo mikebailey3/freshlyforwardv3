@@ -57,7 +57,7 @@ function whatChangesText(row: ProposalRow, decision: ConfirmationDecision): stri
 
 interface ImportReviewPanelProps {
   proposals: ProposalRow[]
-  onDecide: (row: ProposalRow, decision: ConfirmationDecision, editedValue?: string) => void | Promise<void>
+  onDecide: (row: ProposalRow, decision: ConfirmationDecision, editedValue?: string) => Promise<string | null> | void
 }
 
 export function ImportReviewPanel({ proposals, onDecide }: ImportReviewPanelProps) {

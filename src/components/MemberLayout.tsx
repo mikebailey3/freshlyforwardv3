@@ -41,6 +41,7 @@ const navGroups: NavGroup[] = [
       { to: '/profile', label: 'Career Profile', icon: User, feature: 'career_profile' },
       { to: '/forward-dna', label: 'Forward DNA', icon: Dna, isNew: true },
       { to: '/career-vault', label: 'Career Vault', icon: Trophy, isNew: true },
+      { to: '/resume-intelligence', label: 'Resume Intelligence', icon: FileTextIcon, isNew: true },
       { to: '/linkedin-optimizer', label: 'LinkedIn Optimizer', icon: Linkedin, isNew: true },
     ],
   },
