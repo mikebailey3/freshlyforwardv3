@@ -8,7 +8,7 @@ import { isSafeHttpUrl } from '@/lib/url'
 import {
   Search, Check, X, MessageSquare, AlertCircle, Loader2,
   MapPin, DollarSign, Briefcase, Calendar, ExternalLink,
-  ThumbsUp, ThumbsDown, Frown, Ban, ArrowRight,
+  ThumbsUp, ThumbsDown, Frown, Ban, ArrowRight, FileEdit,
 } from 'lucide-react'
 import type { Opportunity, MemberProfile } from '@/types'
 
@@ -195,6 +195,16 @@ export function MemberOpportunitiesPage() {
                       View Posting
                     </a>
                   )}
+
+                  <div className="mt-3">
+                    <Link
+                      to={`/resume-intelligence/tailor/${opp.id}`}
+                      className="inline-flex items-center gap-1.5 border border-border px-3 py-1.5 text-xs font-medium text-ink-muted hover:bg-surface-hover"
+                    >
+                      <FileEdit className="h-3.5 w-3.5" />
+                      Tailor My Resume
+                    </Link>
+                  </div>
                 </div>
               </div>
 

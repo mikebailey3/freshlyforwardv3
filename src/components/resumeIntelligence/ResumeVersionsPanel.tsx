@@ -1,4 +1,5 @@
 import { Star } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import type { ResumeVersionSummary } from '@/lib/resumeIntelligence/masterResume/listResumeVersions'
 
 interface ResumeVersionsPanelProps {
@@ -9,10 +10,11 @@ interface ResumeVersionsPanelProps {
 
 /**
  * Phase 4 punch-list item #3: exposes `promoteResumeVersionToMaster`.
- * No tailored-version creation flow exists yet (explicitly out of scope
- * for this phase), so today this list is realistically just the Master --
- * it's written against the general shape so it needs no changes once
- * tailoring ships and a member has more than one version to choose from.
+ * Phase 5-8 completion: also links each version into the live builder
+ * (`/resume-intelligence/builder/:id`) -- this list now realistically
+ * grows past just the Master once tailoring (Phase 6) creates derived
+ * versions, which is exactly the general shape this was already written
+ * against.
  */
 export function ResumeVersionsPanel({ versions, busy, onPromote }: ResumeVersionsPanelProps) {
   if (versions.length === 0) return null
@@ -27,16 +29,21 @@ export function ResumeVersionsPanel({ versions, busy, onPromote }: ResumeVersion
               {version.isMaster && <Star className="h-4 w-4 fill-primary-600 text-primary-600" />}
               <span className="text-sm font-medium text-ink">{version.title}</span>
             </div>
-            {!version.isMaster && (
-              <button
-                type="button"
-                disabled={busy}
-                onClick={() => onPromote(version.id)}
-                className="border border-border px-3 py-1.5 text-xs font-medium text-ink-muted hover:bg-surface-hover"
-              >
-                Set as Master
-              </button>
-            )}
+            <div className="flex items-center gap-2">
+              <Link to={`/resume-intelligence/builder/${version.id}`} className="border border-border px-3 py-1.5 text-xs font-medium text-ink-muted hover:bg-surface-hover">
+                Open Builder
+              </Link>
+              {!version.isMaster && (
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={() => onPromote(version.id)}
+                  className="border border-border px-3 py-1.5 text-xs font-medium text-ink-muted hover:bg-surface-hover"
+                >
+                  Set as Master
+                </button>
+              )}
+            </div>
           </div>
         ))}
       </div>

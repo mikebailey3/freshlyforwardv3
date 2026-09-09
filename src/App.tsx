@@ -26,6 +26,8 @@ import { CareerProfilePage } from '@/pages/CareerProfilePage'
 import { ForwardDnaPage } from '@/pages/ForwardDnaPage'
 import { CareerVaultPage } from '@/pages/CareerVaultPage'
 import { ResumeIntelligencePage } from '@/pages/ResumeIntelligencePage'
+import { ResumeBuilderPage } from '@/pages/ResumeBuilderPage'
+import { ResumeTailorPage } from '@/pages/ResumeTailorPage'
 import { MembershipPage } from '@/pages/MembershipPage'
 import { CareerSuccessPage } from '@/pages/CareerSuccessPage'
 import { TimelinePage } from '@/pages/TimelinePage'
@@ -176,6 +178,22 @@ function App() {
           element={
             <ProtectedRoute>
               <ResumeIntelligencePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/resume-intelligence/builder/:resumeVersionId"
+          element={
+            <ProtectedRoute>
+              <ResumeBuilderPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/resume-intelligence/tailor/:opportunityId"
+          element={
+            <ProtectedRoute>
+              <ResumeTailorPage />
             </ProtectedRoute>
           }
         />
