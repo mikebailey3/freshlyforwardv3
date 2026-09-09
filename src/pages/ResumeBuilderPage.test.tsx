@@ -17,7 +17,7 @@ const { mockEditor, mockAI } = vi.hoisted(() => ({
     error: null as string | null,
     state: { entries: [], sectionOrder: ['employment', 'education', 'certifications', 'skills'], templateKey: 'ats_classic', summaryOverride: null, dirty: false },
     dispatch: vi.fn(),
-    versionMeta: { id: 'v-1', title: 'Master Resume', isMaster: true, templateKey: 'ats_classic', sectionOrder: null, summaryOverride: null, derivedFromResumeVersionId: null, targetOpportunity: null, entries: [] },
+    versionMeta: { id: 'v-1', title: 'Master Resume', isMaster: true, templateKey: 'ats_classic', sectionOrder: null, summaryOverride: null, derivedFromResumeVersionId: null, targetOpportunity: null as { id: string; jobTitle: string; employer: string } | null, entries: [] as unknown[] },
     viewModel: null as unknown,
     save: vi.fn().mockResolvedValue(null),
     duplicate: vi.fn().mockResolvedValue({ newResumeVersionId: 'v-2', error: null }),
