@@ -40,6 +40,16 @@
 -- explicit column list is the only mechanism that enforces the boundary
 -- server-side, independent of what the client requests.
 --
+-- Repo-wide audit performed alongside this migration (2026-09-09) confirmed:
+-- member_profiles has zero anon/PUBLIC GRANTs today (only owner-self,
+-- admin, and assigned-strategist SELECT/UPDATE policies exist across every
+-- migration in this repo), no table has a foreign key referencing
+-- member_profiles at all (so there is no PostgREST-embeddable join path an
+-- anon caller could use to pull it in via a different, anon-readable
+-- table), and no SECURITY DEFINER RPC anywhere in this repo is granted
+-- EXECUTE to anon. This view is the only anon-facing surface this
+-- migration introduces.
+--
 -- ============================================================================
 -- WHY THE VIEW GATES ON account_status = 'active'
 -- ============================================================================
@@ -51,6 +61,25 @@
 -- needed here.
 --
 -- ============================================================================
+-- WHY jsonb-vs-jsonb EQUALITY, NOT ->>()::boolean, FOR EACH SECTION TOGGLE
+-- ============================================================================
+-- `(public_profile_sections->>'key')::boolean` throws a hard Postgres
+-- runtime error ("invalid input syntax for type boolean") the instant that
+-- key is missing... no, actually ->> on a missing key gives SQL NULL and a
+-- NULL cast is fine -- the real failure mode is a key present but holding
+-- anything that isn't literally 'true'/'false'/'t'/'f'/'yes'/'no'/'1'/'0'
+-- (e.g. a member/attacker writing member_profiles.public_profile_sections
+-- directly via a raw client call instead of through
+-- updatePublicProfileVisibility's typed interface -- Postgres has no way to
+-- statically enforce the shape of a jsonb column). `jsonb = 'true'::jsonb`
+-- instead evaluates to NULL (never an error) for a missing key, a
+-- non-boolean value, or a totally malformed document, and
+-- `CASE WHEN NULL` always takes the ELSE branch -- so a malformed
+-- public_profile_sections value fails closed (that section hidden, no
+-- error) instead of throwing and breaking the entire row fetch for that
+-- member's own public page.
+--
+-- ============================================================================
 -- ALLOW-LIST (the security-bearing contract -- keep in sync with
 -- src/lib/publicProfile.ts's PUBLIC_PROFILE_ALLOWED_COLUMNS and
 -- src/lib/forwardProfilesPublicViewMigration.test.ts)
@@ -59,7 +88,7 @@
 --   username, avatar_url, full_name, headline, location, linkedin_url,
 --   portfolio_url
 -- Exposed only when the member's public_profile_sections toggle for that
--- section is true (NULL/empty otherwise, computed inside the view itself):
+-- section is true (hidden otherwise, computed inside the view itself):
 --   summary, employment_history, education, certifications, skills,
 --   career_goals
 -- Never exposed, under any toggle combination: every other member_profiles
@@ -94,17 +123,17 @@ SELECT
   mp.location,
   mp.linkedin_url,
   mp.portfolio_url,
-  CASE WHEN (mp.public_profile_sections->>'summary')::boolean
+  CASE WHEN mp.public_profile_sections->'summary' = 'true'::jsonb
     THEN mp.summary ELSE NULL END AS summary,
-  CASE WHEN (mp.public_profile_sections->>'employment')::boolean
+  CASE WHEN mp.public_profile_sections->'employment' = 'true'::jsonb
     THEN mp.employment_history ELSE '[]'::jsonb END AS employment_history,
-  CASE WHEN (mp.public_profile_sections->>'education')::boolean
+  CASE WHEN mp.public_profile_sections->'education' = 'true'::jsonb
     THEN mp.education ELSE '[]'::jsonb END AS education,
-  CASE WHEN (mp.public_profile_sections->>'certifications')::boolean
+  CASE WHEN mp.public_profile_sections->'certifications' = 'true'::jsonb
     THEN mp.certifications ELSE '[]'::jsonb END AS certifications,
-  CASE WHEN (mp.public_profile_sections->>'skills')::boolean
+  CASE WHEN mp.public_profile_sections->'skills' = 'true'::jsonb
     THEN mp.skills ELSE '[]'::jsonb END AS skills,
-  CASE WHEN (mp.public_profile_sections->>'career_goals')::boolean
+  CASE WHEN mp.public_profile_sections->'career_goals' = 'true'::jsonb
     THEN mp.career_goals ELSE NULL END AS career_goals
 FROM member_profiles mp
 WHERE mp.public_profile_enabled = true

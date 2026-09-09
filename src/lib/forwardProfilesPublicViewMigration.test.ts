@@ -6,19 +6,14 @@ import { PUBLIC_PROFILE_ALLOWED_COLUMNS } from './publicProfile'
 // Static, text-based regression guard for the DRAFT (NOT APPLIED) migration
 // supabase/migrations/20260909020000_forward_profiles_public_view.sql.
 //
-// SCOPE NOTE: this sandbox has no Node.js runtime available at all (no
-// node/npm/npx, and node_modules/.bin/vitest.cmd itself fails trying to
-// spawn node) -- confirmed while implementing this feature, matching a
-// prior documented finding in this same repo. This file could not actually
-// be executed here. It is written to the same rigor as
-// careerTimelineReservedEventTypeRlsMigration.test.ts (this repo's existing
-// precedent for this exact kind of guard) and should be run in a real
-// environment before this branch is considered verified.
-//
-// Like that precedent, this test does NOT prove the migration works against
-// a real Postgres engine -- it only proves the migration file's *text*
-// still contains the structural pieces this design depends on, so a future
-// edit can't silently widen the public allow-list without a test failing.
+// This does NOT prove the migration works against a real Postgres engine --
+// no local/live Supabase instance is available in this environment to apply
+// it against. It proves the migration file's *text* still contains the
+// structural pieces this design depends on, so a future edit can't silently
+// widen the public allow-list, reintroduce a throwing boolean cast, or grant
+// anon access to the base table without a test failing. This migration
+// should still be applied and smoke-tested against a real (non-production)
+// Postgres instance before being considered fully verified.
 
 const MIGRATION_PATH = join(
   process.cwd(),
@@ -143,5 +138,15 @@ describe('forward_profiles_public_view migration (static text checks only, not l
   it('is explicitly marked as a review-only draft, not applied', () => {
     const sql = readMigration()
     expect(sql).toMatch(/REVIEW-ONLY DRAFT\. NOT APPLIED\./)
+  })
+
+  it('uses null-safe jsonb equality for section toggles, never a throwing ->>()::boolean cast (malformed-input regression)', () => {
+    const sql = readMigration()
+    const executableLines = sql
+      .split('\n')
+      .filter((line) => !line.trim().startsWith('--'))
+      .join('\n')
+    expect(executableLines).not.toMatch(/->>'[a-z_]+'\)::boolean/)
+    expect(executableLines).toMatch(/public_profile_sections->'summary' = 'true'::jsonb/)
   })
 })
