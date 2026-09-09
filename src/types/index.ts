@@ -1,3 +1,5 @@
+import type { PublicProfileSections } from '@/types/publicProfile'
+
 export interface MembershipPlan {
   id: string
   slug: string
@@ -157,6 +159,9 @@ export interface MemberProfile {
   status: string
   username: string | null
   avatar_url: string | null
+  /** Forward Profiles (public /u/:username page) opt-in -- see src/types/publicProfile.ts. Defaults false/all-sections-on-except-career_goals for new rows via migration default. */
+  public_profile_enabled: boolean
+  public_profile_sections: PublicProfileSections
   headline: string | null
   summary: string | null
   full_name: string | null
