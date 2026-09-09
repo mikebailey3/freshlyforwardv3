@@ -99,4 +99,30 @@ describe('PublicProfilePage', () => {
     expect(screen.queryByText(/stripe/i)).not.toBeInTheDocument()
     expect(screen.queryByText(/subscription/i)).not.toBeInTheDocument()
   })
+
+  it('never renders a javascript: or data: LinkedIn/portfolio URL as a clickable href (security regression)', async () => {
+    vi.mocked(getPublicProfileByUsername).mockResolvedValue({
+      username: 'jordan', avatarUrl: null, fullName: 'Jordan Rivera', headline: null,
+      location: null, linkedinUrl: 'javascript:alert(1)', portfolioUrl: 'data:text/html,<script>alert(1)</script>', summary: null,
+      employment: [], education: [], certifications: [], skills: [], careerGoals: null,
+    })
+    renderAt('/u/jordan')
+
+    await waitFor(() => expect(screen.getByRole('heading', { name: 'Jordan Rivera' })).toBeInTheDocument())
+    expect(screen.queryByRole('link', { name: 'LinkedIn' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Portfolio' })).not.toBeInTheDocument()
+  })
+
+  it('renders a normal https LinkedIn/portfolio URL as a real clickable link', async () => {
+    vi.mocked(getPublicProfileByUsername).mockResolvedValue({
+      username: 'jordan', avatarUrl: null, fullName: 'Jordan Rivera', headline: null,
+      location: null, linkedinUrl: 'https://linkedin.com/in/jordan', portfolioUrl: 'https://jordan.example.com', summary: null,
+      employment: [], education: [], certifications: [], skills: [], careerGoals: null,
+    })
+    renderAt('/u/jordan')
+
+    await waitFor(() => expect(screen.getByRole('heading', { name: 'Jordan Rivera' })).toBeInTheDocument())
+    expect(screen.getByRole('link', { name: 'LinkedIn' })).toHaveAttribute('href', 'https://linkedin.com/in/jordan')
+    expect(screen.getByRole('link', { name: 'Portfolio' })).toHaveAttribute('href', 'https://jordan.example.com')
+  })
 })

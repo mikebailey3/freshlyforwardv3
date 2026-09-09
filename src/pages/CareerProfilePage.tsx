@@ -5,6 +5,7 @@ import { SearchReadinessWidget } from '@/components/SearchReadinessWidget'
 import { ProfileEditForm } from '@/components/ProfileEditForm'
 import { ProfileCard as MemberProfileCard } from '@/components/ProfileCard'
 import { ForwardProfileVisibilitySettings } from '@/components/ForwardProfileVisibilitySettings'
+import { isSafeHttpUrl } from '@/lib/url'
 import { useAuth } from '@/context/AuthContext'
 import { supabase } from '@/lib/supabase'
 import { ensureProfile, calculateSearchReadiness } from '@/lib/profile'
@@ -340,8 +341,8 @@ function ProfileField({ label, value, link, multiline }: { label: string; value?
   return (
     <div>
       <p className="text-xs font-semibold text-ink-muted">{label}</p>
-      {link ? (
-        <a href={value} target="_blank" rel="noopener noreferrer" className="mt-1 block text-sm text-primary-600 hover:underline">
+      {link && isSafeHttpUrl(value) ? (
+        <a href={value!} target="_blank" rel="noopener noreferrer" className="mt-1 block text-sm text-primary-600 hover:underline">
           {value}
         </a>
       ) : multiline ? (

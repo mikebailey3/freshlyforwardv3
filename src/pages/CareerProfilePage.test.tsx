@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, afterEach } from 'vitest'
 import { render, screen, waitFor, fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { CareerProfilePage } from './CareerProfilePage'
@@ -6,7 +6,7 @@ import { CareerProfilePage } from './CareerProfilePage'
 const { baseProfile, mockRefreshProfile } = vi.hoisted(() => {
   const baseProfile = {
     user_id: 'user-1', full_name: 'Jordan Rivera', headline: 'Product Manager',
-    location: 'Austin, TX', phone: null, linkedin_url: null, portfolio_url: null, summary: null,
+    location: 'Austin, TX', phone: null, linkedin_url: null, portfolio_url: null as string | null, summary: null,
     employment_history: [{ title: 'Senior PM', company: 'Acme Co', start_date: '2020', end_date: null, current: true, description: '' }],
     education: [], certifications: [], skills: ['SQL', 'Roadmapping'],
     preferred_jobs: [], jobs_to_avoid: [], preferred_industries: [],
@@ -102,5 +102,30 @@ describe('CareerProfilePage', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
     await waitFor(() => expect(screen.getByRole('heading', { name: 'Career Profile' })).toBeInTheDocument())
+  })
+
+  describe('ProfileField link safety (security regression)', () => {
+    afterEach(() => {
+      baseProfile.portfolio_url = null
+    })
+
+    it('never renders an unsafe javascript: URL as a clickable href, but still shows the raw text', async () => {
+      baseProfile.portfolio_url = 'javascript:alert(1)'
+      renderPage()
+
+      await waitFor(() => expect(screen.getByRole('heading', { name: 'Career Profile' })).toBeInTheDocument())
+      expect(screen.getByText('javascript:alert(1)')).toBeInTheDocument()
+      const maliciousLink = screen.queryAllByRole('link').find((a) => a.getAttribute('href')?.startsWith('javascript:'))
+      expect(maliciousLink).toBeUndefined()
+    })
+
+    it('renders a normal https portfolio URL as a real clickable link', async () => {
+      baseProfile.portfolio_url = 'https://jordan.example.com'
+      renderPage()
+
+      await waitFor(() => expect(screen.getByRole('heading', { name: 'Career Profile' })).toBeInTheDocument())
+      const link = screen.getByRole('link', { name: 'https://jordan.example.com' })
+      expect(link).toHaveAttribute('href', 'https://jordan.example.com')
+    })
   })
 })

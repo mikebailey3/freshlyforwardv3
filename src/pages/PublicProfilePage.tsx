@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { getPublicProfileByUsername } from '@/lib/publicProfile'
 import { usePageMeta } from '@/hooks/usePageMeta'
+import { isSafeHttpUrl } from '@/lib/url'
 import type { PublicProfileViewModel } from '@/types/publicProfile'
 
 function formatDateRange(startDate: string, endDate: string | null, current: boolean): string {
@@ -72,11 +73,11 @@ export function PublicProfilePage() {
             {profile.headline && <p className="public-profile-headline">{profile.headline}</p>}
             {profile.location && <p className="public-profile-location">{profile.location}</p>}
             <div className="public-profile-links">
-              {profile.linkedinUrl && (
-                <a href={profile.linkedinUrl} target="_blank" rel="noopener noreferrer">LinkedIn</a>
+              {isSafeHttpUrl(profile.linkedinUrl) && (
+                <a href={profile.linkedinUrl!} target="_blank" rel="noopener noreferrer">LinkedIn</a>
               )}
-              {profile.portfolioUrl && (
-                <a href={profile.portfolioUrl} target="_blank" rel="noopener noreferrer">Portfolio</a>
+              {isSafeHttpUrl(profile.portfolioUrl) && (
+                <a href={profile.portfolioUrl!} target="_blank" rel="noopener noreferrer">Portfolio</a>
               )}
             </div>
           </div>
