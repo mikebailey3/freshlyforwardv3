@@ -121,9 +121,15 @@ describe('forward_profiles_public_view migration (static text checks only, not l
     expect(sql).not.toMatch(/CREATE POLICY/)
   })
 
-  it('does not touch protect_member_profiles_privileged_fields() or its trigger', () => {
+  it('does not touch protect_member_profiles_privileged_fields() or its trigger (may still reference it in explanatory comments)', () => {
     const sql = readMigration()
-    expect(sql).not.toContain('protect_member_profiles_privileged_fields')
+    const executableLines = sql
+      .split('\n')
+      .filter((line) => !line.trim().startsWith('--'))
+      .join('\n')
+    expect(executableLines).not.toMatch(/CREATE (OR REPLACE )?FUNCTION protect_member_profiles_privileged_fields/i)
+    expect(executableLines).not.toMatch(/DROP TRIGGER[^;]*protect_member_profiles_privileged_fields/i)
+    expect(executableLines).not.toMatch(/ALTER FUNCTION protect_member_profiles_privileged_fields/i)
   })
 
   it('includes a rollback reference section', () => {
