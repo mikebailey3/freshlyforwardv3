@@ -68,15 +68,23 @@ export interface FreshFitDimensionResult {
   improvementLink: { label: string; to: string } | null
 }
 
-export type FreshFitHardConstraintKey = 'compensationFloor' | 'remoteRequirement'
+export type FreshFitHardConstraintKey =
+  | 'compensationFloor'
+  | 'remoteRequirement'
+  | 'jobsToAvoidExclusion'
+  | 'mustHaveSkillsCoverage'
 
 /**
  * A requirement that -- when confidently violated -- should be shown
  * prominently rather than folded quietly into a dimension score. V1
- * activates exactly two (see the design spec, Q4): compensation floor
+ * activated exactly two (see the design spec, Q4): compensation floor
  * and remote-only mismatch, both with real member-stated data behind
- * them. A blocked constraint is always *shown*, never used to silently
- * hide a match.
+ * them. OE 2.0 Phase 2 adds two more, using the exact same shape and
+ * the same "only a *confident* violation ever blocks" discipline:
+ * `jobsToAvoidExclusion` (a posting matching a member's own stated
+ * avoid-list) and `mustHaveSkillsCoverage` (a posting's own literal
+ * must-have requirements, not just any detected skill). A blocked
+ * constraint is always *shown*, never used to silently hide a match.
  */
 export interface FreshFitHardConstraint {
   key: FreshFitHardConstraintKey

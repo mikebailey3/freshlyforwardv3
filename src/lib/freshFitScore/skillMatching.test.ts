@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { scoreSkillsDimension, SKILL_KEYWORDS, findSkillsInText } from './skillMatching'
+import { scoreSkillsDimension, SKILL_KEYWORDS, findSkillsInText, classifySkill, isGroundedInCareerVault } from './skillMatching'
 import type { CareerSkill, CareerScope } from '@/types/forwardDna'
 
 function skill(name: string, state: CareerSkill['state']): CareerSkill {
@@ -116,5 +116,62 @@ describe('scoreSkillsDimension - score never exceeds 100', () => {
       'Lead a team of 500 with strong SQL, excel, python and javascript.'
     )
     expect(result.score).toBeLessThanOrEqual(100)
+  })
+})
+
+describe('scoreSkillsDimension - expanded transferable map (OE 2.0 Phase 2)', () => {
+  it('treats warehouse experience as transferable evidence for an inventory-heavy JD', () => {
+    const result = scoreSkillsDimension(['warehouse'], [], [], 'Looking for someone with inventory management experience')
+    expect(result.evidence).toContain('inventory')
+    expect(result.gaps).not.toContain('inventory')
+  })
+
+  it('treats retail experience as transferable evidence for a customer service JD', () => {
+    const result = scoreSkillsDimension(['retail'], [], [], 'Looking for strong customer service skills')
+    expect(result.evidence).toContain('customer service')
+  })
+
+  it('treats bookkeeping as transferable evidence for an accounting JD', () => {
+    const result = scoreSkillsDimension(['bookkeeping'], [], [], 'Looking for someone with accounting experience')
+    expect(result.evidence).toContain('accounting')
+  })
+
+  it('does not claim a transferable match with zero supporting evidence anywhere on the profile (never hallucinates)', () => {
+    const result = scoreSkillsDimension([], [], [], 'Looking for someone with accounting experience', [])
+    expect(result.evidence).not.toContain('accounting')
+  })
+})
+
+describe('classifySkill (exported for qualifications.ts, OE 2.0 Phase 2)', () => {
+  it('is exported and returns the same statuses scoreSkillsDimension relies on internally', () => {
+    expect(classifySkill('sql', ['sql'], [])).toBe('confirmed_match')
+    expect(classifySkill('sql', [], [])).toBe('unknown')
+    expect(classifySkill('sql', ['excel'], [])).toBe('confirmed_gap')
+  })
+})
+
+describe('isGroundedInCareerVault (OE 2.0 Phase 2 -- evidence provenance)', () => {
+  it('is true when a Career Vault confirmed capability backs an exact-match skill', () => {
+    expect(isGroundedInCareerVault('sql', ['sql'])).toBe(true)
+  })
+
+  it('is true when a Career Vault confirmed capability backs a transferable-form skill', () => {
+    expect(isGroundedInCareerVault('accounting', ['bookkeeping'])).toBe(true)
+  })
+
+  it('is false when the confirmed capability list is empty or unrelated', () => {
+    expect(isGroundedInCareerVault('sql', [])).toBe(false)
+    expect(isGroundedInCareerVault('sql', ['welding'])).toBe(false)
+  })
+
+  it('flows through scoreSkillsDimension.groundedByCareerVault for a Career Vault-backed match', () => {
+    const result = scoreSkillsDimension([], [], [], 'Looking for strong Python skills', ['python'])
+    expect(result.groundedByCareerVault).toContain('python')
+  })
+
+  it('does not credit groundedByCareerVault for a match backed only by a flat/typed skill', () => {
+    const result = scoreSkillsDimension(['python'], [], [], 'Looking for strong Python skills')
+    expect(result.evidence).toContain('python')
+    expect(result.groundedByCareerVault).not.toContain('python')
   })
 })

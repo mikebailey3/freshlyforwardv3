@@ -165,3 +165,63 @@ describe('computeFreshFitScore v2 - explainable dimensions', () => {
     expect(withCapability.score).toBeGreaterThan(withoutCapability.score)
   })
 })
+
+describe('computeFreshFitScore v2 - OE 2.0 Phase 2 hard constraints', () => {
+  it('returns exactly 4 hard constraints in a fixed order', () => {
+    const result = computeFreshFitScore(makeProfile(), makeJob())
+    expect(result.hardConstraints.map((c) => c.key)).toEqual([
+      'compensationFloor', 'remoteRequirement', 'jobsToAvoidExclusion', 'mustHaveSkillsCoverage',
+    ])
+  })
+
+  it('surfaces a hard_blocker and read_details_first when the job matches a stated jobs_to_avoid entry', () => {
+    const result = computeFreshFitScore(
+      makeProfile({ jobs_to_avoid: ['call center'] }),
+      makeJob({ title: 'Call Center Representative' })
+    )
+    const constraint = result.hardConstraints.find((c) => c.key === 'jobsToAvoidExclusion')
+    expect(constraint?.status).toBe('hard_blocker')
+    expect(result.recommendation.key).toBe('read_details_first')
+  })
+
+  it('does not block on jobs_to_avoid when the member has not set any', () => {
+    const result = computeFreshFitScore(makeProfile(), makeJob())
+    const constraint = result.hardConstraints.find((c) => c.key === 'jobsToAvoidExclusion')
+    expect(constraint?.status).toBe('unknown')
+  })
+
+  it('surfaces a hard_blocker when every one of a posting\'s literal must-have skills is a confident, confirmed gap', () => {
+    const result = computeFreshFitScore(
+      makeProfile({ skills: ['welding', 'plumbing', 'hvac', 'construction', 'electrical'] }),
+      makeJob({ title: 'Data Analyst', description: 'Must Have:\n- SQL\n- Excel' })
+    )
+    const constraint = result.hardConstraints.find((c) => c.key === 'mustHaveSkillsCoverage')
+    expect(constraint?.status).toBe('hard_blocker')
+    expect(result.recommendation.key).toBe('read_details_first')
+  })
+
+  it('does not block on must-have skills when the member has partial coverage', () => {
+    const result = computeFreshFitScore(
+      makeProfile({ skills: ['sql'] }),
+      makeJob({ title: 'Data Analyst', description: 'Must Have:\n- SQL\n- Excel' })
+    )
+    const constraint = result.hardConstraints.find((c) => c.key === 'mustHaveSkillsCoverage')
+    expect(constraint?.status).toBe('confirmed_match')
+  })
+
+  it('is no-data for compensation, never a false comparison, when the member set a non-USD salary currency', () => {
+    const result = computeFreshFitScore(
+      makeProfile({ salary_currency: 'CAD', salary_min: 90000 }),
+      makeJob({ salary_text: '$50,000 - $60,000' })
+    )
+    const compDimension = result.dimensions.find((d) => d.key === 'compensation')
+    expect(compDimension?.status).toBe('no-data')
+  })
+
+  it('mentions Career Vault evidence by name in the Skills & Evidence explanation when a match is grounded there', () => {
+    const job = makeJob({ title: 'Python Developer', description: 'Looking for strong Python skills.' })
+    const result = computeFreshFitScore(makeProfile({ skills: [] }), job, { skills: [], scope: [] }, null, ['python'])
+    const skillsDimension = result.dimensions.find((d) => d.key === 'skillsEvidence')
+    expect(skillsDimension?.explanation).toContain('Career Vault')
+  })
+})
