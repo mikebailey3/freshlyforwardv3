@@ -1,6 +1,7 @@
-import { MapPin, DollarSign, ExternalLink, X } from 'lucide-react'
+import { MapPin, DollarSign, ExternalLink, X, Sparkles } from 'lucide-react'
 import { FreshFitBadge } from '@/components/freshFit/FreshFitBadge'
 import { FreshFitDetails } from '@/components/freshFit/FreshFitDetails'
+import { NeedsReviewBadge } from '@/components/opportunityEngine/NeedsReviewBadge'
 import { isSafeHttpUrl } from '@/lib/url'
 import type { JobMatchScoreBreakdown, JobMatchWithJob } from '@/types'
 
@@ -13,13 +14,26 @@ import type { JobMatchScoreBreakdown, JobMatchWithJob } from '@/types'
  *
  * FreshFitBadge/FreshFitDetails are consumed as-is (FreshFit 2.0 scope,
  * not touched here) -- only the surrounding card chrome changed.
+ *
+ * `topPick`/`needsReview`/`rankHighlight` are OE 2.0 Phase 4 additions,
+ * all optional and default to nothing rendered -- existing callers with
+ * just `match`/`onDismiss` are byte-for-byte unaffected.
  */
 export function JobMatchCard({
   match,
   onDismiss,
+  topPick = false,
+  needsReview = false,
+  rankHighlight = null,
 }: {
   match: JobMatchWithJob
   onDismiss: (matchId: string) => void
+  /** OE 2.0 Phase 4: this match is one of the member's top-ranked opportunities for today. Never shown alongside `needsReview` -- a flagged match is never presented as a shining pick, even if it mathematically survives near the top of a very short list. */
+  topPick?: boolean
+  /** OE 2.0 Phase 4: mirrors StrategistOpportunityEnginePage's identical flag/badge (Phase 3) -- same underlying `hasHardBlocker()` signal, same visual language, member-facing surface. */
+  needsReview?: boolean
+  /** OE 2.0 Phase 4: one-line "why this ranked here" hint from `buildRankHighlight()`, null when nothing about the match is a ranking standout. */
+  rankHighlight?: string | null
 }) {
   const job = match.scraped_job
 
@@ -35,6 +49,13 @@ export function JobMatchCard({
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <FreshFitBadge score={match.fresh_fit_score} />
+            {topPick && !needsReview && (
+              <span className="inline-flex items-center gap-1 rounded-full border border-accent-700 bg-accent-950/40 px-2.5 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide text-accent-300">
+                <Sparkles className="h-3 w-3" />
+                Top Pick
+              </span>
+            )}
+            {needsReview && <NeedsReviewBadge />}
             {match.promoted_opportunity_id && (
               <span className="rounded-full border border-accent-700 px-2.5 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide text-accent-300">
                 Sent to Strategist
@@ -59,6 +80,10 @@ export function JobMatchCard({
               </span>
             )}
           </div>
+
+          {rankHighlight && (
+            <p className="mt-2 text-xs italic text-ink-muted">Why it's ranked here: {rankHighlight}</p>
+          )}
 
           {match.matched_skills.length > 0 && (
             <div className="mt-3 flex flex-wrap gap-1.5">

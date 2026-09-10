@@ -4,8 +4,15 @@ import { SubmitJobModal } from '@/components/SubmitJobModal'
 import { JobMatchCard } from '@/components/opportunityEngine/JobMatchCard'
 import { useAuth } from '@/context/AuthContext'
 import { getJobMatches, dismissJobMatch } from '@/lib/opportunityEngine'
+import { rankOpportunities, buildRankHighlight } from '@/lib/opportunityEngine/ranking'
 import { Loader2, Sparkles, PlusCircle } from 'lucide-react'
 import type { JobMatchWithJob } from '@/types'
+
+// OE 2.0 Phase 4: below this many total matches, a "Top Opportunities /
+// More Matches" split adds section-header noise without adding value
+// (e.g. "top 3 of 2") -- progressive disclosure, same principle already
+// used for StrategistOpportunityEnginePage's "Show flagged only" toggle.
+const TOP_FEED_SIZE = 3
 
 export function OpportunityEnginePage() {
   const { user, profile } = useAuth()
@@ -35,6 +42,16 @@ export function OpportunityEnginePage() {
       </MemberLayout>
     )
   }
+
+  // OE 2.0 Phase 4: personalized ranking (FreshFit score + career-goal
+  // alignment + posting freshness + qualification risk + evidence
+  // strength -- see ranking.ts) replaces plain fresh_fit_score ordering
+  // for display. The underlying `getJobMatches` fetch/persistence policy
+  // is untouched; this only re-orders what's already been fetched.
+  const ranked = rankOpportunities(matches)
+  const showTopSection = ranked.length > TOP_FEED_SIZE
+  const topOpportunities = showTopSection ? ranked.slice(0, TOP_FEED_SIZE) : []
+  const remaining = showTopSection ? ranked.slice(TOP_FEED_SIZE) : ranked
 
   return (
     <MemberLayout>
@@ -72,11 +89,40 @@ export function OpportunityEnginePage() {
           </p>
         </div>
       ) : (
-        <div className="space-y-5">
-          {matches.map((match) => (
-            <JobMatchCard key={match.id} match={match} onDismiss={handleDismiss} />
-          ))}
-        </div>
+        <>
+          {showTopSection && (
+            <div className="mb-8">
+              <h2 className="mb-3 font-display text-lg font-semibold text-ink">Top Opportunities For You</h2>
+              <div className="space-y-5">
+                {topOpportunities.map(({ match, rank }) => (
+                  <JobMatchCard
+                    key={match.id}
+                    match={match}
+                    onDismiss={handleDismiss}
+                    topPick
+                    needsReview={rank.needsReview}
+                    rankHighlight={buildRankHighlight(rank)}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div>
+            {showTopSection && <h2 className="mb-3 font-display text-lg font-semibold text-ink">More Matches</h2>}
+            <div className="space-y-5">
+              {remaining.map(({ match, rank }) => (
+                <JobMatchCard
+                  key={match.id}
+                  match={match}
+                  onDismiss={handleDismiss}
+                  needsReview={rank.needsReview}
+                  rankHighlight={buildRankHighlight(rank)}
+                />
+              ))}
+            </div>
+          </div>
+        </>
       )}
 
       {showSubmitModal && profile && (

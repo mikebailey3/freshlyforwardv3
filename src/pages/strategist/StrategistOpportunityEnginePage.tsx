@@ -2,12 +2,13 @@ import { useEffect, useState } from 'react'
 import { StrategistLayout } from '@/components/StrategistLayout'
 import { FreshFitBadge } from '@/components/freshFit/FreshFitBadge'
 import { FreshFitDetails } from '@/components/freshFit/FreshFitDetails'
+import { NeedsReviewBadge } from '@/components/opportunityEngine/NeedsReviewBadge'
 import { useAuth } from '@/context/AuthContext'
 import { supabase } from '@/lib/supabase'
 import { getAssignedMembers } from '@/lib/operations'
 import { getJobMatchesForStrategist, promoteMatchToOpportunity, hasHardBlocker } from '@/lib/opportunityEngine'
 import { isSafeHttpUrl } from '@/lib/url'
-import { Loader2, MapPin, DollarSign, ExternalLink, ArrowUpRight, Sparkles, AlertTriangle } from 'lucide-react'
+import { Loader2, MapPin, DollarSign, ExternalLink, ArrowUpRight, Sparkles } from 'lucide-react'
 import type { JobMatchScoreBreakdown, JobMatchWithJob, MemberProfile } from '@/types'
 
 export function StrategistOpportunityEnginePage() {
@@ -121,12 +122,7 @@ export function StrategistOpportunityEnginePage() {
               <div className="mb-2 flex items-center justify-between gap-2">
                 <div className="flex items-center gap-1.5">
                   <FreshFitBadge score={match.fresh_fit_score} />
-                  {flagged && (
-                    <span className="inline-flex items-center gap-1 rounded-full border border-warning-700 bg-warning-950 px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide text-warning-300">
-                      <AlertTriangle className="h-3 w-3" />
-                      Needs review
-                    </span>
-                  )}
+                  {flagged && <NeedsReviewBadge />}
                 </div>
                 <span className="truncate text-xs text-ink-muted">{memberNames[match.member_id] || 'Member'}</span>
               </div>

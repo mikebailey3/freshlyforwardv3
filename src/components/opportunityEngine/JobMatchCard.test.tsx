@@ -42,3 +42,25 @@ describe('JobMatchCard', () => {
     expect(screen.getByText('Sent to Strategist')).toBeInTheDocument()
   })
 })
+
+// OE 2.0 Phase 4: personalized ranking surfaces on the member-facing card.
+describe('JobMatchCard - OE 2.0 Phase 4 ranking props', () => {
+  it('shows a "Top Pick" badge only when topPick is true and the match is not flagged', () => {
+    render(<JobMatchCard match={makeMatch()} onDismiss={vi.fn()} topPick />)
+    expect(screen.getByText('Top Pick')).toBeInTheDocument()
+  })
+
+  it('never shows "Top Pick" on a flagged match, even if topPick is true -- a flagged match is never presented as a shining pick', () => {
+    render(<JobMatchCard match={makeMatch()} onDismiss={vi.fn()} topPick needsReview />)
+    expect(screen.queryByText('Top Pick')).not.toBeInTheDocument()
+    expect(screen.getByText('Needs review')).toBeInTheDocument()
+  })
+
+  it('renders the rank highlight line only when one is provided', () => {
+    const { rerender } = render(<JobMatchCard match={makeMatch()} onDismiss={vi.fn()} />)
+    expect(screen.queryByText(/Why it's ranked here/i)).not.toBeInTheDocument()
+
+    rerender(<JobMatchCard match={makeMatch()} onDismiss={vi.fn()} rankHighlight="posted in the last 3 days" />)
+    expect(screen.getByText(/posted in the last 3 days/i)).toBeInTheDocument()
+  })
+})
