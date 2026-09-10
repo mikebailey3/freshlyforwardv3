@@ -26,6 +26,7 @@ import { selectJobsToDeactivate, isStaleByAge } from './jobSources/liveness'
 import { computeUpsertCounts } from './jobSources/upsertCounts'
 import { summarizeRun, type AttemptResult } from './lib/runSummary'
 import { getErrorDetail } from './lib/errorDetail'
+import { groupDuplicateCandidates } from '../src/lib/opportunityEngine/jobDeduplication'
 import type { ScrapedJobInput } from './jobSources/types'
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL
@@ -117,6 +118,52 @@ async function deactivateStaleJobs(maxAgeDays: number): Promise<void> {
   else console.log(`Deactivated ${staleIds.length} stale job(s) not re-confirmed in ${maxAgeDays} days.`)
 }
 
+/**
+ * OE 2.0 Phase 1 -- dry-run duplicate detection ONLY. Reports (via
+ * console log) the same real posting appearing more than once across
+ * sources/re-scrapes, using the exact-match `groupDuplicateCandidates`
+ * from jobDeduplication.ts. Deliberately does NOT write anything --
+ * `scraped_jobs` has no `canonical_job_id`/`normalized_key` column in
+ * production yet (see supabase/migrations/20260911000000_scraped_jobs_dedup.sql,
+ * prepared for review, not applied). Once that migration is applied,
+ * this becomes a real write (set canonical_job_id on the non-canonical
+ * rows) instead of a log line -- until then, this is safe to run
+ * against the current, unmigrated production schema because it only
+ * ever reads existing columns.
+ */
+async function reportLikelyDuplicates(): Promise<void> {
+  const { data, error } = await supabase
+    .from('scraped_jobs')
+    .select('id, source, title, company, location, posted_at')
+    .eq('is_active', true)
+
+  if (error) {
+    console.error('Error reading scraped_jobs for duplicate detection:', error)
+    return
+  }
+
+  const candidates = (data ?? []).map((row) => ({
+    id: row.id as string,
+    source: row.source as string,
+    title: row.title as string,
+    company: row.company as string,
+    location: row.location as string | null,
+    postedAt: row.posted_at as string | null,
+  }))
+
+  const groups = groupDuplicateCandidates(candidates)
+  if (groups.length === 0) {
+    console.log('Duplicate detection (dry-run): no likely duplicates found across active jobs.')
+    return
+  }
+
+  const duplicateCount = groups.reduce((sum, g) => sum + g.duplicateIds.length, 0)
+  console.log(
+    `Duplicate detection (dry-run): ${groups.length} likely-duplicate group(s), ${duplicateCount} duplicate row(s) total. ` +
+      'No rows were modified -- apply the prepared dedup migration to persist canonical_job_id.'
+  )
+}
+
 async function main() {
   const results: AttemptResult[] = []
   let totalDiscovered = 0
@@ -155,6 +202,7 @@ async function main() {
   }
 
   await deactivateStaleJobs(45)
+  await reportLikelyDuplicates()
 
   const summary = summarizeRun(results)
   console.log('')
