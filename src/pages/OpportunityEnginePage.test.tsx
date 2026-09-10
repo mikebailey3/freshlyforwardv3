@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { OpportunityEnginePage } from './OpportunityEnginePage'
@@ -8,7 +8,10 @@ vi.mock('@/context/AuthContext', () => ({
   useAuth: () => ({ user: { id: 'user-1' }, profile: { user_id: 'user-1' } }),
 }))
 
-const { mockGetJobMatches } = vi.hoisted(() => ({ mockGetJobMatches: vi.fn() }))
+const { mockGetJobMatches, mockGetRecurringGaps } = vi.hoisted(() => ({
+  mockGetJobMatches: vi.fn(),
+  mockGetRecurringGaps: vi.fn(),
+}))
 
 vi.mock('@/lib/opportunityEngine', async () => {
   const actual = await vi.importActual<typeof import('@/lib/opportunityEngine')>('@/lib/opportunityEngine')
@@ -16,6 +19,14 @@ vi.mock('@/lib/opportunityEngine', async () => {
     ...actual,
     getJobMatches: mockGetJobMatches,
     dismissJobMatch: vi.fn(),
+  }
+})
+
+vi.mock('@/lib/opportunityEngine/recurringGaps', async () => {
+  const actual = await vi.importActual<typeof import('@/lib/opportunityEngine/recurringGaps')>('@/lib/opportunityEngine/recurringGaps')
+  return {
+    ...actual,
+    getRecurringGaps: mockGetRecurringGaps,
   }
 })
 
@@ -39,6 +50,14 @@ function renderPage() {
     </MemoryRouter>,
   )
 }
+
+beforeEach(() => {
+  // OE 2.0 Phase 6: every existing test below predates the recurring-gap
+  // fetch and doesn't care about it -- default to "no recurring gaps"
+  // (an empty array, not undefined) so Promise.all resolves cleanly and
+  // RecurringGapCard renders nothing, unless a test overrides this.
+  mockGetRecurringGaps.mockResolvedValue([])
+})
 
 describe('OpportunityEnginePage - posting URL link guard', () => {
   it('shows View Posting only for a safe https URL, and hides it for blank or javascript: URLs', async () => {
@@ -128,5 +147,38 @@ describe('OpportunityEnginePage - OE 2.0 Phase 4 Top Opportunities feed', () => 
     // of the top slice entirely (materially suppressed, not just nudged).
     const topSection = screen.getByText('Top Opportunities For You').closest('div')!
     expect(topSection).not.toHaveTextContent('Job blocked')
+  })
+})
+
+describe('OpportunityEnginePage - OE 2.0 Phase 6 recurring-gap insight', () => {
+  it('renders no recurring-gap card when there are no matches at all (empty state)', async () => {
+    mockGetJobMatches.mockResolvedValue([])
+    mockGetRecurringGaps.mockResolvedValue([{ skill: 'sql', frequency: 3 }])
+
+    renderPage()
+
+    await waitFor(() => expect(screen.getByText(/No matches yet/)).toBeInTheDocument())
+    expect(screen.queryByText(/You keep missing/)).not.toBeInTheDocument()
+  })
+
+  it('renders no recurring-gap card when the aggregation found nothing recurring', async () => {
+    mockGetJobMatches.mockResolvedValue([makeMatch('a', 'https://example.com/a')])
+    mockGetRecurringGaps.mockResolvedValue([])
+
+    renderPage()
+
+    await waitFor(() => expect(screen.getByText('Job a')).toBeInTheDocument())
+    expect(screen.queryByText(/You keep missing/)).not.toBeInTheDocument()
+  })
+
+  it('surfaces the recurring-gap card above the match list when a pattern is found', async () => {
+    mockGetJobMatches.mockResolvedValue([makeMatch('a', 'https://example.com/a')])
+    mockGetRecurringGaps.mockResolvedValue([{ skill: 'sql', frequency: 3 }])
+
+    renderPage()
+
+    await waitFor(() => expect(screen.getByText(/You keep missing/)).toBeInTheDocument())
+    expect(screen.getByText(/sql/)).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /add skill evidence to forward dna/i })).toHaveAttribute('href', '/forward-dna')
   })
 })

@@ -2,9 +2,11 @@ import { useEffect, useState } from 'react'
 import { MemberLayout } from '@/components/MemberLayout'
 import { SubmitJobModal } from '@/components/SubmitJobModal'
 import { JobMatchCard } from '@/components/opportunityEngine/JobMatchCard'
+import { RecurringGapCard } from '@/components/opportunityEngine/RecurringGapCard'
 import { useAuth } from '@/context/AuthContext'
 import { getJobMatches, dismissJobMatch } from '@/lib/opportunityEngine'
 import { rankOpportunities, buildRankHighlight } from '@/lib/opportunityEngine/ranking'
+import { getRecurringGaps, type RecurringGap } from '@/lib/opportunityEngine/recurringGaps'
 import { Loader2, Sparkles, PlusCircle } from 'lucide-react'
 import type { JobMatchWithJob } from '@/types'
 
@@ -17,13 +19,19 @@ const TOP_FEED_SIZE = 3
 export function OpportunityEnginePage() {
   const { user, profile } = useAuth()
   const [matches, setMatches] = useState<JobMatchWithJob[]>([])
+  const [recurringGaps, setRecurringGaps] = useState<RecurringGap[]>([])
   const [loading, setLoading] = useState(true)
   const [showSubmitModal, setShowSubmitModal] = useState(false)
 
   useEffect(() => {
     if (!user) return
-    getJobMatches(user.id).then((data) => {
-      setMatches(data)
+    // OE 2.0 Phase 6: fetched alongside matches, not blocking on them --
+    // the recurring-gap insight is a read-only aggregation over the
+    // member's own already-scored history, independent of whichever
+    // matches happen to be persisted right now.
+    Promise.all([getJobMatches(user.id), getRecurringGaps(user.id)]).then(([matchData, gapData]) => {
+      setMatches(matchData)
+      setRecurringGaps(gapData)
       setLoading(false)
     })
   }, [user])
@@ -90,6 +98,8 @@ export function OpportunityEnginePage() {
         </div>
       ) : (
         <>
+          <RecurringGapCard gaps={recurringGaps} />
+
           {showTopSection && (
             <div className="mb-8">
               <h2 className="mb-3 font-display text-lg font-semibold text-ink">Top Opportunities For You</h2>
