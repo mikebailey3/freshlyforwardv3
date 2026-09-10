@@ -1,7 +1,8 @@
 import { describe, it, expect, vi } from 'vitest'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { buildWhyItMatches, submitMemberJob } from './opportunityEngine'
-import type { JobMatchWithJob, MemberProfile } from '@/types'
+import { buildWhyItMatches, hasHardBlocker, submitMemberJob } from './opportunityEngine'
+import type { JobMatchWithJob, JobMatchScoreBreakdown, MemberProfile } from '@/types'
+import type { FreshFitHardConstraint } from '@/lib/freshFitScore'
 
 function makeMatch(overrides: Partial<JobMatchWithJob> = {}): JobMatchWithJob {
   return {
@@ -57,6 +58,46 @@ describe('buildWhyItMatches', () => {
     expect(text).toContain('Worth a look')
     expect(text).toContain('1 confirmed gap(s)')
     expect(text).toContain('1 area(s) unclear')
+  })
+})
+
+describe('hasHardBlocker (OE 2.0 Phase 3)', () => {
+  function makeBreakdown(hardConstraints: FreshFitHardConstraint[]): JobMatchScoreBreakdown {
+    return {
+      skillsCoverage: 0, roleRelevance: 0, locationFit: 0, keywordDensity: 0,
+      v2: {
+        tier: 'good', confidence: 'high',
+        dimensions: [],
+        hardConstraints,
+        unknowns: [],
+        recommendation: { key: 'worth_a_look', headline: '', detail: '' },
+      },
+    }
+  }
+
+  it('is true when any v2 hard constraint is a hard_blocker', () => {
+    const breakdown = makeBreakdown([
+      { key: 'compensationFloor', label: 'Compensation Floor', status: 'confirmed_match', reason: '' },
+      { key: 'jobsToAvoidExclusion', label: 'Roles/Companies to Avoid', status: 'hard_blocker', reason: 'matches an avoided company' },
+    ])
+    expect(hasHardBlocker(breakdown)).toBe(true)
+  })
+
+  it('is false when every hard constraint is confirmed_match or unknown', () => {
+    const breakdown = makeBreakdown([
+      { key: 'compensationFloor', label: 'Compensation Floor', status: 'confirmed_match', reason: '' },
+      { key: 'remoteRequirement', label: 'Remote Requirement', status: 'unknown', reason: '' },
+    ])
+    expect(hasHardBlocker(breakdown)).toBe(false)
+  })
+
+  it('is false (never a false positive) for a legacy pre-v2 breakdown with no hard-constraint data at all', () => {
+    expect(hasHardBlocker({ skillsCoverage: 40, roleRelevance: 10, locationFit: 10, keywordDensity: 5 })).toBe(false)
+  })
+
+  it('is false for null/undefined without throwing', () => {
+    expect(hasHardBlocker(null)).toBe(false)
+    expect(hasHardBlocker(undefined)).toBe(false)
   })
 })
 

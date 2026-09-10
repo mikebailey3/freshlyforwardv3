@@ -73,6 +73,23 @@ export function buildWhyItMatches(match: JobMatchWithJob): string {
 }
 
 /**
+ * True when a v2-scored match has at least one confirmed hard-constraint
+ * violation (compensation floor, remote mismatch, jobs_to_avoid, or a
+ * confidently-missing must-have requirement -- see
+ * freshFitScore/types.ts). Pure, additive helper (OE 2.0 Phase 3) so any
+ * page rendering a *grid* of matches (today: StrategistOpportunityEnginePage.tsx,
+ * where a strategist scans many members' matches at once and can't
+ * afford to expand every card's "Why this score?" panel individually)
+ * can flag/filter them without duplicating FreshFitDetails.tsx's own
+ * blockedConstraints logic. A pre-v2 legacy breakdown (no `v2` key) has
+ * no hard-constraint data at all, so this is always false for it --
+ * never a false positive.
+ */
+export function hasHardBlocker(breakdown: JobMatchScoreBreakdown | null | undefined): boolean {
+  return (breakdown?.v2?.hardConstraints ?? []).some((c) => c.status === 'hard_blocker')
+}
+
+/**
  * Lets a member submit their own job lead (manual entry only -- no
  * server-side URL fetching, see supabase/migrations/20260901000000)
  * directly into the Opportunity Engine pipeline. Scores it with the same
