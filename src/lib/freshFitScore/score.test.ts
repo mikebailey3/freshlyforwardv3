@@ -113,7 +113,7 @@ describe('computeFreshFitScore v2 - explainable dimensions', () => {
 
   it('assigns a tier consistent with the composite score', () => {
     const result = computeFreshFitScore(makeProfile(), makeJob())
-    expect(['strong', 'good', 'fair', 'weak']).toContain(result.tier)
+    expect(['excellent', 'good', 'fair']).toContain(result.tier)
   })
 
   it('reuses the passed-in career direction score without recomputation', () => {

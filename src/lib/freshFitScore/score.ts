@@ -132,7 +132,7 @@ export function computeFreshFitScore(
 
   const hardConstraints = [compensationHardConstraint(profile, job), remoteHardConstraint(profile, job)]
   const hasConfirmedGaps = dimensions.some((d) => d.gaps.length > 0)
-  const recommendation = computeRecommendation(tier, hardConstraints, hasConfirmedGaps)
+  const recommendation = computeRecommendation(tier, hardConstraints, hasConfirmedGaps, score)
 
   const unknowns = [...new Set(dimensions.flatMap((d) => d.unknowns))]
   const matchedSkills = [...new Set(skillsResult.evidence)].slice(0, 10)

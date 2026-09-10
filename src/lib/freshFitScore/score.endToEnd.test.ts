@@ -62,7 +62,7 @@ describe('FreshFit end-to-end: strong match', () => {
     const result = computeFreshFitScore(profile, job, { skills: [], scope: [] }, 80)
 
     expect(result.score).toBeGreaterThanOrEqual(70)
-    expect(getFreshFitTier(result.score)).not.toBe('weak')
+    expect(getFreshFitTier(result.score)).not.toBe('fair')
     expect(result.matchedSkills.length).toBeGreaterThan(0)
     expect(result.hardConstraints.every((c) => c.status !== 'hard_blocker')).toBe(true)
   })
@@ -80,7 +80,7 @@ describe('FreshFit end-to-end: poor match', () => {
     const result = computeFreshFitScore(profile, job, { skills: [], scope: [] }, 20)
 
     expect(result.score).toBeLessThan(40)
-    expect(getFreshFitTier(result.score)).toMatch(/weak|fair/)
+    expect(getFreshFitTier(result.score)).toBe('fair')
     // A useful explanation means real gaps, not a silent/empty result.
     expect(result.missingSkills.length).toBeGreaterThan(0)
   })

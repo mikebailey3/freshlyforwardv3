@@ -61,13 +61,13 @@ const JOURNEY_STEPS = [
   },
 ]
 
-/** Sample FreshFit tier legend -- same four tiers as the real Opportunity
- * Engine (src/lib/freshFitScore/tiers.ts), never a separate scale. */
+/** Sample FreshFit tier legend -- same three OE 2.0 tiers as the real
+ * Opportunity Engine (src/lib/freshFitScore/tiers.ts: Excellent >=75,
+ * Good 50-74, Fair <50), never a separate scale. */
 const FRESHFIT_TIER_EXAMPLES = [
   { score: 86, description: 'Skills, seniority, and goals line up clearly.' },
-  { score: 68, description: 'Strong overlap -- worth a close look.' },
-  { score: 45, description: 'Partial fit, lower confidence.' },
-  { score: 25, description: 'Meaningful gaps -- likely not the right move yet.' },
+  { score: 62, description: 'Solid overlap -- worth a close look.' },
+  { score: 35, description: 'Meaningful gaps -- lower confidence fit.' },
 ]
 
 /** Threads the (future) Forward Profile will connect. Illustrative only --
@@ -250,7 +250,7 @@ export function LandingPage() {
       </section>
 
       {/* Layer 4: Opportunity Intelligence / FreshFit -- one detailed
-          "why it fits" example, plus the real four-tier legend. Emphasizes
+          "why it fits" example, plus the real three-tier legend. Emphasizes
           reasoning over a bare score. */}
       <section className="bg-bg py-20 lg:py-28">
         <div className="shell">

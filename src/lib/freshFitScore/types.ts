@@ -88,7 +88,7 @@ export interface FreshFitHardConstraint {
 
 export type FreshFitConfidence = 'high' | 'medium' | 'low'
 
-export type FreshFitTier = 'strong' | 'good' | 'fair' | 'weak'
+export type FreshFitTier = 'excellent' | 'good' | 'fair'
 
 export type FreshFitRecommendationKey =
   | 'strong_pursue'

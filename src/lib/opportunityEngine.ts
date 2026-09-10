@@ -1,7 +1,7 @@
 import { supabase } from '@/lib/supabase'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { createOpportunity } from '@/lib/operations'
-import { computeFreshFitScore, toScoreBreakdownPayload, FRESHFIT_TIER_LABELS } from '@/lib/freshFitScore'
+import { computeFreshFitScore, toScoreBreakdownPayload, FRESHFIT_TIER_LABELS, getFreshFitTier } from '@/lib/freshFitScore'
 import { getSkillStates } from '@/lib/forwardDna/skills'
 import { getAllScopeForUser } from '@/lib/forwardDna/scope'
 import type { JobMatchWithJob, JobMatchScoreBreakdown, MemberProfile, ScrapedJob } from '@/types'
@@ -52,10 +52,18 @@ export function buildWhyItMatches(match: JobMatchWithJob): string {
 
   if (breakdown?.v2) {
     const { v2 } = breakdown
+    // Tier is always recomputed from the numeric score here, never read
+    // from the persisted `v2.tier` snapshot -- that field can be stale
+    // relative to whatever tier scheme is live today (e.g. a row scored
+    // before the OE 2.0 Excellent/Good/Fair reconciliation may still
+    // carry a legacy tier string). The raw 0-100 score never changes,
+    // so recomputing here means every historical row displays correctly
+    // under the current bands with zero data migration required.
+    const tier = getFreshFitTier(match.fresh_fit_score)
     const gapCount = v2.dimensions.reduce((sum, d) => sum + d.gaps.length, 0)
     const gapsNote = gapCount > 0 ? ` ${gapCount} confirmed gap(s).` : ''
     const unknownsNote = v2.unknowns.length > 0 ? ` ${v2.unknowns.length} area(s) unclear given your current profile.` : ''
-    return `FreshFit score ${match.fresh_fit_score}/100 (${FRESHFIT_TIER_LABELS[v2.tier]}). ${v2.recommendation.headline}. ${skillsNote}${gapsNote}${unknownsNote}`
+    return `FreshFit score ${match.fresh_fit_score}/100 (${FRESHFIT_TIER_LABELS[tier]}). ${v2.recommendation.headline}. ${skillsNote}${gapsNote}${unknownsNote}`
   }
 
   if (!breakdown?.dnaSkillEvidence) {
