@@ -65,6 +65,7 @@ function makeFakeClient(opts: {
   jobError?: string
   matchRow?: Record<string, unknown> | null
   matchError?: string
+  confirmedCapabilityRows?: { skill_name: string }[]
 }) {
   const scrapedJobsSingle = vi.fn().mockResolvedValue({
     data: opts.jobRow ?? null,
@@ -81,6 +82,10 @@ function makeFakeClient(opts: {
   const dnaEq = vi.fn().mockResolvedValue({ data: [], error: null })
   const dnaSelect = vi.fn().mockReturnValue({ eq: dnaEq })
 
+  const capsEq2 = vi.fn().mockResolvedValue({ data: opts.confirmedCapabilityRows ?? [], error: null })
+  const capsEq1 = vi.fn().mockReturnValue({ eq: capsEq2 })
+  const capsSelect = vi.fn().mockReturnValue({ eq: capsEq1 })
+
   const compassMaybeSingle = vi.fn().mockResolvedValue({ data: null, error: null })
   const compassEq2 = vi.fn().mockReturnValue({ maybeSingle: compassMaybeSingle })
   const compassEq1 = vi.fn().mockReturnValue({ eq: compassEq2 })
@@ -90,11 +95,12 @@ function makeFakeClient(opts: {
     if (table === 'scraped_jobs') return { insert: scrapedJobsInsert }
     if (table === 'job_matches') return { insert: jobMatchesInsert }
     if (table === 'career_skills' || table === 'career_scope') return { select: dnaSelect }
+    if (table === 'career_win_capabilities') return { select: capsSelect }
     if (table === 'career_compass_results') return { select: compassSelect }
     throw new Error(`Unexpected table: ${table}`)
   })
 
-  return { client: { from: fromMock } as unknown as SupabaseClient, dnaSelect, dnaEq, jobMatchesInsert }
+  return { client: { from: fromMock } as unknown as SupabaseClient, dnaSelect, dnaEq, capsEq2, jobMatchesInsert }
 }
 
 const submissionProfile = { user_id: 'member-1', skills: ['sql'] } as unknown as MemberProfile
@@ -139,5 +145,33 @@ describe('submitMemberJob', () => {
     const { match, error } = await submitMemberJob(submissionProfile, submissionInput, client)
     expect(match).toBeNull()
     expect(error).toBe('match insert failed')
+  })
+
+  // OE 2.0 Phase 0: submitMemberJob now composes its scoring inputs via
+  // buildMemberOpportunityProfile instead of independently fetching
+  // Forward DNA/Career Compass. This locks in that Career Vault's
+  // confirmed capabilities are actually queried (evidence linkage), and
+  // that they flow all the way through to a higher score than an
+  // otherwise-identical submission with no confirmed capabilities on
+  // file (precedence: confirmed capability evidence must count).
+  it('queries Career Vault confirmed capabilities and lets them raise the score', async () => {
+    const jobRow = {
+      id: 'job-1', source: 'member-submitted', external_id: 'x', title: 'Data Analyst', company: 'Acme',
+      location: null, description: 'Looking for strong Python and SQL skills.', salary_text: null,
+      employment_type: null, posting_url: '', posted_at: null, search_query: 'member-submitted',
+      is_active: true, scraped_at: '', created_at: '',
+    }
+    const matchRow = { id: 'match-1', member_id: 'member-1', scraped_job_id: 'job-1' }
+
+    const withoutCapabilities = makeFakeClient({ jobRow, matchRow, confirmedCapabilityRows: [] })
+    await submitMemberJob(submissionProfile, submissionInput, withoutCapabilities.client)
+    const withoutScore = (withoutCapabilities.jobMatchesInsert.mock.calls[0][0] as { fresh_fit_score: number }).fresh_fit_score
+
+    const withCapabilities = makeFakeClient({ jobRow, matchRow, confirmedCapabilityRows: [{ skill_name: 'python' }] })
+    await submitMemberJob(submissionProfile, submissionInput, withCapabilities.client)
+    const withScore = (withCapabilities.jobMatchesInsert.mock.calls[0][0] as { fresh_fit_score: number }).fresh_fit_score
+
+    expect(withCapabilities.capsEq2).toHaveBeenCalledWith('status', 'confirmed')
+    expect(withScore).toBeGreaterThan(withoutScore)
   })
 })

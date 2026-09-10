@@ -155,4 +155,13 @@ describe('computeFreshFitScore v2 - explainable dimensions', () => {
     expect(result.unknowns.length).toBeGreaterThan(0)
     expect(result.missingSkills).not.toContain('python')
   })
+
+  it('accepts Career Vault confirmedCapabilities as an additive 5th param (OE 2.0 Phase 0) and lets them count as skill evidence', () => {
+    const job = makeJob({ title: 'Python Developer', description: 'Looking for strong Python skills.' })
+    const withoutCapability = computeFreshFitScore(makeProfile({ skills: [] }), job, { skills: [], scope: [] }, null)
+    const withCapability = computeFreshFitScore(makeProfile({ skills: [] }), job, { skills: [], scope: [] }, null, ['python'])
+
+    expect(withCapability.matchedSkills).toContain('python')
+    expect(withCapability.score).toBeGreaterThan(withoutCapability.score)
+  })
 })

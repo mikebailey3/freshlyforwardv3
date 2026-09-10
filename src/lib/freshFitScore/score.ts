@@ -83,16 +83,24 @@ function statusFromScore(score: number): FreshFitDimensionResult['status'] {
  * `careerDirectionScore` is optional and additive (defaults to null) --
  * every existing call site keeps compiling; callers that have a Career
  * Compass result (the sync script, submitMemberJob) pass it through.
+ *
+ * `confirmedCapabilities` (OE 2.0 Phase 0) is also optional and additive
+ * (defaults to `[]`) -- Career Vault's confirmed (status='confirmed')
+ * skill names, the strongest possible skill evidence FreshlyForward has.
+ * Callers should source this from
+ * `opportunityEngine/memberOpportunityProfile.ts::buildMemberOpportunityProfile`
+ * rather than querying `career_win_capabilities` directly.
  */
 export function computeFreshFitScore(
   profile: MemberProfile,
   job: ScrapedJob,
   dna: { skills: CareerSkill[]; scope: CareerScope[] } = { skills: [], scope: [] },
-  careerDirectionScore: number | null = null
+  careerDirectionScore: number | null = null,
+  confirmedCapabilities: string[] = []
 ): FreshFitResult {
   const jobText = `${job.title} ${job.description}`
 
-  const skillsResult = scoreSkillsDimension(profile.skills || [], dna.skills, dna.scope, jobText)
+  const skillsResult = scoreSkillsDimension(profile.skills || [], dna.skills, dna.scope, jobText, confirmedCapabilities)
   const skillsDimension: FreshFitDimensionResult = {
     key: 'skillsEvidence',
     label: 'Skills & Evidence',

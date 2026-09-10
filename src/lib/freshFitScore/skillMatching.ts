@@ -93,22 +93,37 @@ export function findSkillsInText(text: string, dictionary: string[] = SKILL_KEYW
 function classifySkill(
   jdSkill: string,
   flatSkills: string[],
-  careerSkills: CareerSkill[]
+  careerSkills: CareerSkill[],
+  confirmedCapabilities: string[] = []
 ): EvidenceStatus {
   const normalizedFlat = new Set(flatSkills.map(normalize))
   const careerSkillNames = new Set(careerSkills.map((s) => normalize(s.skill_name)))
+  // Career Vault's confirmed capabilities (career_win_capabilities,
+  // status='confirmed') are the strongest possible evidence -- a
+  // member-confirmed, capability-engine-reasoned skill promoted out of a
+  // real Career Win. Treated as an additional confirmed_match source,
+  // same tier as an exact flat/career-skill match (never weaker).
+  const confirmedCapabilityNames = new Set(confirmedCapabilities.map(normalize))
   const exactSurfaceForms = [jdSkill, ...(ALIAS_MAP[jdSkill] ?? [])]
 
-  if (exactSurfaceForms.some((form) => careerSkillNames.has(form) || normalizedFlat.has(form))) {
+  if (
+    exactSurfaceForms.some(
+      (form) => careerSkillNames.has(form) || normalizedFlat.has(form) || confirmedCapabilityNames.has(form)
+    )
+  ) {
     return 'confirmed_match'
   }
 
   const transferableForms = TRANSFERABLE_MAP[jdSkill] ?? []
-  if (transferableForms.some((form) => normalizedFlat.has(form) || careerSkillNames.has(form))) {
+  if (
+    transferableForms.some(
+      (form) => normalizedFlat.has(form) || careerSkillNames.has(form) || confirmedCapabilityNames.has(form)
+    )
+  ) {
     return 'likely_transferable'
   }
 
-  const totalDistinctSkills = new Set([...normalizedFlat, ...careerSkillNames]).size
+  const totalDistinctSkills = new Set([...normalizedFlat, ...careerSkillNames, ...confirmedCapabilityNames]).size
   return totalDistinctSkills < SPARSE_PROFILE_THRESHOLD ? 'unknown' : 'confirmed_gap'
 }
 
@@ -142,7 +157,8 @@ export function scoreSkillsDimension(
   flatSkills: string[],
   careerSkills: CareerSkill[],
   careerScope: CareerScope[],
-  jobText: string
+  jobText: string,
+  confirmedCapabilities: string[] = []
 ): SkillsEvidenceResult {
   const jdSkills = [...new Set(findSkillsInText(jobText))]
 
@@ -153,7 +169,7 @@ export function scoreSkillsDimension(
   let countedSkills = 0
 
   for (const jdSkill of jdSkills) {
-    const status = classifySkill(jdSkill, flatSkills, careerSkills)
+    const status = classifySkill(jdSkill, flatSkills, careerSkills, confirmedCapabilities)
     if (status === 'confirmed_match' || status === 'likely_transferable') evidence.push(jdSkill)
     else if (status === 'confirmed_gap') gaps.push(jdSkill)
     else unknowns.push(jdSkill)

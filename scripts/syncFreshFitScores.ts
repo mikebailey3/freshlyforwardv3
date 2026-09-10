@@ -23,6 +23,7 @@
 import { createClient } from '@supabase/supabase-js'
 import { computeFreshFitScore, toScoreBreakdownPayload, selectMatchesToPersist, selectStaleMatchesToPrune } from '../src/lib/freshFitScore'
 import type { ScoredCandidate, ExistingMatchRow } from '../src/lib/freshFitScore'
+import { composeMemberOpportunityProfile } from '../src/lib/opportunityEngine/memberOpportunityProfile'
 import { summarizeRun, type AttemptResult } from './lib/runSummary'
 import { getErrorDetail } from './lib/errorDetail'
 import type { MemberProfile, ScrapedJob } from '../src/types'
@@ -71,15 +72,27 @@ async function main() {
   const members = (profiles ?? []) as MemberProfile[]
   const activeJobs = (jobs ?? []) as ScrapedJob[]
 
-  const [{ data: skillRows }, { data: scopeRows }, { data: compassRows }, { data: existingMatchRows }] = await Promise.all([
+  const [{ data: skillRows }, { data: scopeRows }, { data: compassRows }, { data: capabilityRows }, { data: existingMatchRows }] = await Promise.all([
     supabase.from('career_skills').select('*'),
     supabase.from('career_scope').select('*'),
     supabase.from('career_compass_results').select('user_id, readiness_scores').eq('is_current', true),
+    // Career Vault confirmed capabilities (OE 2.0 Phase 0) -- fetched in
+    // bulk here (same pattern as skills/scope/compass above) rather than
+    // per-member, to avoid turning a batch script into an N+1 query storm.
+    supabase.from('career_win_capabilities').select('user_id, skill_name').eq('status', 'confirmed'),
     supabase.from('job_matches').select('id, member_id, scraped_job_id, engine_version, dismissed_at, promoted_opportunity_id'),
   ])
 
   const skillsByUser = groupBy((skillRows ?? []) as CareerSkill[], (row) => row.user_id)
   const scopeByUser = groupBy((scopeRows ?? []) as CareerScope[], (row) => row.user_id)
+  const capabilityRowsByUser = groupBy(
+    (capabilityRows ?? []) as Array<{ user_id: string; skill_name: string }>,
+    (row) => row.user_id
+  )
+  const compassRowByUser = new Map<string, { user_id: string; readiness_scores: { careerDirection?: number | null } | null }>()
+  for (const row of (compassRows ?? []) as Array<{ user_id: string; readiness_scores: { careerDirection?: number | null } | null }>) {
+    compassRowByUser.set(row.user_id, row)
+  }
   const existingByMember = groupBy(
     (existingMatchRows ?? []) as Array<{
       id: string; member_id: string; scraped_job_id: string; engine_version: number
@@ -87,11 +100,6 @@ async function main() {
     }>,
     (row) => row.member_id
   )
-
-  const careerDirectionByUser = new Map<string, number | null>()
-  for (const row of (compassRows ?? []) as Array<{ user_id: string; readiness_scores: { careerDirection?: number | null } | null }>) {
-    careerDirectionByUser.set(row.user_id, row.readiness_scores?.careerDirection ?? null)
-  }
 
   console.log(`Scoring ${members.length} member(s) against ${activeJobs.length} job(s)...`)
 
@@ -105,6 +113,17 @@ async function main() {
   const computedAt = new Date().toISOString()
 
   for (const member of members) {
+    // One canonical composition per member (OE 2.0 Phase 0) -- built from
+    // the bulk-fetched maps above, not a re-fetch. See
+    // memberOpportunityProfile.ts for why this script keeps its bulk
+    // fetch strategy instead of calling buildMemberOpportunityProfile
+    // (the per-member async fetcher) once per member here.
+    const opportunityProfile = composeMemberOpportunityProfile(member, {
+      skills: skillsByUser.get(member.user_id) ?? [],
+      scope: scopeByUser.get(member.user_id) ?? [],
+      confirmedCapabilityRows: capabilityRowsByUser.get(member.user_id) ?? [],
+      compassRow: compassRowByUser.get(member.user_id) ?? null,
+    })
     const candidates: ScoredCandidate[] = []
     const resultByJobId = new Map<string, ReturnType<typeof computeFreshFitScore>>()
 
@@ -112,10 +131,11 @@ async function main() {
       const label = `member ${member.user_id} x job ${job.id}`
       try {
         const result = computeFreshFitScore(
-          member,
+          opportunityProfile.profile,
           job,
-          { skills: skillsByUser.get(member.user_id) ?? [], scope: scopeByUser.get(member.user_id) ?? [] },
-          careerDirectionByUser.get(member.user_id) ?? null
+          { skills: opportunityProfile.skills, scope: opportunityProfile.scope },
+          opportunityProfile.careerDirectionScore,
+          opportunityProfile.confirmedCapabilities
         )
         results.push({ label, status: 'success' })
         candidates.push({ scrapedJobId: job.id, score: result.score })

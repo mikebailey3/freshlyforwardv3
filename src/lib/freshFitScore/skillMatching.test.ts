@@ -64,6 +64,26 @@ describe('scoreSkillsDimension - unknown requirement (sparse profile)', () => {
   })
 })
 
+describe('scoreSkillsDimension - Career Vault confirmed capabilities (OE 2.0 Phase 0)', () => {
+  it('treats a confirmed capability as a confirmed_match even when absent from flat skills and career_skills', () => {
+    const result = scoreSkillsDimension([], [], [], 'Looking for strong Python skills', ['python'])
+    expect(result.evidence).toContain('python')
+    expect(result.gaps).not.toContain('python')
+  })
+
+  it('is additive -- omitting the param entirely keeps every existing call site behaving exactly as before', () => {
+    const withDefault = scoreSkillsDimension(['sql'], [], [], 'Looking for SQL skills')
+    const withExplicitEmpty = scoreSkillsDimension(['sql'], [], [], 'Looking for SQL skills', [])
+    expect(withDefault).toEqual(withExplicitEmpty)
+  })
+
+  it('counts confirmed capabilities toward the sparse-profile threshold -- an undetected skill becomes a confirmed_gap, not unknown, once Career Vault evidence exists', () => {
+    const result = scoreSkillsDimension([], [], [], 'Looking for strong Python skills', ['excel'])
+    expect(result.gaps).toContain('python')
+    expect(result.unknowns).not.toContain('python')
+  })
+})
+
 describe('scoreSkillsDimension - scope fit bonus', () => {
   it('adds bonus credit when career_scope covers a JD-implied team size', () => {
     const withoutScope = scoreSkillsDimension(['sql'], [], [], 'Lead a team of 8 with strong SQL.')

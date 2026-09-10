@@ -2,8 +2,7 @@ import { supabase } from '@/lib/supabase'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { createOpportunity } from '@/lib/operations'
 import { computeFreshFitScore, toScoreBreakdownPayload, FRESHFIT_TIER_LABELS, getFreshFitTier } from '@/lib/freshFitScore'
-import { getSkillStates } from '@/lib/forwardDna/skills'
-import { getAllScopeForUser } from '@/lib/forwardDna/scope'
+import { buildMemberOpportunityProfile } from '@/lib/opportunityEngine/memberOpportunityProfile'
 import type { JobMatchWithJob, JobMatchScoreBreakdown, MemberProfile, ScrapedJob } from '@/types'
 import type { JobSubmissionInput } from '@/lib/jobSubmission'
 
@@ -108,20 +107,18 @@ export async function submitMemberJob(
   }
 
   const job = jobRow as ScrapedJob
-  const [{ skills }, { scope }, compassResult] = await Promise.all([
-    getSkillStates(profile.user_id, client),
-    getAllScopeForUser(profile.user_id, client),
-    client
-      .from('career_compass_results')
-      .select('readiness_scores')
-      .eq('user_id', profile.user_id)
-      .eq('is_current', true)
-      .maybeSingle(),
-  ])
-  const careerDirectionScore =
-    (compassResult.data as { readiness_scores?: { careerDirection?: number | null } } | null)?.readiness_scores
-      ?.careerDirection ?? null
-  const result = computeFreshFitScore(profile, job, { skills, scope }, careerDirectionScore)
+  // Phase 0 (OE 2.0): one canonical composition of Forward DNA, Career
+  // Vault confirmed capabilities, and Career Compass -- replaces this
+  // function's previously-independent (and drifting) fetch of the same
+  // inputs. See memberOpportunityProfile.ts for the full rationale.
+  const opportunityProfile = await buildMemberOpportunityProfile(profile.user_id, profile, client)
+  const result = computeFreshFitScore(
+    opportunityProfile.profile,
+    job,
+    { skills: opportunityProfile.skills, scope: opportunityProfile.scope },
+    opportunityProfile.careerDirectionScore,
+    opportunityProfile.confirmedCapabilities
+  )
 
   const { data: matchRow, error: matchError } = await client
     .from('job_matches')
