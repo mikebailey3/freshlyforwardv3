@@ -197,6 +197,25 @@ export function isGroundedInCareerVault(jdSkill: string, confirmedCapabilities: 
   return surfaceForms.some((form) => confirmedCapabilityNames.has(form))
 }
 
+/**
+ * True when a JD skill's match also happens to be claimed on the
+ * member's current Master Resume (OE 2.0 Phase 5). Every resume skill
+ * entry is validated against `member_profiles.skills` at creation time
+ * (see `createMasterResume.ts`), so a resume claim is never independent
+ * new evidence -- it is always already covered by `flatSkills`, which
+ * `classifySkill` already checks. This function therefore never changes
+ * the score or the EvidenceStatus itself (exactly like
+ * `isGroundedInCareerVault`); it only lets the explanation cite "your
+ * resume already reflects this" for an already-confirmed match, per the
+ * OE 2.0 plan's Resume Intelligence cross-reference -- read-only, no
+ * scoring logic duplicated between the two systems.
+ */
+export function isGroundedInResume(jdSkill: string, resumeSkills: string[]): boolean {
+  const resumeSkillNames = new Set(resumeSkills.map(normalize))
+  const surfaceForms = [jdSkill, ...(ALIAS_MAP[jdSkill] ?? []), ...(TRANSFERABLE_MAP[jdSkill] ?? [])]
+  return surfaceForms.some((form) => resumeSkillNames.has(form))
+}
+
 export interface SkillsEvidenceResult {
   score: number
   evidence: string[]
@@ -204,6 +223,8 @@ export interface SkillsEvidenceResult {
   unknowns: string[]
   /** Subset of `evidence` specifically grounded in a Career Vault confirmed capability (OE 2.0 Phase 2) -- for explanation copy only. */
   groundedByCareerVault: string[]
+  /** Subset of `evidence` also claimed on the member's current Master Resume (OE 2.0 Phase 5) -- for explanation copy only, never a separate evidence tier. */
+  groundedByResume: string[]
   legacyBreakdown: {
     skillsCoverage: number
     dnaSkillEvidence: number
@@ -224,7 +245,8 @@ export function scoreSkillsDimension(
   careerSkills: CareerSkill[],
   careerScope: CareerScope[],
   jobText: string,
-  confirmedCapabilities: string[] = []
+  confirmedCapabilities: string[] = [],
+  resumeSkills: string[] = []
 ): SkillsEvidenceResult {
   const jdSkills = [...new Set(findSkillsInText(jobText))]
 
@@ -232,6 +254,7 @@ export function scoreSkillsDimension(
   const gaps: string[] = []
   const unknowns: string[] = []
   const groundedByCareerVault: string[] = []
+  const groundedByResume: string[] = []
   let weightedSum = 0
   let countedSkills = 0
 
@@ -240,6 +263,7 @@ export function scoreSkillsDimension(
     if (status === 'confirmed_match' || status === 'likely_transferable') {
       evidence.push(jdSkill)
       if (isGroundedInCareerVault(jdSkill, confirmedCapabilities)) groundedByCareerVault.push(jdSkill)
+      if (isGroundedInResume(jdSkill, resumeSkills)) groundedByResume.push(jdSkill)
     } else if (status === 'confirmed_gap') gaps.push(jdSkill)
     else unknowns.push(jdSkill)
 
@@ -269,6 +293,7 @@ export function scoreSkillsDimension(
     gaps,
     unknowns,
     groundedByCareerVault,
+    groundedByResume,
     legacyBreakdown: {
       skillsCoverage,
       dnaSkillEvidence: dnaEvidence.points,

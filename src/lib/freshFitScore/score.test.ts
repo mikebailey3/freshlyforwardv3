@@ -164,6 +164,33 @@ describe('computeFreshFitScore v2 - explainable dimensions', () => {
     expect(withCapability.matchedSkills).toContain('python')
     expect(withCapability.score).toBeGreaterThan(withoutCapability.score)
   })
+
+  it('cites Career Vault-grounded matches by name in the Skills & Evidence explanation', () => {
+    const job = makeJob({ title: 'Python Developer', description: 'Looking for strong Python skills.' })
+    const result = computeFreshFitScore(makeProfile({ skills: [] }), job, { skills: [], scope: [] }, null, ['python'])
+    const skillsDimension = result.dimensions.find((d) => d.key === 'skillsEvidence')
+    expect(skillsDimension?.explanation).toContain('confirmed via your Career Vault evidence')
+  })
+
+  it('accepts resumeSkills as an additive 6th param (OE 2.0 Phase 5) without changing classification or score -- explanation-only grounding', () => {
+    const job = makeJob({ title: 'Python Developer', description: 'Looking for strong Python skills.' })
+    const withoutResume = computeFreshFitScore(makeProfile({ skills: ['python'] }), job, { skills: [], scope: [] }, null)
+    const withResume = computeFreshFitScore(makeProfile({ skills: ['python'] }), job, { skills: [], scope: [] }, null, [], ['python'])
+
+    expect(withResume.score).toBe(withoutResume.score)
+    expect(withResume.matchedSkills).toEqual(withoutResume.matchedSkills)
+
+    const skillsDimension = withResume.dimensions.find((d) => d.key === 'skillsEvidence')
+    expect(skillsDimension?.explanation).toContain('confirmed via your current resume')
+  })
+
+  it('cites both Career Vault and resume grounding together when a match is backed by both (OE 2.0 Phase 5)', () => {
+    const job = makeJob({ title: 'Python Developer', description: 'Looking for strong Python skills.' })
+    const result = computeFreshFitScore(makeProfile({ skills: [] }), job, { skills: [], scope: [] }, null, ['python'], ['python'])
+    const skillsDimension = result.dimensions.find((d) => d.key === 'skillsEvidence')
+    expect(skillsDimension?.explanation).toContain('confirmed via your Career Vault evidence')
+    expect(skillsDimension?.explanation).toContain('confirmed via your current resume')
+  })
 })
 
 describe('computeFreshFitScore v2 - OE 2.0 Phase 2 hard constraints', () => {

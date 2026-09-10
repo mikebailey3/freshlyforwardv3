@@ -93,24 +93,38 @@ function statusFromScore(score: number): FreshFitDimensionResult['status'] {
  * Callers should source this from
  * `opportunityEngine/memberOpportunityProfile.ts::buildMemberOpportunityProfile`
  * rather than querying `career_win_capabilities` directly.
+ *
+ * `resumeSkills` (OE 2.0 Phase 5) is also optional and additive
+ * (defaults to `[]`) -- the member's current Master Resume's claimed
+ * skills, read-only via `getMasterResumeSkills`/`buildMemberOpportunityProfile`.
+ * This never changes classification or score -- every resume skill is
+ * already validated against `profile.skills` at resume-creation time, so
+ * it is only used to strengthen an already-confirmed match's
+ * explanation ("resume confirms this skill"), never as a second
+ * evidence tier or a second scoring engine.
  */
 export function computeFreshFitScore(
   profile: MemberProfile,
   job: ScrapedJob,
   dna: { skills: CareerSkill[]; scope: CareerScope[] } = { skills: [], scope: [] },
   careerDirectionScore: number | null = null,
-  confirmedCapabilities: string[] = []
+  confirmedCapabilities: string[] = [],
+  resumeSkills: string[] = []
 ): FreshFitResult {
   const jobText = `${job.title} ${job.description}`
 
-  const skillsResult = scoreSkillsDimension(profile.skills || [], dna.skills, dna.scope, jobText, confirmedCapabilities)
-  // OE 2.0 Phase 2: call out Career Vault-grounded matches by name --
-  // FreshlyForward's strongest skill evidence -- so members/strategists
-  // can see exactly why a match happened, not just that it did.
-  const careerVaultNote =
-    skillsResult.groundedByCareerVault.length > 0
-      ? ` ${skillsResult.groundedByCareerVault.length} confirmed via your Career Vault evidence.`
-      : ''
+  const skillsResult = scoreSkillsDimension(profile.skills || [], dna.skills, dna.scope, jobText, confirmedCapabilities, resumeSkills)
+  // OE 2.0 Phase 2/5: call out Career Vault- and resume-grounded matches
+  // by name so members/strategists can see exactly why a match
+  // happened, not just that it did.
+  const groundingNotes: string[] = []
+  if (skillsResult.groundedByCareerVault.length > 0) {
+    groundingNotes.push(`${skillsResult.groundedByCareerVault.length} confirmed via your Career Vault evidence.`)
+  }
+  if (skillsResult.groundedByResume.length > 0) {
+    groundingNotes.push(`${skillsResult.groundedByResume.length} confirmed via your current resume.`)
+  }
+  const groundingNote = groundingNotes.length > 0 ? ` ${groundingNotes.join(' ')}` : ''
   const skillsDimension: FreshFitDimensionResult = {
     key: 'skillsEvidence',
     label: 'Skills & Evidence',
@@ -121,7 +135,7 @@ export function computeFreshFitScore(
       (skillsResult.gaps.length === 0 && skillsResult.unknowns.length === 0
         ? 'Your recorded skills and Forward DNA evidence cover what this role is looking for.'
         : `Matched on ${skillsResult.evidence.length} skill(s); ${skillsResult.gaps.length} confirmed gap(s), ${skillsResult.unknowns.length} unclear given your current profile.`) +
-      careerVaultNote,
+      groundingNote,
     evidence: skillsResult.evidence,
     gaps: skillsResult.gaps,
     unknowns: skillsResult.unknowns,

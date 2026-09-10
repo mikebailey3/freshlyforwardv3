@@ -132,12 +132,19 @@ function makeFakeClient(opts: {
   const compassEq1 = vi.fn().mockReturnValue({ eq: compassEq2 })
   const compassSelect = vi.fn().mockReturnValue({ eq: compassEq1 })
 
+  const masterMaybeSingle = vi.fn().mockResolvedValue({ data: null, error: null })
+  const masterEq3 = vi.fn().mockReturnValue({ maybeSingle: masterMaybeSingle })
+  const masterEq2 = vi.fn().mockReturnValue({ eq: masterEq3 })
+  const masterEq1 = vi.fn().mockReturnValue({ eq: masterEq2 })
+  const masterSelect = vi.fn().mockReturnValue({ eq: masterEq1 })
+
   const fromMock = vi.fn((table: string) => {
     if (table === 'scraped_jobs') return { insert: scrapedJobsInsert }
     if (table === 'job_matches') return { insert: jobMatchesInsert }
     if (table === 'career_skills' || table === 'career_scope') return { select: dnaSelect }
     if (table === 'career_win_capabilities') return { select: capsSelect }
     if (table === 'career_compass_results') return { select: compassSelect }
+    if (table === 'resume_versions') return { select: masterSelect }
     throw new Error(`Unexpected table: ${table}`)
   })
 

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { scoreSkillsDimension, SKILL_KEYWORDS, findSkillsInText, classifySkill, isGroundedInCareerVault } from './skillMatching'
+import { scoreSkillsDimension, SKILL_KEYWORDS, findSkillsInText, classifySkill, isGroundedInCareerVault, isGroundedInResume } from './skillMatching'
 import type { CareerSkill, CareerScope } from '@/types/forwardDna'
 
 function skill(name: string, state: CareerSkill['state']): CareerSkill {
@@ -173,5 +173,40 @@ describe('isGroundedInCareerVault (OE 2.0 Phase 2 -- evidence provenance)', () =
     const result = scoreSkillsDimension(['python'], [], [], 'Looking for strong Python skills')
     expect(result.evidence).toContain('python')
     expect(result.groundedByCareerVault).not.toContain('python')
+  })
+})
+
+describe('isGroundedInResume (OE 2.0 Phase 5 -- resume evidence provenance)', () => {
+  it('is true when the current resume claims an exact-match skill', () => {
+    expect(isGroundedInResume('sql', ['sql'])).toBe(true)
+  })
+
+  it('is true when the resume claims a transferable-form skill', () => {
+    expect(isGroundedInResume('accounting', ['bookkeeping'])).toBe(true)
+  })
+
+  it('is false when the resume skill list is empty or unrelated', () => {
+    expect(isGroundedInResume('sql', [])).toBe(false)
+    expect(isGroundedInResume('sql', ['welding'])).toBe(false)
+  })
+
+  it('flows through scoreSkillsDimension.groundedByResume for a resume-backed match, without duplicating it as a second evidence tier', () => {
+    const result = scoreSkillsDimension(['python'], [], [], 'Looking for strong Python skills', [], ['python'])
+    expect(result.evidence).toContain('python')
+    expect(result.groundedByResume).toContain('python')
+  })
+
+  it('never changes classification or score -- a skill only on the resume list (not flat/career/Career Vault) is still an unrelated/absent match', () => {
+    const withResumeOnly = scoreSkillsDimension([], [], [], 'Looking for strong Python skills', [], ['python'])
+    const withoutResumeAtAll = scoreSkillsDimension([], [], [], 'Looking for strong Python skills')
+    expect(withResumeOnly.score).toBe(withoutResumeAtAll.score)
+    expect(withResumeOnly.evidence).toEqual(withoutResumeAtAll.evidence)
+    expect(withResumeOnly.groundedByResume).toEqual([])
+  })
+
+  it('does not credit groundedByResume for a match backed only by a flat/typed skill not on the resume', () => {
+    const result = scoreSkillsDimension(['python'], [], [], 'Looking for strong Python skills')
+    expect(result.evidence).toContain('python')
+    expect(result.groundedByResume).not.toContain('python')
   })
 })

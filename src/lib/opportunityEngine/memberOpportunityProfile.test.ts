@@ -87,6 +87,20 @@ describe('composeMemberOpportunityProfile (pure)', () => {
     expect(result.exclusionRules).toEqual([])
   })
 
+  it('defaults resumeSkills to an empty array when omitted (OE 2.0 Phase 5)', () => {
+    const result = composeMemberOpportunityProfile(makeProfile(), {
+      skills: [], scope: [], confirmedCapabilityRows: [], compassRow: null,
+    })
+    expect(result.resumeSkills).toEqual([])
+  })
+
+  it('passes resumeSkills through when provided (OE 2.0 Phase 5)', () => {
+    const result = composeMemberOpportunityProfile(makeProfile(), {
+      skills: [], scope: [], confirmedCapabilityRows: [], compassRow: null, resumeSkills: ['sql'],
+    })
+    expect(result.resumeSkills).toEqual(['sql'])
+  })
+
   it('degrades gracefully for a member with no evidence anywhere on file (missing data)', () => {
     const result = composeMemberOpportunityProfile(makeProfile(), {
       skills: [], scope: [], confirmedCapabilityRows: null, compassRow: undefined,
@@ -100,6 +114,8 @@ function makeFakeClient(opts: {
   capabilityRows?: { skill_name: string }[] | null
   capabilityError?: string
   compassRow?: { readiness_scores: { careerDirection?: number | null } | null } | null
+  masterResume?: { id: string } | null
+  resumeSkillEntries?: { skill_value: string | null }[]
 }) {
   const dnaEq = vi.fn().mockResolvedValue({ data: [], error: null })
   const dnaSelect = vi.fn().mockReturnValue({ eq: dnaEq })
@@ -116,25 +132,38 @@ function makeFakeClient(opts: {
   const compassEq1 = vi.fn().mockReturnValue({ eq: compassEq2 })
   const compassSelect = vi.fn().mockReturnValue({ eq: compassEq1 })
 
+  const masterMaybeSingle = vi.fn().mockResolvedValue({ data: opts.masterResume ?? null, error: null })
+  const masterEq3 = vi.fn().mockReturnValue({ maybeSingle: masterMaybeSingle })
+  const masterEq2 = vi.fn().mockReturnValue({ eq: masterEq3 })
+  const masterEq1 = vi.fn().mockReturnValue({ eq: masterEq2 })
+  const masterSelect = vi.fn().mockReturnValue({ eq: masterEq1 })
+
+  const entriesEq3 = vi.fn().mockResolvedValue({ data: opts.resumeSkillEntries ?? [], error: null })
+  const entriesEq2 = vi.fn().mockReturnValue({ eq: entriesEq3 })
+  const entriesEq1 = vi.fn().mockReturnValue({ eq: entriesEq2 })
+  const entriesSelect = vi.fn().mockReturnValue({ eq: entriesEq1 })
+
   const tablesTouched: string[] = []
   const fromMock = vi.fn((table: string) => {
     tablesTouched.push(table)
     if (table === 'career_skills' || table === 'career_scope') return { select: dnaSelect }
     if (table === 'career_win_capabilities') return { select: capsSelect }
     if (table === 'career_compass_results') return { select: compassSelect }
-    throw new Error(`Unexpected table: ${table} -- buildMemberOpportunityProfile must only read the four canonical evidence tables`)
+    if (table === 'resume_versions') return { select: masterSelect }
+    if (table === 'resume_entries') return { select: entriesSelect }
+    throw new Error(`Unexpected table: ${table} -- buildMemberOpportunityProfile must only read its canonical evidence tables`)
   })
 
   return { client: { from: fromMock } as unknown as SupabaseClient, tablesTouched, capsEq1, capsEq2 }
 }
 
 describe('buildMemberOpportunityProfile (async fetch + compose)', () => {
-  it('touches exactly the four canonical evidence tables -- no duplicate identity/evidence store is ever created or queried', async () => {
+  it('touches exactly the canonical evidence tables -- no duplicate identity/evidence store is ever created or queried', async () => {
     const { client, tablesTouched } = makeFakeClient({})
     const profile = makeProfile()
     await buildMemberOpportunityProfile(profile.user_id, profile, client)
     expect(new Set(tablesTouched)).toEqual(
-      new Set(['career_skills', 'career_scope', 'career_win_capabilities', 'career_compass_results'])
+      new Set(['career_skills', 'career_scope', 'career_win_capabilities', 'career_compass_results', 'resume_versions'])
     )
   })
 
@@ -173,5 +202,22 @@ describe('buildMemberOpportunityProfile (async fetch + compose)', () => {
     const profile = makeProfile()
     const result = await buildMemberOpportunityProfile(profile.user_id, profile, client)
     expect(result.exclusionRules).toEqual([])
+  })
+
+  it('returns an empty resumeSkills array when the member has no active Master Resume yet (OE 2.0 Phase 5)', async () => {
+    const { client } = makeFakeClient({ masterResume: null })
+    const profile = makeProfile()
+    const result = await buildMemberOpportunityProfile(profile.user_id, profile, client)
+    expect(result.resumeSkills).toEqual([])
+  })
+
+  it('returns the Master Resume\'s claimed skills when one exists (OE 2.0 Phase 5)', async () => {
+    const { client } = makeFakeClient({
+      masterResume: { id: 'version-1' },
+      resumeSkillEntries: [{ skill_value: 'sql' }, { skill_value: 'leadership' }],
+    })
+    const profile = makeProfile()
+    const result = await buildMemberOpportunityProfile(profile.user_id, profile, client)
+    expect(result.resumeSkills).toEqual(['sql', 'leadership'])
   })
 })

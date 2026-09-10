@@ -24,6 +24,7 @@ import { createClient } from '@supabase/supabase-js'
 import { computeFreshFitScore, toScoreBreakdownPayload, selectMatchesToPersist, selectStaleMatchesToPrune } from '../src/lib/freshFitScore'
 import type { ScoredCandidate, ExistingMatchRow } from '../src/lib/freshFitScore'
 import { composeMemberOpportunityProfile } from '../src/lib/opportunityEngine/memberOpportunityProfile'
+import { extractResumeSkillValues } from '../src/lib/resumeIntelligence/masterResume/getMasterResumeSkills'
 import { summarizeRun, type AttemptResult } from './lib/runSummary'
 import { getErrorDetail } from './lib/errorDetail'
 import type { MemberProfile, ScrapedJob } from '../src/types'
@@ -72,7 +73,7 @@ async function main() {
   const members = (profiles ?? []) as MemberProfile[]
   const activeJobs = (jobs ?? []) as ScrapedJob[]
 
-  const [{ data: skillRows }, { data: scopeRows }, { data: compassRows }, { data: capabilityRows }, { data: existingMatchRows }] = await Promise.all([
+  const [{ data: skillRows }, { data: scopeRows }, { data: compassRows }, { data: capabilityRows }, { data: existingMatchRows }, { data: masterResumeRows }] = await Promise.all([
     supabase.from('career_skills').select('*'),
     supabase.from('career_scope').select('*'),
     supabase.from('career_compass_results').select('user_id, readiness_scores').eq('is_current', true),
@@ -81,13 +82,36 @@ async function main() {
     // per-member, to avoid turning a batch script into an N+1 query storm.
     supabase.from('career_win_capabilities').select('user_id, skill_name').eq('status', 'confirmed'),
     supabase.from('job_matches').select('id, member_id, scraped_job_id, engine_version, dismissed_at, promoted_opportunity_id'),
+    // Master Resume (OE 2.0 Phase 5) -- same bulk-fetch-then-group
+    // pattern; a second query below (once we know which resume_version
+    // ids are Masters) fetches the actual claimed skills.
+    supabase.from('resume_versions').select('id, member_id').eq('is_master', true).eq('is_archived', false),
   ])
+
+  const masterResumeIdByUser = new Map<string, string>()
+  for (const row of (masterResumeRows ?? []) as Array<{ id: string; member_id: string }>) {
+    masterResumeIdByUser.set(row.member_id, row.id)
+  }
+  const masterResumeIds = [...masterResumeIdByUser.values()]
+  const { data: resumeSkillRows } =
+    masterResumeIds.length > 0
+      ? await supabase
+          .from('resume_entries')
+          .select('resume_version_id, skill_value')
+          .in('resume_version_id', masterResumeIds)
+          .eq('entry_kind', 'skill')
+          .eq('included', true)
+      : { data: [] as Array<{ resume_version_id: string; skill_value: string | null }> }
 
   const skillsByUser = groupBy((skillRows ?? []) as CareerSkill[], (row) => row.user_id)
   const scopeByUser = groupBy((scopeRows ?? []) as CareerScope[], (row) => row.user_id)
   const capabilityRowsByUser = groupBy(
     (capabilityRows ?? []) as Array<{ user_id: string; skill_name: string }>,
     (row) => row.user_id
+  )
+  const resumeSkillRowsByVersionId = groupBy(
+    (resumeSkillRows ?? []) as Array<{ resume_version_id: string; skill_value: string | null }>,
+    (row) => row.resume_version_id
   )
   const compassRowByUser = new Map<string, { user_id: string; readiness_scores: { careerDirection?: number | null } | null }>()
   for (const row of (compassRows ?? []) as Array<{ user_id: string; readiness_scores: { careerDirection?: number | null } | null }>) {
@@ -123,6 +147,10 @@ async function main() {
       scope: scopeByUser.get(member.user_id) ?? [],
       confirmedCapabilityRows: capabilityRowsByUser.get(member.user_id) ?? [],
       compassRow: compassRowByUser.get(member.user_id) ?? null,
+      resumeSkills: (() => {
+        const resumeVersionId = masterResumeIdByUser.get(member.user_id)
+        return resumeVersionId ? extractResumeSkillValues(resumeSkillRowsByVersionId.get(resumeVersionId)) : []
+      })(),
     })
     const candidates: ScoredCandidate[] = []
     const resultByJobId = new Map<string, ReturnType<typeof computeFreshFitScore>>()
@@ -135,7 +163,8 @@ async function main() {
           job,
           { skills: opportunityProfile.skills, scope: opportunityProfile.scope },
           opportunityProfile.careerDirectionScore,
-          opportunityProfile.confirmedCapabilities
+          opportunityProfile.confirmedCapabilities,
+          opportunityProfile.resumeSkills
         )
         results.push({ label, status: 'success' })
         candidates.push({ scrapedJobId: job.id, score: result.score })

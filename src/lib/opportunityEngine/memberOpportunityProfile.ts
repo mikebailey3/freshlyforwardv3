@@ -2,6 +2,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import { supabase as defaultClient } from '@/lib/supabase'
 import { getSkillStates } from '@/lib/forwardDna/skills'
 import { getAllScopeForUser } from '@/lib/forwardDna/scope'
+import { getMasterResumeSkills } from '@/lib/resumeIntelligence/masterResume/getMasterResumeSkills'
 import type { CareerSkill, CareerScope } from '@/types/forwardDna'
 import type { MemberProfile } from '@/types'
 
@@ -25,6 +26,12 @@ import type { MemberProfile } from '@/types'
  *  - Career Compass (`career_compass_results`, `is_current` row) — the
  *    existing career-direction signal already used by FreshFit's
  *    `careerDirection` dimension.
+ *  - Master Resume (`resume_versions`/`resume_entries`, OE 2.0 Phase 5) —
+ *    the member's current resume's claimed skills, via
+ *    `resumeIntelligence/masterResume/getMasterResumeSkills.ts`. Every
+ *    resume skill is already validated against `member_profiles.skills`
+ *    at creation time, so this is read-only explanation-grounding for
+ *    FreshFit's skillsEvidence dimension, never a second evidence tier.
  *
  * This function is a pure read/composition step — no new table, no new
  * identity concept, no writes anywhere. It replaces the fetch logic that
@@ -67,6 +74,8 @@ export interface MemberOpportunityProfile {
   careerDirectionScore: number | null
   /** Always empty until Phase 9 wires the real table -- present now so later phases don't change this interface's shape. */
   exclusionRules: MemberExclusionRule[]
+  /** OE 2.0 Phase 5: the member's current Master Resume's claimed skills, read-only. Never a second evidence tier -- see skillMatching.ts's isGroundedInResume. */
+  resumeSkills: string[]
 }
 
 interface ConfirmedCapabilityRow {
@@ -125,6 +134,7 @@ export function composeMemberOpportunityProfile(
     confirmedCapabilityRows: ConfirmedCapabilityRow[] | null | undefined
     compassRow: CareerCompassReadinessRow | null | undefined
     exclusionRules?: MemberExclusionRule[]
+    resumeSkills?: string[]
   }
 ): MemberOpportunityProfile {
   return {
@@ -134,6 +144,7 @@ export function composeMemberOpportunityProfile(
     confirmedCapabilities: extractConfirmedCapabilitySkills(inputs.confirmedCapabilityRows),
     careerDirectionScore: extractCareerDirectionScore(inputs.compassRow),
     exclusionRules: inputs.exclusionRules ?? [],
+    resumeSkills: inputs.resumeSkills ?? [],
   }
 }
 
@@ -148,11 +159,12 @@ export async function buildMemberOpportunityProfile(
   profile: MemberProfile,
   client: SupabaseClient = defaultClient
 ): Promise<MemberOpportunityProfile> {
-  const [{ skills }, { scope }, capabilitiesResult, compassResult] = await Promise.all([
+  const [{ skills }, { scope }, capabilitiesResult, compassResult, resumeSkills] = await Promise.all([
     getSkillStates(userId, client),
     getAllScopeForUser(userId, client),
     client.from('career_win_capabilities').select('skill_name').eq('user_id', userId).eq('status', 'confirmed'),
     client.from('career_compass_results').select('readiness_scores').eq('user_id', userId).eq('is_current', true).maybeSingle(),
+    getMasterResumeSkills(userId, client),
   ])
 
   return composeMemberOpportunityProfile(profile, {
@@ -160,5 +172,6 @@ export async function buildMemberOpportunityProfile(
     scope,
     confirmedCapabilityRows: (capabilitiesResult.data as ConfirmedCapabilityRow[] | null) ?? [],
     compassRow: compassResult.data as CareerCompassReadinessRow | null,
+    resumeSkills,
   })
 }

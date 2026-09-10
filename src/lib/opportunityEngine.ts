@@ -134,7 +134,8 @@ export async function submitMemberJob(
     job,
     { skills: opportunityProfile.skills, scope: opportunityProfile.scope },
     opportunityProfile.careerDirectionScore,
-    opportunityProfile.confirmedCapabilities
+    opportunityProfile.confirmedCapabilities,
+    opportunityProfile.resumeSkills
   )
 
   const { data: matchRow, error: matchError } = await client
