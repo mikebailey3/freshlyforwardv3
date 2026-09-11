@@ -9,7 +9,7 @@
 export const NON_PROD_PROJECT_REF = 'szwfxfitrmvqbdvcbgrf'
 export const FIXTURE_PASSWORD = 'Oe2Fixture!Test-Only-Do-Not-Use-1'
 
-export type FixtureActor = 'member-a' | 'member-b' | 'strategist-s'
+export type FixtureActor = 'member-a' | 'member-b' | 'strategist-s' | 'admin'
 
 /** Obviously-fake, easy to find/filter/delete manually -- never a real domain. */
 export function fixtureEmail(runTag: string, who: FixtureActor): string {

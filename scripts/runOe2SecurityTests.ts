@@ -80,11 +80,13 @@ async function main() {
   const { data: matchB } = await serviceClient.from('job_matches').select('id').eq('member_id', memberBId).maybeSingle()
   const { data: opportunity } = await serviceClient.from('opportunities').select('id').eq('member_id', memberAId).maybeSingle()
   const { data: job2 } = await serviceClient.from('scraped_jobs').select('id').eq('external_id', `oe2-fixture-${runTag}-alt`).maybeSingle()
-  if (!matchA || !matchB || !opportunity || !job2) throw new Error('Could not resolve fixture rows -- fixture incomplete for this run tag.')
+  const { data: marketSnapshot } = await serviceClient.from('market_intelligence_snapshots').select('id').eq('role_bucket', 'oe2-fixture').eq('location_bucket', runTag).maybeSingle()
+  if (!matchA || !matchB || !opportunity || !job2 || !marketSnapshot) throw new Error('Could not resolve fixture rows -- fixture incomplete for this run tag.')
 
   const memberA = await signInAs(fixtureEmail(runTag, 'member-a'))
   const memberB = await signInAs(fixtureEmail(runTag, 'member-b'))
   const strategistS = await signInAs(fixtureEmail(runTag, 'strategist-s'))
+  const adminQ = await signInAs(fixtureEmail(runTag, 'admin'))
   const anon = createClient(SUPABASE_URL!, ANON_KEY!) // never signed in
 
   // ============================================================
@@ -115,6 +117,26 @@ async function main() {
   record('Member A CAN read own digest log', (ownDigestA ?? []).length === 1, `rows returned: ${(ownDigestA ?? []).length}`)
   const { data: ownDigestB } = await memberB.from('match_digest_log').select('id').eq('member_id', memberBId)
   record('Member B CAN read own digest log', (ownDigestB ?? []).length === 1, `rows returned: ${(ownDigestB ?? []).length}`)
+
+  // ============================================================
+  // market_intelligence_snapshots (validated-defect regression coverage
+  // -- the one real bug non-prod testing found: the admin branch used
+  // to query auth.users directly, which authenticated has no SELECT on.
+  // Fixed in 20260922000000 to use the auth.jwt() app_metadata claim
+  // instead. No member_id column exists on this table at all, so there
+  // is no member-data-exposure risk in any of these four checks.
+  // ============================================================
+  const { data: adminReads } = await adminQ.from('market_intelligence_snapshots').select('id').eq('id', marketSnapshot.id)
+  record('Admin CAN read market_intelligence_snapshots', (adminReads ?? []).length === 1, `rows returned: ${(adminReads ?? []).length}`)
+
+  const { data: strategistReads } = await strategistS.from('market_intelligence_snapshots').select('id').eq('id', marketSnapshot.id)
+  record('Active strategist CAN read market_intelligence_snapshots', (strategistReads ?? []).length === 1, `rows returned: ${(strategistReads ?? []).length}`)
+
+  const { data: memberReads } = await memberA.from('market_intelligence_snapshots').select('id').eq('id', marketSnapshot.id)
+  record('Ordinary member cannot read market_intelligence_snapshots', (memberReads ?? []).length === 0, `rows returned: ${(memberReads ?? []).length}`)
+
+  const { data: anonMarketIntelReal } = await anon.from('market_intelligence_snapshots').select('id').eq('id', marketSnapshot.id)
+  record('Anonymous cannot read the real market_intelligence_snapshots row', (anonMarketIntelReal ?? []).length === 0, `rows returned: ${(anonMarketIntelReal ?? []).length}`)
 
   // ============================================================
   // Feedback ownership (member_feedback.job_match_id)
@@ -217,16 +239,15 @@ async function main() {
   )
 
   // ============================================================
-  // Admin: NOT automated
+  // Admin: now automated for market_intelligence_snapshots (the only
+  // OE table with admin-specific RLS) via the four assertions above.
+  // Deliberately still NOT extended to every other OE table -- the
+  // fixture's Admin Q has no strategist_assignments row and is not a
+  // member, so it has nothing else to legitimately access; a broader
+  // "admin gains no unintended access anywhere" sweep would just
+  // re-run the exact same cross-member-isolation assertions already
+  // covered above under a different actor label, adding no new signal.
   // ============================================================
-  console.log('')
-  console.log('NOTE: "Admin verify only intended OE admin visibility" was not automated here.')
-  console.log('No admin fixture is created by createOe2SecurityFixtures.ts by design -- granting')
-  console.log('admin (raw_app_meta_data.role=\'admin\') is a deliberate, manual, non-fixture action.')
-  console.log('To test manually: promote a throwaway non-prod user to admin via the Supabase')
-  console.log('dashboard/admin API, sign in as them, and confirm they can read')
-  console.log('market_intelligence_snapshots (the only OE table with admin-specific RLS) but gain')
-  console.log('no access to any member-scoped OE table beyond what their own assignments allow.')
 
   const passed = results.filter((r) => r.passed).length
   const failed = results.filter((r) => !r.passed).length

@@ -12,6 +12,12 @@
  * testing:
  *   - Member A, Member B (real auth.users, obviously-fake emails)
  *   - Strategist S (real auth.users)
+ *   - Admin Q (real auth.users, app_metadata.role='admin') -- needed to
+ *     automate the market_intelligence_snapshots admin-read assertion;
+ *     app_metadata is set at creation time via the service-role admin
+ *     API, the same trusted, non-user-editable field the fixed
+ *     20260922000000 policy and every other admin check in this repo
+ *     already keys off of
  *   - An active strategist_assignments row: S -> Member A only
  *     (S is deliberately NOT assigned to Member B -- this is what lets
  *     the "strategist cannot access an unassigned member" test exist)
@@ -30,12 +36,14 @@
  *     authenticated INSERT policy at all (service-role/script-only
  *     writes), so this is the only way a "member CAN read their own
  *     digest log" positive-control test can exist
+ *   - One market_intelligence_snapshots row -- seeded via service role
+ *     (this table has no authenticated INSERT policy either) so the
+ *     admin-can-read / strategist-can-read / member-cannot-read /
+ *     anon-cannot-read assertions all have a real row to probe, not
+ *     just an always-vacuously-true empty result
  *
  * Deliberately does NOT create member_profiles/communication_preferences
- * rows, and deliberately does NOT create an admin fixture -- none of the
- * member/strategist RLS scenarios this fixture supports require them,
- * and admin escalation should be even more deliberate/manual than an
- * ordinary fixture user, never automated here.
+ * rows -- no scenario this fixture supports requires them.
  *
  * Does NOT automatically clean up. Run with --cleanup, passing the same
  * run tag printed on creation, to deliberately remove everything this
@@ -72,9 +80,13 @@ async function createFixtures() {
   const { data: strategistS, error: strategistError } = await supabase.auth.admin.createUser({
     email: fixtureEmail(runTag, 'strategist-s'), password: FIXTURE_PASSWORD, email_confirm: true,
   })
+  const { data: adminQ, error: adminError } = await supabase.auth.admin.createUser({
+    email: fixtureEmail(runTag, 'admin'), password: FIXTURE_PASSWORD, email_confirm: true,
+    app_metadata: { role: 'admin' },
+  })
 
-  if (memberAError || memberBError || strategistError || !memberA.user || !memberB.user || !strategistS.user) {
-    console.error('Failed to create one or more fixture users:', { memberAError, memberBError, strategistError })
+  if (memberAError || memberBError || strategistError || adminError || !memberA.user || !memberB.user || !strategistS.user || !adminQ.user) {
+    console.error('Failed to create one or more fixture users:', { memberAError, memberBError, strategistError, adminError })
     process.exit(1)
   }
 
@@ -147,19 +159,31 @@ async function createFixtures() {
     process.exit(1)
   }
 
+  const { data: marketSnapshot, error: marketSnapshotError } = await supabase
+    .from('market_intelligence_snapshots')
+    .insert({ role_bucket: 'oe2-fixture', location_bucket: runTag, sample_size: 1 })
+    .select('id')
+    .maybeSingle()
+  if (marketSnapshotError || !marketSnapshot) {
+    console.error('Failed to create market_intelligence_snapshots fixture row:', marketSnapshotError)
+    process.exit(1)
+  }
+
   console.log('')
   console.log('=== OE 2.0 Security Fixtures Created ===')
   console.log(`Run tag (needed for --cleanup, and for runOe2SecurityTests.ts): ${runTag}`)
-  console.log(`Fixture password (all three users): ${FIXTURE_PASSWORD}`)
+  console.log(`Fixture password (all four users): ${FIXTURE_PASSWORD}`)
   console.log(`Member A:      id=${memberA.user.id}  email=${memberA.user.email}`)
   console.log(`Member B:      id=${memberB.user.id}  email=${memberB.user.email}`)
   console.log(`Strategist S:  id=${strategistS.user.id}  email=${strategistS.user.email}  (assigned to Member A only)`)
+  console.log(`Admin Q:       id=${adminQ.user.id}  email=${adminQ.user.email}  (app_metadata.role='admin')`)
   console.log(`scraped_jobs.id:  ${job.id}`)
   console.log(`scraped_jobs.id (alt, for scraped_job_id-reassignment test): ${job2.id}`)
   console.log(`job_matches.id (Member A's): ${matchA.id}`)
   console.log(`job_matches.id (Member B's): ${matchB.id}`)
   console.log(`opportunities.id (Member A's, promotion target): ${opportunity.id}`)
   console.log('match_digest_log: one row seeded for each of Member A and Member B')
+  console.log(`market_intelligence_snapshots.id: ${marketSnapshot.id}`)
   console.log('==========================================')
   console.log('')
   console.log(`Next: npm run test:oe2-security -- ${runTag}`)
@@ -168,9 +192,9 @@ async function createFixtures() {
 
 async function cleanupFixtures(runTag: string) {
   console.log(`Cleaning up OE 2.0 security fixtures for run tag: ${runTag}`)
-  console.log('This will delete the three fixture auth users (cascades to their job_matches/strategist_assignments/opportunities rows via ON DELETE CASCADE) and the fixture scraped_jobs row.')
+  console.log('This will delete the four fixture auth users (cascades to their job_matches/strategist_assignments/opportunities/match_digest_log rows via ON DELETE CASCADE), the fixture scraped_jobs rows, and the fixture market_intelligence_snapshots row.')
 
-  const actors: Array<'member-a' | 'member-b' | 'strategist-s'> = ['member-a', 'member-b', 'strategist-s']
+  const actors: Array<'member-a' | 'member-b' | 'strategist-s' | 'admin'> = ['member-a', 'member-b', 'strategist-s', 'admin']
   const { data: users, error: listError } = await supabase.auth.admin.listUsers()
   if (listError) {
     console.error('Could not list users for cleanup:', listError)
@@ -189,6 +213,10 @@ async function cleanupFixtures(runTag: string) {
   const { error: jobDeleteError } = await supabase.from('scraped_jobs').delete().like('external_id', `oe2-fixture-${runTag}%`)
   if (jobDeleteError) console.error('Failed to delete fixture scraped_jobs row:', jobDeleteError)
   else console.log('Deleted fixture scraped_jobs row.')
+
+  const { error: marketSnapshotDeleteError } = await supabase.from('market_intelligence_snapshots').delete().eq('role_bucket', 'oe2-fixture').eq('location_bucket', runTag)
+  if (marketSnapshotDeleteError) console.error('Failed to delete fixture market_intelligence_snapshots row:', marketSnapshotDeleteError)
+  else console.log('Deleted fixture market_intelligence_snapshots row.')
 
   console.log('Cleanup complete.')
 }

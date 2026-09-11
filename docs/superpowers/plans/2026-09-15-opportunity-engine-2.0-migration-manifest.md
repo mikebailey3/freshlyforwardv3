@@ -1,14 +1,18 @@
 # Opportunity Engine 2.0 — Migration Manifest & Review Doc
 
-**Status as of this update:** migrations 1–6 below have been applied
-to the **non-production** Supabase project ("Freshly Forward",
-`szwfxfitrmvqbdvcbgrf`), per external validation. **Production
-(`bolt-native-database-69540068`) has NOT been touched and is not
-touched by anything in this document.** A second batch of
-non-prod-hardening migrations (7–11, added after Supabase's Security
-and Performance Advisors ran against non-prod) is documented at the
-bottom of this file, also prepared-only / not yet applied anywhere.
-Every migration in both batches is committed to
+**Status as of this update:** migrations 1–6 (Batch 1) AND 7–11
+(Batch 2) have all been applied to the **non-production** Supabase
+project ("Freshly Forward", `szwfxfitrmvqbdvcbgrf`), per controlled
+non-prod execution. **Production (`bolt-native-database-69540068`) has
+NOT been touched and is not touched by anything in this document.**
+That execution's advisor re-run came back clean for every OE-targeted
+finding; live RLS/security testing found exactly **one** validated
+defect (`market_intelligence_snapshots`' admin check queried
+`auth.users` directly, which `authenticated` has no `SELECT` on in
+that project) -- fixed forward-only by migration 12
+(`20260922000000_fix_market_intelligence_admin_jwt_claim.sql`, detailed
+at the bottom of this file), also prepared-only / not yet applied
+anywhere. Every migration across all batches is committed to
 `opportunity-engine-2-phase0` only. `origin/main` has not been touched
 by this project at any point.
 
@@ -530,20 +534,83 @@ live Supabase credentials for `szwfxfitrmvqbdvcbgrf`. They are ready to
 run by whoever has that access; see the Final Report for exactly what
 that run would validate.
 
-## Updated suggested apply order (both batches)
+## Non-prod validation round 1 results (Batch 1 + Batch 2, migrations 1-11)
 
-1-6. Unchanged from Batch 1 above (already applied to non-prod).
-7. `20260917000000_harden_get_job_match_snapshot.sql`
-8. `20260918000000_job_matches_column_security_and_rls_perf.sql`
-9. `20260919000000_oe_rls_performance_auth_uid.sql`
-10. `20260920000000_oe_fk_indexes.sql`
-11. `20260921000000_oe_table_grants_hardening.sql`
+All 11 migrations applied successfully to `szwfxfitrmvqbdvcbgrf`.
+Production untouched throughout.
 
-Recommended non-prod validation loop before any production
-consideration: apply 7-11 to non-prod -> re-run Supabase's Security +
-Performance Advisors there -> run
-`fixtures:oe2-security -- --create` -> `test:oe2-security -- <tag>` ->
-`fixtures:oe2-security -- --cleanup <tag>`.
+**Advisor re-run:** clean for every OE-targeted finding --
+`get_job_match_snapshot`'s mutable-search-path warning gone; every
+OE-specific missing-FK-index warning gone; every OE-specific
+`auth.uid()` initplan warning gone. Remaining advisor findings are all
+pre-existing/out-of-scope debt (`public_forward_profiles` security-
+definer view, older `SECURITY DEFINER` RPCs, older repo-wide RLS/
+performance items) -- unchanged from the "Pre-existing technical debt"
+list below, not new.
+
+**Live RLS/security testing:** every transactional assertion passed
+except one -- cross-member job-match isolation, digest ownership,
+snapshot-RPC isolation, member dismiss-only behavior, strategist
+promote-only behavior, `computed_at` protection, feedback ownership,
+exclusion-rule ownership, unassigned-strategist denial, and anonymous
+RPC/table denial all came back green. Fixtures ran transactionally and
+were rolled back -- no leftover test users/data.
+
+**Validated defect (the one failure):**
+`admin_strategist_read_market_intelligence`'s admin branch
+(`auth.uid() IN (SELECT id FROM auth.users WHERE
+raw_app_meta_data->>'role' = 'admin')`) raised SQLSTATE 42501
+(`permission denied for table users`) because `authenticated` has no
+`SELECT` on `auth.users` in this project. See migration 12 below for
+the forward-only fix -- **not** applied yet, pending round 2.
+
+## 12. `20260922000000_fix_market_intelligence_admin_jwt_claim.sql`
+
+Replaces the admin branch of `admin_strategist_read_market_intelligence`
+with `(select auth.jwt() -> 'app_metadata' ->> 'role') = 'admin'` --
+Supabase's own documented pattern for JWT-claim-based role checks,
+needing zero `auth.users` access at all (`app_metadata` is embedded in
+the session JWT at issuance, sourced from the same `raw_app_meta_data`
+column already used as the single source of truth for roles everywhere
+else in this repo). **Explicitly rejected fix:** granting `authenticated`
+`SELECT` on `auth.users`, since that would let every authenticated user
+query the whole table directly, far beyond what this one admin check
+needs. The active-strategist `OR` branch, the table's grants (migration
+11), and every other policy/table are untouched.
+
+**Accepted, explicitly-stated trade-off:** JWT claims are fixed at
+issuance, so an admin-role grant/revoke doesn't take effect for an
+already-issued access token until it refreshes. Standard, documented
+Supabase behavior -- not a new gap, and strictly better than the prior
+state (which didn't work for `authenticated` callers at all in this
+project).
+
+**Related, explicitly out-of-scope observation:** the identical
+`auth.uid() IN (SELECT id FROM auth.users WHERE
+raw_app_meta_data->>'role' = 'admin')` pattern also exists in several
+pre-OE-2.0 policies (e.g. `20260802172349_phase3_membership_system.sql`'s
+`admin_write_membership_plans`) and may carry the same latent defect in
+any project where `authenticated` lacks `SELECT` on `auth.users`. Per
+explicit instruction to fix only this validated defect, those are not
+touched here -- already tracked in "Pre-existing technical debt" below;
+this just confirms the risk is live, not just theoretical.
+
+**Risk: low.** Policy-only change, no data impact, matches an existing,
+already-established repo convention (`raw_app_meta_data`-based roles)
+just sourced via JWT claim instead of a table lookup.
+
+## Updated suggested apply order (all batches, round 2)
+
+1-11. Unchanged from above (already applied to non-prod in round 1).
+12. `20260922000000_fix_market_intelligence_admin_jwt_claim.sql`
+
+Recommended non-prod validation loop, round 2: apply migration 12 to
+non-prod -> re-run Supabase's Security + Performance Advisors there
+(expect no new findings, and confirm the fixed policy no longer errors)
+-> run `fixtures:oe2-security -- --create` -> `test:oe2-security --
+<tag>` (now including the four `market_intelligence_snapshots`
+admin/strategist/member/anon assertions) -> `fixtures:oe2-security --
+--cleanup <tag>`.
 
 ## Also reviewed, no action needed
 
