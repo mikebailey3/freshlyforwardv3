@@ -10,7 +10,8 @@
     "test": "vitest run",
     "scrape:indeed": "tsx scripts/scrapeIndeed.ts",
     "scrape:companies": "tsx scripts/scrapeCompanies.ts",
-    "sync:freshfit": "tsx scripts/syncFreshFitScores.ts"
+    "sync:freshfit": "tsx scripts/syncFreshFitScores.ts",
+    "compute:market-intelligence": "tsx scripts/computeMarketIntelligence.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
