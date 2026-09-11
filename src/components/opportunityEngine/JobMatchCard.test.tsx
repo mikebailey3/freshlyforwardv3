@@ -27,11 +27,21 @@ describe('JobMatchCard', () => {
     expect(screen.getByText(/FreshFit 82/i)).toBeInTheDocument()
   })
 
-  it('calls onDismiss with the match id when the dismiss button is clicked', () => {
+  it('opens a reason menu on dismiss-button click, and calls onDismiss with no reason when the member skips it', () => {
     const onDismiss = vi.fn()
     render(<JobMatchCard match={makeMatch()} onDismiss={onDismiss} />)
     fireEvent.click(screen.getByRole('button', { name: /dismiss match/i }))
+    expect(onDismiss).not.toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('button', { name: 'Skip, just dismiss' }))
     expect(onDismiss).toHaveBeenCalledWith('match-1')
+  })
+
+  it('calls onDismiss with the chosen reason when the member picks one from the menu (OE 2.0 Phase 9)', () => {
+    const onDismiss = vi.fn()
+    render(<JobMatchCard match={makeMatch()} onDismiss={onDismiss} />)
+    fireEvent.click(screen.getByRole('button', { name: /dismiss match/i }))
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Wrong salary' }))
+    expect(onDismiss).toHaveBeenCalledWith('match-1', 'wrong_salary')
   })
 
   it('shows a "Sent to Strategist" tag only when the match has been promoted', () => {

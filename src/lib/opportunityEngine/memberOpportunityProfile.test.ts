@@ -80,11 +80,19 @@ describe('composeMemberOpportunityProfile (pure)', () => {
     expect(result.profile).toBe(profile)
   })
 
-  it('defaults exclusionRules to an empty array -- Phase 9 has not wired the real table yet', () => {
+  it('defaults exclusionRules to an empty array when omitted', () => {
     const result = composeMemberOpportunityProfile(makeProfile(), {
       skills: [], scope: [], confirmedCapabilityRows: [], compassRow: null,
     })
     expect(result.exclusionRules).toEqual([])
+  })
+
+  it('passes exclusionRules through when provided (OE 2.0 Phase 9)', () => {
+    const rules = [{ ruleType: 'company' as const, value: 'Acme' }]
+    const result = composeMemberOpportunityProfile(makeProfile(), {
+      skills: [], scope: [], confirmedCapabilityRows: [], compassRow: null, exclusionRules: rules,
+    })
+    expect(result.exclusionRules).toEqual(rules)
   })
 
   it('defaults resumeSkills to an empty array when omitted (OE 2.0 Phase 5)', () => {
@@ -116,6 +124,7 @@ function makeFakeClient(opts: {
   compassRow?: { readiness_scores: { careerDirection?: number | null } | null } | null
   masterResume?: { id: string } | null
   resumeSkillEntries?: { skill_value: string | null }[]
+  exclusionRuleRows?: { rule_type: string; value: string }[]
 }) {
   const dnaEq = vi.fn().mockResolvedValue({ data: [], error: null })
   const dnaSelect = vi.fn().mockReturnValue({ eq: dnaEq })
@@ -143,6 +152,9 @@ function makeFakeClient(opts: {
   const entriesEq1 = vi.fn().mockReturnValue({ eq: entriesEq2 })
   const entriesSelect = vi.fn().mockReturnValue({ eq: entriesEq1 })
 
+  const exclusionRulesEq = vi.fn().mockResolvedValue({ data: opts.exclusionRuleRows ?? [], error: null })
+  const exclusionRulesSelect = vi.fn().mockReturnValue({ eq: exclusionRulesEq })
+
   const tablesTouched: string[] = []
   const fromMock = vi.fn((table: string) => {
     tablesTouched.push(table)
@@ -151,6 +163,7 @@ function makeFakeClient(opts: {
     if (table === 'career_compass_results') return { select: compassSelect }
     if (table === 'resume_versions') return { select: masterSelect }
     if (table === 'resume_entries') return { select: entriesSelect }
+    if (table === 'member_job_exclusion_rules') return { select: exclusionRulesSelect }
     throw new Error(`Unexpected table: ${table} -- buildMemberOpportunityProfile must only read its canonical evidence tables`)
   })
 
@@ -163,7 +176,10 @@ describe('buildMemberOpportunityProfile (async fetch + compose)', () => {
     const profile = makeProfile()
     await buildMemberOpportunityProfile(profile.user_id, profile, client)
     expect(new Set(tablesTouched)).toEqual(
-      new Set(['career_skills', 'career_scope', 'career_win_capabilities', 'career_compass_results', 'resume_versions'])
+      new Set([
+        'career_skills', 'career_scope', 'career_win_capabilities', 'career_compass_results',
+        'resume_versions', 'member_job_exclusion_rules',
+      ])
     )
   })
 
@@ -197,11 +213,18 @@ describe('buildMemberOpportunityProfile (async fetch + compose)', () => {
     expect(result.confirmedCapabilities).toEqual([])
   })
 
-  it('always returns exclusionRules as an empty array in Phase 0', async () => {
+  it('returns an empty exclusionRules array when the member has none on file (OE 2.0 Phase 9)', async () => {
     const { client } = makeFakeClient({})
     const profile = makeProfile()
     const result = await buildMemberOpportunityProfile(profile.user_id, profile, client)
     expect(result.exclusionRules).toEqual([])
+  })
+
+  it('returns the member\'s persisted exclusion rules, mapped to camelCase (OE 2.0 Phase 9)', async () => {
+    const { client } = makeFakeClient({ exclusionRuleRows: [{ rule_type: 'company', value: 'Acme' }] })
+    const profile = makeProfile()
+    const result = await buildMemberOpportunityProfile(profile.user_id, profile, client)
+    expect(result.exclusionRules).toEqual([{ ruleType: 'company', value: 'Acme' }])
   })
 
   it('returns an empty resumeSkills array when the member has no active Master Resume yet (OE 2.0 Phase 5)', async () => {

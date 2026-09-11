@@ -5,6 +5,7 @@ import { JobMatchCard } from '@/components/opportunityEngine/JobMatchCard'
 import { RecurringGapCard } from '@/components/opportunityEngine/RecurringGapCard'
 import { useAuth } from '@/context/AuthContext'
 import { getJobMatches, dismissJobMatch } from '@/lib/opportunityEngine'
+import type { DismissalReason } from '@/lib/opportunityEngine/dismissalReasons'
 import { rankOpportunities, buildRankHighlight } from '@/lib/opportunityEngine/ranking'
 import { getRecurringGaps, type RecurringGap } from '@/lib/opportunityEngine/recurringGaps'
 import { Loader2, Sparkles, PlusCircle } from 'lucide-react'
@@ -36,8 +37,8 @@ export function OpportunityEnginePage() {
     })
   }, [user])
 
-  const handleDismiss = async (matchId: string) => {
-    await dismissJobMatch(matchId)
+  const handleDismiss = async (matchId: string, reason?: DismissalReason) => {
+    await dismissJobMatch(matchId, reason)
     setMatches((prev) => prev.filter((m) => m.id !== matchId))
   }
 

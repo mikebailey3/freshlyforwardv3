@@ -3,6 +3,7 @@ import { supabase as defaultClient } from '@/lib/supabase'
 import { getSkillStates } from '@/lib/forwardDna/skills'
 import { getAllScopeForUser } from '@/lib/forwardDna/scope'
 import { getMasterResumeSkills } from '@/lib/resumeIntelligence/masterResume/getMasterResumeSkills'
+import { getExclusionRules } from './exclusionRules'
 import type { CareerSkill, CareerScope } from '@/types/forwardDna'
 import type { MemberProfile } from '@/types'
 
@@ -159,12 +160,13 @@ export async function buildMemberOpportunityProfile(
   profile: MemberProfile,
   client: SupabaseClient = defaultClient
 ): Promise<MemberOpportunityProfile> {
-  const [{ skills }, { scope }, capabilitiesResult, compassResult, resumeSkills] = await Promise.all([
+  const [{ skills }, { scope }, capabilitiesResult, compassResult, resumeSkills, exclusionRules] = await Promise.all([
     getSkillStates(userId, client),
     getAllScopeForUser(userId, client),
     client.from('career_win_capabilities').select('skill_name').eq('user_id', userId).eq('status', 'confirmed'),
     client.from('career_compass_results').select('readiness_scores').eq('user_id', userId).eq('is_current', true).maybeSingle(),
     getMasterResumeSkills(userId, client),
+    getExclusionRules(userId, client),
   ])
 
   return composeMemberOpportunityProfile(profile, {
@@ -173,5 +175,6 @@ export async function buildMemberOpportunityProfile(
     confirmedCapabilityRows: (capabilitiesResult.data as ConfirmedCapabilityRow[] | null) ?? [],
     compassRow: compassResult.data as CareerCompassReadinessRow | null,
     resumeSkills,
+    exclusionRules,
   })
 }

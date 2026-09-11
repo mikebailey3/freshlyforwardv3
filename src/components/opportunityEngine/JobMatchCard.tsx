@@ -1,8 +1,11 @@
+import { useState } from 'react'
 import { MapPin, DollarSign, ExternalLink, X, Sparkles } from 'lucide-react'
 import { FreshFitBadge } from '@/components/freshFit/FreshFitBadge'
 import { FreshFitDetails } from '@/components/freshFit/FreshFitDetails'
 import { NeedsReviewBadge } from '@/components/opportunityEngine/NeedsReviewBadge'
+import { DismissReasonMenu } from '@/components/opportunityEngine/DismissReasonMenu'
 import { isSafeHttpUrl } from '@/lib/url'
+import type { DismissalReason } from '@/lib/opportunityEngine/dismissalReasons'
 import type { JobMatchScoreBreakdown, JobMatchWithJob } from '@/types'
 
 /**
@@ -27,7 +30,8 @@ export function JobMatchCard({
   rankHighlight = null,
 }: {
   match: JobMatchWithJob
-  onDismiss: (matchId: string) => void
+  /** OE 2.0 Phase 9: `reason` is optional -- the member may skip straight to dismissing without giving one. */
+  onDismiss: (matchId: string, reason?: DismissalReason) => void
   /** OE 2.0 Phase 4: this match is one of the member's top-ranked opportunities for today. Never shown alongside `needsReview` -- a flagged match is never presented as a shining pick, even if it mathematically survives near the top of a very short list. */
   topPick?: boolean
   /** OE 2.0 Phase 4: mirrors StrategistOpportunityEnginePage's identical flag/badge (Phase 3) -- same underlying `hasHardBlocker()` signal, same visual language, member-facing surface. */
@@ -36,6 +40,7 @@ export function JobMatchCard({
   rankHighlight?: string | null
 }) {
   const job = match.scraped_job
+  const [showReasonMenu, setShowReasonMenu] = useState(false)
 
   return (
     <div className="group relative overflow-hidden rounded-2xl border border-border bg-surface-card p-6 shadow-sm transition-shadow hover:shadow-lg hover:shadow-black/20">
@@ -114,13 +119,27 @@ export function JobMatchCard({
         </div>
 
         <button
-          onClick={() => onDismiss(match.id)}
+          onClick={() => setShowReasonMenu(true)}
           aria-label="Dismiss match"
           className="flex-shrink-0 rounded-full p-2 text-ink-muted opacity-60 transition-all hover:bg-surface-hover hover:text-ink hover:opacity-100 focus-visible:opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
         >
           <X className="h-4 w-4" />
         </button>
       </div>
+
+      {showReasonMenu && (
+        <DismissReasonMenu
+          onSelectReason={(reason) => {
+            setShowReasonMenu(false)
+            onDismiss(match.id, reason)
+          }}
+          onSkip={() => {
+            setShowReasonMenu(false)
+            onDismiss(match.id)
+          }}
+          onClose={() => setShowReasonMenu(false)}
+        />
+      )}
     </div>
   )
 }

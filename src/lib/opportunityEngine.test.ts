@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { buildWhyItMatches, hasHardBlocker, submitMemberJob } from './opportunityEngine'
+import { buildWhyItMatches, hasHardBlocker, submitMemberJob, dismissJobMatch } from './opportunityEngine'
 import type { JobMatchWithJob, JobMatchScoreBreakdown, MemberProfile } from '@/types'
 import type { FreshFitHardConstraint } from '@/lib/freshFitScore'
 
@@ -138,6 +138,9 @@ function makeFakeClient(opts: {
   const masterEq1 = vi.fn().mockReturnValue({ eq: masterEq2 })
   const masterSelect = vi.fn().mockReturnValue({ eq: masterEq1 })
 
+  const exclusionRulesEq = vi.fn().mockResolvedValue({ data: [], error: null })
+  const exclusionRulesSelect = vi.fn().mockReturnValue({ eq: exclusionRulesEq })
+
   const fromMock = vi.fn((table: string) => {
     if (table === 'scraped_jobs') return { insert: scrapedJobsInsert }
     if (table === 'job_matches') return { insert: jobMatchesInsert }
@@ -145,6 +148,7 @@ function makeFakeClient(opts: {
     if (table === 'career_win_capabilities') return { select: capsSelect }
     if (table === 'career_compass_results') return { select: compassSelect }
     if (table === 'resume_versions') return { select: masterSelect }
+    if (table === 'member_job_exclusion_rules') return { select: exclusionRulesSelect }
     throw new Error(`Unexpected table: ${table}`)
   })
 
@@ -221,5 +225,57 @@ describe('submitMemberJob', () => {
 
     expect(withCapabilities.capsEq2).toHaveBeenCalledWith('status', 'confirmed')
     expect(withScore).toBeGreaterThan(withoutScore)
+  })
+})
+
+describe('dismissJobMatch (OE 2.0 Phase 9 -- optional reason/comment)', () => {
+  function makeDismissClient(opts: { dismissError?: string; feedbackError?: string } = {}) {
+    const dismissEq = vi.fn().mockResolvedValue({ error: opts.dismissError ? { message: opts.dismissError } : null })
+    const dismissUpdate = vi.fn().mockReturnValue({ eq: dismissEq })
+    const feedbackInsert = vi.fn().mockResolvedValue({ error: opts.feedbackError ? { message: opts.feedbackError } : null })
+    const fromMock = vi.fn((table: string) => {
+      if (table === 'job_matches') return { update: dismissUpdate }
+      if (table === 'member_feedback') return { insert: feedbackInsert }
+      throw new Error(`Unexpected table: ${table}`)
+    })
+    return { client: { from: fromMock } as unknown as SupabaseClient, dismissUpdate, dismissEq, feedbackInsert }
+  }
+
+  it('dismisses the match by setting dismissed_at, with no feedback write when no reason is given', async () => {
+    const { client, dismissUpdate, feedbackInsert } = makeDismissClient()
+    await dismissJobMatch('match-1', undefined, undefined, client)
+    expect(dismissUpdate).toHaveBeenCalledWith(expect.objectContaining({ dismissed_at: expect.any(String) }))
+    expect(feedbackInsert).not.toHaveBeenCalled()
+  })
+
+  it('writes a member_feedback row referencing the match when a reason is given', async () => {
+    const { client, feedbackInsert } = makeDismissClient()
+    await dismissJobMatch('match-1', 'wrong_salary', 'pay is too low', client)
+    expect(feedbackInsert).toHaveBeenCalledWith({
+      job_match_id: 'match-1',
+      feedback_type: 'wrong_salary',
+      comment: 'pay is too low',
+    })
+  })
+
+  it('defaults comment to null when a reason is given without one', async () => {
+    const { client, feedbackInsert } = makeDismissClient()
+    await dismissJobMatch('match-1', 'not_interested', undefined, client)
+    expect(feedbackInsert).toHaveBeenCalledWith({
+      job_match_id: 'match-1',
+      feedback_type: 'not_interested',
+      comment: null,
+    })
+  })
+
+  it('never attempts the feedback write when the dismissal itself fails', async () => {
+    const { client, feedbackInsert } = makeDismissClient({ dismissError: 'update failed' })
+    await dismissJobMatch('match-1', 'not_interested', undefined, client)
+    expect(feedbackInsert).not.toHaveBeenCalled()
+  })
+
+  it('does not throw when the feedback write itself fails -- the dismissal already succeeded', async () => {
+    const { client } = makeDismissClient({ feedbackError: 'relation does not exist' })
+    await expect(dismissJobMatch('match-1', 'not_interested', undefined, client)).resolves.toBeUndefined()
   })
 })

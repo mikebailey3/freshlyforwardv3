@@ -3,6 +3,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import { createOpportunity } from '@/lib/operations'
 import { computeFreshFitScore, toScoreBreakdownPayload, FRESHFIT_TIER_LABELS, getFreshFitTier } from '@/lib/freshFitScore'
 import { buildMemberOpportunityProfile } from '@/lib/opportunityEngine/memberOpportunityProfile'
+import type { DismissalReason } from '@/lib/opportunityEngine/dismissalReasons'
 import type { JobMatchWithJob, JobMatchScoreBreakdown, MemberProfile, ScrapedJob } from '@/types'
 import type { JobSubmissionInput } from '@/lib/jobSubmission'
 
@@ -28,13 +29,40 @@ export async function getJobMatches(memberId: string): Promise<JobMatchWithJob[]
   return (data ?? []) as unknown as JobMatchWithJob[]
 }
 
-export async function dismissJobMatch(matchId: string): Promise<void> {
-  const { error } = await supabase
+/**
+ * OE 2.0 Phase 9 -- `reason`/`comment` are optional member feedback,
+ * never required to complete a dismiss. The dismissal itself
+ * (`job_matches.dismissed_at`) always commits first and independently;
+ * the feedback write below is strictly best-effort on top of it.
+ */
+export async function dismissJobMatch(
+  matchId: string,
+  reason?: DismissalReason,
+  comment?: string,
+  client: SupabaseClient = supabase
+): Promise<void> {
+  const { error } = await client
     .from('job_matches')
     .update({ dismissed_at: new Date().toISOString() })
     .eq('id', matchId)
 
-  if (error) console.error('Error dismissing job match:', error)
+  if (error) {
+    console.error('Error dismissing job match:', error)
+    return
+  }
+
+  if (!reason) return
+
+  // Reuses the existing member_feedback table (job_match_id column,
+  // OE 2.0 Phase 9 -- prepared, not yet applied; see that migration's
+  // docs). Deliberately never blocks or reverts the dismissal above on
+  // failure: the member's dismiss action already succeeded, and losing
+  // the "why" is a strictly smaller problem than failing the dismiss.
+  const { error: feedbackError } = await client
+    .from('member_feedback')
+    .insert({ job_match_id: matchId, feedback_type: reason, comment: comment ?? null })
+
+  if (feedbackError) console.error('Error recording dismissal feedback:', feedbackError)
 }
 
 /**
