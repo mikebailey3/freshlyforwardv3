@@ -236,6 +236,40 @@ email to be sent to any member.
 
 ---
 
+## Post-hoc audit: match_digest_log against the Final Gate's own checklist
+
+The original Final Security Gate review (which produced item 5 above)
+ran before `match_digest_log` existed, but its own checklist explicitly
+named that table as something to verify once built ("New tables' RLS
+... verify no anon access, correct strategist-assignment scoping, no
+IDOR on member-owned rows" and "Digest email ... verify the digest
+can't leak one member's match data to another"). Closing that loop now
+that the table exists:
+
+- **No anon access:** RLS is enabled and the only policy
+  (`select_own_digest_log`) is scoped `TO authenticated`. No `anon`
+  policy exists on this table at all.
+- **Strategist-assignment scoping:** N/A by design — no strategist read
+  policy was added. A member's own digest-send history isn't currently
+  part of any strategist-facing surface (unlike `job_matches`/
+  `opportunities`), so there is nothing to scope; adding strategist
+  visibility later would be its own reviewed decision, not an oversight
+  here.
+- **No IDOR on member-owned rows:** the sole policy requires
+  `auth.uid() = member_id`; there is no authenticated INSERT/UPDATE/
+  DELETE policy at all (service-role only), so no write-side IDOR
+  surface exists either.
+- **No cross-member leakage in the digest pipeline itself:**
+  `scripts/sendDigests.ts` groups `job_matches` and `match_digest_log`
+  rows by `member_id` before ever calling `planWeeklyDigest`, so each
+  member's plan is built exclusively from that same member's own
+  matches and own prior log entries — there is no code path where one
+  member's data can end up in another member's payload.
+
+**Result: passes.** No new follow-up migration needed for this table.
+
+---
+
 ## Also reviewed, no action needed
 
 - **`skill_transferability_map`** — mentioned in the OE 2.0 plan's own
