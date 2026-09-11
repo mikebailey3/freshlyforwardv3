@@ -281,10 +281,96 @@ that the table exists:
 # Batch 2 -- Post-Non-Prod-Validation Hardening (migrations 7-11)
 
 Triggered by Supabase's Security and Performance Advisors running
-against the non-prod project after migrations 1-6 above were applied
-there. All five migrations below are **prepared only -- not applied to
-any database, including non-prod.** Each file's own header comment has
-the full reasoning; this section is a summary index.
+against the non-prod project after **all eight** prior OE-related
+migrations were applied there: the original base schema
+(`20260821000000_opportunity_engine.sql`), FreshFit 2.0's
+`engine_version` column (`20260905000000_freshfit_engine_v2.sql`), and
+the six OE 2.0 phase migrations (Batch 1, items 1-6 above). All five
+migrations below are **prepared only -- not applied to any database,
+including non-prod.** Each file's own header comment has the full
+reasoning; this section is a summary index plus the dedicated
+ordering/idempotence/rollback/compatibility review.
+
+## Ordering, idempotence, dependencies, rollback, and compatibility review
+
+**Ordering / dependencies:** migrations 7-11 are, by design,
+**mutually independent** -- there is no hard technical dependency
+between any two of them, despite the numeric filename sequence.
+Specifically:
+- Migration 8 recreates the two `job_matches` UPDATE policies that call
+  `public.get_job_match_snapshot()`; that function already exists
+  (created by Batch 1's migration 5) regardless of whether migration
+  7's `ALTER FUNCTION ... SET search_path` has run yet. Running 8
+  before 7 (or vice versa) produces the identical end state either way.
+- Migrations 9, 10, and 11 each touch a disjoint set of objects
+  (different policies, different columns, different tables
+  respectively) that all already exist from Batch 1 -- none of them
+  reference anything created by 7 or 8.
+- The numeric ordering is a **logical-grouping convention** (mirroring
+  the order these findings are discussed in this document and in the
+  Final Report), not a technical requirement. Applying all five in a
+  single `supabase db push` (their natural order) is recommended purely
+  for a cleaner audit trail, not because a different order would break
+  anything.
+
+**Idempotence:** every statement in all five migrations is safe to
+re-run any number of times with an identical end state and no error:
+`ALTER FUNCTION ... SET search_path` (setting the same value twice is a
+no-op the second time), `REVOKE`/`GRANT` (revoking/granting an
+already-revoked/granted privilege is a safe no-op in Postgres, not an
+error), `DROP POLICY IF EXISTS` + `CREATE POLICY` (the standard,
+already-established pattern in every prior OE 2.0 migration), and
+`CREATE INDEX IF NOT EXISTS`. None of the five would fail or drift if
+accidentally applied twice.
+
+**Safe-failure characteristics:** none of the five uses a construct
+that cannot run inside a transaction (no `CREATE INDEX CONCURRENTLY`,
+no `VACUUM`, no `ALTER TYPE ... ADD VALUE` outside a transaction).
+Supabase/`supabase db push` runs each migration file as a single
+transaction by default, so if any statement within a file fails, the
+entire file rolls back and leaves the prior (already-validated) state
+fully intact -- there is no scenario where a partial application of any
+of these five files leaves the schema in a half-migrated state.
+**Note for whoever applies migration 10 later to a database with real
+traffic** (non-prod currently has 0 rows in every OE table, so this
+doesn't matter yet): plain `CREATE INDEX` takes a write lock for the
+duration of the build. Once real data exists, consider switching that
+one migration's four statements to `CREATE INDEX CONCURRENTLY` (which
+cannot run inside a transaction, so it would need to become its own
+migration file run outside a transaction block) to avoid blocking
+writes during the build.
+
+**Compatibility with the eight already-installed migrations:** every
+column name, table name, and existing policy name referenced across all
+five new migrations was re-verified directly against the actual
+committed SQL of the eight prior migrations (not assumed from memory)
+before being written -- including confirming `job_matches`' complete
+current column list ( `id`, `member_id`, `scraped_job_id`,
+`fresh_fit_score`, `matched_skills`, `missing_skills`,
+`score_breakdown`, `dismissed_at`, `promoted_opportunity_id`,
+`computed_at`, `engine_version` -- the last of which only exists
+because of the separate FreshFit 2.0 migration, not the base schema).
+No naming or column-existence mismatch exists between Batch 2 and what
+is actually live in non-prod.
+
+**Rollback considerations (per migration, all via a NEW forward
+migration -- never by editing 7-11 in place once applied):**
+- **7:** `ALTER FUNCTION public.get_job_match_snapshot(uuid) RESET search_path;`
+  plus, only if fully reverting the exposure decision too (not
+  recommended), `GRANT EXECUTE ... TO PUBLIC`.
+- **8 & 9:** re-apply the prior generation's `CREATE POLICY` text
+  (Batch 1's versions, already preserved verbatim in this repo's git
+  history / the Batch 1 migration files themselves) as a new forward
+  migration. Low rollback risk -- policy-only, no data impact.
+- **10:** `DROP INDEX IF EXISTS idx_member_feedback_job_match_id`, and
+  the same for the other three index names. Trivial, no data impact.
+- **11:** re-`GRANT ALL ON <table> TO anon, authenticated` for the
+  three tables (restoring the original broad-grant-plus-RLS-only
+  posture) -- not recommended, since it removes the defense-in-depth
+  layer this migration exists to add, but technically trivial if ever
+  needed.
+
+## Summary index
 
 ## 7. `20260917000000_harden_get_job_match_snapshot.sql`
 

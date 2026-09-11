@@ -15,13 +15,21 @@
  *   - An active strategist_assignments row: S -> Member A only
  *     (S is deliberately NOT assigned to Member B -- this is what lets
  *     the "strategist cannot access an unassigned member" test exist)
- *   - One scraped_jobs row (shared)
+ *   - Two scraped_jobs rows -- the second exists solely so the security
+ *     test runner can attempt reassigning a match's scraped_job_id to a
+ *     REAL, constraint-valid alternate id (proving the rejection is
+ *     genuinely RLS, not an incidental FK-violation error on a made-up id)
  *   - One job_matches row for Member A, one for Member B (both against
- *     the same scraped job -- UNIQUE is (member_id, scraped_job_id), so
+ *     the first scraped job -- UNIQUE is (member_id, scraped_job_id), so
  *     this is allowed)
  *   - One opportunities row for Member A -- gives the "strategist
  *     promotes a match" test a real, non-null value to promote to,
  *     rather than only a no-op NULL-to-NULL update
+ *   - One match_digest_log row EACH for Member A and Member B --
+ *     seeded via service role since that table deliberately has no
+ *     authenticated INSERT policy at all (service-role/script-only
+ *     writes), so this is the only way a "member CAN read their own
+ *     digest log" positive-control test can exist
  *
  * Deliberately does NOT create member_profiles/communication_preferences
  * rows, and deliberately does NOT create an admin fixture -- none of the
@@ -89,8 +97,17 @@ async function createFixtures() {
     })
     .select('id')
     .maybeSingle()
-  if (jobError || !job) {
-    console.error('Failed to create scraped_jobs fixture row:', jobError)
+  const { data: job2, error: job2Error } = await supabase
+    .from('scraped_jobs')
+    .insert({
+      source: 'fixture', external_id: `oe2-fixture-${runTag}-alt`,
+      title: '[OE2 FIXTURE] Alternate Test Role', company: '[OE2 FIXTURE] Alt Test Co',
+      posting_url: `https://example.invalid/oe2-fixture-${runTag}-alt`,
+    })
+    .select('id')
+    .maybeSingle()
+  if (jobError || job2Error || !job || !job2) {
+    console.error('Failed to create scraped_jobs fixture rows:', { jobError, job2Error })
     process.exit(1)
   }
 
@@ -119,6 +136,17 @@ async function createFixtures() {
     process.exit(1)
   }
 
+  const { error: digestLogAError } = await supabase
+    .from('match_digest_log')
+    .insert({ member_id: memberA.user.id, match_ids: [matchA.id] })
+  const { error: digestLogBError } = await supabase
+    .from('match_digest_log')
+    .insert({ member_id: memberB.user.id, match_ids: [matchB.id] })
+  if (digestLogAError || digestLogBError) {
+    console.error('Failed to create match_digest_log fixture rows:', { digestLogAError, digestLogBError })
+    process.exit(1)
+  }
+
   console.log('')
   console.log('=== OE 2.0 Security Fixtures Created ===')
   console.log(`Run tag (needed for --cleanup, and for runOe2SecurityTests.ts): ${runTag}`)
@@ -127,9 +155,11 @@ async function createFixtures() {
   console.log(`Member B:      id=${memberB.user.id}  email=${memberB.user.email}`)
   console.log(`Strategist S:  id=${strategistS.user.id}  email=${strategistS.user.email}  (assigned to Member A only)`)
   console.log(`scraped_jobs.id:  ${job.id}`)
+  console.log(`scraped_jobs.id (alt, for scraped_job_id-reassignment test): ${job2.id}`)
   console.log(`job_matches.id (Member A's): ${matchA.id}`)
   console.log(`job_matches.id (Member B's): ${matchB.id}`)
   console.log(`opportunities.id (Member A's, promotion target): ${opportunity.id}`)
+  console.log('match_digest_log: one row seeded for each of Member A and Member B')
   console.log('==========================================')
   console.log('')
   console.log(`Next: npm run test:oe2-security -- ${runTag}`)
@@ -156,7 +186,7 @@ async function cleanupFixtures(runTag: string) {
     else console.log(`Deleted ${email}`)
   }
 
-  const { error: jobDeleteError } = await supabase.from('scraped_jobs').delete().eq('external_id', `oe2-fixture-${runTag}`)
+  const { error: jobDeleteError } = await supabase.from('scraped_jobs').delete().like('external_id', `oe2-fixture-${runTag}%`)
   if (jobDeleteError) console.error('Failed to delete fixture scraped_jobs row:', jobDeleteError)
   else console.log('Deleted fixture scraped_jobs row.')
 

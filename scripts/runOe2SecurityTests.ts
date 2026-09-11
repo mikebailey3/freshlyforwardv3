@@ -4,18 +4,14 @@
  * IMPORTANT: this is NOT a vitest unit test. RLS is enforced by
  * Postgres itself, not by any client-side mock, so the only way to
  * genuinely validate it is to run real queries as real signed-in
- * users against a real database -- there is no meaningful way to
- * "mock" Postgres RLS. This script does exactly that, against the
- * fixture created by scripts/createOe2SecurityFixtures.ts.
+ * users against a real database. This script does exactly that,
+ * against the fixture created by scripts/createOe2SecurityFixtures.ts.
  *
  * HARD SAFETY GUARD: refuses to run unless VITE_SUPABASE_URL contains
  * the known non-prod project ref (see scripts/lib/oe2SecurityFixtures.ts).
- * This script only ever performs one authorized UPDATE (dismissing
- * Member A's fixture match) and one authorized promote (Strategist S
- * promoting Member A's fixture match) as its "should succeed" cases --
- * every other case is a read or a deliberately-attempted, expected-to-
- * fail write. It never touches any row outside the fixture set passed
- * in via runTag.
+ * The only rows this script ever authorizes changing are the fixture's
+ * own matchA (one dismiss, one strategist-promote) -- every other case
+ * is a read or a deliberately-attempted, expected-to-fail write.
  *
  * Usage (after running createOe2SecurityFixtures.ts --create and
  * copying its printed run tag):
@@ -57,6 +53,12 @@ async function signInAs(email: string): Promise<SupabaseClient> {
   return client
 }
 
+/** Generic forbidden-column-edit probe -- used for every column neither actor should ever be able to touch. Any non-empty result would mean the edit went through. */
+async function testForbiddenEdit(actorLabel: string, actorClient: SupabaseClient, matchId: string, column: string, value: unknown) {
+  const { data } = await actorClient.from('job_matches').update({ [column]: value }).eq('id', matchId).select('id')
+  record(`${actorLabel} cannot update ${column}`, (data ?? []).length === 0, `rows affected: ${(data ?? []).length}`)
+}
+
 async function main() {
   // ---- Resolve fixture rows via service role (setup lookup only --
   // never used as part of an actual test assertion below) ----
@@ -71,64 +73,114 @@ async function main() {
   }
   const memberAId = findId('member-a')
   const memberBId = findId('member-b')
-  const strategistSId = findId('strategist-s')
+  // Strategist S's own id isn't needed directly -- every assertion below
+  // exercises it purely through its signed-in client's own auth context.
 
   const { data: matchA } = await serviceClient.from('job_matches').select('id').eq('member_id', memberAId).maybeSingle()
   const { data: matchB } = await serviceClient.from('job_matches').select('id').eq('member_id', memberBId).maybeSingle()
   const { data: opportunity } = await serviceClient.from('opportunities').select('id').eq('member_id', memberAId).maybeSingle()
-  if (!matchA || !matchB || !opportunity) throw new Error('Could not resolve fixture job_matches/opportunities rows -- fixture incomplete for this run tag.')
+  const { data: job2 } = await serviceClient.from('scraped_jobs').select('id').eq('external_id', `oe2-fixture-${runTag}-alt`).maybeSingle()
+  if (!matchA || !matchB || !opportunity || !job2) throw new Error('Could not resolve fixture rows -- fixture incomplete for this run tag.')
 
   const memberA = await signInAs(fixtureEmail(runTag, 'member-a'))
   const memberB = await signInAs(fixtureEmail(runTag, 'member-b'))
   const strategistS = await signInAs(fixtureEmail(runTag, 'strategist-s'))
   const anon = createClient(SUPABASE_URL!, ANON_KEY!) // never signed in
 
-  // ---- Cross-member isolation (run both directions) ----
-  async function testIsolation(actorLabel: string, actorClient: SupabaseClient, actorId: string, otherLabel: string, otherMatchId: string, otherMemberId: string) {
+  // ============================================================
+  // Cross-member isolation (both directions)
+  // ============================================================
+  async function testIsolation(actorLabel: string, actorClient: SupabaseClient, otherLabel: string, otherMatchId: string, otherMemberId: string) {
     const { data: selectOther } = await actorClient.from('job_matches').select('id').eq('id', otherMatchId)
     record(`${actorLabel} cannot SELECT ${otherLabel}'s job_match`, (selectOther ?? []).length === 0, `rows returned: ${(selectOther ?? []).length}`)
 
     const { data: updateOther } = await actorClient.from('job_matches').update({ dismissed_at: new Date().toISOString() }).eq('id', otherMatchId).select('id')
     record(`${actorLabel} cannot UPDATE ${otherLabel}'s job_match row`, (updateOther ?? []).length === 0, `rows affected: ${(updateOther ?? []).length}`)
 
-    const { data: feedbackInsert, error: feedbackError } = await actorClient
-      .from('member_feedback')
-      .insert({ member_id: actorId, job_match_id: otherMatchId, feedback_type: 'dismissal', comment: 'oe2 security test -- should be rejected' })
-      .select('id')
-    record(`${actorLabel} cannot INSERT feedback pointing to ${otherLabel}'s job_match`, !!feedbackError && (feedbackInsert ?? []).length === 0, feedbackError?.message ?? `rows inserted: ${(feedbackInsert ?? []).length}`)
-
     const { data: digestLog } = await actorClient.from('match_digest_log').select('id').eq('member_id', otherMemberId)
     record(`${actorLabel} cannot read ${otherLabel}'s digest log`, (digestLog ?? []).length === 0, `rows returned: ${(digestLog ?? []).length}`)
 
-    const { data: exclusionRules } = await actorClient.from('member_job_exclusion_rules').select('id').eq('member_id', otherMemberId)
-    record(`${actorLabel} cannot read ${otherLabel}'s exclusion rules`, (exclusionRules ?? []).length === 0, `rows returned: ${(exclusionRules ?? []).length}`)
+    const { data: rpcResult } = await actorClient.rpc('get_job_match_snapshot', { match_id: otherMatchId })
+    record(`${actorLabel} calling get_job_match_snapshot for ${otherLabel}'s match returns nothing (RLS-bounded RPC)`, !rpcResult, `result: ${JSON.stringify(rpcResult)}`)
   }
 
-  await testIsolation('Member A', memberA, memberAId, 'Member B', matchB.id, memberBId)
-  await testIsolation('Member B', memberB, memberBId, 'Member A', matchA.id, memberAId)
+  await testIsolation('Member A', memberA, 'Member B', matchB.id, memberBId)
+  await testIsolation('Member B', memberB, 'Member A', matchA.id, memberAId)
 
-  // ---- Member A: own-row reads/allowed writes/forbidden column edits ----
+  // ============================================================
+  // Digest-log ownership (positive control -- requires the fixture's
+  // pre-seeded rows, since this table has no authenticated INSERT policy)
+  // ============================================================
+  const { data: ownDigestA } = await memberA.from('match_digest_log').select('id').eq('member_id', memberAId)
+  record('Member A CAN read own digest log', (ownDigestA ?? []).length === 1, `rows returned: ${(ownDigestA ?? []).length}`)
+  const { data: ownDigestB } = await memberB.from('match_digest_log').select('id').eq('member_id', memberBId)
+  record('Member B CAN read own digest log', (ownDigestB ?? []).length === 1, `rows returned: ${(ownDigestB ?? []).length}`)
+
+  // ============================================================
+  // Feedback ownership (member_feedback.job_match_id)
+  // ============================================================
+  const { data: feedbackNull } = await memberA.from('member_feedback').insert({ member_id: memberAId, job_match_id: null, feedback_type: 'oe2_security_test' }).select('id')
+  record('Member A CAN insert feedback with job_match_id IS NULL', (feedbackNull ?? []).length === 1, `rows inserted: ${(feedbackNull ?? []).length}`)
+
+  const { data: feedbackOwn } = await memberA.from('member_feedback').insert({ member_id: memberAId, job_match_id: matchA.id, feedback_type: 'oe2_security_test' }).select('id')
+  record('Member A CAN insert feedback referencing own job_match', (feedbackOwn ?? []).length === 1, `rows inserted: ${(feedbackOwn ?? []).length}`)
+
+  const { data: feedbackCross, error: feedbackCrossError } = await memberA.from('member_feedback').insert({ member_id: memberAId, job_match_id: matchB.id, feedback_type: 'oe2_security_test' }).select('id')
+  record('Member A cannot insert feedback referencing Member B\'s job_match', !!feedbackCrossError && (feedbackCross ?? []).length === 0, feedbackCrossError?.message ?? `rows inserted: ${(feedbackCross ?? []).length}`)
+
+  // ============================================================
+  // Exclusion-rule ownership (member_job_exclusion_rules)
+  // ============================================================
+  const { data: ruleInsertOwn } = await memberA.from('member_job_exclusion_rules').insert({ member_id: memberAId, rule_type: 'company', value: 'OE2 Fixture Excluded Co' }).select('id').maybeSingle()
+  record('Member A CAN insert own exclusion rule', !!ruleInsertOwn, `inserted id: ${ruleInsertOwn?.id ?? 'none'}`)
+
+  const { data: ruleInsertForOther, error: ruleInsertForOtherError } = await memberA.from('member_job_exclusion_rules').insert({ member_id: memberBId, rule_type: 'company', value: 'OE2 Fixture Cross Attempt' }).select('id')
+  record('Member A cannot insert an exclusion rule for Member B', !!ruleInsertForOtherError && (ruleInsertForOther ?? []).length === 0, ruleInsertForOtherError?.message ?? `rows inserted: ${(ruleInsertForOther ?? []).length}`)
+
+  if (ruleInsertOwn) {
+    const { data: crossDelete } = await memberB.from('member_job_exclusion_rules').delete().eq('id', ruleInsertOwn.id).select('id')
+    record('Member B cannot delete Member A\'s exclusion rule', (crossDelete ?? []).length === 0, `rows deleted: ${(crossDelete ?? []).length}`)
+
+    const { data: ownDelete } = await memberA.from('member_job_exclusion_rules').delete().eq('id', ruleInsertOwn.id).select('id')
+    record('Member A CAN delete own exclusion rule', (ownDelete ?? []).length === 1, `rows deleted: ${(ownDelete ?? []).length}`)
+  }
+
+  // ============================================================
+  // Member A: own-row reads/allowed writes/forbidden column edits
+  // ============================================================
   const { data: ownSelect } = await memberA.from('job_matches').select('id').eq('id', matchA.id)
   record('Member A CAN SELECT own job_match', (ownSelect ?? []).length === 1, `rows returned: ${(ownSelect ?? []).length}`)
 
-  const { data: scoreEdit } = await memberA.from('job_matches').update({ fresh_fit_score: 99 }).eq('id', matchA.id).select('id')
-  record('Member A cannot update own fresh_fit_score', (scoreEdit ?? []).length === 0, `rows affected: ${(scoreEdit ?? []).length}`)
+  await testForbiddenEdit('Member A', memberA, matchA.id, 'fresh_fit_score', 99)
+  await testForbiddenEdit('Member A', memberA, matchA.id, 'score_breakdown', { hacked: true })
+  await testForbiddenEdit('Member A', memberA, matchA.id, 'matched_skills', ['hacked'])
+  await testForbiddenEdit('Member A', memberA, matchA.id, 'missing_skills', ['hacked'])
+  await testForbiddenEdit('Member A', memberA, matchA.id, 'computed_at', '2099-01-01T00:00:00.000Z')
+  await testForbiddenEdit('Member A', memberA, matchA.id, 'engine_version', 99)
+  await testForbiddenEdit('Member A', memberA, matchA.id, 'member_id', memberBId)
+  await testForbiddenEdit('Member A', memberA, matchA.id, 'scraped_job_id', job2.id)
+  await testForbiddenEdit('Member A', memberA, matchA.id, 'promoted_opportunity_id', opportunity.id) // self-promote
 
-  const { data: breakdownEdit } = await memberA.from('job_matches').update({ score_breakdown: { hacked: true } }).eq('id', matchA.id).select('id')
-  record('Member A cannot update own score_breakdown', (breakdownEdit ?? []).length === 0, `rows affected: ${(breakdownEdit ?? []).length}`)
-
-  const { data: selfPromote } = await memberA.from('job_matches').update({ promoted_opportunity_id: opportunity.id }).eq('id', matchA.id).select('id')
-  record('Member A cannot self-promote (update own promoted_opportunity_id)', (selfPromote ?? []).length === 0, `rows affected: ${(selfPromote ?? []).length}`)
+  const { data: ownRpc } = await memberA.rpc('get_job_match_snapshot', { match_id: matchA.id })
+  record('Member A calling get_job_match_snapshot for own match returns the row', !!ownRpc && (ownRpc as { id: string }).id === matchA.id, `result: ${JSON.stringify(ownRpc)}`)
 
   const { data: ownDismiss } = await memberA.from('job_matches').update({ dismissed_at: new Date().toISOString() }).eq('id', matchA.id).select('id, dismissed_at')
   record('Member A CAN dismiss own match', (ownDismiss ?? []).length === 1 && !!ownDismiss?.[0]?.dismissed_at, `rows affected: ${(ownDismiss ?? []).length}`)
 
-  // ---- Strategist S: assigned-member access + column-scoped promote ----
+  // ============================================================
+  // Strategist S: assigned-member access + column-scoped promote
+  // ============================================================
   const { data: strategistSeesA } = await strategistS.from('job_matches').select('id').eq('id', matchA.id)
   record('Strategist S CAN SELECT assigned Member A match', (strategistSeesA ?? []).length === 1, `rows returned: ${(strategistSeesA ?? []).length}`)
 
-  const { data: strategistScoreEdit } = await strategistS.from('job_matches').update({ fresh_fit_score: 1 }).eq('id', matchA.id).select('id')
-  record('Strategist S cannot edit score/evidence columns', (strategistScoreEdit ?? []).length === 0, `rows affected: ${(strategistScoreEdit ?? []).length}`)
+  await testForbiddenEdit('Strategist S', strategistS, matchA.id, 'fresh_fit_score', 1)
+  await testForbiddenEdit('Strategist S', strategistS, matchA.id, 'score_breakdown', { hacked: true })
+  await testForbiddenEdit('Strategist S', strategistS, matchA.id, 'matched_skills', ['hacked'])
+  await testForbiddenEdit('Strategist S', strategistS, matchA.id, 'missing_skills', ['hacked'])
+  await testForbiddenEdit('Strategist S', strategistS, matchA.id, 'computed_at', '2099-01-01T00:00:00.000Z')
+  await testForbiddenEdit('Strategist S', strategistS, matchA.id, 'engine_version', 99)
+  await testForbiddenEdit('Strategist S', strategistS, matchA.id, 'member_id', memberBId)
+  await testForbiddenEdit('Strategist S', strategistS, matchA.id, 'scraped_job_id', job2.id)
 
   const { data: strategistPromote } = await strategistS.from('job_matches').update({ promoted_opportunity_id: opportunity.id }).eq('id', matchA.id).select('id, promoted_opportunity_id')
   record('Strategist S CAN promote Member A match', (strategistPromote ?? []).length === 1 && strategistPromote?.[0]?.promoted_opportunity_id === opportunity.id, `rows affected: ${(strategistPromote ?? []).length}`)
@@ -139,9 +191,14 @@ async function main() {
   const { data: strategistUpdatesB } = await strategistS.from('job_matches').update({ promoted_opportunity_id: opportunity.id }).eq('id', matchB.id).select('id')
   record('Strategist S cannot update Member B (not assigned)', (strategistUpdatesB ?? []).length === 0, `rows affected: ${(strategistUpdatesB ?? []).length}`)
 
-  // ---- Anonymous ----
+  // ============================================================
+  // Anonymous
+  // ============================================================
   const { data: anonJobMatches } = await anon.from('job_matches').select('id')
   record('Anonymous cannot read job_matches', (anonJobMatches ?? []).length === 0, `rows returned: ${(anonJobMatches ?? []).length}`)
+
+  const { data: anonFeedback } = await anon.from('member_feedback').select('id')
+  record('Anonymous cannot read member_feedback', (anonFeedback ?? []).length === 0, `rows returned: ${(anonFeedback ?? []).length}`)
 
   const { data: anonExclusion } = await anon.from('member_job_exclusion_rules').select('id')
   record('Anonymous cannot read member_job_exclusion_rules', (anonExclusion ?? []).length === 0, `rows returned: ${(anonExclusion ?? []).length}`)
@@ -159,7 +216,9 @@ async function main() {
     anonRpcError?.message ?? `unexpected non-empty result: ${JSON.stringify(anonRpc)}`
   )
 
-  // ---- Admin: NOT automated ----
+  // ============================================================
+  // Admin: NOT automated
+  // ============================================================
   console.log('')
   console.log('NOTE: "Admin verify only intended OE admin visibility" was not automated here.')
   console.log('No admin fixture is created by createOe2SecurityFixtures.ts by design -- granting')
@@ -180,6 +239,6 @@ async function main() {
 }
 
 main().catch((err) => {
-  console.error('Fatal error running security tests:', err);
+  console.error('Fatal error running security tests:', err)
   process.exit(1)
 })
