@@ -11,7 +11,8 @@
     "scrape:indeed": "tsx scripts/scrapeIndeed.ts",
     "scrape:companies": "tsx scripts/scrapeCompanies.ts",
     "sync:freshfit": "tsx scripts/syncFreshFitScores.ts",
-    "compute:market-intelligence": "tsx scripts/computeMarketIntelligence.ts"
+    "compute:market-intelligence": "tsx scripts/computeMarketIntelligence.ts",
+    "report:freshfit-quality": "tsx scripts/reportFreshFitQuality.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
