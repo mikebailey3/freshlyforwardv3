@@ -599,17 +599,45 @@ this just confirms the risk is live, not just theoretical.
 already-established repo convention (`raw_app_meta_data`-based roles)
 just sourced via JWT claim instead of a table lookup.
 
-## Updated suggested apply order (all batches, round 2)
+## Round 2 non-prod validation results
 
-1-11. Unchanged from above (already applied to non-prod in round 1).
-12. `20260922000000_fix_market_intelligence_admin_jwt_claim.sql`
+Migration 12 applied successfully to `szwfxfitrmvqbdvcbgrf`. Production
+untouched. Functionally green: the SQLSTATE 42501 defect is fixed, and
+every live RLS/security assertion passed, including all four new
+`market_intelligence_snapshots` admin/strategist/member/anon checks.
+One `auth_rls_initplan` Performance Advisor finding remained on this
+same policy -- a pure syntax issue, not a behavior defect -- fixed by
+migration 13 below.
 
-Recommended non-prod validation loop, round 2: apply migration 12 to
-non-prod -> re-run Supabase's Security + Performance Advisors there
-(expect no new findings, and confirm the fixed policy no longer errors)
--> run `fixtures:oe2-security -- --create` -> `test:oe2-security --
-<tag>` (now including the four `market_intelligence_snapshots`
-admin/strategist/member/anon assertions) -> `fixtures:oe2-security --
+## 13. `20260923000000_fix_market_intelligence_admin_jwt_initplan_lint.sql`
+
+Performance-lint correction only, zero behavior change. Migration 12's
+admin branch wrapped the entire jsonb-extraction chain in the scalar
+subquery -- `(select auth.jwt() -> 'app_metadata' ->> 'role') =
+'admin'` -- which doesn't match Supabase's recognized InitPlan shape
+(a bare wrapped function call). Re-parenthesized so only `auth.jwt()`
+itself is wrapped and the `-> 'app_metadata' ->> 'role'` extraction
+applies to its already-evaluated result: `((select auth.jwt()) ->
+'app_metadata' ->> 'role') = 'admin'`. `auth.jwt()` is `STABLE`, so
+this produces the byte-identical result either way -- purely syntactic.
+Everything else (`TO authenticated`, the `app_metadata`-only admin
+source, the active-strategist `OR` branch, all grants, every other
+policy) is preserved exactly.
+
+**Risk: none.** Re-parenthesization of an already-narrowly-scoped
+policy; no other object touched.
+
+## Updated suggested apply order (all batches, round 3)
+
+1-12. Unchanged from above (already applied to non-prod in rounds 1-2).
+13. `20260923000000_fix_market_intelligence_admin_jwt_initplan_lint.sql`
+
+Recommended non-prod validation loop, round 3: apply migration 13 to
+non-prod -> re-run Supabase's Performance Advisor there (expect the
+`auth_rls_initplan` finding on this policy gone, no new findings
+anywhere) -> run `fixtures:oe2-security -- --create` ->
+`test:oe2-security -- <tag>` (regression check -- same assertions as
+round 2, no behavior change expected) -> `fixtures:oe2-security --
 --cleanup <tag>`.
 
 ## Also reviewed, no action needed
