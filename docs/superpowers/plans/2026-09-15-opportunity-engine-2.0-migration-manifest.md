@@ -1,13 +1,21 @@
 # Opportunity Engine 2.0 — Migration Manifest & Review Doc
 
-**Status as of this document: nothing below has been applied to any
-database (production, staging, or otherwise). Every migration listed
-here is committed to `opportunity-engine-2-phase0` only. `origin/main`
-has not been touched by this project at any point.**
+**Status as of this update:** migrations 1–6 below have been applied
+to the **non-production** Supabase project ("Freshly Forward",
+`szwfxfitrmvqbdvcbgrf`), per external validation. **Production
+(`bolt-native-database-69540068`) has NOT been touched and is not
+touched by anything in this document.** A second batch of
+non-prod-hardening migrations (7–11, added after Supabase's Security
+and Performance Advisors ran against non-prod) is documented at the
+bottom of this file, also prepared-only / not yet applied anywhere.
+Every migration in both batches is committed to
+`opportunity-engine-2-phase0` only. `origin/main` has not been touched
+by this project at any point.
 
-This is a plain summary for review — no code changes, no database
-changes. Apply order matches the order listed (each depends only on
-tables that already exist before it).
+This is a plain summary for review — no application code changes
+accompany any of these; only new forward SQL migrations, tests, and
+two non-prod-only tooling scripts. Apply order matches the order
+listed (each depends only on objects that already exist before it).
 
 ---
 
@@ -269,6 +277,187 @@ that the table exists:
 **Result: passes.** No new follow-up migration needed for this table.
 
 ---
+
+# Batch 2 -- Post-Non-Prod-Validation Hardening (migrations 7-11)
+
+Triggered by Supabase's Security and Performance Advisors running
+against the non-prod project after migrations 1-6 above were applied
+there. All five migrations below are **prepared only -- not applied to
+any database, including non-prod.** Each file's own header comment has
+the full reasoning; this section is a summary index.
+
+## 7. `20260917000000_harden_get_job_match_snapshot.sql`
+
+Fixes the Security Advisor's mutable-search-path finding on
+`public.get_job_match_snapshot()`: `ALTER FUNCTION ... SET search_path
+= ''` (metadata-only, no redefinition, no policy changes needed --
+the function already fully-qualified its one table reference). Stays
+`SECURITY INVOKER` (never converted to `DEFINER`).
+
+Also addresses RPC exposure: revokes `EXECUTE` from `PUBLIC` and `anon`
+(neither has any legitimate reason to call this helper, and `anon`
+never satisfies either policy that uses it). `authenticated` **must**
+keep `EXECUTE` -- verified by reasoning through Postgres's privilege
+model that RLS policies are evaluated as the querying role, so revoking
+it would break dismiss/promote for every real user. The residual risk
+of `authenticated` being able to call this RPC directly is provably
+bounded: the function is `SECURITY INVOKER` + `STABLE`, so calling it
+directly returns exactly what the existing `select_own_job_matches` RLS
+policy would already allow via a normal table read -- zero new
+exposure. Full reasoning, including why `SECURITY DEFINER` was
+considered and rejected, is in the migration file.
+
+**Risk: low.** No behavior change for any real application code path.
+
+## 8. `20260918000000_job_matches_column_security_and_rls_perf.sql`
+
+Two things bundled because both touch the same two policies:
+
+1. **Closes a gap found during this review's own re-audit:**
+   `computed_at` was missing from both hardened policies' "everything
+   else must stay unchanged" column list (migration 5 in Batch 1).
+   Re-checked the *complete* current column set (including
+   `engine_version`, added by a separate later migration) and confirmed
+   this was the only gap -- every other nullable column
+   (`dismissed_at`, `promoted_opportunity_id`) already used
+   `IS NOT DISTINCT FROM` correctly; no other column is nullable.
+2. **RLS performance pass** for all three `job_matches` policies
+   (`select_own_job_matches`, `member_dismiss_own_job_matches`,
+   `strategist_promote_job_matches`): every `auth.uid()` call rewritten
+   to `(select auth.uid())` per Supabase's Performance Advisor and its
+   own documented fix. Pure performance change -- `auth.uid()` is
+   `STABLE`, so the rewritten expression is logically identical for
+   every input.
+
+**Risk: low-medium.** This is the third generation of these two
+UPDATE policies and, like the first hardening pass, touches a table
+that may carry real (non-prod) data by the time this is reviewed --
+same staging-first recommendation applies as migration 5.
+
+## 9. `20260919000000_oe_rls_performance_auth_uid.sql`
+
+Same `auth.uid()` -> `(select auth.uid())` performance rewrite, scoped
+to the four remaining OE-related policy objects:
+`member_job_exclusion_rules` (all three policies),
+`member_feedback.insert_own_feedback` (the one OE-touched policy on
+that pre-existing table), `market_intelligence_snapshots`, and
+`match_digest_log`. Explicitly NOT a repo-wide RLS refactor -- every
+other policy in the schema is untouched.
+
+**Risk: low.** Pure performance change, no authorization behavior
+difference.
+
+## 10. `20260920000000_oe_fk_indexes.sql`
+
+Adds four covering indexes for FK columns the Performance Advisor
+flagged, reviewed individually rather than added blindly:
+`member_feedback.job_match_id`, `scraped_jobs.canonical_job_id`,
+`job_matches.scraped_job_id`, `job_matches.promoted_opportunity_id`.
+The latter two are partial indexes (`WHERE ... IS NOT NULL`) since both
+are majority-null in normal operation. No index was added for any
+non-OE-scoped FK the advisor may have also flagged.
+
+**Risk: low.** Additive, non-blocking (`CREATE INDEX IF NOT EXISTS`,
+no `CONCURRENTLY` needed given non-prod's current 0-row tables --
+**note for whoever applies this to a table with real data later:**
+consider `CREATE INDEX CONCURRENTLY` instead to avoid a write lock on a
+populated table).
+
+## 11. `20260921000000_oe_table_grants_hardening.sql`
+
+Explicit `REVOKE ALL` + minimal `GRANT` (not relying on RLS alone, per
+explicit instruction) for the three tables OE 2.0 introduced:
+`market_intelligence_snapshots` (authenticated: `SELECT` only),
+`member_job_exclusion_rules` (authenticated: `SELECT`/`INSERT`/`DELETE`,
+no `UPDATE`), `match_digest_log` (authenticated: `SELECT` only). `anon`
+gets nothing on any of the three. `service_role` is deliberately never
+touched -- every OE 2.0 write-side script depends on its existing
+full-access pattern.
+
+**Risk: low.** Written as unconditional revoke-then-grant so the
+result is correct regardless of this project's exact starting
+default-privilege configuration; a `REVOKE` of a privilege that was
+never granted is a safe no-op in Postgres.
+
+## Reviewed with no new migration needed
+
+- **`job_matches` self-promotion / multi-policy interaction:** verified
+  Postgres's multi-permissive-policy OR semantics -- if a user somehow
+  satisfied *both* `member_dismiss_own_job_matches` and
+  `strategist_promote_job_matches`'s `USING` clauses simultaneously
+  (only possible if `strategist_assignments` ever let someone be their
+  own assigned strategist, a pre-existing Phase 3 membership-system
+  question entirely outside OE 2.0's schema), attempting to change both
+  `dismissed_at` and `promoted_opportunity_id` in the same statement
+  would still fail both policies' `WITH CHECK` and be rejected. No OE
+  2.0 loophole exists here; flagged as a pre-existing-system observation
+  only, not fixed (out of scope, per instruction not to touch
+  `strategist_assignments`).
+- **Stale-detection schema (`last_seen_at`/`missed_run_count`):**
+  re-confirmed nullable/`DEFAULT 0` respectively, no trigger of any
+  kind exists on `scraped_jobs` -- the conservative 3-miss logic lives
+  entirely in `scripts/jobSources/liveness.ts` application code, never
+  the database. No migration needed.
+- **Dedup schema (`normalized_key`/`canonical_job_id`):** re-confirmed
+  `canonical_job_id`'s FK is `ON DELETE SET NULL`, never `CASCADE` --
+  deleting a canonical job cannot cascade-delete its duplicates. The
+  missing reverse-lookup index was added in migration 10 above.
+- **RLS enabled + role/metadata hygiene across every OE table
+  (`scraped_jobs`, `job_matches`, `market_intelligence_snapshots`,
+  `member_job_exclusion_rules`, `match_digest_log`):** all five have
+  `ENABLE ROW LEVEL SECURITY`; every policy targets `TO authenticated`
+  explicitly (no bare/PUBLIC policies); no OE 2.0 policy uses
+  `auth.role()` (a legacy pattern that does exist elsewhere in this
+  repo, pre-dating OE 2.0 -- see "pre-existing technical debt" below);
+  admin checks use `raw_app_meta_data` exclusively, never the
+  user-editable `raw_user_meta_data`.
+
+## Pre-existing technical debt (NOT touched by this task, listed per instruction)
+
+- `auth.role()` usage in `20260902021400_harden_rls_and_security_definer_access.sql`
+  and `20260902040000_protect_member_profiles_privileged_fields.sql`
+  (member_profiles hardening, predates OE 2.0).
+- Any `SECURITY DEFINER` view/RPC elsewhere in the schema (e.g. a
+  `public_forward_profiles`-style view, if one exists) -- not reviewed
+  here, outside OE 2.0's scope, and OE 2.0 has no dependency on it.
+- Any repo-wide `auth.uid()` performance pattern outside the five OE
+  2.0 objects in migrations 8-9 above.
+- Any historically-unindexed FK outside the four OE 2.0 columns in
+  migration 10.
+
+## Non-prod security test tooling (new, not executed in this session)
+
+- `scripts/createOe2SecurityFixtures.ts` (`npm run fixtures:oe2-security
+  -- --create` / `-- --cleanup <tag>`) -- creates/tears down Member A,
+  Member B, Strategist S (assigned to A only), one scraped job, one
+  match each for A and B, and one opportunity for A. Hard-refuses to
+  run against anything but the known non-prod project ref. Never
+  auto-cleans up.
+- `scripts/runOe2SecurityTests.ts` (`npm run test:oe2-security --
+  <tag>`) -- signs in as each fixture actor for real and runs the exact
+  scenarios in the Final Report's "Security Tests" section as live
+  queries against a real database, since RLS cannot be meaningfully
+  unit-tested with a mocked client.
+
+**Neither script was executed in this session** -- this sandbox has no
+live Supabase credentials for `szwfxfitrmvqbdvcbgrf`. They are ready to
+run by whoever has that access; see the Final Report for exactly what
+that run would validate.
+
+## Updated suggested apply order (both batches)
+
+1-6. Unchanged from Batch 1 above (already applied to non-prod).
+7. `20260917000000_harden_get_job_match_snapshot.sql`
+8. `20260918000000_job_matches_column_security_and_rls_perf.sql`
+9. `20260919000000_oe_rls_performance_auth_uid.sql`
+10. `20260920000000_oe_fk_indexes.sql`
+11. `20260921000000_oe_table_grants_hardening.sql`
+
+Recommended non-prod validation loop before any production
+consideration: apply 7-11 to non-prod -> re-run Supabase's Security +
+Performance Advisors there -> run
+`fixtures:oe2-security -- --create` -> `test:oe2-security -- <tag>` ->
+`fixtures:oe2-security -- --cleanup <tag>`.
 
 ## Also reviewed, no action needed
 
