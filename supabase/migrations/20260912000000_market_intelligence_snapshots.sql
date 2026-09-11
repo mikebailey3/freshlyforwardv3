@@ -48,6 +48,15 @@ established in 20260802172349_phase3_membership_system.sql. Writes are
 service-role only (the compute script), matching `scraped_jobs`/
 `job_matches`'s existing write policy shape -- no authenticated-user
 write path at all.
+
+## Security Gate finding (fixed pre-apply)
+The strategist check below filters on
+`strategist_assignments.is_active = true` -- every other
+strategist-scoped policy in this schema does, and without it a
+strategist who has been fully deactivated (all their assignments set
+`is_active = false`) would retain indefinite read access to this table.
+Caught during the OE 2.0 Final Gate review, before this migration was
+ever applied -- fixed in place here rather than shipped-then-patched.
 */
 
 CREATE TABLE IF NOT EXISTS public.market_intelligence_snapshots (
@@ -70,7 +79,10 @@ CREATE POLICY "admin_strategist_read_market_intelligence"
   TO authenticated
   USING (
     auth.uid() IN (SELECT id FROM auth.users WHERE raw_app_meta_data->>'role' = 'admin')
-    OR auth.uid() IN (SELECT strategist_id FROM public.strategist_assignments)
+    OR auth.uid() IN (
+      SELECT strategist_id FROM public.strategist_assignments
+      WHERE strategist_assignments.is_active = true
+    )
   );
 
 -- No authenticated-user write policy at all -- only the service-role

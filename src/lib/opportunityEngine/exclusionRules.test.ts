@@ -100,7 +100,7 @@ describe('addExclusionRule / removeExclusionRule', () => {
     await addExclusionRule('member-1', { ruleType: 'company', value: 'Acme' }, client)
     expect(upsert).toHaveBeenCalledWith(
       { member_id: 'member-1', rule_type: 'company', value: 'Acme' },
-      { onConflict: 'member_id,rule_type,value' }
+      { onConflict: 'member_id,rule_type,value', ignoreDuplicates: true }
     )
   })
 

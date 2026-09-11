@@ -92,3 +92,32 @@ CREATE POLICY "delete_own_exclusion_rules"
 
 ALTER TABLE public.member_feedback
   ADD COLUMN IF NOT EXISTS job_match_id uuid REFERENCES public.job_matches(id) ON DELETE CASCADE;
+
+-- Security Gate finding (fixed pre-apply): the ORIGINAL insert_own_feedback
+-- policy (20260802180911_phase4_operational_engine.sql) only ever
+-- verified auth.uid() = member_id -- it never verified that an optional
+-- job_match_id (the column just added above) actually belongs to a
+-- job_matches row owned by that same member. Without this, a member
+-- could attribute feedback to themselves while pointing job_match_id at
+-- a job_matches row belonging to a DIFFERENT member. This never leaked
+-- data (member_feedback's SELECT policy still scopes strictly by
+-- member_id/strategist assignment), but it was a real cross-member
+-- reference/data-integrity gap. Re-created here (not edited in place in
+-- the original Phase 4 file -- that migration may already be applied
+-- elsewhere, and migrations are never edited after the fact, only
+-- superseded) with the added ownership check.
+DROP POLICY IF EXISTS "insert_own_feedback" ON public.member_feedback;
+CREATE POLICY "insert_own_feedback"
+  ON public.member_feedback FOR INSERT
+  TO authenticated
+  WITH CHECK (
+    auth.uid() = member_id
+    AND (
+      job_match_id IS NULL
+      OR EXISTS (
+        SELECT 1 FROM public.job_matches
+        WHERE job_matches.id = member_feedback.job_match_id
+        AND job_matches.member_id = auth.uid()
+      )
+    )
+  );

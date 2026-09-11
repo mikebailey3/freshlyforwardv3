@@ -83,11 +83,20 @@ export async function addExclusionRule(
   rule: MemberExclusionRule,
   client: SupabaseClient = defaultClient
 ): Promise<void> {
+  // `ignoreDuplicates: true` -> ON CONFLICT DO NOTHING, deliberately NOT
+  // DO UPDATE. Security Gate finding: this table intentionally has no
+  // UPDATE RLS policy at all (members only ever add/remove whole rules,
+  // never edit one in place) -- an ON CONFLICT DO UPDATE upsert would
+  // require UPDATE privilege Postgres RLS would then reject, breaking
+  // the exact "re-adding the same rule is a safe no-op" behavior this
+  // migration's own docs promise. DO NOTHING needs no UPDATE grant at
+  // all and is the correct semantics here anyway: a re-add's values are
+  // byte-identical to the existing row by definition (same conflict key).
   const { error } = await client
     .from('member_job_exclusion_rules')
     .upsert(
       { member_id: memberId, rule_type: rule.ruleType, value: rule.value },
-      { onConflict: 'member_id,rule_type,value' }
+      { onConflict: 'member_id,rule_type,value', ignoreDuplicates: true }
     )
 
   if (error) console.error('Error adding member exclusion rule:', error)
