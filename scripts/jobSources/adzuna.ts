@@ -1,0 +1,157 @@
+import type { ScrapedJobInput } from './types'
+
+/**
+ * Adzuna job search API adapter.
+ *
+ * Mirrors the greenhouse/lever/ashby adapters: a PURE `parseAdzunaJobs()`
+ * that can be unit-tested against a fixture with no network or credentials,
+ * plus a thin `fetchAdzunaJobs()` that does the I/O. Adzuna was previously
+ * the only source with its mapping welded inline in `scripts/scrapeJobs.ts`,
+ * which is precisely why it was the only source without tests.
+ *
+ * Adzuna is a licensed aggregator with a free developer tier and a documented
+ * JSON API -- no scraping, no ToS gray area. Credentials:
+ * https://developer.adzuna.com/
+ */
+
+export interface AdzunaResult {
+  id: string
+  title: string
+  redirect_url: string
+  description: string
+  created: string
+  company?: { display_name?: string }
+  location?: { display_name?: string }
+  salary_min?: number
+  salary_max?: number
+  salary_is_predicted?: string
+  contract_time?: string
+  contract_type?: string
+}
+
+export interface AdzunaResponse {
+  results: AdzunaResult[]
+  count: number
+}
+
+/**
+ * Adzuna reports `salary_is_predicted: "1"` when the figure is its own
+ * ML estimate rather than a number the employer published. We drop those.
+ *
+ * Rationale: FreshFit's compensation dimension is member-facing and must be
+ * evidence-grounded. Presenting an aggregator's guess as a posted salary is
+ * exactly the kind of fabrication the charter forbids -- and a wrong salary
+ * silently skews scoring. Absent is honest; invented is not.
+ */
+export function isPredictedSalary(result: AdzunaResult): boolean {
+  return result.salary_is_predicted === '1'
+}
+
+/** Formats a salary range for display. Returns null when nothing usable exists. */
+export function formatSalary(min?: number, max?: number): string | null {
+  if (!min && !max) return null
+  const fmt = (n: number) => `$${Math.round(n).toLocaleString('en-US')}`
+  if (min && max) return min === max ? fmt(min) : `${fmt(min)} - ${fmt(max)}`
+  return fmt((min ?? max) as number)
+}
+
+/**
+ * Adzuna sends UNDERSCORED employment values (`full_time`, `part_time`) while
+ * the shared `normalizeEmploymentType()` matcher expects the hyphen/space
+ * forms every other provider uses (`full-time`, `full time`, `fte`).
+ *
+ * Left alone, every Adzuna row normalizes to `unknown` and silently degrades
+ * FreshFit. We convert underscores to spaces HERE, at the provider boundary,
+ * rather than teaching the shared normalizer about one vendor's dialect --
+ * adapters own provider quirks; the canonical layer stays canonical.
+ *
+ * `contract_time` (full/part time) is preferred over `contract_type`
+ * (permanent/contract) because it maps onto more of the canonical enum;
+ * `contract_type` is the fallback.
+ */
+export function normalizeAdzunaEmploymentType(result: AdzunaResult): string | null {
+  const raw = result.contract_time ?? result.contract_type ?? null
+  if (!raw) return null
+  return raw.replace(/_/g, ' ').trim() || null
+}
+
+/** Maps a raw Adzuna search response into canonical `ScrapedJobInput` rows. Pure. */
+export function parseAdzunaJobs(raw: unknown, searchQuery: string): ScrapedJobInput[] {
+  const payload = raw as { results?: AdzunaResult[] }
+  const results = payload?.results ?? []
+
+  return results.map((result) => ({
+    source: 'adzuna',
+    external_id: String(result.id),
+    title: result.title,
+    company: result.company?.display_name ?? '',
+    location: result.location?.display_name ?? null,
+    description: result.description ?? '',
+    salary_text: isPredictedSalary(result)
+      ? null
+      : formatSalary(result.salary_min, result.salary_max),
+    employment_type: normalizeAdzunaEmploymentType(result),
+    posting_url: result.redirect_url,
+    posted_at: result.created ? result.created.slice(0, 10) : null,
+    search_query: searchQuery,
+  }))
+}
+
+export const ADZUNA_RESULTS_PER_PAGE = 20
+
+export interface AdzunaFetchOptions {
+  country: string
+  page: number
+  query: string
+  location?: string
+  appId: string
+  appKey: string
+  resultsPerPage?: number
+}
+
+/**
+ * Fetches one page of Adzuna results.
+ *
+ * Credentials are passed in rather than read from `process.env` here so this
+ * stays a pure-ish function the caller can test and so secrets have exactly
+ * one read site (the script entry point).
+ */
+export async function fetchAdzunaPage(options: AdzunaFetchOptions): Promise<AdzunaResponse> {
+  const {
+    country,
+    page,
+    query,
+    location,
+    appId,
+    appKey,
+    resultsPerPage = ADZUNA_RESULTS_PER_PAGE,
+  } = options
+
+  const url = new URL(`https://api.adzuna.com/v1/api/jobs/${country}/search/${page}`)
+  url.searchParams.set('app_id', appId)
+  url.searchParams.set('app_key', appKey)
+  url.searchParams.set('results_per_page', String(resultsPerPage))
+  url.searchParams.set('what', query)
+  if (location) url.searchParams.set('where', location)
+  url.searchParams.set('content-type', 'application/json')
+
+  const response = await fetch(url.toString(), {
+    headers: { 'User-Agent': 'FreshlyForwardOpportunityEngine/1.0' },
+  })
+
+  if (!response.ok) {
+    const body = await response.text().catch(() => '')
+    // Never echo the URL back in the error -- it carries app_id/app_key.
+    throw new Error(
+      `Adzuna ${country} page ${page} responded with ${response.status}: ${body.slice(0, 200)}`,
+    )
+  }
+
+  return (await response.json()) as AdzunaResponse
+}
+
+/** Convenience wrapper: fetch one page and map it to canonical rows. */
+export async function fetchAdzunaJobs(options: AdzunaFetchOptions): Promise<ScrapedJobInput[]> {
+  const response = await fetchAdzunaPage(options)
+  return parseAdzunaJobs(response, options.query)
+}

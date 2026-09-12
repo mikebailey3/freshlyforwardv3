@@ -255,19 +255,36 @@ describe('normalizeApplyUrl', () => {
 
 describe('getSourceReliability', () => {
   it('ranks the documented public ATS APIs highest', () => {
-    expect(getSourceReliability('greenhouse')).toBeGreaterThan(getSourceReliability('indeed'))
-    expect(getSourceReliability('lever')).toBeGreaterThan(getSourceReliability('indeed'))
-    expect(getSourceReliability('ashby')).toBeGreaterThan(getSourceReliability('indeed'))
+    expect(getSourceReliability('greenhouse')).toBeGreaterThan(getSourceReliability('adzuna'))
+    expect(getSourceReliability('lever')).toBeGreaterThan(getSourceReliability('adzuna'))
+    expect(getSourceReliability('ashby')).toBeGreaterThan(getSourceReliability('adzuna'))
   })
 
-  it('ranks member-submitted above the best-effort Indeed scrape but below the documented APIs', () => {
+  it('ranks the licensed aggregator below the ATS boards that publish first-hand', () => {
+    // Adzuna republishes a posting, one hop further from the employer than
+    // an ATS board -- so an ATS record wins the tie for the same opening.
+    const adzuna = getSourceReliability('adzuna')
+    expect(adzuna).toBeGreaterThan(0)
+    expect(adzuna).toBeLessThan(getSourceReliability('greenhouse'))
+  })
+
+  it('ranks member-submitted below the documented APIs', () => {
     const memberSubmitted = getSourceReliability('member-submitted')
-    expect(memberSubmitted).toBeGreaterThan(getSourceReliability('indeed'))
+    expect(memberSubmitted).toBeGreaterThan(0)
     expect(memberSubmitted).toBeLessThan(getSourceReliability('greenhouse'))
   })
 
   it('defaults unknown sources to the lowest reliability rather than throwing', () => {
     expect(getSourceReliability('some-new-source')).toBe(0)
+  })
+
+  it('gives every ingested source an explicit entry -- a missing one silently loses all dedup ties', () => {
+    // Regression: `adzuna` shipped without an entry and scored 0, below even
+    // the retired Indeed scrape. Any source written into `scraped_jobs` must
+    // be ranked here deliberately, not by falling through to the default.
+    for (const source of ['greenhouse', 'lever', 'ashby', 'adzuna', 'member-submitted']) {
+      expect(getSourceReliability(source)).toBeGreaterThan(0)
+    }
   })
 })
 

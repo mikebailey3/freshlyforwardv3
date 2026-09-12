@@ -1,14 +1,19 @@
 /**
- * Job sourcing sync — pulls listings from the Adzuna job search API and
+ * Job sourcing sync -- pulls listings from the Adzuna job search API and
  * upserts them into `scraped_jobs`. This replaced an earlier Indeed HTML
  * scraper (see git history / 20260821000000_opportunity_engine.sql for
  * why that was a ToS-risk stopgap): `scraped_jobs` was designed source-
  * agnostic from day one, so swapping the data source only touches this
- * file — nothing downstream (job_matches, freshFitScore.ts, the
+ * file -- nothing downstream (job_matches, freshFitScore.ts, the
  * Opportunity Engine UI) needed to change.
  *
+ * The provider mapping lives in `scripts/jobSources/adzuna.ts`, matching
+ * the greenhouse/lever/ashby adapters, so it can be unit-tested against a
+ * fixture with no network and no credentials. This file owns only I/O:
+ * argument parsing, secret loading, pagination, and the upsert.
+ *
  * Adzuna is a licensed job aggregator with a free developer tier and a
- * straightforward JSON API — no scraping, no ToS gray area.
+ * straightforward JSON API -- no scraping, no ToS gray area.
  * Sign up for app_id/app_key at https://developer.adzuna.com/
  *
  * Usage:
@@ -22,6 +27,13 @@
  *   ADZUNA_APP_KEY
  */
 import { createClient } from '@supabase/supabase-js'
+
+import {
+  ADZUNA_RESULTS_PER_PAGE,
+  fetchAdzunaPage,
+  parseAdzunaJobs,
+} from './jobSources/adzuna'
+import type { ScrapedJobInput } from './jobSources/types'
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL
 const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -40,39 +52,6 @@ if (!ADZUNA_APP_ID || !ADZUNA_APP_KEY) {
 
 const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY)
 
-const RESULTS_PER_PAGE = 20
-
-interface ScrapedJobInput {
-  external_id: string
-  title: string
-  company: string
-  location: string | null
-  description: string
-  salary_text: string | null
-  employment_type: string | null
-  posting_url: string
-  posted_at: string | null
-}
-
-interface AdzunaResult {
-  id: string
-  title: string
-  redirect_url: string
-  description: string
-  created: string
-  company?: { display_name?: string }
-  location?: { display_name?: string }
-  salary_min?: number
-  salary_max?: number
-  contract_time?: string
-  contract_type?: string
-}
-
-interface AdzunaResponse {
-  results: AdzunaResult[]
-  count: number
-}
-
 function parseArgs() {
   const args = process.argv.slice(2)
   const get = (flag: string, fallback: string) => {
@@ -87,69 +66,11 @@ function parseArgs() {
   }
 }
 
-function formatSalary(min?: number, max?: number): string | null {
-  if (!min && !max) return null
-  const fmt = (n: number) => `$${Math.round(n).toLocaleString()}`
-  if (min && max) return `${fmt(min)} - ${fmt(max)}`
-  return fmt((min ?? max) as number)
-}
-
-async function fetchSearchPage(
-  country: string,
-  page: number,
-  query: string,
-  location: string,
-): Promise<AdzunaResponse> {
-  const url = new URL(`https://api.adzuna.com/v1/api/jobs/${country}/search/${page}`)
-  url.searchParams.set('app_id', ADZUNA_APP_ID as string)
-  url.searchParams.set('app_key', ADZUNA_APP_KEY as string)
-  url.searchParams.set('results_per_page', String(RESULTS_PER_PAGE))
-  url.searchParams.set('what', query)
-  if (location) url.searchParams.set('where', location)
-  url.searchParams.set('content-type', 'application/json')
-
-  const response = await fetch(url.toString())
-
-  if (!response.ok) {
-    const body = await response.text().catch(() => '')
-    throw new Error(`Adzuna responded with ${response.status}: ${body.slice(0, 200)}`)
-  }
-
-  return response.json() as Promise<AdzunaResponse>
-}
-
-function mapResults(results: AdzunaResult[]): ScrapedJobInput[] {
-  return results.map((r) => ({
-    external_id: r.id,
-    title: r.title,
-    company: r.company?.display_name ?? '',
-    location: r.location?.display_name ?? null,
-    description: r.description,
-    salary_text: formatSalary(r.salary_min, r.salary_max),
-    employment_type: r.contract_time ?? r.contract_type ?? null,
-    posting_url: r.redirect_url,
-    posted_at: r.created ? r.created.slice(0, 10) : null,
-  }))
-}
-
-async function upsertJobs(jobs: ScrapedJobInput[], searchQuery: string): Promise<void> {
+async function upsertJobs(jobs: ScrapedJobInput[]): Promise<void> {
   if (jobs.length === 0) return
 
-  const rows = jobs.map((job) => ({
-    source: 'adzuna',
-    external_id: job.external_id,
-    title: job.title,
-    company: job.company,
-    location: job.location,
-    description: job.description,
-    salary_text: job.salary_text,
-    employment_type: job.employment_type,
-    posting_url: job.posting_url,
-    posted_at: job.posted_at,
-    search_query: searchQuery,
-    is_active: true,
-    scraped_at: new Date().toISOString(),
-  }))
+  const scrapedAt = new Date().toISOString()
+  const rows = jobs.map((job) => ({ ...job, is_active: true, scraped_at: scrapedAt }))
 
   const { error } = await supabase
     .from('scraped_jobs')
@@ -170,11 +91,20 @@ async function main() {
 
   for (let page = 1; page <= pages; page++) {
     try {
-      const { results, count } = await fetchSearchPage(country, page, query, location)
-      totalFound += results.length
-      await upsertJobs(mapResults(results), query)
+      const response = await fetchAdzunaPage({
+        country,
+        page,
+        query,
+        location,
+        appId: ADZUNA_APP_ID as string,
+        appKey: ADZUNA_APP_KEY as string,
+      })
 
-      if (results.length === 0 || page * RESULTS_PER_PAGE >= count) {
+      const jobs = parseAdzunaJobs(response, query)
+      totalFound += jobs.length
+      await upsertJobs(jobs)
+
+      if (jobs.length === 0 || page * ADZUNA_RESULTS_PER_PAGE >= response.count) {
         console.log('No more results available, stopping early.')
         break
       }

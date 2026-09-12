@@ -38,9 +38,16 @@ function candidate(overrides: Partial<DedupCandidate> = {}): DedupCandidate {
 describe('pickCanonicalJob', () => {
   it('prefers the more reliable source', () => {
     const greenhouse = candidate({ id: 'gh', source: 'greenhouse' })
-    const indeed = candidate({ id: 'in', source: 'indeed' })
-    expect(pickCanonicalJob(greenhouse, indeed).id).toBe('gh')
-    expect(pickCanonicalJob(indeed, greenhouse).id).toBe('gh') // order-independent
+    const adzuna = candidate({ id: 'az', source: 'adzuna' })
+    expect(pickCanonicalJob(greenhouse, adzuna).id).toBe('gh')
+    expect(pickCanonicalJob(adzuna, greenhouse).id).toBe('gh') // order-independent
+  })
+
+  it('prefers a ranked source over an unranked one', () => {
+    const adzuna = candidate({ id: 'az', source: 'adzuna' })
+    const unknown = candidate({ id: 'zz', source: 'some-unranked-source' })
+    expect(pickCanonicalJob(adzuna, unknown).id).toBe('az')
+    expect(pickCanonicalJob(unknown, adzuna).id).toBe('az')
   })
 
   it('breaks a same-reliability tie by earliest posted date (first-seen wins)', () => {

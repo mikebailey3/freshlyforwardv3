@@ -1,0 +1,144 @@
+import { describe, it, expect } from 'vitest'
+import {
+  parseAdzunaJobs,
+  formatSalary,
+  isPredictedSalary,
+  normalizeAdzunaEmploymentType,
+  type AdzunaResult,
+} from './adzuna'
+import { normalizeEmploymentType } from '../../src/lib/opportunityEngine/jobNormalization'
+
+/**
+ * Fixture shaped exactly like a real Adzuna `/search` result, including the
+ * quirks that matter: underscored `contract_time`, a `salary_is_predicted`
+ * flag, and a nested company/location.
+ */
+const baseResult: AdzunaResult = {
+  id: '4815162342',
+  title: 'Customer Service Representative',
+  redirect_url: 'https://www.adzuna.com/land/ad/4815162342',
+  description: 'Handle inbound customer enquiries and resolve issues.',
+  created: '2026-09-01T08:30:00Z',
+  company: { display_name: 'Acme Support Co' },
+  location: { display_name: 'Dallas, TX' },
+  salary_min: 42000,
+  salary_max: 52000,
+  contract_time: 'full_time',
+}
+
+describe('parseAdzunaJobs', () => {
+  it('maps an Adzuna response into canonical ScrapedJobInput rows', () => {
+    const result = parseAdzunaJobs({ results: [baseResult], count: 1 }, 'customer service')
+
+    expect(result).toEqual([
+      {
+        source: 'adzuna',
+        external_id: '4815162342',
+        title: 'Customer Service Representative',
+        company: 'Acme Support Co',
+        location: 'Dallas, TX',
+        description: 'Handle inbound customer enquiries and resolve issues.',
+        salary_text: '$42,000 - $52,000',
+        employment_type: 'full time',
+        posting_url: 'https://www.adzuna.com/land/ad/4815162342',
+        posted_at: '2026-09-01',
+        search_query: 'customer service',
+      },
+    ])
+  })
+
+  it('returns an empty array for an empty result set', () => {
+    expect(parseAdzunaJobs({ results: [], count: 0 }, 'anything')).toEqual([])
+  })
+
+  it('tolerates a malformed payload without throwing', () => {
+    expect(parseAdzunaJobs({}, 'q')).toEqual([])
+    expect(parseAdzunaJobs(null, 'q')).toEqual([])
+  })
+
+  it('falls back to empty/null rather than fabricating missing fields', () => {
+    const sparse = {
+      id: '1',
+      title: 'Mystery Role',
+      redirect_url: 'https://example.com/job/1',
+      description: '',
+      created: '',
+    } as AdzunaResult
+
+    const [row] = parseAdzunaJobs({ results: [sparse], count: 1 }, 'q')
+    expect(row.company).toBe('')
+    expect(row.location).toBeNull()
+    expect(row.salary_text).toBeNull()
+    expect(row.employment_type).toBeNull()
+    expect(row.posted_at).toBeNull()
+  })
+})
+
+describe('salary handling', () => {
+  it('formats a min-max range', () => {
+    expect(formatSalary(42000, 52000)).toBe('$42,000 - $52,000')
+  })
+
+  it('formats a single-sided salary', () => {
+    expect(formatSalary(42000, undefined)).toBe('$42,000')
+    expect(formatSalary(undefined, 52000)).toBe('$52,000')
+  })
+
+  it('collapses an identical min and max into one figure', () => {
+    expect(formatSalary(50000, 50000)).toBe('$50,000')
+  })
+
+  it('returns null when no salary is present', () => {
+    expect(formatSalary(undefined, undefined)).toBeNull()
+  })
+
+  it('detects an Adzuna-predicted (estimated) salary', () => {
+    expect(isPredictedSalary({ ...baseResult, salary_is_predicted: '1' })).toBe(true)
+    expect(isPredictedSalary({ ...baseResult, salary_is_predicted: '0' })).toBe(false)
+    expect(isPredictedSalary(baseResult)).toBe(false)
+  })
+
+  it('drops a predicted salary rather than presenting an estimate as posted pay', () => {
+    const predicted = { ...baseResult, salary_is_predicted: '1' }
+    const [row] = parseAdzunaJobs({ results: [predicted], count: 1 }, 'q')
+    expect(row.salary_text).toBeNull()
+  })
+})
+
+/**
+ * Regression: Adzuna sends `full_time`, but the shared normalizer matches
+ * `full-time` / `full time` / `fte`. Before the adapter converted
+ * underscores, every Adzuna row normalized to `unknown` and silently
+ * degraded FreshFit's employment-type signal.
+ */
+describe('employment type (underscore regression)', () => {
+  it('converts Adzuna underscores to the canonical spacing', () => {
+    expect(normalizeAdzunaEmploymentType({ ...baseResult, contract_time: 'full_time' })).toBe('full time')
+    expect(normalizeAdzunaEmploymentType({ ...baseResult, contract_time: 'part_time' })).toBe('part time')
+  })
+
+  it('prefers contract_time but falls back to contract_type', () => {
+    const contractOnly = { ...baseResult, contract_time: undefined, contract_type: 'contract' }
+    expect(normalizeAdzunaEmploymentType(contractOnly)).toBe('contract')
+  })
+
+  it('returns null when neither field is present', () => {
+    expect(
+      normalizeAdzunaEmploymentType({ ...baseResult, contract_time: undefined, contract_type: undefined }),
+    ).toBeNull()
+  })
+
+  it('now survives the shared normalizer instead of collapsing to unknown', () => {
+    // The actual bug: the raw Adzuna value loses its meaning...
+    expect(normalizeEmploymentType('full_time')).toBe('unknown')
+    expect(normalizeEmploymentType('part_time')).toBe('unknown')
+
+    // ...while the adapter-normalized value survives.
+    expect(normalizeEmploymentType(normalizeAdzunaEmploymentType(baseResult))).toBe('full_time')
+    expect(
+      normalizeEmploymentType(
+        normalizeAdzunaEmploymentType({ ...baseResult, contract_time: 'part_time' }),
+      ),
+    ).toBe('part_time')
+  })
+})

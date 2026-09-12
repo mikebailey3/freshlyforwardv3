@@ -265,18 +265,28 @@ export function normalizeApplyUrl(raw: string | null | undefined): string | null
  * Deliberately coarse (0-3) and static -- reflects only the two facts
  * already true in this codebase's own docstrings: Greenhouse/Lever/Ashby
  * are documented, unauthenticated public APIs (scrapeCompanies.ts);
- * Indeed is an explicitly "best-effort, ToS-risk" HTML scrape
- * (scrapeIndeed.ts); member-submitted is human-provided but unverified.
+ * member-submitted is human-provided but unverified.
  * Used only to break dedup ties (jobDeduplication.ts) -- never
  * persisted as a per-job trust score, so it can be adjusted here later
  * without a migration.
+ *
+ * Adzuna sits at 2: it is a licensed aggregator with a documented API
+ * (scripts/jobSources/adzuna.ts), so it is strictly more trustworthy than
+ * the retired Indeed HTML scrape -- but it is still an aggregator
+ * REPUBLISHING a posting, one hop further from the employer than an ATS
+ * board. When Adzuna and Greenhouse describe the same opening, the ATS
+ * record should win the tie.
+ *
+ * Note: an unlisted source falls through to 0, so a source added to the
+ * ingest layer without an entry here silently loses every dedup tie-break.
+ * Adding a provider means adding it here too.
  */
 export const SOURCE_RELIABILITY: Record<string, number> = {
   greenhouse: 3,
   lever: 3,
   ashby: 3,
+  adzuna: 2,
   'member-submitted': 2,
-  indeed: 1,
 }
 
 export function getSourceReliability(source: string): number {
