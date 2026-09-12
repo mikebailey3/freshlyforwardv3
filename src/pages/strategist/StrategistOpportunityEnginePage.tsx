@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react'
 import { StrategistLayout } from '@/components/StrategistLayout'
 import { FreshFitBadge } from '@/components/freshFit/FreshFitBadge'
 import { FreshFitDetails } from '@/components/freshFit/FreshFitDetails'
+import { NeedsReviewBadge } from '@/components/opportunityEngine/NeedsReviewBadge'
 import { useAuth } from '@/context/AuthContext'
 import { supabase } from '@/lib/supabase'
 import { getAssignedMembers } from '@/lib/operations'
-import { getJobMatchesForStrategist, promoteMatchToOpportunity } from '@/lib/opportunityEngine'
+import { getJobMatchesForStrategist, promoteMatchToOpportunity, hasHardBlocker } from '@/lib/opportunityEngine'
 import { isSafeHttpUrl } from '@/lib/url'
 import { Loader2, MapPin, DollarSign, ExternalLink, ArrowUpRight, Sparkles } from 'lucide-react'
 import type { JobMatchScoreBreakdown, JobMatchWithJob, MemberProfile } from '@/types'
@@ -16,6 +17,13 @@ export function StrategistOpportunityEnginePage() {
   const [memberNames, setMemberNames] = useState<Record<string, string>>({})
   const [loading, setLoading] = useState(true)
   const [promotingId, setPromotingId] = useState<string | null>(null)
+  // OE 2.0 Phase 3: a busy strategist scanning many members' matches at
+  // once can't afford to expand every card's "Why this score?" panel
+  // individually just to notice a hard-constraint conflict. Progressive
+  // disclosure: the toggle itself only appears once there's something
+  // to filter (see the render below), so this adds zero UI noise for
+  // an all-clear queue.
+  const [showFlaggedOnly, setShowFlaggedOnly] = useState(false)
 
   useEffect(() => {
     if (!user) return
@@ -66,17 +74,36 @@ export function StrategistOpportunityEnginePage() {
     )
   }
 
+  const flaggedCount = matches.filter((m) => hasHardBlocker(m.score_breakdown as JobMatchScoreBreakdown)).length
+  const visibleMatches = showFlaggedOnly
+    ? matches.filter((m) => hasHardBlocker(m.score_breakdown as JobMatchScoreBreakdown))
+    : matches
+
   return (
     <StrategistLayout isAdmin={role === 'admin'}>
-      <div className="mb-6">
-        <h1 className="flex items-center gap-2 font-serif text-2xl font-semibold text-ink sm:text-3xl">
-          <Sparkles className="h-6 w-6 text-primary-600" />
-          Opportunity Engine
-        </h1>
-        <p className="mt-1 text-sm text-ink-muted">
-          Auto-sourced job postings scored against each assigned member's Career Profile.
-          Promote strong matches into their Opportunity Pipeline for review.
-        </p>
+      <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="flex items-center gap-2 font-serif text-2xl font-semibold text-ink sm:text-3xl">
+            <Sparkles className="h-6 w-6 text-primary-600" />
+            Opportunity Engine
+          </h1>
+          <p className="mt-1 text-sm text-ink-muted">
+            Auto-sourced job postings scored against each assigned member's Career Profile.
+            Promote strong matches into their Opportunity Pipeline for review.
+          </p>
+        </div>
+
+        {flaggedCount > 0 && (
+          <label className="flex items-center gap-2 rounded-full border border-warning-700 bg-warning-950 px-3 py-1.5 text-xs font-medium text-warning-200">
+            <input
+              type="checkbox"
+              checked={showFlaggedOnly}
+              onChange={(e) => setShowFlaggedOnly(e.target.checked)}
+              className="h-3.5 w-3.5"
+            />
+            Show flagged only ({flaggedCount})
+          </label>
+        )}
       </div>
 
       {matches.length === 0 ? (
@@ -88,10 +115,15 @@ export function StrategistOpportunityEnginePage() {
         </div>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {matches.map((match) => (
+          {visibleMatches.map((match) => {
+            const flagged = hasHardBlocker(match.score_breakdown as JobMatchScoreBreakdown)
+            return (
             <div key={match.id} className="border border-border border-l-4 border-l-primary-600 bg-surface-card p-4 transition-colors hover:border-l-primary-700">
               <div className="mb-2 flex items-center justify-between gap-2">
-                <FreshFitBadge score={match.fresh_fit_score} />
+                <div className="flex items-center gap-1.5">
+                  <FreshFitBadge score={match.fresh_fit_score} />
+                  {flagged && <NeedsReviewBadge />}
+                </div>
                 <span className="truncate text-xs text-ink-muted">{memberNames[match.member_id] || 'Member'}</span>
               </div>
 
@@ -149,7 +181,8 @@ export function StrategistOpportunityEnginePage() {
                 </button>
               </div>
             </div>
-          ))}
+            )
+          })}
         </div>
       )}
     </StrategistLayout>

@@ -53,16 +53,15 @@ describe('LandingPage', () => {
     expect(screen.getByRole('link', { name: /see how progress is tracked/i })).toHaveAttribute('href', '/applications')
   })
 
-  it('uses the real FreshFit tier system (Strong/Good/Fair/Weak), not an invented scale', () => {
+  it('uses the real FreshFit tier system (Excellent/Good/Fair), not an invented scale', () => {
     render(
       <MemoryRouter>
         <LandingPage />
       </MemoryRouter>,
     )
-    expect(screen.getAllByText(/Strong Match/).length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByText(/Excellent Match/).length).toBeGreaterThanOrEqual(1)
     expect(screen.getAllByText(/Good Match/).length).toBeGreaterThanOrEqual(1)
     expect(screen.getAllByText(/Fair Match/).length).toBeGreaterThanOrEqual(1)
-    expect(screen.getAllByText(/Weak Match/).length).toBeGreaterThanOrEqual(1)
   })
 
   it('labels every sample product-preview module as Sample, never presented as a real member record', () => {

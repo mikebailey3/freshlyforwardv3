@@ -62,6 +62,47 @@ const TRANSFERABLE_MAP: Record<string, string[]> = {
   'project management': ['scheduling', 'operations', 'logistics'],
   leadership: ['management', 'coaching', 'mentoring'],
   management: ['leadership', 'coaching', 'operations'],
+  'customer service': ['customer support', 'call center', 'hospitality', 'retail'],
+  'customer support': ['customer service', 'help desk', 'troubleshooting'],
+  sales: ['customer service', 'business development', 'account management', 'negotiation'],
+  'business development': ['sales', 'account management', 'client relations'],
+  accounting: ['bookkeeping', 'budgeting', 'quickbooks'],
+  bookkeeping: ['accounting', 'budgeting', 'data entry'],
+  'data analysis': ['sql', 'analytics', 'excel'],
+  analytics: ['data analysis', 'sql', 'excel'],
+  'data entry': ['typing', 'bookkeeping', 'organization'],
+  operations: ['logistics', 'supply chain', 'inventory', 'scheduling'],
+  logistics: ['operations', 'supply chain', 'inventory', 'scheduling'],
+  'supply chain': ['logistics', 'operations', 'inventory', 'procurement'],
+  inventory: ['warehouse', 'logistics', 'supply chain'],
+  warehouse: ['inventory', 'logistics', 'forklift'],
+  training: ['coaching', 'mentoring', 'onboarding'],
+  coaching: ['mentoring', 'training', 'leadership'],
+  mentoring: ['coaching', 'training', 'leadership'],
+  recruiting: ['onboarding', 'human resources', 'interviewing'],
+  'human resources': ['recruiting', 'onboarding', 'payroll', 'benefits administration'],
+  marketing: ['social media', 'content creation', 'seo', 'writing'],
+  'social media': ['marketing', 'content creation', 'writing'],
+  'content creation': ['writing', 'editing', 'social media', 'marketing'],
+  writing: ['editing', 'content creation', 'communication'],
+  'quality assurance': ['quality control', 'compliance', 'regulatory'],
+  'quality control': ['quality assurance', 'compliance', 'manufacturing'],
+  'help desk': ['customer support', 'troubleshooting', 'network administration'],
+  troubleshooting: ['help desk', 'network administration', 'customer support'],
+  'event planning': ['scheduling', 'logistics', 'organization', 'hospitality'],
+  hospitality: ['customer service', 'food service', 'event planning'],
+  'food service': ['hospitality', 'customer service', 'retail'],
+  retail: ['customer service', 'merchandising', 'point of sale', 'sales'],
+  'point of sale': ['retail', 'cash handling', 'customer service'],
+  'cash handling': ['point of sale', 'retail', 'bookkeeping'],
+  'contract negotiation': ['negotiation', 'procurement', 'vendor management'],
+  'vendor management': ['procurement', 'contract negotiation', 'operations'],
+  procurement: ['vendor management', 'supply chain', 'contract negotiation'],
+  paralegal: ['legal', 'compliance', 'contract negotiation'],
+  legal: ['paralegal', 'compliance', 'contract negotiation'],
+  'strategic planning': ['business development', 'operations', 'management'],
+  'account management': ['sales', 'client relations', 'customer service'],
+  'client relations': ['account management', 'customer service', 'sales'],
 }
 
 /** A profile with fewer than this many total distinct skills on record
@@ -89,26 +130,46 @@ export function findSkillsInText(text: string, dictionary: string[] = SKILL_KEYW
  * find anywhere is only ever a CONFIRMED_GAP when the member's profile
  * has enough other skill data on record to make that absence meaningful
  * -- otherwise it's UNKNOWN.
+ *
+ * Exported (OE 2.0 Phase 2) so `qualifications.ts`'s must-have hard
+ * constraint reuses this exact classification logic instead of a
+ * second copy -- "must-have vs. nice-to-have" is a question of *which*
+ * skills to check, not a different way of checking them.
  */
-function classifySkill(
+export function classifySkill(
   jdSkill: string,
   flatSkills: string[],
-  careerSkills: CareerSkill[]
+  careerSkills: CareerSkill[],
+  confirmedCapabilities: string[] = []
 ): EvidenceStatus {
   const normalizedFlat = new Set(flatSkills.map(normalize))
   const careerSkillNames = new Set(careerSkills.map((s) => normalize(s.skill_name)))
+  // Career Vault's confirmed capabilities (career_win_capabilities,
+  // status='confirmed') are the strongest possible evidence -- a
+  // member-confirmed, capability-engine-reasoned skill promoted out of a
+  // real Career Win. Treated as an additional confirmed_match source,
+  // same tier as an exact flat/career-skill match (never weaker).
+  const confirmedCapabilityNames = new Set(confirmedCapabilities.map(normalize))
   const exactSurfaceForms = [jdSkill, ...(ALIAS_MAP[jdSkill] ?? [])]
 
-  if (exactSurfaceForms.some((form) => careerSkillNames.has(form) || normalizedFlat.has(form))) {
+  if (
+    exactSurfaceForms.some(
+      (form) => careerSkillNames.has(form) || normalizedFlat.has(form) || confirmedCapabilityNames.has(form)
+    )
+  ) {
     return 'confirmed_match'
   }
 
   const transferableForms = TRANSFERABLE_MAP[jdSkill] ?? []
-  if (transferableForms.some((form) => normalizedFlat.has(form) || careerSkillNames.has(form))) {
+  if (
+    transferableForms.some(
+      (form) => normalizedFlat.has(form) || careerSkillNames.has(form) || confirmedCapabilityNames.has(form)
+    )
+  ) {
     return 'likely_transferable'
   }
 
-  const totalDistinctSkills = new Set([...normalizedFlat, ...careerSkillNames]).size
+  const totalDistinctSkills = new Set([...normalizedFlat, ...careerSkillNames, ...confirmedCapabilityNames]).size
   return totalDistinctSkills < SPARSE_PROFILE_THRESHOLD ? 'unknown' : 'confirmed_gap'
 }
 
@@ -118,11 +179,52 @@ const CLASSIFICATION_WEIGHT: Partial<Record<EvidenceStatus, number>> = {
   confirmed_gap: 0,
 }
 
+/**
+ * True when a JD skill's match is specifically grounded in a Career
+ * Vault confirmed capability -- FreshlyForward's strongest possible
+ * skill evidence (a member-confirmed, capability-engine-reasoned skill
+ * promoted out of a real Career Win, not just free-text the member
+ * typed into a form). Reuses the exact same ALIAS_MAP/TRANSFERABLE_MAP
+ * surface-form lookup `classifySkill` already does, rather than a
+ * second parallel definition of "what counts as a match for this JD
+ * skill." Used only for explainability (which matches to call out by
+ * name in the dimension's explanation) -- never changes the score or
+ * the EvidenceStatus itself.
+ */
+export function isGroundedInCareerVault(jdSkill: string, confirmedCapabilities: string[]): boolean {
+  const confirmedCapabilityNames = new Set(confirmedCapabilities.map(normalize))
+  const surfaceForms = [jdSkill, ...(ALIAS_MAP[jdSkill] ?? []), ...(TRANSFERABLE_MAP[jdSkill] ?? [])]
+  return surfaceForms.some((form) => confirmedCapabilityNames.has(form))
+}
+
+/**
+ * True when a JD skill's match also happens to be claimed on the
+ * member's current Master Resume (OE 2.0 Phase 5). Every resume skill
+ * entry is validated against `member_profiles.skills` at creation time
+ * (see `createMasterResume.ts`), so a resume claim is never independent
+ * new evidence -- it is always already covered by `flatSkills`, which
+ * `classifySkill` already checks. This function therefore never changes
+ * the score or the EvidenceStatus itself (exactly like
+ * `isGroundedInCareerVault`); it only lets the explanation cite "your
+ * resume already reflects this" for an already-confirmed match, per the
+ * OE 2.0 plan's Resume Intelligence cross-reference -- read-only, no
+ * scoring logic duplicated between the two systems.
+ */
+export function isGroundedInResume(jdSkill: string, resumeSkills: string[]): boolean {
+  const resumeSkillNames = new Set(resumeSkills.map(normalize))
+  const surfaceForms = [jdSkill, ...(ALIAS_MAP[jdSkill] ?? []), ...(TRANSFERABLE_MAP[jdSkill] ?? [])]
+  return surfaceForms.some((form) => resumeSkillNames.has(form))
+}
+
 export interface SkillsEvidenceResult {
   score: number
   evidence: string[]
   gaps: string[]
   unknowns: string[]
+  /** Subset of `evidence` specifically grounded in a Career Vault confirmed capability (OE 2.0 Phase 2) -- for explanation copy only. */
+  groundedByCareerVault: string[]
+  /** Subset of `evidence` also claimed on the member's current Master Resume (OE 2.0 Phase 5) -- for explanation copy only, never a separate evidence tier. */
+  groundedByResume: string[]
   legacyBreakdown: {
     skillsCoverage: number
     dnaSkillEvidence: number
@@ -142,20 +244,27 @@ export function scoreSkillsDimension(
   flatSkills: string[],
   careerSkills: CareerSkill[],
   careerScope: CareerScope[],
-  jobText: string
+  jobText: string,
+  confirmedCapabilities: string[] = [],
+  resumeSkills: string[] = []
 ): SkillsEvidenceResult {
   const jdSkills = [...new Set(findSkillsInText(jobText))]
 
   const evidence: string[] = []
   const gaps: string[] = []
   const unknowns: string[] = []
+  const groundedByCareerVault: string[] = []
+  const groundedByResume: string[] = []
   let weightedSum = 0
   let countedSkills = 0
 
   for (const jdSkill of jdSkills) {
-    const status = classifySkill(jdSkill, flatSkills, careerSkills)
-    if (status === 'confirmed_match' || status === 'likely_transferable') evidence.push(jdSkill)
-    else if (status === 'confirmed_gap') gaps.push(jdSkill)
+    const status = classifySkill(jdSkill, flatSkills, careerSkills, confirmedCapabilities)
+    if (status === 'confirmed_match' || status === 'likely_transferable') {
+      evidence.push(jdSkill)
+      if (isGroundedInCareerVault(jdSkill, confirmedCapabilities)) groundedByCareerVault.push(jdSkill)
+      if (isGroundedInResume(jdSkill, resumeSkills)) groundedByResume.push(jdSkill)
+    } else if (status === 'confirmed_gap') gaps.push(jdSkill)
     else unknowns.push(jdSkill)
 
     const weight = CLASSIFICATION_WEIGHT[status]
@@ -183,6 +292,8 @@ export function scoreSkillsDimension(
     evidence,
     gaps,
     unknowns,
+    groundedByCareerVault,
+    groundedByResume,
     legacyBreakdown: {
       skillsCoverage,
       dnaSkillEvidence: dnaEvidence.points,

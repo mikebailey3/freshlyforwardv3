@@ -77,3 +77,30 @@ describe('scoreRoleRelevanceDimension - career change', () => {
     expect(result.explanation.toLowerCase()).toContain('pursuing')
   })
 })
+
+describe('scoreRoleRelevanceDimension - target_role (OE 2.0 Phase 0)', () => {
+  it('scores highly against target_role alone, with no preferred_jobs on file', () => {
+    const result = scoreRoleRelevanceDimension(
+      makeProfile({ preferred_jobs: [], employment_history: [], target_role: 'Data Analyst' }),
+      makeJob({ title: 'Data Analyst' })
+    )
+    expect(result.score).toBeGreaterThan(50)
+    expect(result.status).not.toBe('no-data')
+  })
+
+  it('is additive to preferred_jobs, not a replacement for it', () => {
+    const withBoth = scoreRoleRelevanceDimension(
+      makeProfile({ preferred_jobs: ['Data Analyst'], employment_history: [], target_role: 'Data Analyst' }),
+      makeJob({ title: 'Data Analyst' })
+    )
+    expect(withBoth.score).toBeGreaterThan(50)
+  })
+
+  it('still falls back to no-data when neither preferred_jobs, target_role, nor work history is on file', () => {
+    const result = scoreRoleRelevanceDimension(
+      makeProfile({ preferred_jobs: [], employment_history: [], target_role: null }),
+      makeJob()
+    )
+    expect(result.status).toBe('no-data')
+  })
+})

@@ -1,9 +1,9 @@
 import { supabase } from '@/lib/supabase'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { createOpportunity } from '@/lib/operations'
-import { computeFreshFitScore, toScoreBreakdownPayload, FRESHFIT_TIER_LABELS } from '@/lib/freshFitScore'
-import { getSkillStates } from '@/lib/forwardDna/skills'
-import { getAllScopeForUser } from '@/lib/forwardDna/scope'
+import { computeFreshFitScore, toScoreBreakdownPayload, FRESHFIT_TIER_LABELS, getFreshFitTier } from '@/lib/freshFitScore'
+import { buildMemberOpportunityProfile } from '@/lib/opportunityEngine/memberOpportunityProfile'
+import type { DismissalReason } from '@/lib/opportunityEngine/dismissalReasons'
 import type { JobMatchWithJob, JobMatchScoreBreakdown, MemberProfile, ScrapedJob } from '@/types'
 import type { JobSubmissionInput } from '@/lib/jobSubmission'
 
@@ -29,13 +29,40 @@ export async function getJobMatches(memberId: string): Promise<JobMatchWithJob[]
   return (data ?? []) as unknown as JobMatchWithJob[]
 }
 
-export async function dismissJobMatch(matchId: string): Promise<void> {
-  const { error } = await supabase
+/**
+ * OE 2.0 Phase 9 -- `reason`/`comment` are optional member feedback,
+ * never required to complete a dismiss. The dismissal itself
+ * (`job_matches.dismissed_at`) always commits first and independently;
+ * the feedback write below is strictly best-effort on top of it.
+ */
+export async function dismissJobMatch(
+  matchId: string,
+  reason?: DismissalReason,
+  comment?: string,
+  client: SupabaseClient = supabase
+): Promise<void> {
+  const { error } = await client
     .from('job_matches')
     .update({ dismissed_at: new Date().toISOString() })
     .eq('id', matchId)
 
-  if (error) console.error('Error dismissing job match:', error)
+  if (error) {
+    console.error('Error dismissing job match:', error)
+    return
+  }
+
+  if (!reason) return
+
+  // Reuses the existing member_feedback table (job_match_id column,
+  // OE 2.0 Phase 9 -- prepared, not yet applied; see that migration's
+  // docs). Deliberately never blocks or reverts the dismissal above on
+  // failure: the member's dismiss action already succeeded, and losing
+  // the "why" is a strictly smaller problem than failing the dismiss.
+  const { error: feedbackError } = await client
+    .from('member_feedback')
+    .insert({ job_match_id: matchId, feedback_type: reason, comment: comment ?? null })
+
+  if (feedbackError) console.error('Error recording dismissal feedback:', feedbackError)
 }
 
 /**
@@ -52,10 +79,18 @@ export function buildWhyItMatches(match: JobMatchWithJob): string {
 
   if (breakdown?.v2) {
     const { v2 } = breakdown
+    // Tier is always recomputed from the numeric score here, never read
+    // from the persisted `v2.tier` snapshot -- that field can be stale
+    // relative to whatever tier scheme is live today (e.g. a row scored
+    // before the OE 2.0 Excellent/Good/Fair reconciliation may still
+    // carry a legacy tier string). The raw 0-100 score never changes,
+    // so recomputing here means every historical row displays correctly
+    // under the current bands with zero data migration required.
+    const tier = getFreshFitTier(match.fresh_fit_score)
     const gapCount = v2.dimensions.reduce((sum, d) => sum + d.gaps.length, 0)
     const gapsNote = gapCount > 0 ? ` ${gapCount} confirmed gap(s).` : ''
     const unknownsNote = v2.unknowns.length > 0 ? ` ${v2.unknowns.length} area(s) unclear given your current profile.` : ''
-    return `FreshFit score ${match.fresh_fit_score}/100 (${FRESHFIT_TIER_LABELS[v2.tier]}). ${v2.recommendation.headline}. ${skillsNote}${gapsNote}${unknownsNote}`
+    return `FreshFit score ${match.fresh_fit_score}/100 (${FRESHFIT_TIER_LABELS[tier]}). ${v2.recommendation.headline}. ${skillsNote}${gapsNote}${unknownsNote}`
   }
 
   if (!breakdown?.dnaSkillEvidence) {
@@ -63,6 +98,23 @@ export function buildWhyItMatches(match: JobMatchWithJob): string {
   }
   const strength = breakdown.dnaSkillEvidence >= 10 ? 'strong' : 'partial'
   return `FreshFit score ${match.fresh_fit_score}/100. ${skillsNote} Forward DNA evidence backs ${strength} fit on these skills.`
+}
+
+/**
+ * True when a v2-scored match has at least one confirmed hard-constraint
+ * violation (compensation floor, remote mismatch, jobs_to_avoid, or a
+ * confidently-missing must-have requirement -- see
+ * freshFitScore/types.ts). Pure, additive helper (OE 2.0 Phase 3) so any
+ * page rendering a *grid* of matches (today: StrategistOpportunityEnginePage.tsx,
+ * where a strategist scans many members' matches at once and can't
+ * afford to expand every card's "Why this score?" panel individually)
+ * can flag/filter them without duplicating FreshFitDetails.tsx's own
+ * blockedConstraints logic. A pre-v2 legacy breakdown (no `v2` key) has
+ * no hard-constraint data at all, so this is always false for it --
+ * never a false positive.
+ */
+export function hasHardBlocker(breakdown: JobMatchScoreBreakdown | null | undefined): boolean {
+  return (breakdown?.v2?.hardConstraints ?? []).some((c) => c.status === 'hard_blocker')
 }
 
 /**
@@ -100,20 +152,19 @@ export async function submitMemberJob(
   }
 
   const job = jobRow as ScrapedJob
-  const [{ skills }, { scope }, compassResult] = await Promise.all([
-    getSkillStates(profile.user_id, client),
-    getAllScopeForUser(profile.user_id, client),
-    client
-      .from('career_compass_results')
-      .select('readiness_scores')
-      .eq('user_id', profile.user_id)
-      .eq('is_current', true)
-      .maybeSingle(),
-  ])
-  const careerDirectionScore =
-    (compassResult.data as { readiness_scores?: { careerDirection?: number | null } } | null)?.readiness_scores
-      ?.careerDirection ?? null
-  const result = computeFreshFitScore(profile, job, { skills, scope }, careerDirectionScore)
+  // Phase 0 (OE 2.0): one canonical composition of Forward DNA, Career
+  // Vault confirmed capabilities, and Career Compass -- replaces this
+  // function's previously-independent (and drifting) fetch of the same
+  // inputs. See memberOpportunityProfile.ts for the full rationale.
+  const opportunityProfile = await buildMemberOpportunityProfile(profile.user_id, profile, client)
+  const result = computeFreshFitScore(
+    opportunityProfile.profile,
+    job,
+    { skills: opportunityProfile.skills, scope: opportunityProfile.scope },
+    opportunityProfile.careerDirectionScore,
+    opportunityProfile.confirmedCapabilities,
+    opportunityProfile.resumeSkills
+  )
 
   const { data: matchRow, error: matchError } = await client
     .from('job_matches')

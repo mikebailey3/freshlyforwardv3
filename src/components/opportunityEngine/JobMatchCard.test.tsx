@@ -27,11 +27,21 @@ describe('JobMatchCard', () => {
     expect(screen.getByText(/FreshFit 82/i)).toBeInTheDocument()
   })
 
-  it('calls onDismiss with the match id when the dismiss button is clicked', () => {
+  it('opens a reason menu on dismiss-button click, and calls onDismiss with no reason when the member skips it', () => {
     const onDismiss = vi.fn()
     render(<JobMatchCard match={makeMatch()} onDismiss={onDismiss} />)
     fireEvent.click(screen.getByRole('button', { name: /dismiss match/i }))
+    expect(onDismiss).not.toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('button', { name: 'Skip, just dismiss' }))
     expect(onDismiss).toHaveBeenCalledWith('match-1')
+  })
+
+  it('calls onDismiss with the chosen reason when the member picks one from the menu (OE 2.0 Phase 9)', () => {
+    const onDismiss = vi.fn()
+    render(<JobMatchCard match={makeMatch()} onDismiss={onDismiss} />)
+    fireEvent.click(screen.getByRole('button', { name: /dismiss match/i }))
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Wrong salary' }))
+    expect(onDismiss).toHaveBeenCalledWith('match-1', 'wrong_salary')
   })
 
   it('shows a "Sent to Strategist" tag only when the match has been promoted', () => {
@@ -40,5 +50,27 @@ describe('JobMatchCard', () => {
 
     rerender(<JobMatchCard match={makeMatch({ promoted_opportunity_id: 'opp-1' })} onDismiss={vi.fn()} />)
     expect(screen.getByText('Sent to Strategist')).toBeInTheDocument()
+  })
+})
+
+// OE 2.0 Phase 4: personalized ranking surfaces on the member-facing card.
+describe('JobMatchCard - OE 2.0 Phase 4 ranking props', () => {
+  it('shows a "Top Pick" badge only when topPick is true and the match is not flagged', () => {
+    render(<JobMatchCard match={makeMatch()} onDismiss={vi.fn()} topPick />)
+    expect(screen.getByText('Top Pick')).toBeInTheDocument()
+  })
+
+  it('never shows "Top Pick" on a flagged match, even if topPick is true -- a flagged match is never presented as a shining pick', () => {
+    render(<JobMatchCard match={makeMatch()} onDismiss={vi.fn()} topPick needsReview />)
+    expect(screen.queryByText('Top Pick')).not.toBeInTheDocument()
+    expect(screen.getByText('Needs review')).toBeInTheDocument()
+  })
+
+  it('renders the rank highlight line only when one is provided', () => {
+    const { rerender } = render(<JobMatchCard match={makeMatch()} onDismiss={vi.fn()} />)
+    expect(screen.queryByText(/Why it's ranked here/i)).not.toBeInTheDocument()
+
+    rerender(<JobMatchCard match={makeMatch()} onDismiss={vi.fn()} rankHighlight="posted in the last 3 days" />)
+    expect(screen.getByText(/posted in the last 3 days/i)).toBeInTheDocument()
   })
 })

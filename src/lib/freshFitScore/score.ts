@@ -5,6 +5,8 @@ import { scoreRoleRelevanceDimension } from './roleRelevance'
 import { scoreCareerDirectionDimension } from './careerDirection'
 import { scoreCompensationDimension, compensationHardConstraint } from './compensation'
 import { scoreLocationDimension, remoteHardConstraint } from './location'
+import { jobsToAvoidHardConstraint } from './exclusions'
+import { mustHaveSkillsHardConstraint } from './qualifications'
 import { computeConfidence } from './confidence'
 import { computeRecommendation } from './recommendation'
 import { getFreshFitTier } from './tiers'
@@ -77,22 +79,52 @@ function statusFromScore(score: number): FreshFitDimensionResult['status'] {
  * intelligence. No LLM, no external API. Composes five independently
  * testable dimensions (see ./skillMatching, ./roleRelevance,
  * ./careerDirection, ./compensation, ./location) into one 0-100
- * composite, plus hard constraints, confidence, and a deterministic
- * recommendation.
+ * composite, plus four hard constraints (./compensation,
+ * ./location, ./exclusions, ./qualifications), confidence, and a
+ * deterministic recommendation.
  *
  * `careerDirectionScore` is optional and additive (defaults to null) --
  * every existing call site keeps compiling; callers that have a Career
  * Compass result (the sync script, submitMemberJob) pass it through.
+ *
+ * `confirmedCapabilities` (OE 2.0 Phase 0) is also optional and additive
+ * (defaults to `[]`) -- Career Vault's confirmed (status='confirmed')
+ * skill names, the strongest possible skill evidence FreshlyForward has.
+ * Callers should source this from
+ * `opportunityEngine/memberOpportunityProfile.ts::buildMemberOpportunityProfile`
+ * rather than querying `career_win_capabilities` directly.
+ *
+ * `resumeSkills` (OE 2.0 Phase 5) is also optional and additive
+ * (defaults to `[]`) -- the member's current Master Resume's claimed
+ * skills, read-only via `getMasterResumeSkills`/`buildMemberOpportunityProfile`.
+ * This never changes classification or score -- every resume skill is
+ * already validated against `profile.skills` at resume-creation time, so
+ * it is only used to strengthen an already-confirmed match's
+ * explanation ("resume confirms this skill"), never as a second
+ * evidence tier or a second scoring engine.
  */
 export function computeFreshFitScore(
   profile: MemberProfile,
   job: ScrapedJob,
   dna: { skills: CareerSkill[]; scope: CareerScope[] } = { skills: [], scope: [] },
-  careerDirectionScore: number | null = null
+  careerDirectionScore: number | null = null,
+  confirmedCapabilities: string[] = [],
+  resumeSkills: string[] = []
 ): FreshFitResult {
   const jobText = `${job.title} ${job.description}`
 
-  const skillsResult = scoreSkillsDimension(profile.skills || [], dna.skills, dna.scope, jobText)
+  const skillsResult = scoreSkillsDimension(profile.skills || [], dna.skills, dna.scope, jobText, confirmedCapabilities, resumeSkills)
+  // OE 2.0 Phase 2/5: call out Career Vault- and resume-grounded matches
+  // by name so members/strategists can see exactly why a match
+  // happened, not just that it did.
+  const groundingNotes: string[] = []
+  if (skillsResult.groundedByCareerVault.length > 0) {
+    groundingNotes.push(`${skillsResult.groundedByCareerVault.length} confirmed via your Career Vault evidence.`)
+  }
+  if (skillsResult.groundedByResume.length > 0) {
+    groundingNotes.push(`${skillsResult.groundedByResume.length} confirmed via your current resume.`)
+  }
+  const groundingNote = groundingNotes.length > 0 ? ` ${groundingNotes.join(' ')}` : ''
   const skillsDimension: FreshFitDimensionResult = {
     key: 'skillsEvidence',
     label: 'Skills & Evidence',
@@ -100,9 +132,10 @@ export function computeFreshFitScore(
     weight: WEIGHTS.skillsEvidence,
     status: statusFromScore(skillsResult.score),
     explanation:
-      skillsResult.gaps.length === 0 && skillsResult.unknowns.length === 0
+      (skillsResult.gaps.length === 0 && skillsResult.unknowns.length === 0
         ? 'Your recorded skills and Forward DNA evidence cover what this role is looking for.'
-        : `Matched on ${skillsResult.evidence.length} skill(s); ${skillsResult.gaps.length} confirmed gap(s), ${skillsResult.unknowns.length} unclear given your current profile.`,
+        : `Matched on ${skillsResult.evidence.length} skill(s); ${skillsResult.gaps.length} confirmed gap(s), ${skillsResult.unknowns.length} unclear given your current profile.`) +
+      groundingNote,
     evidence: skillsResult.evidence,
     gaps: skillsResult.gaps,
     unknowns: skillsResult.unknowns,
@@ -130,9 +163,14 @@ export function computeFreshFitScore(
   const tier = getFreshFitTier(score)
   const confidence = computeConfidence(dimensions)
 
-  const hardConstraints = [compensationHardConstraint(profile, job), remoteHardConstraint(profile, job)]
+  const hardConstraints = [
+    compensationHardConstraint(profile, job),
+    remoteHardConstraint(profile, job),
+    jobsToAvoidHardConstraint(profile, job),
+    mustHaveSkillsHardConstraint(profile, job, dna.skills, confirmedCapabilities),
+  ]
   const hasConfirmedGaps = dimensions.some((d) => d.gaps.length > 0)
-  const recommendation = computeRecommendation(tier, hardConstraints, hasConfirmedGaps)
+  const recommendation = computeRecommendation(tier, hardConstraints, hasConfirmedGaps, score)
 
   const unknowns = [...new Set(dimensions.flatMap((d) => d.unknowns))]
   const matchedSkills = [...new Set(skillsResult.evidence)].slice(0, 10)

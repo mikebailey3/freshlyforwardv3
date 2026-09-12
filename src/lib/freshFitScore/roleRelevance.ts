@@ -54,19 +54,27 @@ const CAREER_CHANGE_HISTORY_CEILING = 0.1
 
 /**
  * Role Relevance dimension -- title overlap between the JD and the
- * member's preferred job titles vs. their past employment titles,
- * scored separately (not as one combined bag of words) specifically so
- * a deliberate career changer -- someone whose *preferred* direction
- * doesn't match their *past* titles -- gets full credit for matching
- * where they're trying to go, not penalized for not yet having done it.
- * Also folds in a best-effort seniority comparison (src/./seniority.ts):
- * a JD implying meaningfully more seniority than the member's current
- * level is a confirmed gap; the reverse (overqualification) is an
- * honest, non-penalizing note, not a mismatch.
+ * member's preferred job titles (plus `target_role`, OE 2.0 Phase 0 --
+ * both feed the same "where you're trying to go" comparison) vs. their
+ * past employment titles, scored separately (not as one combined bag of
+ * words) specifically so a deliberate career changer -- someone whose
+ * *preferred* direction doesn't match their *past* titles -- gets full
+ * credit for matching where they're trying to go, not penalized for not
+ * yet having done it. Also folds in a best-effort seniority comparison
+ * (src/./seniority.ts): a JD implying meaningfully more seniority than
+ * the member's current level is a confirmed gap; the reverse
+ * (overqualification) is an honest, non-penalizing note, not a mismatch.
  */
 export function scoreRoleRelevanceDimension(profile: MemberProfile, job: ScrapedJob): FreshFitDimensionResult {
   const titleTokens = tokenize(job.title)
-  const preferredTokens = tokenize((profile.preferred_jobs || []).join(' '))
+  // `target_role` (OE 2.0 Phase 0) folds into the same "where you're
+  // trying to go" bucket as `preferred_jobs` -- one member-stated
+  // direction signal, not a second/competing one. A member who has only
+  // filled in target_role (no preferred_jobs list yet) still gets a real
+  // comparison instead of falling into the no-data branch below.
+  const preferredTitles = [...(profile.preferred_jobs || [])]
+  if (profile.target_role) preferredTitles.push(profile.target_role)
+  const preferredTokens = tokenize(preferredTitles.join(' '))
   const historyTitles = (profile.employment_history || []).map((e) => e.title)
   const historyTokens = tokenize(historyTitles.join(' '))
 

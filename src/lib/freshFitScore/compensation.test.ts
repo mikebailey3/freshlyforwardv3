@@ -30,6 +30,54 @@ describe('parseSalaryRange', () => {
     expect(parseSalaryRange(null)).toBeNull()
     expect(parseSalaryRange('Competitive salary')).toBeNull()
   })
+
+  it('returns null for an explicit DOE/negotiable mention with no dollar figure (never fabricates a number)', () => {
+    expect(parseSalaryRange('Salary DOE')).toBeNull()
+    expect(parseSalaryRange('Pay is negotiable')).toBeNull()
+  })
+
+  it('returns null for a non-USD currency symbol rather than mis-parsing the digits', () => {
+    expect(parseSalaryRange('£50,000')).toBeNull()
+  })
+
+  it('annualizes an hourly RANGE, not just the upper bound (OE 2.0 Phase 2)', () => {
+    expect(parseSalaryRange('$25-$30/hr')).toEqual({ min: 52000, max: 62400 })
+    expect(parseSalaryRange('$20 to $22 per hour')).toEqual({ min: 41600, max: 45760 })
+  })
+
+  it('annualizes a single monthly value (OE 2.0 Phase 2)', () => {
+    expect(parseSalaryRange('$5,000/mo')).toEqual({ min: 60000, max: 60000 })
+  })
+
+  it('annualizes a monthly RANGE (OE 2.0 Phase 2)', () => {
+    expect(parseSalaryRange('$4,500 - $5,500 per month')).toEqual({ min: 54000, max: 66000 })
+  })
+
+  it('annualizes a single weekly value (OE 2.0 Phase 2)', () => {
+    expect(parseSalaryRange('$1,200/wk')).toEqual({ min: 62400, max: 62400 })
+  })
+
+  it('annualizes a weekly RANGE (OE 2.0 Phase 2)', () => {
+    expect(parseSalaryRange('$1,000 - $1,200/week')).toEqual({ min: 52000, max: 62400 })
+  })
+
+  it('supports "k" shorthand on a monthly value (OE 2.0 Phase 2)', () => {
+    expect(parseSalaryRange('$5k/mo')).toEqual({ min: 60000, max: 60000 })
+  })
+})
+
+describe('scoreCompensationDimension - non-USD member currency (OE 2.0 Phase 2)', () => {
+  it('is no-data, never a false numeric comparison, when the member set a non-USD salary currency', () => {
+    const result = scoreCompensationDimension(makeProfile({ salary_currency: 'CAD' }), makeJob())
+    expect(result.status).toBe('no-data')
+    expect(result.score).toBe(50)
+    expect(result.explanation).toContain('CAD')
+  })
+
+  it('treats an unset/empty salary_currency as USD (backward compatible with existing fixtures)', () => {
+    const result = scoreCompensationDimension(makeProfile({ salary_currency: undefined }), makeJob())
+    expect(result.status).not.toBe('no-data')
+  })
 })
 
 describe('scoreCompensationDimension - compensation match', () => {
@@ -75,5 +123,11 @@ describe('compensationHardConstraint', () => {
   it('is unknown (never a false block) when salary data is missing on either side', () => {
     expect(compensationHardConstraint(makeProfile(), makeJob({ salary_text: null })).status).toBe('unknown')
     expect(compensationHardConstraint(makeProfile({ salary_min: null }), makeJob()).status).toBe('unknown')
+  })
+
+  it('is unknown, never a false comparison, when the member set a non-USD salary currency (OE 2.0 Phase 2)', () => {
+    const result = compensationHardConstraint(makeProfile({ salary_currency: 'CAD', salary_min: 90000 }), makeJob({ salary_text: '$50,000 - $60,000' }))
+    expect(result.status).toBe('unknown')
+    expect(result.reason).toContain('CAD')
   })
 })

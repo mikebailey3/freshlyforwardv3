@@ -8,13 +8,29 @@ function normalize(text: string | null | undefined): string {
 const TRAVEL_PERCENT_RE = /(\d{1,3})\s?%\s*travel/i
 const TRAVEL_MENTION_RE = /\brequires?\s+travel\b|\bfrequent travel\b|\bextensive travel\b/i
 
-function jobImpliesHeavyTravel(description: string): boolean {
-  const pctMatch = description.match(TRAVEL_PERCENT_RE)
-  if (pctMatch && Number(pctMatch[1]) >= 25) return true
-  return TRAVEL_MENTION_RE.test(description)
+/**
+ * Shared travel-language detector, exported (OE 2.0 Phase 1) so
+ * `opportunityEngine/jobNormalization.ts` reads the exact same signal
+ * this scoring dimension already relies on, instead of maintaining a
+ * second copy of these regexes that could silently drift.
+ */
+export function extractTravelSignal(description: string | null | undefined): { impliesHeavyTravel: boolean; percentage: number | null } {
+  const text = description || ''
+  const pctMatch = text.match(TRAVEL_PERCENT_RE)
+  const percentage = pctMatch ? Number(pctMatch[1]) : null
+  const impliesHeavyTravel = (percentage !== null && percentage >= 25) || TRAVEL_MENTION_RE.test(text)
+  return { impliesHeavyTravel, percentage }
 }
 
-function isRemoteText(location: string): boolean {
+function jobImpliesHeavyTravel(description: string): boolean {
+  return extractTravelSignal(description).impliesHeavyTravel
+}
+
+/**
+ * Shared remote-language detector, exported (OE 2.0 Phase 1) for the
+ * same DRY reason as `extractTravelSignal` above.
+ */
+export function isRemoteText(location: string | null | undefined): boolean {
   return normalize(location).includes('remote')
 }
 

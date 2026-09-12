@@ -1,7 +1,8 @@
 import { describe, it, expect, vi } from 'vitest'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { buildWhyItMatches, submitMemberJob } from './opportunityEngine'
-import type { JobMatchWithJob, MemberProfile } from '@/types'
+import { buildWhyItMatches, hasHardBlocker, submitMemberJob, dismissJobMatch } from './opportunityEngine'
+import type { JobMatchWithJob, JobMatchScoreBreakdown, MemberProfile } from '@/types'
+import type { FreshFitHardConstraint } from '@/lib/freshFitScore'
 
 function makeMatch(overrides: Partial<JobMatchWithJob> = {}): JobMatchWithJob {
   return {
@@ -60,11 +61,52 @@ describe('buildWhyItMatches', () => {
   })
 })
 
+describe('hasHardBlocker (OE 2.0 Phase 3)', () => {
+  function makeBreakdown(hardConstraints: FreshFitHardConstraint[]): JobMatchScoreBreakdown {
+    return {
+      skillsCoverage: 0, roleRelevance: 0, locationFit: 0, keywordDensity: 0,
+      v2: {
+        tier: 'good', confidence: 'high',
+        dimensions: [],
+        hardConstraints,
+        unknowns: [],
+        recommendation: { key: 'worth_a_look', headline: '', detail: '' },
+      },
+    }
+  }
+
+  it('is true when any v2 hard constraint is a hard_blocker', () => {
+    const breakdown = makeBreakdown([
+      { key: 'compensationFloor', label: 'Compensation Floor', status: 'confirmed_match', reason: '' },
+      { key: 'jobsToAvoidExclusion', label: 'Roles/Companies to Avoid', status: 'hard_blocker', reason: 'matches an avoided company' },
+    ])
+    expect(hasHardBlocker(breakdown)).toBe(true)
+  })
+
+  it('is false when every hard constraint is confirmed_match or unknown', () => {
+    const breakdown = makeBreakdown([
+      { key: 'compensationFloor', label: 'Compensation Floor', status: 'confirmed_match', reason: '' },
+      { key: 'remoteRequirement', label: 'Remote Requirement', status: 'unknown', reason: '' },
+    ])
+    expect(hasHardBlocker(breakdown)).toBe(false)
+  })
+
+  it('is false (never a false positive) for a legacy pre-v2 breakdown with no hard-constraint data at all', () => {
+    expect(hasHardBlocker({ skillsCoverage: 40, roleRelevance: 10, locationFit: 10, keywordDensity: 5 })).toBe(false)
+  })
+
+  it('is false for null/undefined without throwing', () => {
+    expect(hasHardBlocker(null)).toBe(false)
+    expect(hasHardBlocker(undefined)).toBe(false)
+  })
+})
+
 function makeFakeClient(opts: {
   jobRow?: Record<string, unknown> | null
   jobError?: string
   matchRow?: Record<string, unknown> | null
   matchError?: string
+  confirmedCapabilityRows?: { skill_name: string }[]
 }) {
   const scrapedJobsSingle = vi.fn().mockResolvedValue({
     data: opts.jobRow ?? null,
@@ -81,20 +123,36 @@ function makeFakeClient(opts: {
   const dnaEq = vi.fn().mockResolvedValue({ data: [], error: null })
   const dnaSelect = vi.fn().mockReturnValue({ eq: dnaEq })
 
+  const capsEq2 = vi.fn().mockResolvedValue({ data: opts.confirmedCapabilityRows ?? [], error: null })
+  const capsEq1 = vi.fn().mockReturnValue({ eq: capsEq2 })
+  const capsSelect = vi.fn().mockReturnValue({ eq: capsEq1 })
+
   const compassMaybeSingle = vi.fn().mockResolvedValue({ data: null, error: null })
   const compassEq2 = vi.fn().mockReturnValue({ maybeSingle: compassMaybeSingle })
   const compassEq1 = vi.fn().mockReturnValue({ eq: compassEq2 })
   const compassSelect = vi.fn().mockReturnValue({ eq: compassEq1 })
 
+  const masterMaybeSingle = vi.fn().mockResolvedValue({ data: null, error: null })
+  const masterEq3 = vi.fn().mockReturnValue({ maybeSingle: masterMaybeSingle })
+  const masterEq2 = vi.fn().mockReturnValue({ eq: masterEq3 })
+  const masterEq1 = vi.fn().mockReturnValue({ eq: masterEq2 })
+  const masterSelect = vi.fn().mockReturnValue({ eq: masterEq1 })
+
+  const exclusionRulesEq = vi.fn().mockResolvedValue({ data: [], error: null })
+  const exclusionRulesSelect = vi.fn().mockReturnValue({ eq: exclusionRulesEq })
+
   const fromMock = vi.fn((table: string) => {
     if (table === 'scraped_jobs') return { insert: scrapedJobsInsert }
     if (table === 'job_matches') return { insert: jobMatchesInsert }
     if (table === 'career_skills' || table === 'career_scope') return { select: dnaSelect }
+    if (table === 'career_win_capabilities') return { select: capsSelect }
     if (table === 'career_compass_results') return { select: compassSelect }
+    if (table === 'resume_versions') return { select: masterSelect }
+    if (table === 'member_job_exclusion_rules') return { select: exclusionRulesSelect }
     throw new Error(`Unexpected table: ${table}`)
   })
 
-  return { client: { from: fromMock } as unknown as SupabaseClient, dnaSelect, dnaEq, jobMatchesInsert }
+  return { client: { from: fromMock } as unknown as SupabaseClient, dnaSelect, dnaEq, capsEq2, jobMatchesInsert }
 }
 
 const submissionProfile = { user_id: 'member-1', skills: ['sql'] } as unknown as MemberProfile
@@ -139,5 +197,85 @@ describe('submitMemberJob', () => {
     const { match, error } = await submitMemberJob(submissionProfile, submissionInput, client)
     expect(match).toBeNull()
     expect(error).toBe('match insert failed')
+  })
+
+  // OE 2.0 Phase 0: submitMemberJob now composes its scoring inputs via
+  // buildMemberOpportunityProfile instead of independently fetching
+  // Forward DNA/Career Compass. This locks in that Career Vault's
+  // confirmed capabilities are actually queried (evidence linkage), and
+  // that they flow all the way through to a higher score than an
+  // otherwise-identical submission with no confirmed capabilities on
+  // file (precedence: confirmed capability evidence must count).
+  it('queries Career Vault confirmed capabilities and lets them raise the score', async () => {
+    const jobRow = {
+      id: 'job-1', source: 'member-submitted', external_id: 'x', title: 'Data Analyst', company: 'Acme',
+      location: null, description: 'Looking for strong Python and SQL skills.', salary_text: null,
+      employment_type: null, posting_url: '', posted_at: null, search_query: 'member-submitted',
+      is_active: true, scraped_at: '', created_at: '',
+    }
+    const matchRow = { id: 'match-1', member_id: 'member-1', scraped_job_id: 'job-1' }
+
+    const withoutCapabilities = makeFakeClient({ jobRow, matchRow, confirmedCapabilityRows: [] })
+    await submitMemberJob(submissionProfile, submissionInput, withoutCapabilities.client)
+    const withoutScore = (withoutCapabilities.jobMatchesInsert.mock.calls[0][0] as { fresh_fit_score: number }).fresh_fit_score
+
+    const withCapabilities = makeFakeClient({ jobRow, matchRow, confirmedCapabilityRows: [{ skill_name: 'python' }] })
+    await submitMemberJob(submissionProfile, submissionInput, withCapabilities.client)
+    const withScore = (withCapabilities.jobMatchesInsert.mock.calls[0][0] as { fresh_fit_score: number }).fresh_fit_score
+
+    expect(withCapabilities.capsEq2).toHaveBeenCalledWith('status', 'confirmed')
+    expect(withScore).toBeGreaterThan(withoutScore)
+  })
+})
+
+describe('dismissJobMatch (OE 2.0 Phase 9 -- optional reason/comment)', () => {
+  function makeDismissClient(opts: { dismissError?: string; feedbackError?: string } = {}) {
+    const dismissEq = vi.fn().mockResolvedValue({ error: opts.dismissError ? { message: opts.dismissError } : null })
+    const dismissUpdate = vi.fn().mockReturnValue({ eq: dismissEq })
+    const feedbackInsert = vi.fn().mockResolvedValue({ error: opts.feedbackError ? { message: opts.feedbackError } : null })
+    const fromMock = vi.fn((table: string) => {
+      if (table === 'job_matches') return { update: dismissUpdate }
+      if (table === 'member_feedback') return { insert: feedbackInsert }
+      throw new Error(`Unexpected table: ${table}`)
+    })
+    return { client: { from: fromMock } as unknown as SupabaseClient, dismissUpdate, dismissEq, feedbackInsert }
+  }
+
+  it('dismisses the match by setting dismissed_at, with no feedback write when no reason is given', async () => {
+    const { client, dismissUpdate, feedbackInsert } = makeDismissClient()
+    await dismissJobMatch('match-1', undefined, undefined, client)
+    expect(dismissUpdate).toHaveBeenCalledWith(expect.objectContaining({ dismissed_at: expect.any(String) }))
+    expect(feedbackInsert).not.toHaveBeenCalled()
+  })
+
+  it('writes a member_feedback row referencing the match when a reason is given', async () => {
+    const { client, feedbackInsert } = makeDismissClient()
+    await dismissJobMatch('match-1', 'wrong_salary', 'pay is too low', client)
+    expect(feedbackInsert).toHaveBeenCalledWith({
+      job_match_id: 'match-1',
+      feedback_type: 'wrong_salary',
+      comment: 'pay is too low',
+    })
+  })
+
+  it('defaults comment to null when a reason is given without one', async () => {
+    const { client, feedbackInsert } = makeDismissClient()
+    await dismissJobMatch('match-1', 'not_interested', undefined, client)
+    expect(feedbackInsert).toHaveBeenCalledWith({
+      job_match_id: 'match-1',
+      feedback_type: 'not_interested',
+      comment: null,
+    })
+  })
+
+  it('never attempts the feedback write when the dismissal itself fails', async () => {
+    const { client, feedbackInsert } = makeDismissClient({ dismissError: 'update failed' })
+    await dismissJobMatch('match-1', 'not_interested', undefined, client)
+    expect(feedbackInsert).not.toHaveBeenCalled()
+  })
+
+  it('does not throw when the feedback write itself fails -- the dismissal already succeeded', async () => {
+    const { client } = makeDismissClient({ feedbackError: 'relation does not exist' })
+    await expect(dismissJobMatch('match-1', 'not_interested', undefined, client)).resolves.toBeUndefined()
   })
 })
