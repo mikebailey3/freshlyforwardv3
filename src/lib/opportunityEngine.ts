@@ -10,7 +10,8 @@ import type { JobSubmissionInput } from '@/lib/jobSubmission'
 const ENGINE_VERSION = 2
 
 // ============================================================
-// JOB MATCHES (read-side; scores are computed by scripts/syncFreshFitScores.ts)
+// JOB MATCHES (read-side; scores are computed by scripts/syncFreshFitScores.ts,
+// fed by scripts/scrapeJobs.ts via the Adzuna API)
 // ============================================================
 
 export async function getJobMatches(memberId: string): Promise<JobMatchWithJob[]> {

@@ -110,7 +110,7 @@ export function StrategistOpportunityEnginePage() {
         <div className="border border-border bg-surface-card p-12 text-center">
           <Sparkles className="mx-auto h-10 w-10 text-ink-muted" />
           <p className="mt-4 text-sm text-ink-muted">
-            No pending matches. Run the scraper + FreshFit sync scripts to populate this queue.
+            No pending matches. Run the job sync + FreshFit sync scripts to populate this queue.
           </p>
         </div>
       ) : (
