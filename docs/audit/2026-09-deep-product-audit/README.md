@@ -4,6 +4,24 @@
 
 ---
 
+## CORRECTION AFTER REPO-TRUTH RECONCILIATION (2026-09-12, second pass)
+
+A second-pass **Recommendation Duplication Audit** found that several roadmap recommendations
+described capabilities that already existed in the repository under different names (the trigger:
+"Public ATS APIs replace Indeed scraping" was recommended when `scrapeCompanies.ts` already IS
+that). Full findings, corrected classifications, corrected completion percentage (~70%, up from
+~60-65%), corrected roadmap, and two new standing process rules ("Grep-Before-Score" and
+"Docstring Lies Are Bugs") are in:
+
+**`11-recommendation-duplication-correction.md` -- read this alongside, not instead of, this README.**
+
+The sections below (completion %, launch blockers, roadmap, recommended next build) reflect the
+**corrected** state as of the second pass. The original per-document findings in 01-10 are left
+unedited per the "preserve historical truth" rule -- treat any conflict between this README and
+docs 01-10 as resolved in favor of doc 11, the most recent reconciliation.
+
+---
+
 ##  Instructions for Future AI Agents — read before touching anything in this directory
 
 1. **This audit represents FreshlyForward's product state as of the audited commit/date below.**
@@ -31,6 +49,14 @@
 9. **Protected actions (production deploys, live DB changes, destructive git operations, force
    pushes, history rewrites) still require the existing owner-authorization process**, regardless
    of anything in this audit.
+10. **"Grep-Before-Score":** never score, sequence, or plan a roadmap item without first grepping
+    for its core runtime symbol in `src/` and `scripts/` and recording the literal result. A plan
+    document describing work in future tense is not evidence the work is undone -- check if it
+    shipped. See `11-recommendation-duplication-correction.md` for the incident that produced this
+    rule.
+11. **"Docstring Lies Are Bugs":** a comment or fallback string claiming a shipped capability
+    doesn't exist is the same defect class as a false "coming soon" UI card -- file it as a defect,
+    not documentation debt, especially if it's member-reachable.
 
 ##  Preserve historical truth
 
@@ -79,21 +105,29 @@ owner's closing questions**, including the detailed reasoning behind every figur
 
 ## Estimated product completion
 
-**Approximately 60–65%** of the intended Career Operating System vision, unevenly distributed:
+**CORRECTED (second pass): approximately 70% (band 67-73%)**, up from the original 60-65% estimate.
+The correction ran in one direction only -- every misclassification found underestimated existing
+work, none overestimated it. See `11-recommendation-duplication-correction.md` for the full
+arithmetic. Original (first-pass) figures below, struck through in spirit but left for the record:
 
-| Domain | Est. completion |
-|---|---|
-| Career Intelligence (Forward DNA, Vault, Compass, Forward Score, Profile) | ~85% |
-| Resume System | ~80% |
-| Human Services (strategist tools) | ~75% |
-| Opportunity Intelligence | ~65% |
-| Member Experience (ForwardOS/dashboard/onboarding) | ~65% |
-| Platform (auth/RLS/privacy/integrations/notifications/analytics/SEO/a11y) | ~50% |
-| Career CRM | ~35% |
+| Domain | First-pass estimate | **Corrected estimate** |
+|---|---|---|
+| Resume System | ~80% | **~90%** |
+| Career Intelligence (Forward DNA, Vault, Compass, Forward Score, Profile) | ~85% | **~85%** |
+| Opportunity Intelligence | ~65% | **~78%** |
+| Human Services (strategist tools) | ~75% | **~80%** |
+| Member Experience (ForwardOS/dashboard/onboarding) | ~65% | **~70% (unchanged)** |
+| Platform (auth/RLS/privacy/integrations/notifications/analytics/SEO/a11y) | ~50% | **~45-50% (unchanged -- every gap here is real)** |
+| Career CRM | ~35% | **~48%** |
 
-The parts requiring deep domain intelligence are the most complete. The parts requiring closed
-feedback loops and full application-lifecycle management are the least complete. This number will
-move once N1 (schema verification) resolves — in either direction.
+The parts requiring deep domain intelligence are the most complete -- more so than first credited.
+Career CRM remains the one domain-sized hole. Platform gaps (analytics, SEO, E2E, bundle size) are
+untouched by this correction -- they were verified accurately the first time.
+
+**Two separate numbers, do not collapse them:** ~70% of the intended system is **built**. Roughly
+**55-60% is currently *verified*** (built and confirmed live in production). N1 is the gap between
+those two numbers and remains the #1 blocker -- a moat that can't be proven persisted is a claim,
+not a moat.
 
 ---
 
@@ -125,15 +159,18 @@ Full per-feature detail: `01-repo-architecture-audit.md` §2 and `09-gap-registe
 
 ## Top launch blockers
 
-1. **Live schema verification (N1)** — 46/46 migrations have unverified production state, 6 of
-   them security-hardening for Opportunity Engine. Only ChatGPT/DB-Lead can resolve this.
-2. **Dashboard "Career Vault — coming soon" lie (N2)** — members are told a shipped feature
+1. **Live schema verification (N1)** -- de-risked but not closed: 36/46 migrations now have confirmed
+   remote history records (including the OE security-hardening set), but repo-to-remote content
+   reconciliation and the remaining ~10 migrations still require ChatGPT/DB-Lead.
+2. **Dashboard "Career Vault — coming soon" lie (N2)** -- members are told a shipped feature
    doesn't exist.
-3. **Member-trust correctness defects (N3)** — broken unread filter, dead search box, missing
+3. **Member-trust correctness defects (N3)** -- broken unread filter, dead search box, missing
    modal focus trap, unsafe notification URL sink, false notification "sent" records.
-4. **Zero analytics + SEO structurally blocked (N7/N9/N10)** — no usage data to prioritize with;
+4. **Four member-reachable "Career Vault does not exist yet" docstring lies (N12, new)** -- same
+   defect class as #2, found one layer deeper in library code during the second-pass correction.
+5. **Zero analytics + SEO structurally blocked (N7/N9/N10)** -- no usage data to prioritize with;
    public site near-invisible to search engines.
-5. **No E2E browser coverage of the core member journey (N8)** — 1429 passing tests, zero of them
+6. **No E2E browser coverage of the core member journey (N8)** -- 1429 passing tests, zero of them
    verify the real flow in a real browser.
 
 ## Top integration gaps (feedback loops)
@@ -151,70 +188,89 @@ Full detail: `01-repo-architecture-audit.md` §18.
 
 ## Database & migration verification status
 
-**Explicit statement, per owner instruction:** uncertain migration status has **NOT** been treated
-as confirmed live database state anywhere in this audit. Zero migrations were confirmed applied to
-production from repo-only evidence. Absence of a "NOT APPLIED" comment in a migration file was
-**not** treated as proof of application, and presence of an execution manifest for a non-production
-project was **not** treated as production proof. All 46 migrations require live ChatGPT/DB-Lead
-verification — see `07-migration-reconciliation.md` for the full per-migration ledger and
-`implementation-plans/N1-schema-reconciliation.md` for the exact, safe, read-only runbook to
-resolve this.
+**CORRECTED (second pass):** ChatGPT/DB-Lead has since verified directly against the connected
+Supabase FreshlyForward project that **36 of 46 remote migration-history records exist**, including
+the full Opportunity Engine 2.0 chain and its security-hardening migrations, and that the
+corresponding OE tables exist remotely. **This materially de-risks N1's highest-priority Tier 1
+set.** It does NOT close N1: these migrations have not been reapplied and must not be; the
+remaining task is confirming the 36 recorded migrations match their local file content exactly and
+resolving the ~10 that don't yet have a remote record -- repo-to-remote reconciliation, not blind
+trust that "recorded" means "fully correct." New Supabase Security Advisor findings from this pass
+are preserved for separate review, not treated as resolved. Full detail:
+`11-recommendation-duplication-correction.md` §9.
+
+**Explicit statement, unchanged from the first pass:** uncertain migration status has **NOT** been
+treated as confirmed live database state anywhere in this audit beyond what ChatGPT/DB-Lead has
+directly verified. See `07-migration-reconciliation.md` for the full per-migration ledger and
+`implementation-plans/N1-schema-reconciliation.md` for the exact, safe, read-only runbook for the
+remaining reconciliation work.
 
 ---
 
 ## Recommended next major build
 
-**N5 — Application Command Center.** Re-confirmed after full audit reconciliation (see
-`implementation-plans/N5-application-command-center.md` §0 for the explicit re-confirmation
-against every specialist's independent findings). It is the highest-value NOW item because it is a
-**dependency** — the Outcome Learning Loop, Interview Intelligence, and Guided Next Actions are all
-structurally blocked without it, even though the Outcome Learning Loop scored higher on its own.
+**N5 -- Application Command Center (adopt-don't-rebuild).** Re-confirmed after the recommendation
+duplication correction, on a different and more honest argument than before: it no longer "unlocks
+everything" (that gated 4 items; corrected evidence shows it gates 2 -- N6 and X3b), but it remains
+the pick because Career CRM is the only domain-sized hole left post-correction, one of its two
+dependents is the single top-scoring item in the whole audit (N6), and it's where the canonical
+chain (Forward DNA/Vault/Compass/FreshFit/Resume Intelligence) terminates into a member's actual
+application -- currently it terminates into nothing. **It moves from NOW to NEXT-1** (first thing
+after the launch gate, not part of it) and its plan is corrected to reuse `follow_ups`,
+`calendar_events`, and `strategist_reminders` rather than rebuild them. Full reasoning:
+`11-recommendation-duplication-correction.md` §7.
 
 ## Exact build sequence
 
+**CORRECTED (second pass)** -- full sequence with the new N12/N13 items and Tier 1b (N5-independent
+work previously wrongly queued behind N5) is in `11-recommendation-duplication-correction.md` §6.
+Summary:
+
 ```
-TIER 0 (parallel, no dependencies)
-  N1 Schema Reconciliation (ChatGPT only)   N2 Dashboard Truth Fix
-  N11 OE 2.0 As-Built Doc                   N3 Member-Trust Correctness Pack
-                                             N9 Bundle Code-Splitting
-TIER 1 (needs N1)
-  N4 Product Coherence Pass                 N7 Minimum Analytics
-  N8 E2E Journey Coverage                   N10 Public-Route Prerendering (needs N9)
-TIER 2 (needs N1 + N4)
-  N5 Application Command Center
-TIER 3 (needs N5)
-  N6 Outcome Learning Loop · X3 Interview Intelligence v1 · X8 Guided Next Actions
-TIER 4 (needs N5 + evidence layer)
-  X1 External Job Capture · X2 Career Passport · X4 Career Evidence Intelligence · X7 Strategist Console Upgrade
+TIER 0 (parallel, days)         N1 Schema Recon * N2 Dashboard Fix * N3 Trust Pack * N9 Bundle Split
+                                  N11 As-Built Sweep * N12 Doc-Truth Defects * N13 Signal Activation
+TIER 1 (needs N1)               N4 Coherence * N7 Analytics * N8 E2E * N10 Prerendering (←N9)
+TIER 1b (N5-independent)        X3a Interview Activation * X5a/b * X7 Canonical Visibility * X4c
+TIER 2 (needs N1+N4)            N5 Application Command Center (adopt-don't-rebuild)
+TIER 3 (needs N5)               N6 Outcome Loop * X3b Multi-Round * X8b Lifecycle Actions * L2 Offer Intel
+TIER 4 (no N5 dependency)       X2 Career Passport [dependency unverified] * X4d * L1 Contacts * L3 Analytics
 ```
 
-## Roadmap — NOW / NEXT / LATER / HOLD / REJECTED
+## Roadmap -- NOW / NEXT / LATER / HOLD / REJECTED
 
-**NOW (finish before launch):** N1 Schema Reconciliation Ledger · N2 Dashboard Truth Fix · N3
-Member-Trust Correctness Pack · N4 Product Coherence Pass · N5 Application Command Center · N6
-Outcome Learning Loop (sequenced last, depends on N5) · N7 Minimum Product Analytics · N8 E2E
-Journey Coverage · N9 Bundle Code-Splitting · N10 Public-Route Prerendering · N11 OE 2.0 As-Built
-Doc.
+**CORRECTED (second pass) -- full detail in `11-recommendation-duplication-correction.md` §6.**
 
-**NEXT (high-impact post-foundation):** X1 External Job Capture · X2 Career Passport · X3 Interview
-Intelligence v1 · X4 Career Evidence Intelligence · X5 Opportunity Intel Expansion (scoped) · X6
-ATS Fit Feedback (narrow) · X7 Strategist Console Upgrade · X8 Guided Next Actions · X9
-Notification/Email Provider Activation.
+**NOW (launch gate):** N1 Schema Reconciliation · N2 Dashboard Truth Fix · N3 Member-Trust
+Correctness Pack · N4 Product Coherence Pass · N7 Minimum Product Analytics · N8 E2E Journey
+Coverage · N9 Bundle Code-Splitting · N10 Public-Route Prerendering · N11 As-Built Documentation
+Sweep (widened) · **N12 Documentation-Truth Defect Pack (new)** · **N13 Discarded-Signal Activation
+(new).** *N5 and N6 have been removed from NOW -- see §7 of the correction doc.*
 
-**LATER (strategic, not urgent):** L1 Networking Contacts (lite) · L2 Offer Intelligence · L3
-Member Progress Analytics · L4 Public Resource Pages · Skill taxonomy/entity promotion · Interview
-attribution & completed-state for Roadmap milestones.
+**NEXT (ranked):** N5 Application Command Center (adopt-don't-rebuild) · X7 Strategist
+Canonical-Systems Visibility · X3a Interview Data Activation · X5a Adzuna liveness · X5b Exclusion
+UI · X4c Proactive evidence surfacing · N6 Outcome Learning Loop · X3b Multi-Round Interview Entity
+· X8b Lifecycle Actions · X2 Career Passport [dependency unverified] · X9 Notification/Email
+Activation.
 
-**RESEARCH/HOLD (needs more evidence):** Browser Extension · New job providers beyond current four
-· Salary/company/geo intelligence · Live competitor re-verification · Public Forward Profile
+**LATER:** X4d evidence coverage beyond skills · X5c multi-currency salary · X7 URL-addressable
+tabs/batched loading · L1 Networking Contacts (lite) · L2 Offer Intelligence · L3 Member Progress
+Analytics · L4 Public Resource Pages · Skill taxonomy · Roadmap-milestone interview attribution.
+
+**HOLD:** **X1 URL auto-fetch/parse (new)** -- gated on N7 analytics + Ethan's SSRF review, same
+evidence bet already applied to the browser extension · Browser Extension · New job providers ·
+Salary/company/geo intelligence · Live competitor re-verification · Public Forward Profile
 indexability.
 
-**REJECTED (investigated, declined):** Full-auto mass-apply/Autopilot · Browser extension at this
-time · Full Networking CRM · Generic AI career chatbot · OpenResume adoption (AGPL) · Porting
-JobNavigator/career-ops architecture · Programmatic SEO landing-page farms · New global state
-library · Backend API rewrite · Schema merge of opportunity tables.
+**REJECTED:** Full-auto mass-apply/Autopilot · Browser extension at this time · Full Networking CRM
+· Generic AI career chatbot · OpenResume adoption (AGPL) · Porting JobNavigator/career-ops
+architecture · Programmatic SEO landing-page farms · New global state library · Backend API rewrite
+· Schema merge of opportunity tables · **X6 ATS Fit Feedback (new -- capability already shipped,
+building it would create a competing architecture).**
 
-Full detail and rationale for every item: `08-roadmap-and-prioritization.md`.
+**DELETED entirely (not just reclassified):** "Public ATS APIs replace Indeed scraping" · X1 as a
+project · X6 as a project. See correction doc §6 for the COMPLETE bucket these moved into.
+
+Original (first-pass) roadmap detail and rationale: `08-roadmap-and-prioritization.md`.
 
 ---
 
@@ -256,47 +312,60 @@ Full detail and rationale for every item: `08-roadmap-and-prioritization.md`.
 | 08 | `08-roadmap-and-prioritization.md` | Alex Morgan | Full roadmap, scoring, build sequence, owner escalations |
 | 09 | `09-gap-register.md` | Code Puppy (synthesis) | Master gap register across all specialist findings |
 | 10 | `10-executive-summary-and-closing-questions.md` | Code Puppy (synthesis) | Answers to all 10 owner closing questions |
-| — | `implementation-plans/N1-schema-reconciliation.md` | Code Puppy (synthesis) | Safe DB verification runbook for ChatGPT |
+| 11 | `11-recommendation-duplication-correction.md` | Code Puppy + John Carter + Alex Morgan | **Second-pass correction: Recommendation Duplication Audit, corrected classifications, corrected roadmap, corrected % complete** |
+| — | `implementation-plans/N1-schema-reconciliation.md` | Code Puppy (synthesis) | Safe DB verification runbook for ChatGPT (updated with ChatGPT's partial verification results) |
 | — | `implementation-plans/N2-dashboard-career-vault-fix.md` | Code Puppy (synthesis) | Scoped plan to fix the dashboard defect |
-| — | `implementation-plans/N5-application-command-center.md` | Code Puppy (synthesis) | Full design/scope plan for the recommended next major build |
+| — | `implementation-plans/N5-application-command-center.md` | Code Puppy (synthesis) | Full design/scope plan for the recommended next major build (updated: adopt-don't-rebuild) |
 
 ## Recommended reading order
 
 1. **This README** (you're here)
-2. `10-executive-summary-and-closing-questions.md` — the synthesized answers
-3. `01-repo-architecture-audit.md` — the architectural foundation everything else references
-4. `09-gap-register.md` — the master table of every gap, cited back to source
-5. `07-migration-reconciliation.md` — understand the database-verification blocker
-6. `08-roadmap-and-prioritization.md` — the full roadmap reasoning
-7. `02-ux-product-walkthrough.md`, `03-competitive-oss-research.md`,
-   `04-security-privacy-review.md`, `05-qa-testing-review.md`, `06-seo-growth-review.md` — domain
+2. **`11-recommendation-duplication-correction.md` -- the second-pass correction; read this before
+   trusting any specific classification in docs 01-10**
+3. `10-executive-summary-and-closing-questions.md` -- the synthesized answers (first-pass numbers;
+   cross-check against doc 11's corrections)
+4. `01-repo-architecture-audit.md` -- the architectural foundation everything else references
+5. `09-gap-register.md` -- the master table of every gap, cited back to source
+6. `07-migration-reconciliation.md` -- understand the database-verification blocker (see doc 11 §9
+   for the ChatGPT verification update)
+7. `08-roadmap-and-prioritization.md` -- the full first-pass roadmap reasoning (superseded in
+   several places by doc 11 §6 -- read both)
+8. `02-ux-product-walkthrough.md`, `03-competitive-oss-research.md`,
+   `04-security-privacy-review.md`, `05-qa-testing-review.md`, `06-seo-growth-review.md` -- domain
    detail, in any order
-8. `implementation-plans/` — once ready to actually schedule N1/N2/N5
+9. `implementation-plans/` -- once ready to actually schedule N1/N2/N5 (N5's plan is updated for
+   adopt-don't-rebuild)
 
 ---
 
 ## The five most important findings
 
-1. **The product is further along than it can currently prove**, because live database state for
-   46 migrations (including 6 security-critical ones) is unverified — not missing, unverified.
-2. **The dashboard tells members a shipped, working feature doesn't exist** (Career Vault) — the
-   single most visible untruth in the product, and trivial to fix.
-3. **The canonical Career Operating System architecture is real and holds up** — Forward DNA,
+**CORRECTED (second pass) -- see `11-recommendation-duplication-correction.md` for full detail:**
+
+1. **The product is further along than it can currently prove, in two compounding ways.** First,
+   live database state for the highest-priority migrations is now substantially de-risked (36/46
+   confirmed recorded remotely) but not fully reconciled. Second, and newly discovered: at least
+   three major roadmap recommendations (external job capture, ATS fit feedback, evidence-gap
+   prompting) described capabilities that were already fully built, tested, and live.
+2. **The dashboard tells members a shipped, working feature doesn't exist** (Career Vault) --
+   and a second-pass audit found the identical defect pattern one layer deeper, in four
+   member-reachable library docstrings claiming Career Vault "does not exist yet."
+3. **The canonical Career Operating System architecture is real and holds up** -- Forward DNA,
    Career Vault, FreshFit, Opportunity Engine, and Resume Intelligence are genuinely integrated,
-   not aspirational, and this audit found no reason to rebuild any of it.
-4. **The biggest missed opportunity is closing feedback loops that already have the data** —
-   outcome → FreshFit, resume → performance, and interview → Career Vault loops are all
-   substantially or entirely open, and the underlying data already exists in most cases.
-5. **Zero analytics and structurally blocked SEO** mean the team is about to prioritize a roadmap
-   with no usage data, and the product is nearly invisible to organic search — both fixable, both
-   currently true.
+   and are in fact MORE integrated than the first-pass audit credited.
+4. **The biggest missed opportunity is closing feedback loops that already have the data** --
+   outcome -> FreshFit, resume -> performance, and interview -> Career Vault loops remain
+   substantially or entirely open; this finding was NOT affected by the second-pass correction.
+5. **Zero product-usage analytics and structurally blocked SEO** remain real and unaffected by the
+   correction -- every platform-tier gap named in the first pass held up under re-verification.
 
 ## Exact next action after audit approval
 
-1. Send N1 (schema reconciliation) to ChatGPT/DB-Lead using the runbook in
-   `implementation-plans/N1-schema-reconciliation.md` — this is the only step that must happen
-   first, and it requires no code changes from anyone else.
-2. In parallel, schedule N2, N3, and N9 for implementation — small, independent, no dependencies.
-3. Do not begin N5 (Application Command Center) until N1 and N4 are both resolved.
-4. Nothing in this audit authorizes implementation to begin automatically — this remains
-   documentation pending explicit owner approval to proceed into build phases.
+1. Send N1 (schema reconciliation) to ChatGPT/DB-Lead for the remaining repo-to-remote content
+   reconciliation on the 36 confirmed migrations, plus resolution of the ~10 without a remote
+   record yet -- using the updated runbook in `implementation-plans/N1-schema-reconciliation.md`.
+2. In parallel, schedule N2, N3, N9, N12 (documentation-truth defects), and N13
+   (discarded-signal activation) for implementation -- all small, independent, no dependencies.
+3. Do not begin N5 (now NEXT-1, not NOW) until N1 and N4 are both resolved.
+4. Nothing in this audit or its correction authorizes implementation to begin automatically -- this
+   remains documentation pending explicit owner approval to proceed into build phases.

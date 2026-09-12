@@ -1,5 +1,13 @@
 # Executive Summary & Answers to the Owner's 10 Closing Questions
 
+> ## CORRECTION AFTER REPO-TRUTH RECONCILIATION (2026-09-12, second pass)
+> This document's Q1 (% complete), Q5 (highest-value new capability), and Q6/Q7 (competitor/OSS-
+> derived recommendations referencing X1/X4/X6) are **superseded** by
+> `11-recommendation-duplication-correction.md`. Corrected % complete is **~70% (band 67-73%)**,
+> not 60-65%. N5 is still the right next major build but moves from NOW to NEXT-1. X6 is deleted
+> entirely (capability already shipped). Read doc 11 alongside this document. Original answers left
+> unedited below per the "preserve historical truth" rule.
+
 **Audit commit:** `ec22a4b` (branch `main`) · **Audit date:** 2026-09-12 · **Synthesized by:**
 Code Puppy, from seven independent specialist audits (John, Sarah, Ryan, Ethan, Nina, Jordan,
 Olivia) and one product/roadmap synthesis (Alex Morgan).

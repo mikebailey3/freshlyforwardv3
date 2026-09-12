@@ -1,5 +1,19 @@
 # Migration Reconciliation — FreshlyForward
 
+> ## CORRECTION / UPDATE AFTER REPO-TRUTH RECONCILIATION (2026-09-12, second pass)
+> Since this document was first published, **ChatGPT (Supabase/DB Lead, the sole execution
+> authority) has verified directly against the connected Supabase FreshlyForward project that 36 of
+> 46 remote migration-history records exist**, including the full Opportunity Engine 2.0 chain and
+> its security-hardening migrations, and that the corresponding OE tables exist remotely. **This
+> materially de-risks the Tier 1 (security-sensitive) set below.** This does NOT close N1: these
+> migrations have not been reapplied and must not be; the remaining task is confirming the 36
+> recorded migrations match their local file content exactly and resolving the ~10 that don't yet
+> have a remote record — repo-to-remote reconciliation, not blind trust that "recorded" means
+> "fully correct." New Supabase Security Advisor findings from this verification pass are preserved
+> for separate review and are NOT treated as resolved by this note. Full detail:
+> `11-recommendation-duplication-correction.md` §9. The per-migration table below is left unedited
+> pending the detailed enumeration of exactly which 36 (and which ~10) from ChatGPT.
+
 ## Summary
 
 Scope: static, read-only reconciliation from repo evidence only (migration SQL, docs/plans, git-visible source usage). I did **not** run any Supabase command or touch any live project.

@@ -2,6 +2,17 @@
 **Phases 13, 14, 15, 21, 22, 23** · Author: Alex Morgan (CEO / Product Director) · Date: 2026-09-12
 **Mode:** READ-ONLY / DOCUMENTATION-ONLY per owner instruction. No product code, no roster changes, no migrations.
 
+> ## CORRECTION AFTER REPO-TRUTH RECONCILIATION (2026-09-12, second pass)
+> A second-pass Recommendation Duplication Audit found that X1 (External Job Capture), X6 (ATS Fit
+> Feedback), and X4 (Career Evidence Intelligence) were significantly misclassified below — all
+> three describe capabilities substantially or fully already built. N5 also moves from NOW to
+> NEXT-1 once its true (smaller) dependency graph is corrected. **The NOW/NEXT/LATER/HOLD/REJECTED
+> tables and Tier sequence below are superseded by
+> `11-recommendation-duplication-correction.md` §6-7 — read that document for the corrected
+> roadmap.** This document's reasoning, scoring methodology, and everything NOT touched by the
+> correction (N1-N3, N7-N11, rejections, owner escalations) remain accurate and unedited below, per
+> the "preserve historical truth" rule.
+
 ## Inputs actually read before writing this
 
 | Source | Author | What I took from it |

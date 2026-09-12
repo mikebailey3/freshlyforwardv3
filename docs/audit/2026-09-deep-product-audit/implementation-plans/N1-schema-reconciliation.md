@@ -1,5 +1,15 @@
 # Implementation Plan — N1: Schema Reconciliation & Migration-State Verification
 
+> ## UPDATE AFTER REPO-TRUTH RECONCILIATION (2026-09-12, second pass)
+> ChatGPT/DB-Lead has since completed a first pass of Step 1 below: **36 of 46 remote
+> migration-history records confirmed to exist**, including the full OE 2.0 chain and its
+> security-hardening migrations (the entire Tier 1 list below), with corresponding tables confirmed
+> present remotely. **This materially de-risks Tier 1.** Remaining work is now narrower: (a) Step 3
+> object-level content reconciliation for the 36 confirmed migrations (does the live object exactly
+> match the file?), and (b) identify + resolve the ~10 migrations without a remote record yet. No
+> migration has been reapplied. New Security Advisor findings from this pass are preserved for
+> separate review. Full detail: `../11-recommendation-duplication-correction.md` §9.
+
 **Status:** PLANNED — not started. **Owner:** ChatGPT (Supabase/Database Lead) — exclusively, per
 charter rule 9. **Collaborators:** John Carter (architecture review of results), Ethan Cole
 (security confirmation), Nina Patel (test strategy for closing the gap going forward), Olivia Grant

@@ -1,4 +1,27 @@
-# Implementation Plan — N5: Application Command Center
+# Implementation Plan — N5: Application Command Center (adopt-don't-rebuild)
+
+> ## CORRECTION AFTER REPO-TRUTH RECONCILIATION (2026-09-12, second pass)
+> This plan's original §2 and §3.5 **understated existing substrate and contained two factual
+> errors**, struck below rather than silently fixed:
+> - ~~"`follow_up_date` exists as a single column on `applications` — no history, no reminder
+>   engine."~~ **WRONG.** A real `follow_ups` table already exists (`20260802180911...sql`) with
+>   working CRUD in `operations.ts`, a live `FollowUpsTab` in `StrategistMemberWorkspacePage.tsx`,
+>   and an overdue rollup on `AdminDashboardPage.tsx`. What's missing is the **member-facing** view
+>   and tighter application linkage — not the table or history.
+> - ~~"Calendar events exist... but aren't wired to applications today."~~ **WRONG.**
+>   `AddCalendarEventModal.tsx` already calls the `set_application_interview_date` RPC, and
+>   `CalendarPage.tsx`/`InterviewsPage.tsx` already read `applications.interview_date`.
+> - **New finding:** `strategist_reminders` exists with full RLS but **zero callers anywhere in
+>   `src/`** — same dead-code category as `interview_prep`/`interview_feedback`. §3.5 below is
+>   corrected to **adopt** this table, not build a fourth reminder model.
+> - **Status changed: this moves from NOW to NEXT-1** (first item after the launch gate, not part
+>   of it). Its "unlocks everything" justification weakened from 4 dependents to 2 (N6 and X3b only
+>   — X1, X3a, and X4 turned out to be N5-independent or already live). It remains the right next
+>   major build on its own merit — see `../11-recommendation-duplication-correction.md` §7 for the
+>   full corrected reasoning.
+>
+> The rest of this plan (interview entity design, contacts, offer/rejection structure, FreshFit
+> snapshot, strategist visibility) is unaffected and stands as originally written.
 
 **Status:** PLANNED — not started (documentation only; no schema or product code created by this
 audit). **Owner:** John Carter (architecture) + an Opportunity Engine / Career CRM delivery
@@ -46,9 +69,10 @@ reasons and offer terms have nowhere structured to live, so nothing can learn fr
   bypasses them entirely for a plain text column.
 - `career_notes` / `internal_notes` / `member_notes` / `member_visible_notes` split already exists
   and is well-considered (John, §2.6) — reuse this pattern, don't invent a new notes model.
-- `follow_up_date` exists as a single column on `applications` — no history, no reminder engine.
+- `follow_up_date` exists as a single column on `applications` — **CORRECTED: see banner above, a
+  full `follow_ups` table + UI + admin rollup already exist; do not rebuild.**
 - Calendar events exist (`/calendar`) and could host interview scheduling, but aren't wired to
-  applications today.
+  applications today. **CORRECTED: see banner above — already wired via `set_application_interview_date`.**
 - `job_matches.promoted_opportunity_id` already bridges Opportunity Engine matches into the
   `opportunities` table — the Command Center should sit downstream of that bridge, not duplicate it.
 
@@ -81,10 +105,14 @@ Reuse the existing `internal_notes`/`member_notes`/`member_visible_notes` patter
 strategist surfaces — attach the same pattern to applications/interviews/contacts rather than
 inventing a fourth note model.
 
-### 3.5 Follow-ups and reminders
-Promote `follow_up_date` from a single column into a history-tracked entity (multiple follow-ups
-per application over time), and connect it to a real reminder surface (notification + calendar),
-rather than a silent date field nobody is prompted about.
+### 3.5 Follow-ups and reminders (CORRECTED: adopt existing tables, don't rebuild)
+A real `follow_ups` table, CRUD, strategist tab, and admin overdue rollup already exist — see the
+correction banner above. The genuine remaining work is: (a) a **member-facing** follow-up view (today
+it's strategist/admin-only), (b) tighter linkage from a follow-up to the specific application
+lifecycle stage it belongs to, and (c) **adopting** the existing, fully-RLS'd but currently-uncalled
+`strategist_reminders` table as the reminder engine rather than building a new one. Connect both to
+the existing `calendar_events` (already wired to applications via `set_application_interview_date`)
+for the actual reminder surface.
 
 ### 3.6 Offer / rejection / withdrawal outcomes
 Structured records, not free text: offer terms (comp, start date, deadline to decide — enough to
