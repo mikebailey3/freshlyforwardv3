@@ -1,0 +1,25 @@
+# Normalize text files to LF in the repository.
+#
+# Without this, core.autocrlf=true on Windows rewrites checked-out files to
+# CRLF. The agent config generator writes LF, so `npm run agents:check` would
+# report false drift on a fresh Windows clone even though the content is
+# byte-identical apart from line endings.
+* text=auto eol=lf
+
+# Generated agent configs: always LF, and marked generated so review tools
+# collapse them by default. Regenerate with `npm run agents:generate`.
+.code_puppy/agents/*.json text eol=lf linguist-generated=true
+
+# Binary assets must never be line-ending converted.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.pdf binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.otf binary
+*.docx binary
