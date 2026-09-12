@@ -135,23 +135,17 @@ hand-crafted applications, explicitly not AI mass-applying" (`PRODUCT.md`).
 
 ---
 
-## E. Job Discovery Recommendation
+### GitHub First Gate note — Adzuna
 
-**Stop scheduling Indeed scraping.** Concrete plan:
+Adzuna is treated here as a licensed API source, not as reusable external code.
 
-- Keep `scrapeIndeed.ts` in the repo (it's already correctly labeled best-effort/
-  educational) but stop running it as the production source.
-- Add Greenhouse + Lever + Ashby public JSON API sources into the same `scraped_jobs`
-  table — zero auth, zero ToS risk, structured data. Follow `job_finder`'s
-  `greenhouse.py` shape and `career-ops`'s "pre-configured company list" pattern (a
-  `portals.yml`-style config, not a hardcoded scraper per company).
-- The `20260821000000_opportunity_engine.sql` migration's own doc comment *already*
-  names a licensed aggregator (Adzuna, JSearch) as the intended eventual swap-in — this
-  isn't new advice, it's finishing what's already documented in the codebase.
-- Schema needs no change: `scraped_jobs.source` + `external_id` unique constraint is
-  already source-agnostic.
-- Add the opt-in liveness/expiration sweep (Section C, #3) before scaling volume so
-  `is_active` actually reflects reality.
+- **Capability:** job-search aggregation via the Adzuna JSON API
+- **Source:** Adzuna API / developer docs
+- **Classification:** **ADAPT COMPONENT**
+- **License / terms:** Adzuna developer API terms; the free-tier-vs-commercial-use question remains **open pending owner/legal decision** and is not resolved here
+- **FreshlyForward authority preserved:** `scraped_jobs`, `job_matches`, FreshFit scoring, and the existing Opportunity Engine workflow remain canonical
+- **Exact integration point:** `scripts/jobSources/adzuna.ts` and `scripts/scrapeJobs.ts`
+- **Security / maintenance note:** no external package or repository is being imported for this source; the integration is a FreshlyForward-owned adapter around a documented API
 
 ---
 

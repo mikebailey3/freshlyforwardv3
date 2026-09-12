@@ -26,98 +26,157 @@
  *   ADZUNA_APP_ID
  *   ADZUNA_APP_KEY
  */
-import { createClient } from '@supabase/supabase-js'
+import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import { pathToFileURL } from 'node:url'
 
-import {
-  ADZUNA_RESULTS_PER_PAGE,
-  fetchAdzunaPage,
-  parseAdzunaJobs,
-} from './jobSources/adzuna'
+import { fetchAdzunaPage, parseAdzunaJobs } from './jobSources/adzuna'
 import type { ScrapedJobInput } from './jobSources/types'
+import { summarizeRun, type AttemptResult } from './lib/runSummary'
+import { getErrorDetail } from './lib/errorDetail'
 
-const SUPABASE_URL = process.env.VITE_SUPABASE_URL
-const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
-const ADZUNA_APP_ID = process.env.ADZUNA_APP_ID
-const ADZUNA_APP_KEY = process.env.ADZUNA_APP_KEY
-
-if (!SUPABASE_URL || !SERVICE_ROLE_KEY) {
-  console.error('Missing VITE_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY in the environment.')
-  process.exit(1)
+export interface ParsedArgs {
+  query: string
+  location: string
+  pages: number
+  country: string
 }
 
-if (!ADZUNA_APP_ID || !ADZUNA_APP_KEY) {
-  console.error('Missing ADZUNA_APP_ID or ADZUNA_APP_KEY in the environment. Get a free key at https://developer.adzuna.com/')
-  process.exit(1)
-}
+function readFlagValue(args: string[], flag: string, fallback: string): string {
+  const idx = args.indexOf(flag)
+  if (idx === -1) return fallback
 
-const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY)
-
-function parseArgs() {
-  const args = process.argv.slice(2)
-  const get = (flag: string, fallback: string) => {
-    const idx = args.indexOf(flag)
-    return idx >= 0 && args[idx + 1] ? args[idx + 1] : fallback
+  const value = args[idx + 1]
+  if (!value || value.startsWith('--')) {
+    throw new Error(`Invalid ${flag} value: expected a value after ${flag}.`)
   }
+
+  return value
+}
+
+const MAX_ADZUNA_PAGES = 50
+
+export function parseArgs(args = process.argv.slice(2)): ParsedArgs {
+  const query = readFlagValue(args, '--query', 'customer service')
+  const location = readFlagValue(args, '--location', '')
+  const country = readFlagValue(args, '--country', 'us')
+  const pagesRaw = readFlagValue(args, '--pages', '1')
+
+  if (!/^[1-9]\d*$/.test(pagesRaw)) {
+    throw new Error(`Invalid --pages value "${pagesRaw}". Expected a positive integer.`)
+  }
+
+  const pages = Number(pagesRaw)
+  if (pages > MAX_ADZUNA_PAGES) {
+    throw new Error(`Invalid --pages value "${pagesRaw}". Expected a positive integer no greater than ${MAX_ADZUNA_PAGES}.`)
+  }
+
   return {
-    query: get('--query', 'customer service'),
-    location: get('--location', ''),
-    pages: parseInt(get('--pages', '1'), 10),
-    country: get('--country', 'us'),
+    query,
+    location,
+    pages,
+    country,
   }
 }
 
-async function upsertJobs(jobs: ScrapedJobInput[]): Promise<void> {
+function requireEnv(name: string): string {
+  const value = process.env[name]
+  if (!value) {
+    throw new Error(`Missing ${name} in the environment.`)
+  }
+  return value
+}
+
+function createSupabaseClient(): SupabaseClient {
+  return createClient(
+    requireEnv('VITE_SUPABASE_URL'),
+    requireEnv('SUPABASE_SERVICE_ROLE_KEY'),
+  )
+}
+
+function requireAdzunaCredentials(): { appId: string; appKey: string } {
+  return {
+    appId: requireEnv('ADZUNA_APP_ID'),
+    appKey: requireEnv('ADZUNA_APP_KEY'),
+  }
+}
+
+async function upsertJobs(client: SupabaseClient, jobs: ScrapedJobInput[]): Promise<void> {
   if (jobs.length === 0) return
 
   const scrapedAt = new Date().toISOString()
   const rows = jobs.map((job) => ({ ...job, is_active: true, scraped_at: scrapedAt }))
 
-  const { error } = await supabase
+  const { error } = await client
     .from('scraped_jobs')
     .upsert(rows, { onConflict: 'source,external_id' })
 
-  if (error) {
-    console.error('Error upserting scraped jobs:', error)
-  } else {
-    console.log(`Upserted ${rows.length} job(s).`)
-  }
+  if (error) throw error
+
+  console.log(`Upserted ${rows.length} job(s).`)
 }
 
-async function main() {
+export async function main() {
+  const supabase = createSupabaseClient()
+  const { appId, appKey } = requireAdzunaCredentials()
   const { query, location, pages, country } = parseArgs()
+
   console.log(`Fetching Adzuna (${country}) jobs for "${query}" in "${location || 'anywhere'}" (${pages} page(s))...`)
 
+  const results: AttemptResult[] = []
   let totalFound = 0
 
   for (let page = 1; page <= pages; page++) {
+    const label = `page ${page}`
     try {
       const response = await fetchAdzunaPage({
         country,
         page,
         query,
         location,
-        appId: ADZUNA_APP_ID as string,
-        appKey: ADZUNA_APP_KEY as string,
+        appId,
+        appKey,
       })
 
-      const jobs = parseAdzunaJobs(response, query)
+      const jobs = parseAdzunaJobs(response, query, country)
+      await upsertJobs(supabase, jobs)
       totalFound += jobs.length
-      await upsertJobs(jobs)
+      results.push({ label, status: 'success' })
 
-      if (jobs.length === 0 || page * ADZUNA_RESULTS_PER_PAGE >= response.count) {
+      const responseCount = typeof response.count === 'number' ? response.count : null
+      if (jobs.length === 0 || (responseCount !== null && totalFound >= responseCount)) {
         console.log('No more results available, stopping early.')
         break
       }
     } catch (err) {
-      console.error(`Failed on page ${page}:`, err)
-      break
+      const detail = getErrorDetail(err)
+      console.error(`Failed on ${label}: ${detail}`)
+      results.push({ label, status: 'failure', detail })
     }
   }
 
-  console.log(`Done. Found ${totalFound} job(s) across requested pages.`)
+  const summary = summarizeRun(results)
+  console.log('')
+  console.log('=== Job Discovery: Scrape Summary ===')
+  console.log(`Pages attempted: ${summary.total} (succeeded: ${summary.succeeded}, failed: ${summary.failed})`)
+  console.log(`Jobs discovered this run: ${totalFound}`)
+  console.log(`Status: ${summary.status.toUpperCase()}`)
+  console.log('======================================')
+
+  if (summary.failed > 0) {
+    console.error('One or more Adzuna pages failed -- failing the run so the outage is visible.')
+    process.exit(1)
+  }
+  if (summary.status === 'empty') {
+    console.error('No Adzuna pages completed successfully -- failing the run so the outage is visible.')
+    process.exit(1)
+  }
 }
 
-main().catch((err) => {
-  console.error('Fatal error running job sync:', err)
-  process.exit(1)
-})
+const isMainModule = process.argv[1] ? import.meta.url === pathToFileURL(process.argv[1]).href : false
+
+if (isMainModule) {
+  main().catch((err) => {
+    console.error('Fatal error running job sync:', getErrorDetail(err))
+    process.exit(1)
+  })
+}

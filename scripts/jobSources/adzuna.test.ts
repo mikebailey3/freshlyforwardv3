@@ -1,5 +1,6 @@
-import { describe, it, expect } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
+  fetchAdzunaPage,
   parseAdzunaJobs,
   formatSalary,
   isPredictedSalary,
@@ -26,6 +27,14 @@ const baseResult: AdzunaResult = {
   contract_time: 'full_time',
 }
 
+beforeEach(() => {
+  vi.stubGlobal('fetch', vi.fn())
+})
+
+afterEach(() => {
+  vi.restoreAllMocks()
+})
+
 describe('parseAdzunaJobs', () => {
   it('maps an Adzuna response into canonical ScrapedJobInput rows', () => {
     const result = parseAdzunaJobs({ results: [baseResult], count: 1 }, 'customer service')
@@ -47,6 +56,11 @@ describe('parseAdzunaJobs', () => {
     ])
   })
 
+  it('uses the requested country when formatting salary text', () => {
+    const [row] = parseAdzunaJobs({ results: [baseResult], count: 1 }, 'customer service', 'gb')
+    expect(row.salary_text).toBe('£42,000 - £52,000')
+  })
+
   it('returns an empty array for an empty result set', () => {
     expect(parseAdzunaJobs({ results: [], count: 0 }, 'anything')).toEqual([])
   })
@@ -56,13 +70,32 @@ describe('parseAdzunaJobs', () => {
     expect(parseAdzunaJobs(null, 'q')).toEqual([])
   })
 
+  it('drops malformed rows and caps oversized text before persistence', () => {
+    const oversized = {
+      ...baseResult,
+      id: '2',
+      title: 'T'.repeat(500),
+      description: 'D'.repeat(25_000),
+    }
+    const malformed = {
+      ...baseResult,
+      id: '',
+      redirect_url: '',
+    }
+
+    const rows = parseAdzunaJobs({ results: [oversized, malformed], count: 2 }, 'q')
+    expect(rows).toHaveLength(1)
+    expect(rows[0].title).toHaveLength(300)
+    expect(rows[0].description).toHaveLength(20_000)
+  })
+
   it('falls back to empty/null rather than fabricating missing fields', () => {
     const sparse = {
       id: '1',
       title: 'Mystery Role',
       redirect_url: 'https://example.com/job/1',
-      description: '',
-      created: '',
+      description: 'A short posting with missing optional fields.',
+      created: '2026-09-02T00:00:00Z',
     } as AdzunaResult
 
     const [row] = parseAdzunaJobs({ results: [sparse], count: 1 }, 'q')
@@ -70,7 +103,7 @@ describe('parseAdzunaJobs', () => {
     expect(row.location).toBeNull()
     expect(row.salary_text).toBeNull()
     expect(row.employment_type).toBeNull()
-    expect(row.posted_at).toBeNull()
+    expect(row.posted_at).toBe('2026-09-02')
   })
 })
 
@@ -88,12 +121,19 @@ describe('salary handling', () => {
     expect(formatSalary(50000, 50000)).toBe('$50,000')
   })
 
+  it('uses a country-aware symbol instead of hardcoding dollars', () => {
+    expect(formatSalary(42000, 52000, 'gb')).toBe('£42,000 - £52,000')
+    expect(formatSalary(42000, undefined, 'au')).toBe('A$42,000')
+  })
+
   it('returns null when no salary is present', () => {
     expect(formatSalary(undefined, undefined)).toBeNull()
   })
 
   it('detects an Adzuna-predicted (estimated) salary', () => {
     expect(isPredictedSalary({ ...baseResult, salary_is_predicted: '1' })).toBe(true)
+    expect(isPredictedSalary({ ...baseResult, salary_is_predicted: 1 })).toBe(true)
+    expect(isPredictedSalary({ ...baseResult, salary_is_predicted: true })).toBe(true)
     expect(isPredictedSalary({ ...baseResult, salary_is_predicted: '0' })).toBe(false)
     expect(isPredictedSalary(baseResult)).toBe(false)
   })
@@ -142,3 +182,39 @@ describe('employment type (underscore regression)', () => {
     ).toBe('part_time')
   })
 })
+
+describe('fetchAdzunaPage', () => {
+  it('redacts the request URL from non-OK errors so app_id/app_key never leak', async () => {
+    vi.mocked(fetch).mockResolvedValue({
+      ok: false,
+      status: 500,
+      text: async () => 'upstream error',
+    } as Response)
+
+    let error: unknown
+    try {
+      await fetchAdzunaPage({
+        country: 'us',
+        page: 2,
+        query: 'customer service',
+        location: 'Dallas, TX',
+        appId: 'secret-app-id',
+        appKey: 'secret-app-key',
+      })
+    } catch (err) {
+      error = err
+    }
+
+    expect(error).toBeInstanceOf(Error)
+    expect((error as Error).message).toBe('Adzuna us page 2 responded with 500: upstream error')
+    expect((error as Error).message).not.toContain('https://api.adzuna.com')
+    expect((error as Error).message).not.toContain('app_id')
+    expect((error as Error).message).not.toContain('app_key')
+
+    const [requestUrl] = vi.mocked(fetch).mock.calls[0]
+    expect(String(requestUrl)).toContain('https://api.adzuna.com/v1/api/jobs/us/search/2')
+    expect(String(requestUrl)).toContain('app_id=secret-app-id')
+    expect(String(requestUrl)).toContain('app_key=secret-app-key')
+  })
+})
+

@@ -24,7 +24,7 @@ export interface AdzunaResult {
   location?: { display_name?: string }
   salary_min?: number
   salary_max?: number
-  salary_is_predicted?: string
+  salary_is_predicted?: string | number | boolean
   contract_time?: string
   contract_type?: string
 }
@@ -43,14 +43,47 @@ export interface AdzunaResponse {
  * exactly the kind of fabrication the charter forbids -- and a wrong salary
  * silently skews scoring. Absent is honest; invented is not.
  */
-export function isPredictedSalary(result: AdzunaResult): boolean {
-  return result.salary_is_predicted === '1'
+export function isPredictedSalary(result: Pick<AdzunaResult, 'salary_is_predicted'>): boolean {
+  return result.salary_is_predicted === '1' || result.salary_is_predicted === 1 || result.salary_is_predicted === true
 }
 
-/** Formats a salary range for display. Returns null when nothing usable exists. */
-export function formatSalary(min?: number, max?: number): string | null {
+const ADZUNA_SALARY_FORMATS: Record<string, { locale: string; symbol: string }> = {
+  us: { locale: 'en-US', symbol: '$' },
+  gb: { locale: 'en-GB', symbol: '£' },
+  au: { locale: 'en-AU', symbol: 'A$' },
+  ca: { locale: 'en-CA', symbol: 'C$' },
+  nz: { locale: 'en-NZ', symbol: 'NZ$' },
+  ie: { locale: 'en-IE', symbol: '€' },
+  fr: { locale: 'fr-FR', symbol: '€' },
+  de: { locale: 'de-DE', symbol: '€' },
+  es: { locale: 'es-ES', symbol: '€' },
+  it: { locale: 'it-IT', symbol: '€' },
+  nl: { locale: 'nl-NL', symbol: '€' },
+  be: { locale: 'nl-BE', symbol: '€' },
+  ch: { locale: 'de-CH', symbol: 'CHF' },
+  pl: { locale: 'pl-PL', symbol: 'zł' },
+  ro: { locale: 'ro-RO', symbol: 'lei' },
+  ru: { locale: 'ru-RU', symbol: '₽' },
+  za: { locale: 'en-ZA', symbol: 'R' },
+  in: { locale: 'en-IN', symbol: '₹' },
+  at: { locale: 'de-AT', symbol: '€' },
+}
+
+/**
+ * Adzuna does not expose a currency field in the result shape we document
+ * here. We use a tiny country -> currency map for the country codes Adzuna
+ * supports instead of hardcoding USD everywhere; if we do not recognize a
+ * country, we omit the symbol rather than inventing one.
+ */
+export function formatSalary(min?: number, max?: number, country = 'us'): string | null {
   if (!min && !max) return null
-  const fmt = (n: number) => `$${Math.round(n).toLocaleString('en-US')}`
+
+  const format = ADZUNA_SALARY_FORMATS[country.toLowerCase()] ?? { locale: 'en-US', symbol: '' }
+  const fmt = (n: number) => {
+    const amount = Math.round(n).toLocaleString(format.locale)
+    return format.symbol ? `${format.symbol}${amount}` : amount
+  }
+
   if (min && max) return min === max ? fmt(min) : `${fmt(min)} - ${fmt(max)}`
   return fmt((min ?? max) as number)
 }
@@ -75,26 +108,58 @@ export function normalizeAdzunaEmploymentType(result: AdzunaResult): string | nu
   return raw.replace(/_/g, ' ').trim() || null
 }
 
-/** Maps a raw Adzuna search response into canonical `ScrapedJobInput` rows. Pure. */
-export function parseAdzunaJobs(raw: unknown, searchQuery: string): ScrapedJobInput[] {
-  const payload = raw as { results?: AdzunaResult[] }
-  const results = payload?.results ?? []
+const MAX_ADZUNA_TITLE_LENGTH = 300
+const MAX_ADZUNA_DESCRIPTION_LENGTH = 20_000
 
-  return results.map((result) => ({
-    source: 'adzuna',
-    external_id: String(result.id),
-    title: result.title,
-    company: result.company?.display_name ?? '',
-    location: result.location?.display_name ?? null,
-    description: result.description ?? '',
-    salary_text: isPredictedSalary(result)
-      ? null
-      : formatSalary(result.salary_min, result.salary_max),
-    employment_type: normalizeAdzunaEmploymentType(result),
-    posting_url: result.redirect_url,
-    posted_at: result.created ? result.created.slice(0, 10) : null,
-    search_query: searchQuery,
-  }))
+function isNonEmptyString(value: unknown): value is string {
+  return typeof value === 'string' && value.trim().length > 0
+}
+
+function trimAndCap(value: string, maxLength: number): string {
+  const trimmed = value.trim()
+  return trimmed.length > maxLength ? trimmed.slice(0, maxLength) : trimmed
+}
+
+function isAdzunaResult(raw: unknown): raw is AdzunaResult {
+  if (!raw || typeof raw !== 'object') return false
+
+  const candidate = raw as Partial<AdzunaResult>
+  return (
+    isNonEmptyString(candidate.id) &&
+    isNonEmptyString(candidate.title) &&
+    isNonEmptyString(candidate.redirect_url) &&
+    isNonEmptyString(candidate.description) &&
+    isNonEmptyString(candidate.created)
+  )
+}
+
+/** Maps a raw Adzuna search response into canonical `ScrapedJobInput` rows. Pure. */
+export function parseAdzunaJobs(raw: unknown, searchQuery: string, country = 'us'): ScrapedJobInput[] {
+  const results = Array.isArray((raw as { results?: unknown } | null | undefined)?.results)
+    ? ((raw as { results: unknown[] }).results)
+    : []
+
+  return results.flatMap((result) => {
+    if (!isAdzunaResult(result)) return []
+
+    return [{
+      source: 'adzuna',
+      external_id: result.id.trim(),
+      title: trimAndCap(result.title, MAX_ADZUNA_TITLE_LENGTH),
+      company: typeof result.company?.display_name === 'string' ? result.company.display_name.trim() : '',
+      location: typeof result.location?.display_name === 'string' && result.location.display_name.trim().length > 0
+        ? result.location.display_name.trim()
+        : null,
+      description: trimAndCap(result.description, MAX_ADZUNA_DESCRIPTION_LENGTH),
+      salary_text: isPredictedSalary(result)
+        ? null
+        : formatSalary(result.salary_min, result.salary_max, country),
+      employment_type: normalizeAdzunaEmploymentType(result),
+      posting_url: result.redirect_url.trim(),
+      posted_at: result.created.trim().slice(0, 10),
+      search_query: searchQuery,
+    }]
+  })
 }
 
 export const ADZUNA_RESULTS_PER_PAGE = 20
@@ -153,5 +218,5 @@ export async function fetchAdzunaPage(options: AdzunaFetchOptions): Promise<Adzu
 /** Convenience wrapper: fetch one page and map it to canonical rows. */
 export async function fetchAdzunaJobs(options: AdzunaFetchOptions): Promise<ScrapedJobInput[]> {
   const response = await fetchAdzunaPage(options)
-  return parseAdzunaJobs(response, options.query)
+  return parseAdzunaJobs(response, options.query, options.country)
 }

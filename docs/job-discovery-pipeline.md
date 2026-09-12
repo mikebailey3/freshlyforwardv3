@@ -1,8 +1,9 @@
 # Job Discovery Pipeline (Scheduled)
 
 Automates what used to be manual `npm run` commands: scraping Greenhouse /
-Lever / Ashby public job-board APIs into `scraped_jobs`, then scoring every
-active member against every active job into `job_matches` via FreshFit.
+Lever / Ashby public job-board APIs plus Adzuna job-search results into
+`scraped_jobs`, then scoring every active member against every active job
+into `job_matches` via FreshFit.
 
 Runs via `.github/workflows/job-discovery-pipeline.yml`, on a schedule
 (every 6 hours, UTC) and on-demand (`workflow_dispatch`). It runs the
@@ -11,7 +12,9 @@ existing scripts unchanged:
 1. `npm run scrape:companies` -- Greenhouse/Lever/Ashby only. `scrapeIndeed.ts`
    is intentionally excluded (ToS risk); it stays a manual, non-scheduled
    fallback.
-2. `npm run sync:freshfit` -- always attempted, even if step 1 hard-fails,
+2. `npm run scrape:jobs` -- Adzuna job-search API. Requires `ADZUNA_APP_ID`
+   and `ADZUNA_APP_KEY` in addition to the standard Supabase secrets.
+3. `npm run sync:freshfit` -- always attempted, even if step 1 hard-fails,
    because it re-scores against the existing job backlog, not just this
    cycle's new finds.
 
@@ -25,6 +28,8 @@ already read locally -- no renaming, no second config system for CI:
 |---|---|
 | `VITE_SUPABASE_URL` | Same Supabase project URL used locally / in the app's own env |
 | `SUPABASE_SERVICE_ROLE_KEY` | Supabase **service role** key (not the anon key) -- required to write past RLS |
+| `ADZUNA_APP_ID` | Adzuna developer app ID used by `npm run scrape:jobs` |
+| `ADZUNA_APP_KEY` | Adzuna developer app key used by `npm run scrape:jobs` |
 
 Only a repo admin can set these; this is a manual, credential-handling step
 that has to happen before the workflow can do anything real.
