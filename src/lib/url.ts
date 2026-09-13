@@ -32,9 +32,20 @@ export function isSafeHttpUrl(value: string | null | undefined): boolean {
  * is NOT protocol-relative (`//host/...`) or a backslash-based bypass of the
  * same trick (`/\host/...` -- browsers treat `\` as `/` for special schemes,
  * so `/\evil.com` can resolve off-origin exactly like `//evil.com`).
+ *
+ * The check runs against a whitespace-normalized copy of the value, not the
+ * raw string: the WHATWG URL parser strips every ASCII tab/CR/LF (U+0009,
+ * U+000D, U+000A) from anywhere in a URL before parsing it, so a string
+ * like `/\t/evil.com` looks like a safe single-leading-slash path here but
+ * collapses to `//evil.com` -- an off-origin protocol-relative URL -- the
+ * instant a browser actually navigates it. Rendering still uses the
+ * original, un-stripped `notification.link` value; the browser applies the
+ * identical stripping at navigation time, so validating the normalized copy
+ * and rendering the raw one always agree on the real destination.
  */
 export function isSafeAppLink(value: string | null | undefined): boolean {
   if (!value) return false
   if (isSafeHttpUrl(value)) return true
-  return value.startsWith('/') && !value.startsWith('//') && !value.startsWith('/\\')
+  const normalized = value.replace(/[\t\r\n]/g, '')
+  return normalized.startsWith('/') && !normalized.startsWith('//') && !normalized.startsWith('/\\')
 }

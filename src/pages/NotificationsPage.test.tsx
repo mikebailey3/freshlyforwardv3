@@ -113,6 +113,15 @@ describe('NotificationsPage - unsafe href sink (N3 item 1)', () => {
     expect(screen.queryByRole('link', { name: /View/ })).not.toBeInTheDocument()
   })
 
+  it('hides the "View" link for a tab-smuggled off-origin bypass (WHATWG URL strips tabs before parsing)', async () => {
+    mockGetNotifications.mockResolvedValue([makeNotification({ link: '/\t/evil.com' })])
+
+    renderPage()
+
+    await waitFor(() => expect(screen.getByText('You have a new message')).toBeInTheDocument())
+    expect(screen.queryByRole('link', { name: /View/ })).not.toBeInTheDocument()
+  })
+
   it('hides the "View" link for a null notification.link', async () => {
     mockGetNotifications.mockResolvedValue([makeNotification({ link: null })])
 

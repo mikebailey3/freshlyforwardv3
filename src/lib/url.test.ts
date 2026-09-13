@@ -45,6 +45,12 @@ describe('isSafeAppLink', () => {
     expect(isSafeAppLink('/\\evil.com')).toBe(false)
   })
 
+  it('rejects the tab/CR/LF stripping bypass (WHATWG URL removes these before parsing, collapsing "/\\t/host" into "//host")', () => {
+    expect(isSafeAppLink('/\t/evil.com')).toBe(false)
+    expect(isSafeAppLink('/\n/evil.com')).toBe(false)
+    expect(isSafeAppLink('/\r/evil.com')).toBe(false)
+  })
+
   it('rejects javascript:/data: URIs and null/empty input', () => {
     expect(isSafeAppLink('javascript:alert(1)')).toBe(false)
     expect(isSafeAppLink('data:text/html,<script>alert(1)</script>')).toBe(false)
