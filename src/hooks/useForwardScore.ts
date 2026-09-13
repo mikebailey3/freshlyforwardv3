@@ -27,9 +27,21 @@ interface CompassRow {
   recommended_plan_slug: string | null
 }
 
+/** Narrow union rather than a generic `string` -- avoids accidental
+ * misuse of the discriminator downstream (Ethan Cole's N13a security
+ * review hardening note). */
+type MessageSenderType = 'member' | 'strategist' | 'system'
+
 interface UnreadMessageRow {
   id: string
+  sender_type: MessageSenderType
 }
+
+/** N13a: submission-follow-up window is intentionally narrower than the
+ * pillar's 30-day `submittedInLast30Days` input -- 30 days is true for
+ * nearly the entire active membership, which would make this CTA tier
+ * permanently swamp the pillar rules below it. */
+const RECENT_SUBMISSION_DAYS = 7
 
 /** The small subset of the `career_compass_results` row DashboardPage's
  * Career Compass summary card needs -- exposed here so that card and
@@ -122,7 +134,7 @@ export function useForwardScore(
           .maybeSingle(),
         client.from('applications').select('*').eq('member_id', userId),
         client.from('mock_interviews').select('*').eq('user_id', userId),
-        client.from('messages').select('id').eq('user_id', userId).eq('is_read', false),
+        client.from('messages').select('id, sender_type').eq('user_id', userId).eq('is_read', false),
       ])
 
       if (cancelled) return
@@ -152,6 +164,19 @@ export function useForwardScore(
 
       const now = new Date()
       const thirtyDaysAgo = new Date(now.getTime() - 30 * MS_PER_DAY)
+      const sevenDaysAgo = new Date(now.getTime() - RECENT_SUBMISSION_DAYS * MS_PER_DAY)
+
+      // N13a lifecycle signals -- deliberately narrower/different-shaped
+      // than the momentum pillar inputs below (see field docstrings on
+      // NextBestMoveContext for why each one differs), derived from the
+      // same already-fetched rows, zero new queries.
+      const hasUpcomingInterview = applications.some(
+        (a) => a.interview_date && new Date(a.interview_date) >= now
+      )
+      const submittedRecently = applications.some(
+        (a) => a.date_submitted && new Date(a.date_submitted) >= sevenDaysAgo
+      )
+      const hasUnreadInboundMessages = unreadMessages.some((m) => m.sender_type !== 'member')
 
       const inputs: ForwardScoreInputs = {
         forwardDnaCompletenessScore,
@@ -172,7 +197,12 @@ export function useForwardScore(
       }
 
       const score = computeForwardScore(inputs)
-      const move = getNextBestMove(score, { hasActiveApplication: inputs.momentum.hasActiveApplication })
+      const move = getNextBestMove(score, {
+        hasActiveApplication: inputs.momentum.hasActiveApplication,
+        hasUpcomingInterview,
+        submittedRecently,
+        hasUnreadInboundMessages,
+      })
 
       setForwardScore(score)
       setNextBestMove(move)

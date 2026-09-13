@@ -237,4 +237,95 @@ describe('useForwardScore', () => {
     // are both false, so momentum caps below the "all 4 signals" max.
     expect(careerMomentum.score).toBeLessThan(100)
   })
+
+  describe('N13a lifecycle signals reaching getNextBestMove', () => {
+    it('C1 guard: a completed mock interview with no future interview_date does NOT trigger prepare_for_interview', async () => {
+      const { client } = makeFakeClient(
+        allTables({
+          applications: { data: [], error: null },
+          mock_interviews: { data: [{ id: 'm1', user_id: 'u1', status: 'completed' }], error: null },
+        })
+      )
+
+      const { result } = renderHook(() => useForwardScore(baseProfile, client))
+      await waitFor(() => expect(result.current.loading).toBe(false))
+
+      // The pillar-side hasRecentOrUpcomingInterview is (correctly) true
+      // here -- completed mock interviews count for scoring. The point of
+      // C1 is that this must NOT leak into the Next Best Move CTA.
+      expect(result.current.hasRecentOrUpcomingInterview).toBe(true)
+      expect(result.current.nextBestMove!.key).not.toBe('prepare_for_interview')
+    })
+
+    it('a real future interview_date fires prepare_for_interview to /interviews', async () => {
+      const tomorrow = new Date(Date.now() + 86400000).toISOString()
+      const { client } = makeFakeClient(
+        allTables({
+          applications: { data: [{ id: 'a1', member_id: 'u1', status: 'interview', date_submitted: null, interview_date: tomorrow }], error: null },
+        })
+      )
+
+      const { result } = renderHook(() => useForwardScore(baseProfile, client))
+      await waitFor(() => expect(result.current.loading).toBe(false))
+
+      expect(result.current.nextBestMove!.key).toBe('prepare_for_interview')
+      expect(result.current.nextBestMove!.cta.to).toBe('/interviews')
+    })
+
+    it('C2 guard: a submission 10 days ago (within the pillar\'s 30-day window) does NOT fire follow_up_on_application -- only within the narrower 7-day window', async () => {
+      const tenDaysAgo = new Date(Date.now() - 10 * 86400000).toISOString()
+      const { client } = makeFakeClient(
+        allTables({
+          applications: { data: [{ id: 'a1', member_id: 'u1', status: 'submitted', date_submitted: tenDaysAgo, interview_date: null }], error: null },
+        })
+      )
+
+      const { result } = renderHook(() => useForwardScore(baseProfile, client))
+      await waitFor(() => expect(result.current.loading).toBe(false))
+
+      expect(result.current.nextBestMove!.key).not.toBe('follow_up_on_application')
+    })
+
+    it('a submission 2 days ago fires follow_up_on_application to /applications', async () => {
+      const twoDaysAgo = new Date(Date.now() - 2 * 86400000).toISOString()
+      const { client } = makeFakeClient(
+        allTables({
+          applications: { data: [{ id: 'a1', member_id: 'u1', status: 'submitted', date_submitted: twoDaysAgo, interview_date: null }], error: null },
+        })
+      )
+
+      const { result } = renderHook(() => useForwardScore(baseProfile, client))
+      await waitFor(() => expect(result.current.loading).toBe(false))
+
+      expect(result.current.nextBestMove!.key).toBe('follow_up_on_application')
+      expect(result.current.nextBestMove!.cta.to).toBe('/applications')
+    })
+
+    it('C3 guard: an unread message the member sent themselves does NOT fire reply_to_strategist', async () => {
+      const { client } = makeFakeClient(
+        allTables({
+          messages: { data: [{ id: 'msg1', sender_type: 'member' }], error: null },
+        })
+      )
+
+      const { result } = renderHook(() => useForwardScore(baseProfile, client))
+      await waitFor(() => expect(result.current.loading).toBe(false))
+
+      expect(result.current.nextBestMove!.key).not.toBe('reply_to_strategist')
+    })
+
+    it('an unread inbound strategist message fires reply_to_strategist to /messages', async () => {
+      const { client } = makeFakeClient(
+        allTables({
+          messages: { data: [{ id: 'msg1', sender_type: 'strategist' }], error: null },
+        })
+      )
+
+      const { result } = renderHook(() => useForwardScore(baseProfile, client))
+      await waitFor(() => expect(result.current.loading).toBe(false))
+
+      expect(result.current.nextBestMove!.key).toBe('reply_to_strategist')
+      expect(result.current.nextBestMove!.cta.to).toBe('/messages')
+    })
+  })
 })
