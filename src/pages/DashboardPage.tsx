@@ -8,6 +8,7 @@ import { useEntitlements } from '@/hooks/useEntitlements'
 import { useForwardScore } from '@/hooks/useForwardScore'
 import { ForwardScoreWidget } from '@/components/forwardScore/ForwardScoreWidget'
 import { NextBestMoveCard } from '@/components/forwardScore/NextBestMoveCard'
+import { CareerVaultTeaserCard } from '@/components/careerVault/CareerVaultTeaserCard'
 import { PillarCard } from '@/components/forwardScore/PillarCard'
 import { supabase } from '@/lib/supabase'
 import { ensureProfile, calculateSearchReadiness, getReadinessFixLink } from '@/lib/profile'
@@ -16,7 +17,7 @@ import { ARCHETYPE_LABELS } from '@/lib/careerCompass'
 import { TOOL_TILES } from '@/data/tools'
 import {
   FileText, MessageSquare, Briefcase, Calendar, Mail,
-  Lightbulb, Flag, Loader2, Sparkles, Lock, Compass, X, Archive,
+  Lightbulb, Flag, Loader2, Sparkles, Lock, Compass, X,
 } from 'lucide-react'
 import type { Message, CalendarEvent } from '@/types'
 
@@ -245,12 +246,14 @@ export function DashboardPage() {
         </div>
       </div>
 
-      {/* Career Vault (locked layout position 5) -- graceful placeholder.
-          No Career Vault table/route/component exists on this branch yet
-          (unmerged, separate work), so this is intentionally the
-          least-polished card on the page: static, prop-less, zero queries,
-          and no link at all (there's nothing real to link to yet). */}
-      <CareerVaultPlaceholderCard />
+      {/* Career Vault (locked layout position 5) -- N12/N2 correction 2026-09-12:
+          Career Vault has been fully live since career_wins/career_win_capabilities
+          shipped, /career-vault is routed, and CareerVaultTeaserCard already exists
+          and is used on ForwardDnaPage.tsx. This now reuses that real component
+          instead of a stale "coming soon" placeholder that had gone false. */}
+      <div className="mt-6">
+        <CareerVaultTeaserCard />
+      </div>
 
       {/* Career Compass (locked layout position 6) */}
       <div className={`mt-6 ${CARD_CLASS}`}>
@@ -545,31 +548,6 @@ export function DashboardPage() {
         </div>
       </div>
     </MemberLayout>
-  )
-}
-
-/**
- * Task 7: Career Vault graceful placeholder. This branch has no
- * `career_wins` table, no `/career-vault` route, and no Career Vault
- * component to reuse (that work is unmerged, on a separate branch).
- * Deliberately the least-polished card on the page -- an honest
- * reflection of its actual current state, not something to over-build:
- * static, prop-less, zero queries, and no link/href at all (there's
- * nothing real to link to yet, so no dead `href="#"` either).
- */
-function CareerVaultPlaceholderCard() {
-  return (
-    <div className="mt-6 rounded-2xl border border-dashed border-border bg-surface-subtle p-6">
-      <div className="flex items-center gap-3">
-        <Archive className="h-5 w-5 flex-shrink-0 text-ink-muted" />
-        <div>
-          <h2 className="font-display !text-base font-semibold text-ink-muted">Career Vault — coming soon</h2>
-          <p className="mt-1 text-xs text-ink-muted">
-            Track evidence-backed career wins here once Career Vault ships.
-          </p>
-        </div>
-      </div>
-    </div>
   )
 }
 

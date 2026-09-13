@@ -24,7 +24,7 @@ export class NullEvidenceCoverageProvider implements EvidenceCoverageProvider {
       status: 'unavailable',
       score: null,
       unavailableReason:
-        'Career Vault does not exist yet, so no confirmed evidence is available to check skill coverage against. This dimension will score once a CareerVaultEvidenceCoverageProvider is implemented.',
+        'Career Vault evidence coverage is unavailable in this context -- no real evidence provider is active for this scoring run. Pass a CareerVaultEvidenceCoverageProvider to score this dimension.',
       findings: [],
     })
   }

@@ -99,9 +99,10 @@ export interface TargetRoleAlignmentInput {
 
 /**
  * Evidence coverage reads Career Vault's confirmed `career_win_capabilities`
- * — never invents substitute evidence (locked decision). Phase 1 ships
- * this interface plus a `NullEvidenceCoverageProvider` that reports
- * 'unavailable' honestly, since Career Vault does not exist yet.
+ * — never invents substitute evidence (locked decision). Career Vault has
+ * shipped (`CareerVaultEvidenceCoverageProvider`); a `NullEvidenceCoverageProvider`
+ * is also provided for callers/tests that want an honest 'unavailable' result
+ * without a database round trip (e.g. no evidence provider injected).
  */
 export interface EvidenceCoverageProvider {
   score(input: EvidenceCoverageInput): Promise<ResumeDimensionResult>

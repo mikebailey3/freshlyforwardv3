@@ -5,9 +5,11 @@ import { NullEvidenceCoverageProvider, CareerVaultEvidenceCoverageProvider } fro
 /**
  * Evidence Coverage must read Career Vault's confirmed
  * career_win_capabilities — never invent substitute evidence (locked
- * decision). Career Vault does not exist yet, so Phase 1 ships only the
- * interface (src/types/resume.ts#EvidenceCoverageProvider) plus this null
- * implementation, which reports the dimension as honestly 'unavailable'.
+ * decision). This suite covers the `NullEvidenceCoverageProvider`, which
+ * reports the dimension as honestly 'unavailable' whenever no real
+ * evidence provider is injected (e.g. no database round trip available),
+ * separately from `CareerVaultEvidenceCoverageProvider` below, which is
+ * the real, shipped implementation.
  */
 describe('NullEvidenceCoverageProvider', () => {
   it('reports the dimension as unavailable with a null score, never invented evidence', async () => {

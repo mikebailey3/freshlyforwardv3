@@ -51,11 +51,11 @@ import type { MemberProfile } from '@/types'
  */
 
 /**
- * Forward-looking placeholder for Phase 9's `member_job_exclusion_rules`
- * table, which does not exist yet. Modeled as a real (if currently
- * unused) type -- rather than `unknown[]` -- so Phase 9 only has to add
- * the query and populate this array; it does not need to touch this
- * interface's shape or any Phase 0 call site.
+ * Type for a member's persistent "don't show me this again" exclusion
+ * rule. `member_job_exclusion_rules` (Phase 9, `20260914000000_member_feedback_and_exclusion_rules.sql`)
+ * has shipped and is actively read/written by `exclusionRules.ts`'s
+ * `getExclusionRules`/`addExclusionRule`/`removeExclusionRule` -- this is
+ * the real, shared type those functions already use, not a placeholder.
  */
 export interface MemberExclusionRule {
   ruleType: 'company' | 'title_keyword' | 'industry'
@@ -73,7 +73,7 @@ export interface MemberOpportunityProfile {
   confirmedCapabilities: string[]
   /** Career Compass's current readiness_scores.careerDirection, or null if none/not completed. */
   careerDirectionScore: number | null
-  /** Always empty until Phase 9 wires the real table -- present now so later phases don't change this interface's shape. */
+  /** Member's persistent exclusion rules (Phase 9, shipped) -- populated from `member_job_exclusion_rules` via `getExclusionRules` in the real async fetch path below. Defaults to empty only for callers of the pure `composeMemberOpportunityProfile` step that don't pass any (e.g. tests constructing a profile manually). */
   exclusionRules: MemberExclusionRule[]
   /** OE 2.0 Phase 5: the member's current Master Resume's claimed skills, read-only. Never a second evidence tier -- see skillMatching.ts's isGroundedInResume. */
   resumeSkills: string[]

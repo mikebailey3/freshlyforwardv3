@@ -17,7 +17,7 @@ export function OnboardingDashboardIntro({ onNext }: OnboardingStepProps) {
     { icon: MessageSquare, title: 'Messages', desc: 'Direct communication with your Career Strategist.' },
     { icon: FileText, title: 'Documents', desc: 'Upload and manage your resume and other documents.' },
     { icon: CreditCard, title: 'Membership', desc: 'Manage your billing, pause, or cancel anytime.' },
-    { icon: Compass, title: 'Career Success', desc: 'Tools for long-term career growth — coming soon.' },
+    { icon: Compass, title: 'Career Success', desc: 'Achievement Vault, Career Roadmap, and coaching tools for long-term career growth.' },
     { icon: LayoutDashboard, title: 'Dashboard', desc: 'Your home base — everything in one place.' },
   ]
 
