@@ -1,7 +1,5 @@
 import { useState } from 'react'
 import { Download, Loader2 } from 'lucide-react'
-import { exportResumePdf } from '@/lib/resumeIntelligence/export/pdf/pdfExportImpl'
-import { exportResumeDocx } from '@/lib/resumeIntelligence/export/docx/exportResumeDocx'
 import type { ResumeViewModel } from '@/lib/resumeIntelligence/presentation/types'
 
 interface ResumeExportButtonsProps {
@@ -33,7 +31,16 @@ export function ResumeExportButtons({ viewModel, fileBaseName }: ResumeExportBut
     setBusyFormat(format)
     setError(null)
     try {
-      const blob = format === 'pdf' ? await exportResumePdf(viewModel) : await exportResumeDocx(viewModel)
+      // N9 (bundle code-splitting): dynamic-import each exporter on demand
+      // instead of statically at module scope. @react-pdf + docx/JSZip/yoga
+      // together are >1.6MB -- statically importing both here meant every
+      // member opening the resume builder downloaded BOTH export engines
+      // just to click one button. `busyFormat` already drives a spinner, so
+      // the extra network round-trip has no new UX cost.
+      const blob =
+        format === 'pdf'
+          ? await (await import('@/lib/resumeIntelligence/export/pdf/pdfExportImpl')).exportResumePdf(viewModel)
+          : await (await import('@/lib/resumeIntelligence/export/docx/exportResumeDocx')).exportResumeDocx(viewModel)
       downloadBlob(blob, `${fileBaseName}.${format}`)
     } catch (e) {
       setError(e instanceof Error ? e.message : `Could not export ${format.toUpperCase()}.`)
