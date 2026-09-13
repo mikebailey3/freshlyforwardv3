@@ -36,6 +36,13 @@ export function MessagesPage() {
   const [attachment, setAttachment] = useState<{ name: string; url: string; type: string } | null>(null)
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  // Per-conversation unread count, keyed by conversation id. Deliberately NOT
+  // derived from `messages` -- that state only ever holds the ACTIVE
+  // conversation's messages (loadMessages replaces it wholesale), so a
+  // derived count would read as 0 for every non-active conversation and
+  // collapse to 0 for the active one the instant it's marked read. Fetched
+  // as one aggregate query per load, grouped client-side -- no N+1 loop.
+  const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({})
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -52,6 +59,20 @@ export function MessagesPage() {
       .order('last_message_at', { ascending: false })
     const convs = (data ?? []) as ConversationInfo[]
     setConversations(convs)
+
+    if (convs.length > 0) {
+      const { data: unreadRows } = await supabase
+        .from('messages')
+        .select('conversation_id')
+        .in('conversation_id', convs.map((c) => c.id))
+        .neq('sender_type', 'member')
+        .eq('is_read', false)
+      const counts: Record<string, number> = {}
+      for (const row of (unreadRows ?? []) as Array<{ conversation_id: string }>) {
+        counts[row.conversation_id] = (counts[row.conversation_id] ?? 0) + 1
+      }
+      setUnreadCounts(counts)
+    }
 
     if (convs.length > 0 && !activeConversation) {
       const nonArchived = convs.find((c) => !c.is_archived)
@@ -81,6 +102,9 @@ export function MessagesPage() {
         .update({ is_read: true, read_at: new Date().toISOString() })
         .in('id', receivedUnread.map((m) => m.id))
       setMessages((prev) => prev.map((m) => (receivedUnread.some((r) => r.id === m.id) ? { ...m, is_read: true } : m)))
+      // Keep the badge/filter map in sync immediately rather than waiting on
+      // the next full loadConversations() -- this conversation is now read.
+      setUnreadCounts((prev) => ({ ...prev, [conversationId]: 0 }))
     }
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
@@ -162,10 +186,12 @@ export function MessagesPage() {
     }
   }
 
+  const getUnreadCount = (convId: string) => unreadCounts[convId] ?? 0
+
   const filteredConversations = conversations.filter((c) => {
     if (filter === 'archived') return c.is_archived
     if (filter === 'pinned') return c.is_pinned && !c.is_archived
-    if (filter === 'unread') return !c.is_archived
+    if (filter === 'unread') return !c.is_archived && getUnreadCount(c.id) > 0
     return !c.is_archived
   })
 
@@ -230,7 +256,7 @@ export function MessagesPage() {
               </div>
             ) : (
               filteredConversations.map((conv) => {
-                const unreadCount = messages.filter((m) => m.conversation_id === conv.id && m.sender_type !== 'member' && !m.is_read).length
+                const unreadCount = getUnreadCount(conv.id)
                 return (
                   <button
                     key={conv.id}

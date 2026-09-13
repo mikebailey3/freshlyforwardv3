@@ -181,6 +181,15 @@ describe('employment type (underscore regression)', () => {
       ),
     ).toBe('part_time')
   })
+
+  // Adzuna review (Priya Shah): contract_type: permanent -- Adzuna/UK-market
+  // shorthand meaning not-a-fixed-term-contract -- fell through every
+  // shared-normalizer pattern to unknown when contract_time was absent.
+  it('maps a contract_type-only permanent result to full_time end-to-end', () => {
+    const permanentOnly = { ...baseResult, contract_time: undefined, contract_type: 'permanent' }
+    expect(normalizeAdzunaEmploymentType(permanentOnly)).toBe('permanent')
+    expect(normalizeEmploymentType(normalizeAdzunaEmploymentType(permanentOnly))).toBe('full_time')
+  })
 })
 
 describe('fetchAdzunaPage', () => {
@@ -215,6 +224,47 @@ describe('fetchAdzunaPage', () => {
     expect(String(requestUrl)).toContain('https://api.adzuna.com/v1/api/jobs/us/search/2')
     expect(String(requestUrl)).toContain('app_id=secret-app-id')
     expect(String(requestUrl)).toContain('app_key=secret-app-key')
+  })
+
+  // Adzuna review (Ryan Mitchell): Adzuna's API path expects a lower-case
+  // country code; an upper-case --country flag (e.g. GB) previously hit a
+  // path Adzuna does not recognize.
+  it('lower-cases the country code in the request URL regardless of input casing', async () => {
+    vi.mocked(fetch).mockResolvedValue({
+      ok: true,
+      json: async () => ({ results: [], count: 0 }),
+    } as Response)
+
+    await fetchAdzunaPage({
+      country: 'GB',
+      page: 1,
+      query: 'engineer',
+      appId: 'id',
+      appKey: 'key',
+    })
+
+    const [requestUrl] = vi.mocked(fetch).mock.calls[0]
+    expect(String(requestUrl)).toContain('/v1/api/jobs/gb/search/1')
+  })
+
+  // Adzuna review (Ryan Mitchell): a hung upstream connection previously had
+  // no bound and could stall the whole sync run indefinitely.
+  it('attaches a bounded AbortSignal so a hung request cannot stall the run forever', async () => {
+    vi.mocked(fetch).mockResolvedValue({
+      ok: true,
+      json: async () => ({ results: [], count: 0 }),
+    } as Response)
+
+    await fetchAdzunaPage({
+      country: 'us',
+      page: 1,
+      query: 'engineer',
+      appId: 'id',
+      appKey: 'key',
+    })
+
+    const [, requestInit] = vi.mocked(fetch).mock.calls[0]
+    expect((requestInit as RequestInit).signal).toBeInstanceOf(AbortSignal)
   })
 })
 

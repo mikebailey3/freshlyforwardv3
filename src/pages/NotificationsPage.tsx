@@ -11,6 +11,7 @@ import {
   NOTIFICATION_TYPE_ICONS,
 } from '@/types'
 import { timeAgo, cn } from '@/lib/utils'
+import { isSafeAppLink } from '@/lib/url'
 import {
   MessageSquare, Search, AlertCircle, FileText, Calendar,
   Clock, User, FileCheck, CreditCard, Bell, CheckCheck,
@@ -215,9 +216,9 @@ export function NotificationsPage() {
                       <span className="text-xs text-ink-muted">
                         {timeAgo(notification.created_at)}
                       </span>
-                      {notification.link && (
+                      {isSafeAppLink(notification.link) && (
                         <a
-                          href={notification.link}
+                          href={notification.link!}
                           className="flex items-center gap-1 text-xs font-medium text-primary-600 hover:text-primary-400"
                         >
                           View

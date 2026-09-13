@@ -482,7 +482,14 @@ function App() {
           }
         />
 
-        <Route path="/internal/design-system" element={<DesignSystemShowcasePage />} />
+        <Route
+          path="/internal/design-system"
+          element={
+            <ProtectedRoute roles={['admin']}>
+              <DesignSystemShowcasePage />
+            </ProtectedRoute>
+          }
+        />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       {isPublicRoute && <SiteFooter />}

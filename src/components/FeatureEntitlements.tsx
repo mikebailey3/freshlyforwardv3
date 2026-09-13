@@ -1,7 +1,8 @@
-import { useState, type ReactNode } from 'react'
+import { useRef, useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { Lock, X, ArrowRight } from 'lucide-react'
 import { useEntitlements } from '@/hooks/useEntitlements'
+import { useFocusTrap } from '@/hooks/useFocusTrap'
 import type { Feature, FeatureKey } from '@/types'
 
 const planDisplayNames: Record<string, string> = {
@@ -35,6 +36,9 @@ export function UpgradeModal({
   isOpen,
   onClose,
 }: UpgradeModalProps) {
+  const dialogRef = useRef<HTMLDivElement>(null)
+  useFocusTrap(dialogRef, isOpen)
+
   if (!isOpen) return null
 
   const displayName = featureName || feature?.display_name || featureKey.replace(/_/g, ' ')
@@ -53,8 +57,10 @@ export function UpgradeModal({
       role="dialog"
       aria-modal="true"
       aria-labelledby="upgrade-modal-title"
+      aria-describedby="upgrade-modal-body"
     >
       <div
+        ref={dialogRef}
         className="relative w-full max-w-md rounded-2xl border border-border bg-surface-card p-6 shadow-xl animate-slide-up"
         onClick={(e) => e.stopPropagation()}
       >
@@ -71,7 +77,7 @@ export function UpgradeModal({
         <h2 id="upgrade-modal-title" className="mt-4 font-serif text-xl font-semibold text-ink">
           {title}
         </h2>
-        <p className="mt-2 text-sm text-ink-muted">{body}</p>
+        <p id="upgrade-modal-body" className="mt-2 text-sm text-ink-muted">{body}</p>
 
         {requiredPlan && (
           <div className="mt-4 border border-border bg-surface-subtle p-4">

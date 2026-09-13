@@ -1,5 +1,6 @@
-import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from 'react'
 import { X, Loader2 } from 'lucide-react'
+import { useFocusTrap } from '@/hooks/useFocusTrap'
 import { DeterministicCareerWinInterpreter } from '@/lib/careerVault/deterministicInterpreter'
 import { inferCapabilities } from '@/lib/careerVault/capabilityEngine'
 import { createCareerWin } from '@/lib/careerVault/careerWins'
@@ -114,6 +115,9 @@ export function AddCareerWinModal({ userId, employmentEntries, onClose, onSaved 
     onSaved(careerWin)
   }
 
+  const dialogRef = useRef<HTMLDivElement>(null)
+  useFocusTrap(dialogRef, true)
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && !saving) onClose()
@@ -125,6 +129,7 @@ export function AddCareerWinModal({ userId, employmentEntries, onClose, onSaved 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
       <div
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby="cw-modal-title"
@@ -143,7 +148,11 @@ export function AddCareerWinModal({ userId, employmentEntries, onClose, onSaved 
           </button>
         </div>
 
-        {error && <div className="mb-4 border border-error-700 bg-error-950 px-4 py-2.5 text-sm text-error-300">{error}</div>}
+        {error && (
+          <div role="alert" className="mb-4 border border-error-700 bg-error-950 px-4 py-2.5 text-sm text-error-300">
+            {error}
+          </div>
+        )}
 
         {step === 'input' && (
           <form onSubmit={handleContinue} className="space-y-4">

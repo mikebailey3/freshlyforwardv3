@@ -26,6 +26,16 @@ export interface NotificationPayload {
 
 export interface NotificationSendResult {
   success: boolean
+  /**
+   * REQUIRED, never optional -- this is the one field every provider must
+   * state honestly. `true` means no email was actually delivered (or ever
+   * attempted); `success: true` alone does NOT mean "delivered", it only
+   * ever meant "the provider call didn't error". Callers that persist
+   * delivery state (e.g. `match_digest_log`) must gate that write on
+   * `simulated === false`, not on `success` alone -- see
+   * `NoOpNotificationProvider` below for why a doc comment isn't enough.
+   */
+  simulated: boolean
   /** Provider-assigned message id, when available -- opaque, never parsed/relied upon by this codebase. */
   providerMessageId?: string
   error?: string
@@ -57,7 +67,19 @@ export class NoOpNotificationProvider implements NotificationProvider {
   readonly name = 'noop'
 
   async send(payload: NotificationPayload): Promise<NotificationSendResult> {
-    console.log(`[NoOpNotificationProvider] Would send to ${payload.toEmail}: "${payload.subject}"`)
-    return Promise.resolve({ success: true, providerMessageId: undefined })
+    console.log(`[SIMULATED -- NOT SENT] [NoOpNotificationProvider] Would send to ${maskEmail(payload.toEmail)}: "${payload.subject}"`)
+    return Promise.resolve({ success: true, simulated: true, providerMessageId: undefined })
   }
+}
+
+/**
+ * Masks an email for console/log output -- this script can run against real
+ * member data before a real provider exists, and logs get copied/retained
+ * far more often than people expect. `j***@example.com` is enough to spot-
+ * check the right member was targeted without printing the full address.
+ */
+function maskEmail(email: string): string {
+  const [local, domain] = email.split('@')
+  if (!domain) return '***'
+  return `${local[0] ?? '*'}***@${domain}`
 }

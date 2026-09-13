@@ -103,6 +103,7 @@ async function main() {
   const now = new Date()
   const results: AttemptResult[] = []
   let sentCount = 0
+  let simulatedCount = 0
 
   for (const profile of profiles) {
     const label = `member ${profile.user_id}`
@@ -155,6 +156,17 @@ async function main() {
         throw new Error(`Provider ${provider.name} failed to send: ${sendResult.error ?? 'unknown error'}`)
       }
 
+      if (sendResult.simulated) {
+        // No email was actually sent -- do NOT write a "delivered" row into
+        // match_digest_log. Skipping the insert makes this structurally
+        // impossible to mistake for a real send, regardless of who runs
+        // this script or against which Supabase project: re-running stays
+        // idempotent and simply re-plans the same digest next time.
+        simulatedCount++
+        results.push({ label, status: 'success' })
+        continue
+      }
+
       const { error: logError } = await supabase
         .from('match_digest_log')
         .insert({ member_id: profile.user_id, match_ids: plan.matchIds })
@@ -174,6 +186,9 @@ async function main() {
   console.log('=== Alerts & Digests: Send Summary ===')
   console.log(`Members considered: ${summary.total} (succeeded: ${summary.succeeded}, failed: ${summary.failed})`)
   console.log(`Digests sent this run (via ${provider.name}): ${sentCount}`)
+  if (simulatedCount > 0) {
+    console.log(`WARNING: NO EMAILS WERE ACTUALLY SENT for ${simulatedCount} member(s) -- provider '${provider.name}' is a simulated no-op. Nothing was written to match_digest_log for these.`)
+  }
   console.log(`Status: ${summary.status.toUpperCase()}`)
   console.log('========================================')
 

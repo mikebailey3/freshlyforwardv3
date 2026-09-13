@@ -1,3 +1,4 @@
+
 /**
  * Job sourcing sync -- pulls listings from the Adzuna job search API and
  * upserts them into `scraped_jobs`. This replaced an earlier Indeed HTML
@@ -100,6 +101,21 @@ function requireAdzunaCredentials(): { appId: string; appKey: string } {
   }
 }
 
+// Deliberately does NOT run its own consecutive-miss/closed-role detection
+// (unlike scrapeCompanies.ts's deactivateGoneJobs) -- Adzuna is a ranked
+// search API, not a fixed company-board dump, so "missing from this run's
+// paginated results" is a much weaker signal than "missing from a full
+// board fetch" and would risk false-deactivating still-open roles that
+// simply ranked off-page this run. Adzuna rows are NOT exempt from
+// staleness overall, though: scrapeCompanies.ts's deactivateStaleJobs(45)
+// sweep is deliberately global (no source filter), and scrapeCompanies.ts
+// IS scheduled (every 6 hours -- see docs/job-discovery-pipeline.md), so it
+// still ages out Adzuna rows even though this script itself is NOT in that
+// schedule (Adzuna stays manual-invocation-only pending the licensing-tier
+// decision -- see the same doc). Practical consequence: Adzuna rows are
+// only *re-confirmed* (scraped_at bumped) when a human runs this script by
+// hand; coverage decays toward inactive without manual runs, which is the
+// fail-safe direction.
 async function upsertJobs(client: SupabaseClient, jobs: ScrapedJobInput[]): Promise<void> {
   if (jobs.length === 0) return
 

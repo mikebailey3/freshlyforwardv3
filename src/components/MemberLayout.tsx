@@ -236,14 +236,6 @@ export function MemberLayout({ children }: { children: ReactNode }) {
       {/* Desktop top header */}
       <header className="sticky top-0 z-20 hidden border-b border-border bg-surface-card lg:block lg:pl-64">
         <div className="flex items-center justify-end gap-4 px-6 py-3">
-          <div className="relative flex-1 max-w-md">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-muted" />
-            <input
-              type="search"
-              placeholder="Search opportunities, tools, and more..."
-              className="w-full border border-border bg-surface-subtle py-2 pl-9 pr-3 text-sm text-ink-muted placeholder:text-ink-muted focus:border-primary-300 focus:outline-none"
-            />
-          </div>
           <Link to="/notifications" className="relative p-2 text-ink-muted hover:bg-surface-hover">
             <Bell className="h-5 w-5" />
             {unreadNotifications > 0 && (

@@ -163,6 +163,7 @@ export function parseAdzunaJobs(raw: unknown, searchQuery: string, country = 'us
 }
 
 export const ADZUNA_RESULTS_PER_PAGE = 20
+export const ADZUNA_REQUEST_TIMEOUT_MS = 15_000
 
 export interface AdzunaFetchOptions {
   country: string
@@ -192,7 +193,7 @@ export async function fetchAdzunaPage(options: AdzunaFetchOptions): Promise<Adzu
     resultsPerPage = ADZUNA_RESULTS_PER_PAGE,
   } = options
 
-  const url = new URL(`https://api.adzuna.com/v1/api/jobs/${country}/search/${page}`)
+  const url = new URL(`https://api.adzuna.com/v1/api/jobs/${country.toLowerCase()}/search/${page}`)
   url.searchParams.set('app_id', appId)
   url.searchParams.set('app_key', appKey)
   url.searchParams.set('results_per_page', String(resultsPerPage))
@@ -200,8 +201,14 @@ export async function fetchAdzunaPage(options: AdzunaFetchOptions): Promise<Adzu
   if (location) url.searchParams.set('where', location)
   url.searchParams.set('content-type', 'application/json')
 
+  // Adzuna review (N3-adjacent, Ryan Mitchell): without a bounded timeout, a
+  // hung/stalled connection blocks this page -- and every page after it,
+  // since scrapeJobs.ts awaits pages sequentially -- for the life of the
+  // process. AbortSignal.timeout is the platform-native fetch cancellation;
+  // no extra dependency needed.
   const response = await fetch(url.toString(), {
     headers: { 'User-Agent': 'FreshlyForwardOpportunityEngine/1.0' },
+    signal: AbortSignal.timeout(ADZUNA_REQUEST_TIMEOUT_MS),
   })
 
   if (!response.ok) {

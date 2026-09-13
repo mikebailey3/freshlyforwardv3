@@ -16,3 +16,25 @@ export function isSafeHttpUrl(value: string | null | undefined): boolean {
     return false
   }
 }
+
+/**
+ * Guards a `notifications.link` value before it's rendered as a live `href`.
+ * Unlike `isSafeHttpUrl`, notification links are legitimately EITHER an
+ * absolute external URL (rare today, but the schema doesn't forbid it) OR a
+ * same-origin in-app route written by trusted server-side triggers (e.g.
+ * `/strategist/applications` -- see
+ * supabase/migrations/20260821010000_interviews_reports_profile_upgrade.sql).
+ * `isSafeHttpUrl` alone rejects every relative path (`new URL('/x')` throws
+ * without a base), which would silently hide every real in-app notification
+ * link -- a functional regression, not just an over-tightening.
+ *
+ * A relative path is accepted only when it starts with exactly one `/` and
+ * is NOT protocol-relative (`//host/...`) or a backslash-based bypass of the
+ * same trick (`/\host/...` -- browsers treat `\` as `/` for special schemes,
+ * so `/\evil.com` can resolve off-origin exactly like `//evil.com`).
+ */
+export function isSafeAppLink(value: string | null | undefined): boolean {
+  if (!value) return false
+  if (isSafeHttpUrl(value)) return true
+  return value.startsWith('/') && !value.startsWith('//') && !value.startsWith('/\\')
+}

@@ -12,6 +12,12 @@ describe('NoOpNotificationProvider', () => {
     expect(result.success).toBe(true)
   })
 
+  it('honestly reports simulated: true -- no email was ever actually sent', async () => {
+    const provider = new NoOpNotificationProvider()
+    const result = await provider.send(makePayload())
+    expect(result.simulated).toBe(true)
+  })
+
   it('exposes a log-friendly name identifying it as the deferred/no-provider-chosen default', () => {
     const provider = new NoOpNotificationProvider()
     expect(provider.name).toBe('noop')

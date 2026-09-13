@@ -166,7 +166,12 @@ const EMPLOYMENT_TYPE_PATTERNS: Array<{ type: NormalizedEmploymentType; pattern:
   { type: 'temporary', pattern: /\btemp(orary)?\b|\bseasonal\b/i },
   { type: 'contract', pattern: /\bcontract(or)?\b|\bfreelance\b|\b1099\b/i },
   { type: 'part_time', pattern: /\bpart[\s-]?time\b/i },
-  { type: 'full_time', pattern: /\bfull[\s-]?time\b|\bfte\b/i },
+  // "Permanent" is UK/EU shorthand contrasting with contract/temporary
+  // roles (Adzuna and other EU-market sources use it heavily) -- it maps
+  // onto the same canonical bucket as full_time/FTE, not a separate enum
+  // value, since it describes contract duration/permanence rather than
+  // hours.
+  { type: 'full_time', pattern: /\bfull[\s-]?time\b|\bfte\b|\bpermanent\b/i },
 ]
 
 /** Maps free-text employment-type strings from any provider (Lever's `commitment`, Ashby's `employmentType`, etc.) onto one shared canonical enum. */

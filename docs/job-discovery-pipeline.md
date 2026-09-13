@@ -1,9 +1,9 @@
 # Job Discovery Pipeline (Scheduled)
 
 Automates what used to be manual `npm run` commands: scraping Greenhouse /
-Lever / Ashby public job-board APIs plus Adzuna job-search results into
-`scraped_jobs`, then scoring every active member against every active job
-into `job_matches` via FreshFit.
+Lever / Ashby public job-board APIs into `scraped_jobs`, then scoring every
+active member against every active job into `job_matches` via FreshFit.
+(Adzuna is intentionally excluded from the schedule -- see below.)
 
 Runs via `.github/workflows/job-discovery-pipeline.yml`, on a schedule
 (every 6 hours, UTC) and on-demand (`workflow_dispatch`). It runs the
@@ -12,11 +12,25 @@ existing scripts unchanged:
 1. `npm run scrape:companies` -- Greenhouse/Lever/Ashby only. `scrapeIndeed.ts`
    is intentionally excluded (ToS risk); it stays a manual, non-scheduled
    fallback.
-2. `npm run scrape:jobs` -- Adzuna job-search API. Requires `ADZUNA_APP_ID`
-   and `ADZUNA_APP_KEY` in addition to the standard Supabase secrets.
-3. `npm run sync:freshfit` -- always attempted, even if step 1 hard-fails,
+2. `npm run sync:freshfit` -- always attempted, even if step 1 hard-fails,
    because it re-scores against the existing job backlog, not just this
    cycle's new finds.
+
+### Deliberately NOT scheduled: `npm run scrape:jobs` (Adzuna)
+
+Adzuna is **manual-invocation-only** and is not part of this workflow. Per a
+standing owner decision, it runs on the free developer tier and must **not**
+be added to CI until the licensing-tier question (free dev tier vs.
+FreshlyForward's commercial/paid-member use) and the member-facing
+attribution requirement are resolved. Run it by hand when needed:
+
+```
+npm run scrape:jobs -- --query "customer service" --location "Dallas, TX"
+```
+
+Because it is manual, Adzuna rows are only re-confirmed when a human runs
+it. The global 45-day `deactivateStaleJobs` sweep inside `scrape:companies`
+still ages them out, so coverage decays rather than going stale-but-visible.
 
 ## Required GitHub secrets
 
@@ -28,8 +42,10 @@ already read locally -- no renaming, no second config system for CI:
 |---|---|
 | `VITE_SUPABASE_URL` | Same Supabase project URL used locally / in the app's own env |
 | `SUPABASE_SERVICE_ROLE_KEY` | Supabase **service role** key (not the anon key) -- required to write past RLS |
-| `ADZUNA_APP_ID` | Adzuna developer app ID used by `npm run scrape:jobs` |
-| `ADZUNA_APP_KEY` | Adzuna developer app key used by `npm run scrape:jobs` |
+
+`ADZUNA_APP_ID` / `ADZUNA_APP_KEY` are deliberately **not** CI secrets --
+`scrape:jobs` is not scheduled (see above). They are local-env only, for
+manual runs.
 
 Only a repo admin can set these; this is a manual, credential-handling step
 that has to happen before the workflow can do anything real.

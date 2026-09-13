@@ -138,6 +138,14 @@ describe('normalizeEmploymentType', () => {
     expect(normalizeEmploymentType('FULLTIME')).toBe('full_time')
   })
 
+  // Adzuna review (N3-adjacent) -- "permanent" is UK/EU-market shorthand
+  // contrasting with contract/temp roles; without this it silently fell
+  // through every pattern to "unknown".
+  it('maps "permanent" (UK/EU contract-duration term) to full_time', () => {
+    expect(normalizeEmploymentType('Permanent')).toBe('full_time')
+    expect(normalizeEmploymentType('permanent')).toBe('full_time')
+  })
+
   it('maps common part-time variants', () => {
     expect(normalizeEmploymentType('Part time')).toBe('part_time')
   })
