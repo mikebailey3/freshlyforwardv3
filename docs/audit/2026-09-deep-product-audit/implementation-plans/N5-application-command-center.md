@@ -23,6 +23,24 @@
 > The rest of this plan (interview entity design, contacts, offer/rejection structure, FreshFit
 > snapshot, strategist visibility) is unaffected and stands as originally written.
 
+> ## FURTHER CORRECTION -- DOMAIN BOUNDARY WARNING (do not implement until resolved)
+> ChatGPT/owner review flagged that **§3.1's proposed state machine
+> (`Discovered → Saved → Preparing → Applied → Follow-up → Interview → Offer/Rejected/Withdrawn`)
+> must not be automatically implemented as a single flat lifecycle directly on the `applications`
+> table.** FreshlyForward already deliberately separates the **opportunities vocabulary**
+> (`scraped_jobs`/`job_matches`/`opportunities` -- candidate leads sourced by Opportunity Engine,
+> pre-commitment) from the **applications vocabulary** (`applications` -- a member has actually
+> applied). `Discovered` and `Saved` are opportunity-side states that predate an `applications` row
+> existing at all; collapsing them into one state machine on `applications` would erase that
+> intentional boundary rather than respect it. This is exactly the "two unexplained opportunity
+> vocabularies" problem N4 (product coherence pass, already listed as a hard dependency in §5 above)
+> exists to resolve -- N5 must not quietly pre-empt that answer by baking a merged state machine into
+> its own design. **Note: this correction message arrived truncated after "FreshlyForward already
+> deliberately separates: opportunities" -- the exact intended continuation/wording has been
+> requested from the owner and this banner will be updated once received.** Until N4 resolves the
+> vocabulary question and John Carter re-reviews §3.1 against that resolution, treat §3.1 as **not
+> approved for implementation as currently worded**. This plan remains NEXT-1/not-started regardless.
+
 **Status:** PLANNED — not started (documentation only; no schema or product code created by this
 audit). **Owner:** John Carter (architecture) + an Opportunity Engine / Career CRM delivery
 specialist (Emily Foster is the charter's Career CRM Lead — she should own delivery).

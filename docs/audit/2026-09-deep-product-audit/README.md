@@ -188,15 +188,17 @@ Full detail: `01-repo-architecture-audit.md` §18.
 
 ## Database & migration verification status
 
-**CORRECTED (second pass):** ChatGPT/DB-Lead has since verified directly against the connected
-Supabase FreshlyForward project that **36 of 46 remote migration-history records exist**, including
-the full Opportunity Engine 2.0 chain and its security-hardening migrations, and that the
-corresponding OE tables exist remotely. **This materially de-risks N1's highest-priority Tier 1
-set.** It does NOT close N1: these migrations have not been reapplied and must not be; the
-remaining task is confirming the 36 recorded migrations match their local file content exactly and
-resolving the ~10 that don't yet have a remote record -- repo-to-remote reconciliation, not blind
-trust that "recorded" means "fully correct." New Supabase Security Advisor findings from this pass
-are preserved for separate review, not treated as resolved. Full detail:
+**CORRECTED (second pass -- further corrected):** ChatGPT/DB-Lead has since verified directly
+against the connected Supabase FreshlyForward project that **36 remote migration-history records
+were observed** (out of 46 local files), that the Opportunity Engine 2.0 chain and its
+security-hardening migrations are represented remotely, and that corresponding OE objects/tables
+were observed. **This is not "the entire Tier 1 list is confirmed"** -- no individual Tier 1
+migration has been matched against remote evidence one by one yet. It does NOT close N1: these
+migrations have not been reapplied and must not be; the remaining task is repo-to-remote
+reconciliation -- comparing each object's cumulative intended end-state (all migrations touching it,
+combined) against its live definition, not an exact match against any single originating file --
+and resolving the migrations without a remote record. New Supabase Security Advisor findings from
+this pass are preserved for separate review, not treated as resolved. Full detail:
 `11-recommendation-duplication-correction.md` §9.
 
 **Explicit statement, unchanged from the first pass:** uncertain migration status has **NOT** been
@@ -228,7 +230,7 @@ Summary:
 
 ```
 TIER 0 (parallel, days)         N1 Schema Recon * N2 Dashboard Fix * N3 Trust Pack * N9 Bundle Split
-                                  N11 As-Built Sweep * N12 Doc-Truth Defects * N13 Signal Activation
+                                  N11 As-Built Sweep * N12 Doc-Truth Defects * N13a Signal Activation
 TIER 1 (needs N1)               N4 Coherence * N7 Analytics * N8 E2E * N10 Prerendering (←N9)
 TIER 1b (N5-independent)        X3a Interview Activation * X5a/b * X7 Canonical Visibility * X4c
 TIER 2 (needs N1+N4)            N5 Application Command Center (adopt-don't-rebuild)
@@ -243,7 +245,7 @@ TIER 4 (no N5 dependency)       X2 Career Passport [dependency unverified] * X4d
 **NOW (launch gate):** N1 Schema Reconciliation · N2 Dashboard Truth Fix · N3 Member-Trust
 Correctness Pack · N4 Product Coherence Pass · N7 Minimum Product Analytics · N8 E2E Journey
 Coverage · N9 Bundle Code-Splitting · N10 Public-Route Prerendering · N11 As-Built Documentation
-Sweep (widened) · **N12 Documentation-Truth Defect Pack (new)** · **N13 Discarded-Signal Activation
+Sweep (widened) · **N12 Documentation-Truth Defect Pack (new)** · **N13a Lifecycle Signal Activation
 (new).** *N5 and N6 have been removed from NOW -- see §7 of the correction doc.*
 
 **NEXT (ranked):** N5 Application Command Center (adopt-don't-rebuild) · X7 Strategist

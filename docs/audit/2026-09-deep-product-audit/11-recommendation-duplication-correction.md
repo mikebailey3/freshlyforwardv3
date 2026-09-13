@@ -151,7 +151,11 @@ Coherence Pass · N7 Minimum Product Analytics · N8 E2E Journey Coverage · N9 
 N10 Public-Route Prerendering · N11 As-Built Documentation Sweep (**widened** to cover every newly
 COMPLETE item + the Shipped-But-Uncalled Register) · **N12 Documentation-Truth Defect Pack (NEW)** —
 fix the four member-reachable "Career Vault does not exist yet" strings, same gate as D-05 ·
-**N13 Discarded-Signal Activation (NEW)** — X8a + X4a as one small commit; highest value-per-hour
+**N13 Discarded-Signal Activation -- SPLIT into N13a (Lifecycle Signal Activation, X8a, in
+progress) and N13b (Evidence-Specific Next Best Move Integration, X4a, blocked on its own
+architecture ruling)** -- see `implementation-plans/N13a-lifecycle-signal-activation.md` and
+`implementation-plans/N13b-evidence-specific-next-best-move.md`. N13a remains the highest
+value-per-hour
 item on the board.
 
 **Removed from NOW: N5 and N6.** Both remain real work, but N5's "everything depends on it"
@@ -246,16 +250,29 @@ Supabase FreshlyForward project that:
   `07-migration-reconciliation.md`
 - **Corresponding OE tables exist remotely**
 
-**This materially de-risks N1** — the highest-priority security-sensitive set (Tier 1 in the N1
-implementation plan) now has direct evidence of remote application, not just a non-production
-execution manifest. **This does not mean N1 is closed.** Per the owner's explicit instruction:
+**Correction (per further ChatGPT/DB-Lead review): the safe verified statement is narrower than
+the original wording above implied.** Do not claim "the entire Tier 1 list is confirmed" — that has
+not been established, because no individual Tier 1 migration has yet been matched against remote
+evidence one by one. What is actually verified is exactly the three bullet points above: 36 remote
+migration-history records were observed, the OE 2.0 chain and its security-hardening migrations are
+represented remotely, and corresponding OE objects/tables were observed. Remaining repo-vs-remote
+reconciliation is still required before any Tier 1 item can be called closed. **This does not mean
+N1 is closed.** Per the owner's explicit instruction:
 
 - These migrations have **not** been reapplied, and must not be
 - The statement "46/46 migrations unverified" in the original `07-migration-reconciliation.md` is
-  **superseded by this new evidence for the 36 confirmed** — but the remaining **task is repo-to-remote
-  reconciliation** (confirming the 36 recorded migrations match their local file content exactly,
-  and identifying and resolving the remaining ~10 that don't yet have a remote record), **not blind
-  trust that "recorded" means "fully reconciled and correct."**
+  **narrowed by this new evidence for the 36 with a remote history record** — but the remaining
+  **task is repo-to-remote reconciliation**, and the methodology for that reconciliation is corrected
+  below, **not blind trust that "recorded" means "fully reconciled and correct."**
+
+**Reconciliation methodology correction:** do **not** require every current live object to "exactly
+match" the historical migration file that originally created it. Later migrations can legitimately
+modify that same object (add a column, tighten a policy, replace a function body), so a live object
+differing from its *originating* file is expected, not drift. The correct check is: migration
+history + the **cumulative intended end-state** across every migration touching that object, compared
+against the object's actual current definition — and identify genuine drift from that final expected
+schema/policy/function definition, not from any single historical snapshot. Do not mistake a
+legitimate later migration for drift.
 - The newly-surfaced **Supabase Security Advisor findings** from this verification pass are
   preserved for separate review and are **not** treated as resolved by this correction.
 

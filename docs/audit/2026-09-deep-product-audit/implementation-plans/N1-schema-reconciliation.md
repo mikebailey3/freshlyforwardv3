@@ -1,14 +1,17 @@
 # Implementation Plan — N1: Schema Reconciliation & Migration-State Verification
 
-> ## UPDATE AFTER REPO-TRUTH RECONCILIATION (2026-09-12, second pass)
-> ChatGPT/DB-Lead has since completed a first pass of Step 1 below: **36 of 46 remote
-> migration-history records confirmed to exist**, including the full OE 2.0 chain and its
-> security-hardening migrations (the entire Tier 1 list below), with corresponding tables confirmed
-> present remotely. **This materially de-risks Tier 1.** Remaining work is now narrower: (a) Step 3
-> object-level content reconciliation for the 36 confirmed migrations (does the live object exactly
-> match the file?), and (b) identify + resolve the ~10 migrations without a remote record yet. No
-> migration has been reapplied. New Security Advisor findings from this pass are preserved for
-> separate review. Full detail: `../11-recommendation-duplication-correction.md` §9.
+> ## UPDATE AFTER REPO-TRUTH RECONCILIATION (2026-09-12, second pass -- corrected)
+> ChatGPT/DB-Lead has since completed a first pass of Step 1 below: **36 remote migration-history
+> records were observed** (out of 46 local files), the OE 2.0 chain and its security-hardening
+> migrations are represented remotely, and corresponding OE objects/tables were observed. **This is
+> not the same claim as "the entire Tier 1 list is confirmed"** -- no individual Tier 1 migration has
+> yet been matched against remote evidence one by one, so that stronger claim is not yet supported
+> and must not be asserted until Step 3 below actually does that per-item work. Remaining work is: (a)
+> Step 3 object-level reconciliation for the migrations with a remote history record -- see the
+> corrected methodology in Step 3 below (cumulative end-state, not single-file exact match), and (b)
+> identify + resolve the migrations without a remote record yet. No migration has been reapplied. New
+> Security Advisor findings from this pass are preserved for separate review. Full detail:
+> `../11-recommendation-duplication-correction.md` §9.
 
 **Status:** PLANNED — not started. **Owner:** ChatGPT (Supabase/Database Lead) — exclusively, per
 charter rule 9. **Collaborators:** John Carter (architecture review of results), Ethan Cole
@@ -68,9 +71,16 @@ migration system, regardless of what its file header says.
 
 ### Step 3 — Object-level confirmation for the high-priority set (below)
 For each high-priority migration, confirm the specific object it claims to create/alter actually
-exists with the expected shape, using `information_schema` / `pg_catalog` — this catches the edge
+exists with the expected shape, using `information_schema` / `pg_catalog` -- this catches the edge
 case where a migration was applied outside the tracked migration flow (e.g. run by hand in the SQL
-editor and never recorded):
+editor and never recorded). **Methodology correction:** do not require the live object to exactly
+match the single migration file that originally created it -- later migrations can legitimately
+modify that same object (add a column, tighten an RLS policy, replace a function body), so a live
+object differing from its *originating* file is expected, not drift. Instead, compare the live object
+against the **cumulative intended end-state**: read every migration touching that object, in order,
+and build the expected final shape, then diff the live object against that final expected shape --
+not against any single historical snapshot. Only report something as drift if it deviates from that
+cumulative end-state.
 ```sql
 -- Table/column existence
 SELECT table_name, column_name FROM information_schema.columns
@@ -136,10 +146,11 @@ Step 1–3 method. Full list and per-file detail already in `07-migration-reconc
 ## 5. App code depending on possibly-unverified schema (already inventoried)
 
 `07-migration-reconciliation.md` lists the exact consuming files for every migration in its
-"whether application code currently depends on it" column — that inventory is the input to this
-step, not duplicated here. The headline: **every Tier 1 and Tier 2 migration has confirmed,
-named application-code consumers.** None of this is speculative or dead code being needlessly
-verified — real member/strategist-facing paths depend on every item in the priority list above.
+"whether application code currently depends on it" column -- that inventory is the input to this
+step, not duplicated here. The headline: **Tier 1 and Tier 2 migrations have named application-code
+consumers per that inventory** -- this describes repo dependency, not a verified-remote-status claim,
+which remains Step 1-3's job. None of this is speculative or dead code being needlessly verified --
+real member/strategist-facing paths depend on every item in the priority list above.
 
 ## 6. Deliverable
 
